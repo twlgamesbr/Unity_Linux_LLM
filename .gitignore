@@ -56,6 +56,27 @@ ProjectSettings/Packages/
 
 # Downloaded runtime bundles
 Assets/StreamingAssets/LlamaLib-v2.0.5/
+Assets/StreamingAssets/LlamaLib-v2.0.5.meta
+
+# Upstream package docs, samples, and tests kept out of repo-local baseline
+Assets/LLMUnity/CHANGELOG.md
+Assets/LLMUnity/CHANGELOG.md.meta
+Assets/LLMUnity/CHANGELOG.release.md
+Assets/LLMUnity/CHANGELOG.release.md.meta
+Assets/LLMUnity/CODE_OF_CONDUCT.md
+Assets/LLMUnity/CODE_OF_CONDUCT.md.meta
+Assets/LLMUnity/CONTRIBUTING.md
+Assets/LLMUnity/CONTRIBUTING.md.meta
+Assets/LLMUnity/Docs/
+Assets/LLMUnity/Docs.meta
+Assets/LLMUnity/Migration.md
+Assets/LLMUnity/Migration.md.meta
+Assets/LLMUnity/Samples/
+Assets/LLMUnity/Samples.meta
+Assets/LLMUnity/Tests/
+Assets/LLMUnity/Tests.meta
+Packages/com.gladekit.mcp-bridge/Tests/
+Packages/com.gladekit.mcp-bridge/Tests.meta
 
 # Unity runtime artifacts and local logs
 *.log
@@ -69,3 +90,7 @@ run_tests.log
 # Local helper/workspace files
 LOCALAI_UNITY-workspace.code-workspace
 compile_check.cs
+Assets/opencode.json
+Assets/opencode.json.meta
+cognee_memory_simulation.py
+*.slnx
