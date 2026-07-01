@@ -1,0 +1,21 @@
+{
+    "name": "NPCSystem.Runtime",
+    "rootNamespace": "NPCSystem",
+    "references": [
+        "undream.llmunity.Runtime",
+        "GladeAgenticAI.Core",
+        "Unity.InputSystem",
+        "Unity.Nuget.Newtonsoft-Json",
+        "Cloud.Unum.USearch",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,82 @@
+{
+  "description": "Smoke-query matrix for Unity Linux LLM codebase retrieval experiments",
+  "prompts": [
+    {
+      "id": "npcsystem_namespaces",
+      "category": "structural",
+      "prompt": "list namespaces used by NPCSystem",
+      "preferred_record_types": ["relation", "namespace", "using_directive", "file_overview", "runtime_summary"],
+      "preferred_regions": ["Runtime", "Editor"]
+    },
+    {
+      "id": "npcdialogue_asmdefs",
+      "category": "structural",
+      "prompt": "which asmdefs own npc dialogue runtime",
+      "preferred_record_types": ["assembly", "file_overview", "namespace", "runtime_summary"],
+      "preferred_regions": ["Runtime", "Editor"]
+    },
+    {
+      "id": "llmagent_references",
+      "category": "structural",
+      "prompt": "which scripts reference LLMAgent",
+      "preferred_record_types": ["relation", "using_directive", "file_overview", "type", "runtime_summary"],
+      "preferred_regions": ["Runtime", "Editor"]
+    },
+    {
+      "id": "namespace_summary_focus",
+      "category": "structural",
+      "prompt": "list all namespaces and references in the project",
+      "preferred_record_types": ["namespace", "file_overview", "assembly", "namespace_summary", "runtime_summary"],
+      "preferred_regions": ["Runtime", "Editor"]
+    },
+    {
+      "id": "localai_transport",
+      "category": "runtime",
+      "prompt": "where is LocalAI chat transport implemented",
+      "preferred_record_types": ["type", "file_overview", "member", "runtime_summary"],
+      "preferred_regions": ["Runtime"]
+    },
+    {
+      "id": "qdrant_classes",
+      "category": "runtime",
+      "prompt": "what classes handle qdrant rag",
+      "preferred_record_types": ["type", "file_overview", "runtime_summary", "member"],
+      "preferred_regions": ["Runtime"]
+    },
+    {
+      "id": "embeddings_owner",
+      "category": "runtime",
+      "prompt": "which script manages embeddings for llm rag",
+      "preferred_record_types": ["file_overview", "type", "runtime_summary", "member"],
+      "preferred_regions": ["Runtime"]
+    },
+    {
+      "id": "cognee_service",
+      "category": "runtime",
+      "prompt": "where is cognee memory service implemented",
+      "preferred_record_types": ["file_overview", "type", "runtime_summary", "member"],
+      "preferred_regions": ["Runtime"]
+    },
+    {
+      "id": "npc_dialogue_manager",
+      "category": "behavior",
+      "prompt": "how does the dialogue request reach LocalAI",
+      "preferred_record_types": ["member", "type", "file_overview", "runtime_summary"],
+      "preferred_regions": ["Runtime"]
+    },
+    {
+      "id": "scene_wiring_qdrant",
+      "category": "scene",
+      "prompt": "which scene objects use Qdrant",
+      "preferred_record_types": ["file_overview", "doc", "runtime_summary", "type"],
+      "preferred_regions": ["Runtime", "Scene"]
+    },
+    {
+      "id": "scene_components_remote",
+      "category": "scene",
+      "prompt": "which components must stay remote for LocalAI",
+      "preferred_record_types": ["file_overview", "type", "runtime_summary", "serialized_field"],
+      "preferred_regions": ["Runtime"]
+    }
+  ]
+}

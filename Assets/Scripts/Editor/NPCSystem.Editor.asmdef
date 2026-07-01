@@ -1,0 +1,22 @@
+{
+    "name": "NPCSystem.Editor",
+    "rootNamespace": "NPCSystem",
+    "references": [
+        "NPCSystem.Runtime",
+        "GladeKit.Bridge",
+        "GladeAgenticAI.Core",
+        "undream.llmunity.Runtime",
+        "Unity.Nuget.Newtonsoft-Json"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

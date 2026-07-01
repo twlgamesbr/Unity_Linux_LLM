@@ -1,0 +1,34 @@
+namespace NPCSystem
+{
+    public enum NPCFlowStage
+    {
+        SceneBootstrap,
+        ReferenceResolution,
+        ConfigurationValidation,
+        ProfileIndexBuild,
+        HistoryLoad,
+        HistoryRestore,
+        NPCSwitch,
+        UIInput,
+        RequestStart,
+        ActionSelection,
+        ActionExecution,
+        GrammarOverride,
+        GrammarRestore,
+        ContextRetrieval,
+        QdrantEmbedding,
+        QdrantSearch,
+        LocalRagReady,
+        LocalRagSearch,
+        CogneeSearch,
+        CogneeWrite,
+        PromptBuild,
+        DialogueGeneration,
+        LLMChat,
+        LLMStream,
+        ResponseComplete,
+        HistoryPersist,
+        SmokeValidation,
+        EditorWorkflow
+    }
+}

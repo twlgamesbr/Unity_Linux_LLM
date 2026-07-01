@@ -1,0 +1,387 @@
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.UI;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
+
+namespace NPCSystem
+{
+    [DefaultExecutionOrder(-400)]
+    public class NPCDialogueUIController : MonoBehaviour
+    {
+        [Header("Runtime")]
+        public NPCDialogueManager dialogueManager;
+        public Behaviour legacyKnowledgeBaseController;
+
+        [Header("Dialogue UI")]
+        public Dropdown characterSelect;
+        public InputField playerInput;
+        public Text aiText;
+        public Button stopButton;
+
+        [Header("Portraits")]
+        public RawImage butlerImage;
+        public RawImage maidImage;
+        public RawImage chefImage;
+
+        [Header("Notebook / Panels")]
+        public NotebookUIController notebookController;
+
+        bool _listenersBound;
+        bool _managerBound;
+        bool _readyForInput;
+        List<NPCProfile> _profiles = new List<NPCProfile>();
+
+        async void Start()
+        {
+            NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.SceneBootstrap, NPCFlowStatus.Start,
+                NPCFlowLogLevel.Debug, "NPCDialogueUIController starting.",
+                source: nameof(NPCDialogueUIController));
+
+            ResolveReferences();
+            DisableLegacyController();
+            SetInputEnabled(false);
+            BindUiListeners();
+
+            if (dialogueManager == null)
+            {
+                NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.SceneBootstrap, NPCFlowStatus.Error,
+                    NPCFlowLogLevel.Error, "NPCDialogueManager reference is missing.",
+                    source: nameof(NPCDialogueUIController));
+                return;
+            }
+
+            await dialogueManager.InitializeAsync();
+            BindManagerEvents();
+            PopulateDropdown();
+            await SyncDropdownToCurrentProfileAsync();
+
+            NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.SceneBootstrap, NPCFlowStatus.Success,
+                NPCFlowLogLevel.Debug, "NPCDialogueUIController ready.",
+                source: nameof(NPCDialogueUIController));
+        }
+
+        void OnDestroy()
+        {
+            UnbindManagerEvents();
+            UnbindUiListeners();
+        }
+
+        void ResolveReferences()
+        {
+            if (dialogueManager == null)
+            {
+                dialogueManager = GetComponent<NPCDialogueManager>();
+                if (dialogueManager == null)
+                {
+                    dialogueManager = FindAnyObjectByType<NPCDialogueManager>(FindObjectsInactive.Include);
+                }
+            }
+
+            if (legacyKnowledgeBaseController == null)
+            {
+                legacyKnowledgeBaseController = FindObjectsByType<Behaviour>(FindObjectsInactive.Include)
+                    .FirstOrDefault(behaviour => behaviour != null && behaviour.GetType().FullName == "LLMUnitySamples.KnowledgeBaseGame");
+            }
+
+            characterSelect = characterSelect != null ? characterSelect : FindComponent<Dropdown>("Canvas/Dropdown");
+            playerInput = playerInput != null ? playerInput : FindComponent<InputField>("Canvas/PlayerInput");
+            aiText = aiText != null ? aiText : FindComponent<Text>("Canvas/AIImage/AIText");
+            stopButton = stopButton != null ? stopButton : FindComponent<Button>("Canvas/StopButton");
+
+            butlerImage = butlerImage != null ? butlerImage : FindComponent<RawImage>("Canvas/ButlerImage");
+            maidImage = maidImage != null ? maidImage : FindComponent<RawImage>("Canvas/MaidImage");
+            chefImage = chefImage != null ? chefImage : FindComponent<RawImage>("Canvas/ChefImage");
+
+            notebookController = notebookController != null ? notebookController : FindAnyObjectByType<NotebookUIController>(FindObjectsInactive.Include);
+        }
+
+        void DisableLegacyController()
+        {
+            if (legacyKnowledgeBaseController != null)
+            {
+                legacyKnowledgeBaseController.enabled = false;
+            }
+        }
+
+        void BindUiListeners()
+        {
+            if (_listenersBound) return;
+
+            if (characterSelect != null) characterSelect.onValueChanged.AddListener(OnCharacterSelectionChanged);
+            if (playerInput != null)
+            {
+                playerInput.onSubmit.AddListener(OnInputFieldSubmit);
+                playerInput.onValueChanged.AddListener(OnValueChanged);
+            }
+            if (stopButton != null) stopButton.onClick.AddListener(OnStopPressed);
+            _listenersBound = true;
+        }
+
+        void UnbindUiListeners()
+        {
+            if (!_listenersBound) return;
+
+            if (characterSelect != null) characterSelect.onValueChanged.RemoveListener(OnCharacterSelectionChanged);
+            if (playerInput != null)
+            {
+                playerInput.onSubmit.RemoveListener(OnInputFieldSubmit);
+                playerInput.onValueChanged.RemoveListener(OnValueChanged);
+            }
+            if (stopButton != null) stopButton.onClick.RemoveListener(OnStopPressed);
+            _listenersBound = false;
+        }
+
+        void BindManagerEvents()
+        {
+            if (_managerBound || dialogueManager == null) return;
+
+            dialogueManager.onResponseStart.AddListener(HandleResponseStart);
+            dialogueManager.onResponseUpdated.AddListener(SetAIText);
+            dialogueManager.onResponseComplete.AddListener(HandleResponseComplete);
+            dialogueManager.onNPCChanged.AddListener(HandleNpcChanged);
+            dialogueManager.onError.AddListener(HandleError);
+
+            _managerBound = true;
+        }
+
+        void UnbindManagerEvents()
+        {
+            if (!_managerBound || dialogueManager == null) return;
+
+            dialogueManager.onResponseStart.RemoveListener(HandleResponseStart);
+            dialogueManager.onResponseUpdated.RemoveListener(SetAIText);
+            dialogueManager.onResponseComplete.RemoveListener(HandleResponseComplete);
+            dialogueManager.onNPCChanged.RemoveListener(HandleNpcChanged);
+            dialogueManager.onError.RemoveListener(HandleError);
+
+            _managerBound = false;
+        }
+
+        void PopulateDropdown()
+        {
+            _profiles = dialogueManager.Profiles.Where(profile => profile != null).ToList();
+            if (characterSelect == null) return;
+
+            characterSelect.ClearOptions();
+            characterSelect.AddOptions(_profiles.Select(profile => profile.GetDisplayName()).ToList());
+        }
+
+        async System.Threading.Tasks.Task SyncDropdownToCurrentProfileAsync()
+        {
+            if (dialogueManager == null || characterSelect == null || _profiles.Count == 0) return;
+
+            if (dialogueManager.currentProfile == null)
+            {
+                characterSelect.SetValueWithoutNotify(0);
+                await SelectProfileAsync(0);
+                return;
+            }
+
+            int index = _profiles.FindIndex(profile => profile == dialogueManager.currentProfile);
+            if (index < 0) index = 0;
+            characterSelect.SetValueWithoutNotify(index);
+            UpdatePortrait(dialogueManager.currentProfile);
+            SetInputEnabled(true);
+            _readyForInput = true;
+        }
+
+        void HandleNpcChanged(string displayName)
+        {
+            UpdatePortrait(dialogueManager.currentProfile);
+            _readyForInput = true;
+            SetInputEnabled(true);
+        }
+
+        void HandleResponseStart(string playerMessage)
+        {
+            NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.UIInput, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
+                "UI received response-start event.", source: nameof(NPCDialogueUIController),
+                npcSlug: dialogueManager != null && dialogueManager.currentProfile != null ? dialogueManager.currentProfile.GetNpcSlug() : null,
+                data: NPCFlowTextSanitizer.MergeSummary(new Dictionary<string, object>(), "player", playerMessage, false, 0));
+            if (playerInput != null) playerInput.interactable = false;
+            SetAIText("...");
+        }
+
+        void HandleResponseComplete(string npcName, string response)
+        {
+            NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.ResponseComplete, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
+                "UI received response-complete event.", source: nameof(NPCDialogueUIController), npcSlug: npcName,
+                data: NPCFlowTextSanitizer.MergeSummary(new Dictionary<string, object>(), "response", response, false, 0));
+            SetAIText(response);
+            if (playerInput != null)
+            {
+                playerInput.interactable = true;
+                playerInput.text = "";
+                playerInput.Select();
+            }
+        }
+
+        void HandleError(string error)
+        {
+            NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.UIInput, NPCFlowStatus.Error, NPCFlowLogLevel.Error,
+                "UI received dialogue error.", source: nameof(NPCDialogueUIController), data: new Dictionary<string, object>
+                {
+                    ["error"] = error
+                });
+            SetAIText($"Error: {error}");
+            if (dialogueManager != null && dialogueManager.currentProfile != null)
+            {
+                _readyForInput = true;
+                SetInputEnabled(true);
+            }
+        }
+
+        void SetAIText(string text)
+        {
+            if (aiText != null) aiText.text = text;
+        }
+
+        void OnCharacterSelectionChanged(int selection)
+        {
+            _ = SelectProfileAsync(selection);
+        }
+
+        async System.Threading.Tasks.Task SelectProfileAsync(int selection)
+        {
+            if (selection < 0 || selection >= _profiles.Count)
+            {
+                NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.NPCSwitch, NPCFlowStatus.Skipped, NPCFlowLogLevel.Warning,
+                    "UI profile selection index out of range.", source: nameof(NPCDialogueUIController), data: new Dictionary<string, object>
+                    {
+                        ["selection"] = selection,
+                        ["profileCount"] = _profiles.Count
+                    });
+                return;
+            }
+            NPCProfile profile = _profiles[selection];
+            NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.NPCSwitch, NPCFlowStatus.Start, NPCFlowLogLevel.Info,
+                "UI requested NPC switch.", source: nameof(NPCDialogueUIController), npcSlug: profile.GetNpcSlug(), data: new Dictionary<string, object>
+                {
+                    ["selection"] = selection
+                });
+            _readyForInput = false;
+            SetInputEnabled(false);
+            UpdatePortrait(profile);
+            await dialogueManager.SwitchToNPCAsync(profile.GetNpcSlug());
+        }
+
+        void OnInputFieldSubmit(string question)
+        {
+            if (!_readyForInput || string.IsNullOrWhiteSpace(question) || dialogueManager == null || dialogueManager.currentProfile == null)
+            {
+                NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.UIInput, NPCFlowStatus.Skipped, NPCFlowLogLevel.Info,
+                    "UI input submit ignored.", source: nameof(NPCDialogueUIController), data: new Dictionary<string, object>
+                    {
+                        ["readyForInput"] = _readyForInput,
+                        ["hasText"] = !string.IsNullOrWhiteSpace(question),
+                        ["hasManager"] = dialogueManager != null,
+                        ["hasCurrentProfile"] = dialogueManager != null && dialogueManager.currentProfile != null
+                    });
+                return;
+            }
+            NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.UIInput, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
+                "UI submitted player input.", source: nameof(NPCDialogueUIController), npcSlug: dialogueManager.currentProfile.GetNpcSlug(),
+                data: NPCFlowTextSanitizer.MergeSummary(new Dictionary<string, object>(), "player", question, false, 0));
+            dialogueManager.SendMessage(question.Trim());
+        }
+
+        void SetInputEnabled(bool enabled)
+        {
+            if (playerInput == null) return;
+
+            playerInput.interactable = enabled;
+            if (enabled)
+            {
+                playerInput.Select();
+            }
+        }
+
+        void OnStopPressed()
+        {
+            NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.UIInput, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
+                "UI stop/cancel pressed.", source: nameof(NPCDialogueUIController),
+                npcSlug: dialogueManager != null && dialogueManager.currentProfile != null ? dialogueManager.currentProfile.GetNpcSlug() : null);
+            dialogueManager?.CancelRequests();
+            if (playerInput != null)
+            {
+                playerInput.interactable = true;
+                playerInput.Select();
+            }
+        }
+
+        void UpdatePortrait(NPCProfile profile)
+        {
+            RawImage[] portraits = new[] { butlerImage, maidImage, chefImage };
+            foreach (RawImage portrait in portraits)
+            {
+                if (portrait != null) portrait.gameObject.SetActive(false);
+            }
+
+            if (profile == null) return;
+
+            RawImage target = ResolvePortraitTarget(profile);
+            if (target == null) return;
+
+            if (profile.portraitTexture != null)
+            {
+                target.texture = profile.portraitTexture;
+            }
+            target.gameObject.SetActive(true);
+        }
+
+        RawImage ResolvePortraitTarget(NPCProfile profile)
+        {
+            string slug = profile.GetNpcSlug();
+            if (slug.Contains("butler")) return butlerImage != null ? butlerImage : maidImage != null ? maidImage : chefImage;
+            if (slug.Contains("maid")) return maidImage != null ? maidImage : butlerImage != null ? butlerImage : chefImage;
+            if (slug.Contains("chef")) return chefImage != null ? chefImage : butlerImage != null ? butlerImage : maidImage;
+            return butlerImage != null ? butlerImage : maidImage != null ? maidImage : chefImage;
+        }
+
+        void OnValueChanged(string newText)
+        {
+            if (!IsSubmitPressed()) return;
+            if (playerInput != null && string.IsNullOrWhiteSpace(playerInput.text))
+            {
+                playerInput.text = string.Empty;
+            }
+        }
+
+        bool IsSubmitPressed()
+        {
+#if ENABLE_INPUT_SYSTEM
+            return Keyboard.current != null && Keyboard.current.enterKey.wasPressedThisFrame;
+#else
+            return Input.GetKey(KeyCode.Return);
+#endif
+        }
+
+        void Update()
+        {
+#if ENABLE_INPUT_SYSTEM
+            bool mouseClicked = Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
+            Vector2 mousePosition = Mouse.current != null ? Mouse.current.position.ReadValue() : Vector2.zero;
+#else
+            bool mouseClicked = Input.GetMouseButtonDown(0);
+            Vector2 mousePosition = Input.mousePosition;
+#endif
+            if (!mouseClicked) return;
+
+            notebookController?.HandleGlobalClick(mousePosition);
+        }
+
+        static T FindComponent<T>(string path) where T : Component
+        {
+            GameObject gameObject = FindObject(path);
+            return gameObject != null ? gameObject.GetComponent<T>() : null;
+        }
+
+        static GameObject FindObject(string path)
+        {
+            return GameObject.Find(path);
+        }
+    }
+}

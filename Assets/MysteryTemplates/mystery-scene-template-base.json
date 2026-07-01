@@ -1,0 +1,141 @@
+{
+  "caseSlug": "your-mystery-slug",
+  "displayName": "Your Mystery Title",
+  "prototypeScenePath": "Assets/Scenes/NPCDialoguePrototype.unity",
+  "outputScenePath": "Assets/Scenes/GeneratedMysteries/your-mystery-slug.unity",
+  "ragEmbeddingPath": "RAG/your-mystery-slug/NPCDialogues-minilm-chunked.rag",
+  "caseMetadata": {
+    "victim": "Who/what was harmed",
+    "crime": "What happened (theft, murder, disappearance, etc.)",
+    "setting": "Location description",
+    "timePeriod": "When it takes place",
+    "tone": "noir, cozy, thriller, supernatural, etc.",
+    "difficulty": "easy, medium, hard",
+    "estimatedPlaytimeMinutes": 15
+  },
+  "correctAnswers": {
+    "culprit": "Culprit Name",
+    "location": "Location Name",
+    "evidence": "Evidence Name",
+    "motive": "Why they did it",
+    "method": "How they did it"
+  },
+  "choices": {
+    "culprits": [
+      "Culprit Name",
+      "Suspect 2",
+      "Suspect 3",
+      "Suspect 4",
+      "Suspect 5",
+      "Suspect 6"
+    ],
+    "locations": [
+      "Location 1",
+      "Location 2",
+      "Location 3",
+      "Location 4",
+      "Location 5"
+    ],
+    "evidence": [
+      "Evidence 1",
+      "Evidence 2",
+      "Evidence 3",
+      "Evidence 4",
+      "Evidence 5"
+    ]
+  },
+  "events": [
+    {
+      "name": "Event 1",
+      "description": "What happened during this event",
+      "time": "Time of event",
+      "keyWitnesses": ["NPC slug 1", "NPC slug 2"]
+    },
+    {
+      "name": "Event 2",
+      "description": "What happened during this event",
+      "time": "Time of event",
+      "keyWitnesses": ["NPC slug 2", "NPC slug 3"]
+    }
+  ],
+  "rooms": [
+    {
+      "name": "Room Name",
+      "description": "Room description",
+      "hidingSpot": "Where something could be hidden",
+      "keyItem": "Important item in room",
+      "npcsPresent": ["NPC slug 1", "NPC slug 2"]
+    }
+  ],
+  "npcs": [
+    {
+      "slug": "npc-slug-1",
+      "displayName": "NPC Display Name",
+      "archetype": "witness, suspect, authority, informant",
+      "portraitAssetPath": "Assets/LLMUnity/Samples/KnowledgeBaseGame/Images/butler.png",
+      "systemPrompt": "You are [NPC Name] in a mystery-solving interrogation scene. [Personality description]. Answer only from your knowledge. If you do not know something, say so in character. Treat retrieved facts as authoritative.",
+      "temperature": 0.75,
+      "topP": 0.9,
+      "minP": 0.05,
+      "topK": 40,
+      "repeatPenalty": 1.1,
+      "maxTokens": 180,
+      "ragResults": 3,
+      "loraAdapterPath": "NPCs/your-mystery-slug/npc-slug-1/adapter.gguf",
+      "loraWeight": 0.8,
+      "knowledgeMarkdown": "# NPC Name Knowledge\n\n## Personal Info\n- Name: [Name]\n- Role: [Role in mystery]\n- Personality: [Brief personality]\n- Relationship to victim/crime: [Connection]\n\n## What They Know (Q&A pairs for RAG)\n\n- Q: What did you see?\n  A: [What they witnessed]\n- Q: Where were you during [event]?\n  A: [Their alibi/location]\n- Q: Who was acting suspiciously?\n  A: [Their observations]\n- Q: What do you know about [key item/location]?\n  A: [Their knowledge]\n- Q: [Custom question]\n  A: [Custom answer]\n\n## Secrets They're Hiding\n- [Secret 1]\n- [Secret 2]\n\n## Personality Quirks\n- [Quirk 1]\n- [Quirk 2]"
+    },
+    {
+      "slug": "npc-slug-2",
+      "displayName": "NPC Display Name 2",
+      "archetype": "witness, suspect, authority, informant",
+      "portraitAssetPath": "Assets/LLMUnity/Samples/KnowledgeBaseGame/Images/maid.png",
+      "systemPrompt": "You are [NPC Name] in a mystery-solving interrogation scene. [Personality description]. Answer only from your knowledge. If you do not know something, say so in character. Treat retrieved facts as authoritative.",
+      "temperature": 0.78,
+      "topP": 0.92,
+      "minP": 0.05,
+      "topK": 40,
+      "repeatPenalty": 1.08,
+      "maxTokens": 180,
+      "ragResults": 3,
+      "loraAdapterPath": "NPCs/your-mystery-slug/npc-slug-2/adapter.gguf",
+      "loraWeight": 0.8,
+      "knowledgeMarkdown": "# NPC Name Knowledge\n\n## Personal Info\n- Name: [Name]\n- Role: [Role in mystery]\n- Personality: [Brief personality]\n- Relationship to victim/crime: [Connection]\n\n## What They Know (Q&A pairs for RAG)\n\n- Q: What did you see?\n  A: [What they witnessed]\n- Q: Where were you during [event]?\n  A: [Their alibi/location]\n- Q: Who was acting suspiciously?\n  A: [Their observations]\n- Q: What do you know about [key item/location]?\n  A: [Their knowledge]\n- Q: [Custom question]\n  A: [Custom answer]\n\n## Secrets They're Hiding\n- [Secret 1]\n- [Secret 2]\n\n## Personality Quirks\n- [Quirk 1]\n- [Quirk 2]"
+    },
+    {
+      "slug": "npc-slug-3",
+      "displayName": "NPC Display Name 3",
+      "archetype": "witness, suspect, authority, informant",
+      "portraitAssetPath": "Assets/LLMUnity/Samples/KnowledgeBaseGame/Images/chef.png",
+      "systemPrompt": "You are [NPC Name] in a mystery-solving interrogation scene. [Personality description]. Answer only from your knowledge. If you do not know something, say so in character. Treat retrieved facts as authoritative.",
+      "temperature": 0.82,
+      "topP": 0.9,
+      "minP": 0.04,
+      "topK": 40,
+      "repeatPenalty": 1.12,
+      "maxTokens": 120,
+      "ragResults": 3,
+      "loraAdapterPath": "NPCs/your-mystery-slug/npc-slug-3/adapter.gguf",
+      "loraWeight": 0.8,
+      "knowledgeMarkdown": "# NPC Name Knowledge\n\n## Personal Info\n- Name: [Name]\n- Role: [Role in mystery]\n- Personality: [Brief personality]\n- Relationship to victim/crime: [Connection]\n\n## What They Know (Q&A pairs for RAG)\n\n- Q: What did you see?\n  A: [What they witnessed]\n- Q: Where were you during [event]?\n  A: [Their alibi/location]\n- Q: Who was acting suspiciously?\n  A: [Their observations]\n- Q: What do you know about [key item/location]?\n  A: [Their knowledge]\n- Q: [Custom question]\n  A: [Custom answer]\n\n## Secrets They're Hiding\n- [Secret 1]\n- [Secret 2]\n\n## Personality Quirks\n- [Quirk 1]\n- [Quirk 2]"
+    }
+  ],
+  "progression": {
+    "startingNpc": "npc-slug-1",
+    "cluesToUnlock": [
+      {
+        "clue": "Clue description",
+        "revealedBy": "npc-slug-1",
+        "triggerQuestion": "Question that reveals this clue",
+        "unlocks": ["npc-slug-2", "npc-slug-3"]
+      }
+    ],
+    "redHerrings": [
+      {
+        "description": "False lead description",
+        "source": "npc-slug",
+        "truth": "What's actually true"
+      }
+    ]
+  }
+}

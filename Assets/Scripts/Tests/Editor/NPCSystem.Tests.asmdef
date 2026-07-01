@@ -1,0 +1,22 @@
+{
+    "name": "NPCSystem.Tests",
+    "rootNamespace": "NPCSystem.Tests",
+    "references": [
+        "NPCSystem.Runtime",
+        "Unity.Nuget.Newtonsoft-Json"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ],
+    "noEngineReferences": false
+}
