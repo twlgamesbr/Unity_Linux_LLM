@@ -13,6 +13,7 @@ namespace NPCSystem
     {
         [Header("Runtime")]
         public NPCDialogueManager dialogueManager;
+        public NPCDialogueNetworkBridge networkBridge;
         public Behaviour legacyKnowledgeBaseController;
 
         [Header("Dialogue UI")]
@@ -45,16 +46,20 @@ namespace NPCSystem
             SetInputEnabled(false);
             BindUiListeners();
 
-            if (dialogueManager == null)
+            if (networkBridge == null && dialogueManager == null)
             {
                 NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.SceneBootstrap, NPCFlowStatus.Error,
-                    NPCFlowLogLevel.Error, "NPCDialogueManager reference is missing.",
+                    NPCFlowLogLevel.Error, "Neither NPCDialogueManager nor NPCDialogueNetworkBridge is available.",
                     source: nameof(NPCDialogueUIController));
                 return;
             }
 
-            await dialogueManager.InitializeAsync();
-            BindManagerEvents();
+            if (networkBridge != null)
+                await networkBridge.InitializeAsync();
+            else
+                await dialogueManager.InitializeAsync();
+
+            BindRuntimeEvents();
             PopulateDropdown();
             await SyncDropdownToCurrentProfileAsync();
 
@@ -65,7 +70,7 @@ namespace NPCSystem
 
         void OnDestroy()
         {
-            UnbindManagerEvents();
+            UnbindRuntimeEvents();
             UnbindUiListeners();
         }
 
@@ -77,6 +82,15 @@ namespace NPCSystem
                 if (dialogueManager == null)
                 {
                     dialogueManager = FindAnyObjectByType<NPCDialogueManager>(FindObjectsInactive.Include);
+                }
+            }
+
+            if (networkBridge == null)
+            {
+                networkBridge = GetComponent<NPCDialogueNetworkBridge>();
+                if (networkBridge == null)
+                {
+                    networkBridge = FindAnyObjectByType<NPCDialogueNetworkBridge>(FindObjectsInactive.Include);
                 }
             }
 
@@ -134,35 +148,63 @@ namespace NPCSystem
             _listenersBound = false;
         }
 
-        void BindManagerEvents()
+        void BindRuntimeEvents()
         {
-            if (_managerBound || dialogueManager == null) return;
+            if (_managerBound) return;
 
-            dialogueManager.onResponseStart.AddListener(HandleResponseStart);
-            dialogueManager.onResponseUpdated.AddListener(SetAIText);
-            dialogueManager.onResponseComplete.AddListener(HandleResponseComplete);
-            dialogueManager.onNPCChanged.AddListener(HandleNpcChanged);
-            dialogueManager.onError.AddListener(HandleError);
+            if (networkBridge != null)
+            {
+                networkBridge.onResponseStart.AddListener(HandleResponseStart);
+                networkBridge.onResponseUpdated.AddListener(SetAIText);
+                networkBridge.onResponseComplete.AddListener(HandleResponseComplete);
+                networkBridge.onNPCChanged.AddListener(HandleNpcChanged);
+                networkBridge.onError.AddListener(HandleError);
+            }
+            else if (dialogueManager != null)
+            {
+                dialogueManager.onResponseStart.AddListener(HandleResponseStart);
+                dialogueManager.onResponseUpdated.AddListener(SetAIText);
+                dialogueManager.onResponseComplete.AddListener(HandleResponseComplete);
+                dialogueManager.onNPCChanged.AddListener(HandleNpcChanged);
+                dialogueManager.onError.AddListener(HandleError);
+            }
+            else
+            {
+                return;
+            }
 
             _managerBound = true;
         }
 
-        void UnbindManagerEvents()
+        void UnbindRuntimeEvents()
         {
-            if (!_managerBound || dialogueManager == null) return;
+            if (!_managerBound) return;
 
-            dialogueManager.onResponseStart.RemoveListener(HandleResponseStart);
-            dialogueManager.onResponseUpdated.RemoveListener(SetAIText);
-            dialogueManager.onResponseComplete.RemoveListener(HandleResponseComplete);
-            dialogueManager.onNPCChanged.RemoveListener(HandleNpcChanged);
-            dialogueManager.onError.RemoveListener(HandleError);
+            if (networkBridge != null)
+            {
+                networkBridge.onResponseStart.RemoveListener(HandleResponseStart);
+                networkBridge.onResponseUpdated.RemoveListener(SetAIText);
+                networkBridge.onResponseComplete.RemoveListener(HandleResponseComplete);
+                networkBridge.onNPCChanged.RemoveListener(HandleNpcChanged);
+                networkBridge.onError.RemoveListener(HandleError);
+            }
+
+            if (dialogueManager != null)
+            {
+                dialogueManager.onResponseStart.RemoveListener(HandleResponseStart);
+                dialogueManager.onResponseUpdated.RemoveListener(SetAIText);
+                dialogueManager.onResponseComplete.RemoveListener(HandleResponseComplete);
+                dialogueManager.onNPCChanged.RemoveListener(HandleNpcChanged);
+                dialogueManager.onError.RemoveListener(HandleError);
+            }
 
             _managerBound = false;
         }
 
         void PopulateDropdown()
         {
-            _profiles = dialogueManager.Profiles.Where(profile => profile != null).ToList();
+            NPCProfile[] availableProfiles = networkBridge != null ? networkBridge.Profiles : dialogueManager.Profiles;
+            _profiles = availableProfiles.Where(profile => profile != null).ToList();
             if (characterSelect == null) return;
 
             characterSelect.ClearOptions();
@@ -171,26 +213,27 @@ namespace NPCSystem
 
         async System.Threading.Tasks.Task SyncDropdownToCurrentProfileAsync()
         {
-            if (dialogueManager == null || characterSelect == null || _profiles.Count == 0) return;
+            if ((dialogueManager == null && networkBridge == null) || characterSelect == null || _profiles.Count == 0) return;
 
-            if (dialogueManager.currentProfile == null)
+            NPCProfile activeProfile = GetActiveProfile();
+            if (activeProfile == null)
             {
                 characterSelect.SetValueWithoutNotify(0);
                 await SelectProfileAsync(0);
                 return;
             }
 
-            int index = _profiles.FindIndex(profile => profile == dialogueManager.currentProfile);
+            int index = _profiles.FindIndex(profile => profile == activeProfile);
             if (index < 0) index = 0;
             characterSelect.SetValueWithoutNotify(index);
-            UpdatePortrait(dialogueManager.currentProfile);
+            UpdatePortrait(activeProfile);
             SetInputEnabled(true);
             _readyForInput = true;
         }
 
         void HandleNpcChanged(string displayName)
         {
-            UpdatePortrait(dialogueManager.currentProfile);
+            UpdatePortrait(GetActiveProfile());
             _readyForInput = true;
             SetInputEnabled(true);
         }
@@ -199,7 +242,7 @@ namespace NPCSystem
         {
             NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.UIInput, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
                 "UI received response-start event.", source: nameof(NPCDialogueUIController),
-                npcSlug: dialogueManager != null && dialogueManager.currentProfile != null ? dialogueManager.currentProfile.GetNpcSlug() : null,
+                npcSlug: GetActiveProfile() != null ? GetActiveProfile().GetNpcSlug() : null,
                 data: NPCFlowTextSanitizer.MergeSummary(new Dictionary<string, object>(), "player", playerMessage, false, 0));
             if (playerInput != null) playerInput.interactable = false;
             SetAIText("...");
@@ -227,7 +270,7 @@ namespace NPCSystem
                     ["error"] = error
                 });
             SetAIText($"Error: {error}");
-            if (dialogueManager != null && dialogueManager.currentProfile != null)
+            if (GetActiveProfile() != null)
             {
                 _readyForInput = true;
                 SetInputEnabled(true);
@@ -265,27 +308,34 @@ namespace NPCSystem
             _readyForInput = false;
             SetInputEnabled(false);
             UpdatePortrait(profile);
-            await dialogueManager.SwitchToNPCAsync(profile.GetNpcSlug());
+            if (networkBridge != null)
+                await networkBridge.RequestNpcSelectionAsync(profile.GetNpcSlug());
+            else
+                await dialogueManager.SwitchToNPCAsync(profile.GetNpcSlug());
         }
 
         void OnInputFieldSubmit(string question)
         {
-            if (!_readyForInput || string.IsNullOrWhiteSpace(question) || dialogueManager == null || dialogueManager.currentProfile == null)
+            NPCProfile activeProfile = GetActiveProfile();
+            if (!_readyForInput || string.IsNullOrWhiteSpace(question) || activeProfile == null)
             {
                 NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.UIInput, NPCFlowStatus.Skipped, NPCFlowLogLevel.Info,
                     "UI input submit ignored.", source: nameof(NPCDialogueUIController), data: new Dictionary<string, object>
                     {
                         ["readyForInput"] = _readyForInput,
                         ["hasText"] = !string.IsNullOrWhiteSpace(question),
-                        ["hasManager"] = dialogueManager != null,
-                        ["hasCurrentProfile"] = dialogueManager != null && dialogueManager.currentProfile != null
+                        ["hasManager"] = dialogueManager != null || networkBridge != null,
+                        ["hasCurrentProfile"] = activeProfile != null
                     });
                 return;
             }
             NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.UIInput, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
-                "UI submitted player input.", source: nameof(NPCDialogueUIController), npcSlug: dialogueManager.currentProfile.GetNpcSlug(),
+                "UI submitted player input.", source: nameof(NPCDialogueUIController), npcSlug: activeProfile.GetNpcSlug(),
                 data: NPCFlowTextSanitizer.MergeSummary(new Dictionary<string, object>(), "player", question, false, 0));
-            dialogueManager.SendMessage(question.Trim());
+            if (networkBridge != null)
+                networkBridge.SubmitPlayerMessage(question.Trim());
+            else
+                dialogueManager.SendMessage(question.Trim());
         }
 
         void SetInputEnabled(bool enabled)
@@ -303,8 +353,11 @@ namespace NPCSystem
         {
             NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.UIInput, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
                 "UI stop/cancel pressed.", source: nameof(NPCDialogueUIController),
-                npcSlug: dialogueManager != null && dialogueManager.currentProfile != null ? dialogueManager.currentProfile.GetNpcSlug() : null);
-            dialogueManager?.CancelRequests();
+                npcSlug: GetActiveProfile() != null ? GetActiveProfile().GetNpcSlug() : null);
+            if (networkBridge != null)
+                networkBridge.CancelActiveRequest();
+            else
+                dialogueManager?.CancelRequests();
             if (playerInput != null)
             {
                 playerInput.interactable = true;
@@ -377,6 +430,12 @@ namespace NPCSystem
         {
             GameObject gameObject = FindObject(path);
             return gameObject != null ? gameObject.GetComponent<T>() : null;
+        }
+
+        NPCProfile GetActiveProfile()
+        {
+            if (networkBridge != null && networkBridge.currentProfile != null) return networkBridge.currentProfile;
+            return dialogueManager != null ? dialogueManager.currentProfile : null;
         }
 
         static GameObject FindObject(string path)

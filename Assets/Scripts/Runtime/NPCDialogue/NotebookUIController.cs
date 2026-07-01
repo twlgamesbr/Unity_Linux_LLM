@@ -5,6 +5,10 @@ namespace NPCSystem
 {
     public class NotebookUIController : MonoBehaviour
     {
+        [Header("Runtime")]
+        public NPCDialogueManager dialogueManager;
+        public NPCDialogueNetworkBridge networkBridge;
+
         [Header("Notebook / Panels")]
         public Button notesButton;
         public Button mapButton;
@@ -21,27 +25,38 @@ namespace NPCSystem
         public Dropdown answer1;
         public Dropdown answer2;
         public Dropdown answer3;
+        public Text notesText1;
+        public Text notesText2;
 
         [Header("Solve Answers")]
         public string correctAnswer1 = "Professor Pluot";
         public string correctAnswer2 = "Living Room";
         public string correctAnswer3 = "A Hollow Bible";
 
+        string _defaultNotesPageLeft = string.Empty;
+        string _defaultNotesPageRight = string.Empty;
         bool _listenersBound;
+        bool _runtimeEventsBound;
 
         void Awake()
         {
             ResolveReferences();
+            CacheDefaultNotebookText();
             BindListeners();
+            BindRuntimeEvents();
+            RefreshNotebookState();
         }
 
         void OnDestroy()
         {
+            UnbindRuntimeEvents();
             UnbindListeners();
         }
 
         void ResolveReferences()
         {
+            dialogueManager = dialogueManager != null ? dialogueManager : FindAnyObjectByType<NPCDialogueManager>(FindObjectsInactive.Include);
+            networkBridge = networkBridge != null ? networkBridge : FindAnyObjectByType<NPCDialogueNetworkBridge>(FindObjectsInactive.Include);
             notesButton = notesButton != null ? notesButton : FindComponent<Button>("Canvas/NotesButton");
             mapButton = mapButton != null ? mapButton : FindComponent<Button>("Canvas/MapButton");
             solveButton = solveButton != null ? solveButton : FindComponent<Button>("Canvas/SolveButton");
@@ -57,6 +72,14 @@ namespace NPCSystem
             answer1 = answer1 != null ? answer1 : FindComponent<Dropdown>("Canvas/NotebookImage/SolvePanel/Answer1");
             answer2 = answer2 != null ? answer2 : FindComponent<Dropdown>("Canvas/NotebookImage/SolvePanel/Answer2");
             answer3 = answer3 != null ? answer3 : FindComponent<Dropdown>("Canvas/NotebookImage/SolvePanel/Answer3");
+            notesText1 = notesText1 != null ? notesText1 : FindComponent<Text>("Canvas/NotebookImage/NotesPanel/NotesText1");
+            notesText2 = notesText2 != null ? notesText2 : FindComponent<Text>("Canvas/NotebookImage/NotesPanel/NotesText2");
+        }
+
+        void CacheDefaultNotebookText()
+        {
+            _defaultNotesPageLeft = notesText1 != null ? notesText1.text : string.Empty;
+            _defaultNotesPageRight = notesText2 != null ? notesText2.text : string.Empty;
         }
 
         void BindListeners()
@@ -91,8 +114,44 @@ namespace NPCSystem
             _listenersBound = false;
         }
 
+        void BindRuntimeEvents()
+        {
+            if (_runtimeEventsBound) return;
+
+            if (networkBridge != null)
+            {
+                networkBridge.onNotebookStateChanged.AddListener(ApplyNotebookState);
+                _runtimeEventsBound = true;
+            }
+            else if (dialogueManager != null)
+            {
+                dialogueManager.onNPCChanged.AddListener(HandleNpcChanged);
+                dialogueManager.onResponseComplete.AddListener(HandleResponseComplete);
+                _runtimeEventsBound = true;
+            }
+        }
+
+        void UnbindRuntimeEvents()
+        {
+            if (!_runtimeEventsBound) return;
+
+            if (networkBridge != null)
+            {
+                networkBridge.onNotebookStateChanged.RemoveListener(ApplyNotebookState);
+            }
+
+            if (dialogueManager != null)
+            {
+                dialogueManager.onNPCChanged.RemoveListener(HandleNpcChanged);
+                dialogueManager.onResponseComplete.RemoveListener(HandleResponseComplete);
+            }
+
+            _runtimeEventsBound = false;
+        }
+
         public void ShowNotes()
         {
+            RefreshNotebookState();
             if (notesPanel != null) notesPanel.SetActive(true);
             if (helpPanel != null) helpPanel.SetActive(false);
             if (solvePanel != null) solvePanel.SetActive(false);
@@ -155,6 +214,57 @@ namespace NPCSystem
                 {
                     image.gameObject.SetActive(false);
                 }
+            }
+        }
+
+        void HandleNpcChanged(string npcName)
+        {
+            RefreshNotebookState();
+        }
+
+        void HandleResponseComplete(string npcName, string response)
+        {
+            RefreshNotebookState();
+        }
+
+        void RefreshNotebookState()
+        {
+            if (networkBridge != null)
+            {
+                ApplyNotebookState(networkBridge.CurrentNotebookState);
+                return;
+            }
+
+            if (dialogueManager == null)
+            {
+                ApplyNotebookState(new NPCNotebookStateMessage
+                {
+                    notesPageLeft = _defaultNotesPageLeft,
+                    notesPageRight = _defaultNotesPageRight
+                });
+                return;
+            }
+
+            NPCNotebookStateMessage message = NPCNotebookStateFormatter.Build(
+                dialogueManager.CaptureEvidenceSnapshot(),
+                dialogueManager.currentProfile != null ? dialogueManager.currentProfile.GetNpcSlug() : string.Empty);
+            ApplyNotebookState(message);
+        }
+
+        void ApplyNotebookState(NPCNotebookStateMessage message)
+        {
+            if (notesText1 != null)
+            {
+                notesText1.text = string.IsNullOrWhiteSpace(message.notesPageLeft)
+                    ? _defaultNotesPageLeft
+                    : message.notesPageLeft;
+            }
+
+            if (notesText2 != null)
+            {
+                notesText2.text = string.IsNullOrWhiteSpace(message.notesPageRight)
+                    ? _defaultNotesPageRight
+                    : message.notesPageRight;
             }
         }
 

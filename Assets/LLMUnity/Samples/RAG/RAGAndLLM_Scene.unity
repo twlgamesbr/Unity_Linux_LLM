@@ -259,7 +259,7 @@ MonoBehaviour:
   filterValue: 
   structuralRecordTypesCsv: namespace,using_directive,file_overview,assembly,relation,type,member
   localAiBaseUrl: http://localhost:8080
-  localAiChatModel: llama-3.1-8b-q4-k-m
+  localAiChatModel: llama-3.2-3b-instruct:q8_0
   localAiEmbeddingModel: nomic-embed-text-v1.5
   useDirectLocalAiChat: 1
   characterFilterField: 

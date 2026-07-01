@@ -7,6 +7,7 @@ using UnityEngine;
 
 namespace NPCSystem
 {
+    [DefaultExecutionOrder(-3000)]
     public sealed class NPCFlowLogger : MonoBehaviour
     {
         public bool logToUnityConsole = true;

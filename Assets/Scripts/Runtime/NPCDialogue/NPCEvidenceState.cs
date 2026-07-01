@@ -45,6 +45,32 @@ namespace NPCSystem
         }
     }
 
+    [Serializable]
+    public class NPCEvidenceStateSnapshot
+    {
+        public List<ClueEntry> discoveredClues = new List<ClueEntry>();
+        public List<string> obtainedItems = new List<string>();
+        public List<string> visitedLocations = new List<string>();
+        public List<string> npcMoodKeys = new List<string>();
+        public List<string> npcMoodValues = new List<string>();
+        public List<string> npcTrustKeys = new List<string>();
+        public List<int> npcTrustValues = new List<int>();
+
+        public NPCEvidenceStateSnapshot Clone()
+        {
+            return new NPCEvidenceStateSnapshot
+            {
+                discoveredClues = new List<ClueEntry>(discoveredClues ?? new List<ClueEntry>()),
+                obtainedItems = new List<string>(obtainedItems ?? new List<string>()),
+                visitedLocations = new List<string>(visitedLocations ?? new List<string>()),
+                npcMoodKeys = new List<string>(npcMoodKeys ?? new List<string>()),
+                npcMoodValues = new List<string>(npcMoodValues ?? new List<string>()),
+                npcTrustKeys = new List<string>(npcTrustKeys ?? new List<string>()),
+                npcTrustValues = new List<int>(npcTrustValues ?? new List<int>())
+            };
+        }
+    }
+
     public class NPCEvidenceState : MonoBehaviour
     {
         [Header("Investigation State")]
@@ -63,10 +89,7 @@ namespace NPCSystem
 
         void Awake()
         {
-            _clueHashes = new HashSet<string>();
-            foreach (var c in discoveredClues)
-                _clueHashes.Add(CanonicalHash(c.clueText));
-            WarmLookups();
+            RebuildRuntimeCaches();
         }
 
         void WarmLookups()
@@ -207,6 +230,33 @@ namespace NPCSystem
             return $"Current state: mood={mood}, trust={trust}.";
         }
 
+        public NPCEvidenceStateSnapshot CreateSnapshot()
+        {
+            return new NPCEvidenceStateSnapshot
+            {
+                discoveredClues = new List<ClueEntry>(discoveredClues ?? new List<ClueEntry>()),
+                obtainedItems = new List<string>(obtainedItems ?? new List<string>()),
+                visitedLocations = new List<string>(visitedLocations ?? new List<string>()),
+                npcMoodKeys = new List<string>(npcMoodKeys ?? new List<string>()),
+                npcMoodValues = new List<string>(npcMoodValues ?? new List<string>()),
+                npcTrustKeys = new List<string>(npcTrustKeys ?? new List<string>()),
+                npcTrustValues = new List<int>(npcTrustValues ?? new List<int>())
+            };
+        }
+
+        public void ApplySnapshot(NPCEvidenceStateSnapshot snapshot)
+        {
+            NPCEvidenceStateSnapshot source = snapshot?.Clone() ?? new NPCEvidenceStateSnapshot();
+            discoveredClues = source.discoveredClues;
+            obtainedItems = source.obtainedItems;
+            visitedLocations = source.visitedLocations;
+            npcMoodKeys = source.npcMoodKeys;
+            npcMoodValues = source.npcMoodValues;
+            npcTrustKeys = source.npcTrustKeys;
+            npcTrustValues = source.npcTrustValues;
+            RebuildRuntimeCaches();
+        }
+
         // --- Serialization sync ---
 
         void SyncMoodLists()
@@ -236,6 +286,17 @@ namespace NPCSystem
         static string CanonicalHash(string text)
         {
             return text.Trim().ToLowerInvariant().GetHashCode().ToString();
+        }
+
+        void RebuildRuntimeCaches()
+        {
+            _clueHashes = new HashSet<string>();
+            foreach (var c in discoveredClues ?? new List<ClueEntry>())
+            {
+                _clueHashes.Add(CanonicalHash(c.clueText));
+            }
+
+            WarmLookups();
         }
 
         static void Log(string message)

@@ -96,7 +96,7 @@ Key folders:
 
 ### Dialogue manager
 
-`Assets/Scripts/Runtime/NPCDialogueManager.cs`
+`Assets/Scripts/Runtime/NPCDialogue/NPCDialogueManager.cs`
 
 - initializes scene references
 - indexes NPC profiles

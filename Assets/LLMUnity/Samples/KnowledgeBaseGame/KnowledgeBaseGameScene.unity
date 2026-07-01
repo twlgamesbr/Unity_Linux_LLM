@@ -3475,7 +3475,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &964853999
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5828,7 +5828,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1614562620
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6520,14 +6520,32 @@ MonoBehaviour:
   llmAgent: {fileID: 1275496425}
   rag: {fileID: 1400265393}
   ragEmbeddingPath: NPCDialogues.rag
-  npcs: []
+  qdrantRag: {fileID: 0}
+  useQdrantRag: 0
+  actionPlanner: {fileID: 0}
+  evidenceState: {fileID: 0}
+  useRemoteServer: 1
+  remoteHost: localhost
+  remotePort: 8080
+  remoteModel: default-llm
+  cogneeMemory: {fileID: 0}
+  useCogneeMemory: 0
+  forceRemoteEmbedder: 1
+  remoteEmbeddingHost: localhost
+  remoteEmbeddingPort: 8080
+  profiles: []
   persistHistory: 1
   enableRAG: 1
+  rebuildRagFromKnowledgeIfMissing: 1
   maxHistoryPerNPC: 20
+  enablePreloadedLoraSwitching: 0
   onNPCChanged:
     m_PersistentCalls:
       m_Calls: []
   onResponseStart:
+    m_PersistentCalls:
+      m_Calls: []
+  onResponseUpdated:
     m_PersistentCalls:
       m_Calls: []
   onResponseComplete:

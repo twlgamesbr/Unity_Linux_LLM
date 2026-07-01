@@ -127,7 +127,7 @@ Important implication:
 
 ### `NPCDialogueManager`
 
-Source: `Assets/Scripts/Runtime/NPCDialogueManager.cs`
+Source: `Assets/Scripts/Runtime/NPCDialogue/NPCDialogueManager.cs`
 
 - Initializes references, profiles, history, and local `.rag` state
 - Persists per-NPC conversation history via `NPCHistoryStore`

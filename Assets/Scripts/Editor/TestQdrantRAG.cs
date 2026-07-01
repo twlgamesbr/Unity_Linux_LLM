@@ -1,13 +1,13 @@
 using UnityEditor;
-using UnityEngine;
-using NPCSystem;
-using System.Reflection;
 
-public class TestQdrantRAG
+namespace NPCSystem.Editor
 {
-    [MenuItem("Tools/Test Qdrant RAG")]
-    public static void RunTest()
+    public class TestQdrantRAG
     {
-        EditorApplication.EnterPlaymode();
+        [MenuItem("Tools/Test Qdrant RAG")]
+        public static void RunTest()
+        {
+            EditorApplication.EnterPlaymode();
+        }
     }
 }
