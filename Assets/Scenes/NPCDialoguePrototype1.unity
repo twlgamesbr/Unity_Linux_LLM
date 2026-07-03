@@ -2489,10 +2489,6 @@ MonoBehaviour:
   maidImage: {fileID: 961591108}
   chefImage: {fileID: 718663248}
   notebookController: {fileID: 489627716}
-  _listenersBound: 0
-  _managerBound: 0
-  _readyForInput: 0
-  _profiles: []
 --- !u!114 &489627716
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2527,10 +2523,6 @@ MonoBehaviour:
   correctAnswer1: Professor Pluot
   correctAnswer2: Living Room
   correctAnswer3: A Hollow Bible
-  _defaultNotesPageLeft: 
-  _defaultNotesPageRight: 
-  _listenersBound: 0
-  _runtimeEventsBound: 0
 --- !u!1652712579 &489627717
 MultiplayerRolesData:
   m_ObjectHideFlags: 2
@@ -3283,7 +3275,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &574317511
 RectTransform:
   m_ObjectHideFlags: 0
@@ -9494,18 +9486,12 @@ MonoBehaviour:
     onLoginSuccess:
       m_PersistentCalls:
         m_Calls: []
-      m_CallsDirty: 1
     onRegisterSuccess:
       m_PersistentCalls:
         m_Calls: []
-      m_CallsDirty: 1
     onError:
       m_PersistentCalls:
         m_Calls: []
-      m_CallsDirty: 1
-  _initialized: 0
-  _isRegisterMode: 0
-  _eventsBound: 0
 --- !u!4 &1351714795
 Transform:
   m_ObjectHideFlags: 0
@@ -9536,7 +9522,8 @@ MonoBehaviour:
   serviceBaseUrl: http://localhost:5100
   requestTimeoutSeconds: 15
   validateStoredSessionOnStart: 1
-  lastAuthStatus: Idle
+  lastAuthStatus: 'Auth service settings look valid: http://localhost:5100/api/auth/login
+    | timeout=15s'
   lastAuthRoute: 
   lastAuthDurationMs: 0
 --- !u!114 &1351714797
@@ -9551,9 +9538,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d1d8a84f9442d78b96081df1aba7422, type: 3}
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.AuthNetworkBridge
+  authController: {fileID: 1351714794}
   networkBootstrap: {fileID: 1161870789}
-  autoDetectStartupMode: 1
-  startAsHost: 1
+  autoDetectStartupMode: 0
+  startAsHost: 0
   hostAddress: 127.0.0.1
   hostPort: 0
   onHostStarted:

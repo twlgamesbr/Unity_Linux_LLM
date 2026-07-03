@@ -93,42 +93,160 @@
       "timestamp": "2026-07-03T08:07:25Z",
       "fact": "Modal endpoints: vLLM (Qwen3-8B on H100) proxied as modal-vllm-qwen in LocalAI. Direct API at andretwl--modal-qwen-vllm-serve.modal.run/v1. Ollama (qwen2.5:32b on A100) at andretwl--example-ollama-llama-serve.modal.run/v1.",
       "category": "system"
+    },
+    {
+      "id": 5,
+      "timestamp": "2026-07-03T08:12:00Z",
+      "fact": "Full opencode 3-feature system configured: commands/ (6 .md files), tools/ (5 TS tools), skills/ (2 SKILL.md). Plus opencode-self SKILL.md for self-awareness. Self-discovery SKILL.md describes all capabilities.",
+      "category": "system"
+    },
+    {
+      "id": 6,
+      "timestamp": "2026-07-03T09:53:35.474Z",
+      "fact": "LocalAI Docker benchmark results (RTX 3060 6GB laptop, i7-11800H 16c): qwen2.5-1.5b Q4 ~62ms warm, llama-3.2-3b Q4 ~96ms warm, llama-3.1-8b Q4 ~187ms warm / 182 tok/s sustained, nomic-embed ~6ms. Docker compose.yaml updated: cpus=8, THREADS=8, gpu_layers=33. Model YAMLs fixed: 3B models switched from llama-cpp (CPU) to cuda13-llama-cpp (GPU), all models now use full GPU offload. Key finding: original config had gpu_layers=12 (CPU bottleneck) and cpus=4 (starvation); after fixes 8B model went from ~2 tok/s to 182 tok/s.",
+      "category": "infrastructure"
+    },
+    {
+      "id": 7,
+      "timestamp": "2026-07-03T10:14:53.198Z",
+      "fact": "SUCCESS MILESTONE: LocalAI Docker optimization completed. Turned 8B model from ~2 tok/s (broken CPU-only) to 182 tok/s (full GPU). Learned: (1) Docker `cpus: 4` was starving GPU feed — bumped to 8; (2) Model YAMLs need explicit `backend: cuda13-llama-cpp` for GPU (default `llama-cpp` is CPU); (3) `gpu_layers` must be set to at least the model's total layer count (33 for 8B, 999 for smaller) for full offload; (4) Stale llama.cpp backends can linger in VRAM after restarts — check `nvidia-smi --query-compute-apps` and kill stale PIDs; (5) On RTX 3060 6GB, full 8B Q4 fits at ~5.2GB VRAM leaving ~800MB headroom; (6) The 3B Q8 model (3GB) also fits entirely on GPU when backend is corrected; (7) nomic-embed with gpu_layers=999 runs in 6ms vs default CPU. Conclusion: Docker wins over bare-metal — GPU is the bottleneck, not Docker overhead.",
+      "category": "milestone"
+    },
+    {
+      "id": 8,
+      "timestamp": "2026-07-03T10:29:12.914Z",
+      "fact": "LocalAI has 4 powerful features I should enable. (1) Intelligent Router — middleware that classifies prompts and auto-routes to the best model (qwen1.5b for simple, llama3b for balanced, llama8b for complex). Uses Arch-Router-1.5B or ColBERT, with embedding cache. (2) Agent Platform — built-in autonomous agents with per-agent RAG, skills, tools, MCP server integration, SSE streaming. Currently DISABLED via LOCALAI_DISABLE_AGENTS=true. (3) Backend Monitor API — /backend/monitor for model state/memory, /backend/shutdown to unload models. (4) MCP support — models can use external tools via MCP servers (remote HTTP or local stdio). Can connect MCP tools to my own opencode tools.",
+      "category": "infrastructure"
+    },
+    {
+      "id": 9,
+      "timestamp": "2026-07-03T10:50:07.207Z",
+      "fact": "Intelligent Router now deployed and working. Uses ColBERT classifier with nomic-embed-text-v1.5. Routes: casual→qwen1.5b (Tier1), code→llama3b (Tier2), heavy-reasoning→llama8b (Tier3). Activation threshold 0.30. Config at localai/models/intelligent-router.yaml. Model name 'intelligent-router' for auto-routing.",
+      "category": "infrastructure"
+    },
+    {
+      "id": 10,
+      "timestamp": "2026-07-03T10:50:07.976Z",
+      "fact": "Bare-metal LocalAI systemd user service disabled. Docker is the active deployment. Systemd service file at ~/.config/systemd/user/localai.service updated with optimized config (max_backends=3, agents enabled). Re-enable with: systemctl --user enable localai.service",
+      "category": "infrastructure"
+    },
+    {
+      "id": 11,
+      "timestamp": "2026-07-03T10:50:08.664Z",
+      "fact": "LocalAI Agents platform enabled (LOCALAI_DISABLE_AGENTS=false). Existing agent data found: pc-resource-librarian with skills and collections. Agent state at localai/data/agents/. Vector engine: chromem (embedded).",
+      "category": "infrastructure"
+    },
+    {
+      "id": 12,
+      "timestamp": "2026-07-03T11:07:00.208Z",
+      "fact": "Installed qdrant-mcp-server and @modelcontextprotocol/server-filesystem globally. Filesystem MCP serves /mnt/data/Projects_SSD. Qdrant MCP connects to localhost:6333 via stdio transport. Both configured in Unity_Linux_LLM/.opencode/opencode.json under mcpServers.",
+      "category": "infrastructure"
+    },
+    {
+      "id": 13,
+      "timestamp": "2026-07-03T19:18:20.245Z",
+      "fact": "PostgreSQL stack updated: Adminer on :8082 for DB visualization, PostgREST on :3001 for auto-generated REST API with Swagger/OpenAPI docs. PostgREST exposes /players and /player_sessions endpoints with full CRUD, filtering, pagination. Roles created: web_anon (read-only), authenticator (PostgREST connector). Init SQL updated at Backend/PlayerAuthService/db/init.sql. Compose at Backend/PlayerAuthService/docker-compose.yml.",
+      "category": "infrastructure"
     }
   ],
-  "session_count": 1,
-  "last_session": "2026-07-03T08:07:25Z",
+  "session_count": 10,
+  "last_session": "2026-07-03T19:18:20.245Z",
   "infrastructure_snapshot": {
-    "timestamp": "2026-07-03T08:07:25Z",
+    "timestamp": "2026-07-03T10:49:34Z",
     "containers": {
+      "pc-resource-localai": {
+        "image": "localai/localai:latest-gpu-nvidia-cuda-13",
+        "status": "Up_About a minute (healthy)",
+        "created": "2026-07-03 07:45:24 -0300 -03",
+        "ports": "0.0.0.0:8080->8080/tcp, [::]:8080->8080/tcp",
+        "state": "running"
+      },
       "npc-dedicated-server": {
         "image": "docker-npc-server",
-        "status": "Up_3 hours",
-        "created": "2026-07-03 02:13:30 -0300 -03",
+        "status": "Up_34 minutes",
+        "created": "2026-07-03 07:15:14 -0300 -03",
         "ports": "",
         "state": "running"
       },
       "unity-linux-llm-auth-db": {
         "image": "postgres:16",
-        "status": "Up_34 hours (healthy)",
+        "status": "Up_36 hours (healthy)",
         "created": "2026-07-01 19:25:06 -0300 -03",
         "ports": "0.0.0.0:5433->5432/tcp, [::]:5433->5432/tcp",
         "state": "running"
       },
-      "pc-resource-localai": {
-        "image": "localai/localai:latest-gpu-nvidia-cuda-13",
-        "status": "Up_37 hours (healthy)",
-        "created": "2026-06-30 19:36:06 -0300 -03",
-        "ports": "",
-        "state": "running"
-      },
       "qdrant-codebase": {
         "image": "qdrant/qdrant:latest",
-        "status": "Up_37 hours",
+        "status": "Up_39 hours",
         "created": "2026-06-30 13:16:09 -0300 -03",
         "ports": "0.0.0.0:6333-6334->6333-6334/tcp, [::]:6333-6334->6333-6334/tcp",
         "state": "running"
       }
+    },
+    "localai": {
+      "available_models": [
+        "nomic-embed-text-v1.5",
+        "qwen3-tts-cpp-1.7b-base-q4",
+        "intelligent-router",
+        "llama-3.1-8b-q4-k-m",
+        "llama-3.2-3b-instruct:q8_0",
+        "modal-vllm-qwen",
+        "qwen2.5-1.5b-instruct-q4-k-m",
+        "embeddinggemma-300m",
+        "gemma-4-e2b-it",
+        "llama-3.1-8b-q4-k-m-vulkan",
+        "llama-3.2-3b-instruct:q4_k_m"
+      ],
+      "recent_traces": [
+        {
+          "model": "nomic-embed-text-v1.5",
+          "type": "rerank",
+          "duration_ms": 0.8,
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "error": "rpc error: code = Unimplemented desc = This server does not support reranking. Start it with `--reranking` and without `--embedding`"
+        },
+        {
+          "model": "nomic-embed-text-v1.5",
+          "type": "tokenize",
+          "duration_ms": 1,
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "error": ""
+        },
+        {
+          "model": "nomic-embed-text-v1.5",
+          "type": "tokenize",
+          "duration_ms": 0.8,
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "error": ""
+        },
+        {
+          "model": "nomic-embed-text-v1.5",
+          "type": "tokenize",
+          "duration_ms": 0.9,
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "error": ""
+        },
+        {
+          "model": "nomic-embed-text-v1.5",
+          "type": "tokenize",
+          "duration_ms": 1.7,
+          "tokens_in": 0,
+          "tokens_out": 0,
+          "error": ""
+        }
+      ],
+      "api_metrics": {
+        "api_call_count{method=\"GET\",otel_scope_name=\"github.com/mudler/LocalAI\",otel_scope_schema_url=\"\",otel_scope_version=\"\",path=\"/api/traces\"} 21": 21,
+        "api_call_count{method=\"GET\",otel_scope_name=\"github.com/mudler/LocalAI\",otel_scope_schema_url=\"\",otel_scope_version=\"\",path=\"/backend/monitor\"} 4": 4,
+        "api_call_count{method=\"GET\",otel_scope_name=\"github.com/mudler/LocalAI\",otel_scope_schema_url=\"\",otel_scope_version=\"\",path=\"/readyz\"} 1": 1,
+        "api_call_count{method=\"GET\",otel_scope_name=\"github.com/mudler/LocalAI\",otel_scope_schema_url=\"\",otel_scope_version=\"\",path=\"/v1/models\"} 3": 3,
+        "api_call_count{method=\"POST\",otel_scope_name=\"github.com/mudler/LocalAI\",otel_scope_schema_url=\"\",otel_scope_version=\"\",path=\"/v1/chat/completions\"} 5": 5
+      }
     }
   },
-  "last_infra_check": "2026-07-03T08:07:25Z"
+  "last_infra_check": "2026-07-03T10:49:34Z"
 }

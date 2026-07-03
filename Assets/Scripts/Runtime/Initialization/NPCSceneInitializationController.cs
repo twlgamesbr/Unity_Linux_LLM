@@ -25,6 +25,7 @@ namespace NPCSystem
         {
             NPCSceneInitializationPhase.Logger,
             NPCSceneInitializationPhase.SceneReferences,
+            NPCSceneInitializationPhase.NetworkTransport,
             NPCSceneInitializationPhase.DialogueServices,
             NPCSceneInitializationPhase.BackendReadiness,
             NPCSceneInitializationPhase.NetworkBridge,

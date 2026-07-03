@@ -52,6 +52,7 @@ venv/
 .gladekit/
 .hermes/
 .pi/
+.opencode/.env
 ProjectSettings/Packages/
 
 # Downloaded runtime bundles

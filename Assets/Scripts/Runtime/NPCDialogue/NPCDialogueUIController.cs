@@ -265,12 +265,13 @@ namespace NPCSystem
 
         void HandleError(string error)
         {
+            string normalizedError = string.IsNullOrWhiteSpace(error) ? "Unknown dialogue error." : error.Trim();
             NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.UIInput, NPCFlowStatus.Error, NPCFlowLogLevel.Error,
-                "UI received dialogue error.", source: nameof(NPCDialogueUIController), data: new Dictionary<string, object>
+                $"UI received dialogue error: {normalizedError}", source: nameof(NPCDialogueUIController), data: new Dictionary<string, object>
                 {
-                    ["error"] = error
+                    ["error"] = normalizedError
                 });
-            SetAIText($"Error: {error}");
+            SetAIText($"Error: {normalizedError}");
             if (GetActiveProfile() != null)
             {
                 _readyForInput = true;

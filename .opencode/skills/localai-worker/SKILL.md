@@ -3,7 +3,49 @@ name: localai-worker
 description: Use when delegating subtasks to LocalAI or Modal models for token economy. Covers 3-tier model routing, subagent invocation, and persistent memory maintenance. Activates for any task mentioning code scanning, code analysis, bulk file processing, fine-tuning, or Modal deployment.
 ---
 
-# LocalAI Worker — 3-Tier Delegation Skill
+# LocalAI Worker — 3-Tier Delegation Skill + Intelligent Router
+
+## Intelligent Router
+
+An automatic model router (`intelligent-router`) is configured to classify prompts and select the cheapest adequate model:
+
+| Classification | Routes to | Threshold |
+|---|---|---|
+| Casual chat, small talk | `qwen2.5-1.5b-instruct-q4-k-m` (Tier 1) | Default |
+| Code questions | `llama-3.2-3b-instruct:q8_0` (Tier 2) | activation 0.30 |
+| Heavy reasoning | `llama-3.1-8b-q4-k-m` (Tier 3) | activation 0.30 |
+
+Use the router model name directly instead of picking tiers manually:
+```bash
+# Auto-route — router picks best model
+curl http://localhost:8080/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{"model":"intelligent-router","messages":[{"role":"user","content":"..."}],"max_tokens":...}'
+```
+
+The router uses ColBERT classifier with `nomic-embed-text-v1.5`. Config: `localai/models/intelligent-router.yaml`.
+
+## Backend Monitor API
+
+Monitor model state, traces, and metrics:
+```bash
+# Recent traces (model, duration, token usage)
+curl http://localhost:8080/api/backend-traces
+
+# Raw Prometheus metrics
+curl http://localhost:8080/metrics
+
+# Snapshot all infra + LocalAI state
+bash .opencode/scripts/infra-snapshot.sh
+```
+
+The infra snapshot now includes available models, recent traces with durations/tokens, and API call count metrics.
+
+## LocalAI Agents
+
+Agents platform is **enabled** (`LOCALAI_DISABLE_AGENTS=false`). Persistent agents with per-agent RAG, skills, and tools are available. Existing agent data found: `pc-resource-librarian` with skills and collections.
+
+Agent vector engine: `chromem` (embedded, no extra server). State directory: `localai/data/agents`.
 
 ## Memory system
 
@@ -33,13 +75,15 @@ EMBED=$(bash .opencode/scripts/localai.sh embed "your query here")
 
 ## 3-Tier Model Routing
 
+Prefer `intelligent-router` for auto-routing. Manual mapping for reference:
+
 | Tier | Models | Cost | For |
 |---|---|---|---|
 | **1** | `qwen2.5-1.5b-instruct-q4-k-m`, `llama-3.2-3b-instruct:q8_0` | ~free (local GPU) | Bulk code scan, class ID, file summaries, simple Q&A |
-| **2** | `llama-3.1-8b-q4-k-m`, `gemma-4-e2b-it` | ~free (local GPU) | Refactoring, generation, medium reasoning |
+| **2** | `llama-1.8b-q4-k-m`, `gemma-4-e2b-it` | ~free (local GPU) | Refactoring, generation, medium reasoning |
 | **3** | `modal-vllm-qwen` (Modal H100), `qwen2.5:32b` (Modal A100) | Cloud GPU $ | Complex analysis, architecture, large-scale refactoring |
 
-**Rule:** Always use the cheapest tier that can do the job. Escalate only when the task requires it.
+**Rule:** Use `intelligent-router` model name for auto-classification. Fall back to manual tier selection only when you need a specific model for a known task type.
 
 ## Subagent delegation
 
@@ -107,6 +151,8 @@ All compose files are tracked in `long-term.json`. Snapshot current state with:
 ```bash
 bash .opencode/scripts/infra-snapshot.sh
 ```
+
+**Important:** A bare-metal systemd user service (`localai.service`) previously conflicted with Docker on port 8080. It has been disabled (`systemctl --user disable localai.service`). Docker is the active deployment. The service file still exists at `~/.config/systemd/user/localai.service` with updated config if re-enabling is needed.
 
 ## Project-specific models (via LocalAI gateway)
 

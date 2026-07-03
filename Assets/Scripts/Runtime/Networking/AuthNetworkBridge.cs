@@ -34,11 +34,11 @@ namespace NPCSystem
         public NPCNetworkBootstrap networkBootstrap;
 
         [Header("Mode")]
-        [Tooltip("When enabled, runtime role/CLI overrides can switch this instance to client mode automatically for 2-player tests.")]
-        public bool autoDetectStartupMode = true;
+        [Tooltip("Dedicated-server projects should keep this disabled so auth always starts a client unless an explicit CLI override is supplied. Enable only for legacy listen-server/Multiplayer Play Mode host tests.")]
+        public bool autoDetectStartupMode = false;
 
-        [Tooltip("True: start as host (listen-server). False: connect as client to an existing host.")]
-        public bool startAsHost = true;
+        [Tooltip("False for Docker/dedicated-server flow: auth starts StartClient() against the dedicated server. Enable only for intentional legacy listen-server host tests.")]
+        public bool startAsHost = false;
 
         [Tooltip("Host address to connect to when startAsHost is false.")]
         public string hostAddress = "127.0.0.1";
@@ -67,6 +67,19 @@ namespace NPCSystem
         /// </summary>
         public static string ActivePlayerName { get; private set; } = "Player";
 
+        void Reset()
+        {
+            ResolveReferences();
+        }
+
+        void OnValidate()
+        {
+            if (!Application.isPlaying)
+            {
+                ResolveReferences();
+            }
+        }
+
         void Awake()
         {
             ResolveReferences();
@@ -91,6 +104,9 @@ namespace NPCSystem
         {
 #if !UNITY_SERVER
             if (authController == null)
+                authController = GetComponent<AuthUIController>();
+
+            if (authController == null)
                 authController = FindAnyObjectByType<AuthUIController>(FindObjectsInactive.Include);
 #endif
             if (networkBootstrap == null)
@@ -100,9 +116,33 @@ namespace NPCSystem
 #if !UNITY_SERVER
         void BindAuthEvents()
         {
-            if (authController == null) return;
+            ResolveReferences();
+
+            if (authController == null)
+            {
+                _logger?.Log(NPCFlowStage.ConfigurationValidation, NPCFlowStatus.Error, NPCFlowLogLevel.Error,
+                    "AuthNetworkBridge cannot bind auth events because Auth Controller is not assigned and no AuthUIController was found.",
+                    source: nameof(AuthNetworkBridge),
+                    data: new Dictionary<string, object>
+                    {
+                        ["gameObject"] = gameObject.name,
+                        ["expectedComponent"] = nameof(AuthUIController)
+                    });
+                lastBridgeStatus = "Missing Auth Controller reference; auth success cannot start networking.";
+                return;
+            }
+
             authController.events.onLoginSuccess.AddListener(HandleAuthSuccess);
             authController.events.onRegisterSuccess.AddListener(HandleAuthSuccess);
+
+            _logger?.Log(NPCFlowStage.ConfigurationValidation, NPCFlowStatus.Success, NPCFlowLogLevel.Debug,
+                "AuthNetworkBridge bound AuthUIController success events.",
+                source: nameof(AuthNetworkBridge),
+                data: new Dictionary<string, object>
+                {
+                    ["authController"] = authController.name,
+                    ["networkBootstrap"] = networkBootstrap != null ? networkBootstrap.name : "<missing>"
+                });
         }
 
         void UnbindAuthEvents()

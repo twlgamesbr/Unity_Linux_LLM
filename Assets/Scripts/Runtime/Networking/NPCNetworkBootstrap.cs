@@ -61,7 +61,13 @@ namespace NPCSystem
             {
                 ApplyTransportConfiguration();
             }
+        }
 
+        void Start()
+        {
+            // Defer auto-start to Start() so NetworkManager's Awake (execution order 0)
+            // has run and initialized its internal state (ConnectionManager, LocalClient, etc.).
+            // Calling StartConfiguredMode in Awake at -2500 causes NRE in NetworkManager.StartServer.
             if ((autoStartInPlayMode || (Application.isBatchMode && transportConfig.autoStartMode != NPCNetworkAutoStartMode.Manual)) && Application.isPlaying)
             {
                 StartConfiguredMode();

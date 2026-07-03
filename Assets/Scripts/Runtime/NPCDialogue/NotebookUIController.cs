@@ -38,6 +38,7 @@ namespace NPCSystem
         string _defaultNotesPageRight = string.Empty;
         bool _listenersBound;
         bool _runtimeEventsBound;
+        int _overlayOpenedFrame = -1;
 
         void Awake()
         {
@@ -152,6 +153,7 @@ namespace NPCSystem
 
         public void ShowNotes()
         {
+            MarkOverlayOpenedThisFrame();
             RefreshNotebookState();
             if (notesPanel != null) notesPanel.SetActive(true);
             if (helpPanel != null) helpPanel.SetActive(false);
@@ -161,11 +163,13 @@ namespace NPCSystem
 
         public void ShowMap()
         {
+            MarkOverlayOpenedThisFrame();
             if (mapImage != null) mapImage.gameObject.SetActive(true);
         }
 
         public void ShowSolve()
         {
+            MarkOverlayOpenedThisFrame();
             HideFail(0);
             if (notesPanel != null) notesPanel.SetActive(false);
             if (helpPanel != null) helpPanel.SetActive(false);
@@ -175,6 +179,7 @@ namespace NPCSystem
 
         public void ShowHelp()
         {
+            MarkOverlayOpenedThisFrame();
             if (notesPanel != null) notesPanel.SetActive(false);
             if (helpPanel != null) helpPanel.SetActive(true);
             if (solvePanel != null) solvePanel.SetActive(false);
@@ -194,6 +199,7 @@ namespace NPCSystem
                 && SelectedText(answer2) == correctAnswer2
                 && SelectedText(answer3) == correctAnswer3)
             {
+                MarkOverlayOpenedThisFrame();
                 NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.UIInput, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
                     "Mystery solve answer accepted.", source: nameof(NotebookUIController));
                 if (notebookImage != null) notebookImage.gameObject.SetActive(false);
@@ -209,6 +215,12 @@ namespace NPCSystem
 
         public void HandleGlobalClick(Vector2 mousePosition)
         {
+            // Button onClick is processed by EventSystem.Update before MonoBehaviour.Update.
+            // Without this guard, the same click that opens Notes/Map/Solve/Help is seen here
+            // as an "outside overlay" click and immediately closes the overlay again.
+            if (_overlayOpenedFrame == Time.frameCount)
+                return;
+
             foreach (RawImage image in new[] { notebookImage, mapImage, successImage })
             {
                 if (image != null && image.IsActive() && !RectTransformUtility.RectangleContainsScreenPoint(image.rectTransform, mousePosition))
@@ -216,6 +228,11 @@ namespace NPCSystem
                     image.gameObject.SetActive(false);
                 }
             }
+        }
+
+        void MarkOverlayOpenedThisFrame()
+        {
+            _overlayOpenedFrame = Time.frameCount;
         }
 
         void HandleNpcChanged(string npcName)

@@ -12,9 +12,9 @@ services:
       - SERVER_PORT=11474
       - SERVER_ADDRESS=0.0.0.0
     # Bind-mount the server build so you can iterate without rebuilding.
-    # Disable (:ro = read-only) after you're happy and want an immutable image.
+    # Read-write: Unity needs to write to _Data/ for logs and config.
     volumes:
-      - ../Builds/Server:/server:ro
+      - ../Builds/Server:/server
     restart: unless-stopped
     stop_grace_period: 30s
     logging:

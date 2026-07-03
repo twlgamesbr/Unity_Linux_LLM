@@ -470,7 +470,16 @@ namespace NPCSystem
 
         void SendErrorToClient(ulong clientId, string error)
         {
-            ReceiveErrorClientRpc(string.IsNullOrWhiteSpace(error) ? "Unknown dialogue error." : error.Trim(), RpcTarget.Single(clientId, RpcTargetUse.Temp));
+            string normalizedError = string.IsNullOrWhiteSpace(error) ? "Unknown dialogue error." : error.Trim();
+            NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.DialogueRouting, NPCFlowStatus.Error, NPCFlowLogLevel.Error,
+                $"Sending dialogue error to client {clientId}: {normalizedError}",
+                source: nameof(NPCDialogueNetworkBridge), requestId: _activeRequestId,
+                data: new Dictionary<string, object>
+                {
+                    ["clientId"] = clientId,
+                    ["error"] = normalizedError
+                });
+            ReceiveErrorClientRpc(normalizedError, RpcTarget.Single(clientId, RpcTargetUse.Temp));
         }
 
         void SendNotebookStateToClient(ulong clientId, NPCNotebookStateMessage payload)

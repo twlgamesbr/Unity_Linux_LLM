@@ -1,6 +1,18 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "instructions": ["AGENTS.md"],
+  "mcp": {
+    "filesystem": {
+      "type": "local",
+      "command": ["mcp-server-filesystem", "/mnt/data/Projects_SSD"],
+      "enabled": true
+    },
+    "qdrant": {
+      "type": "local",
+      "command": ["qdrant-mcp", "--transport=stdio"],
+      "enabled": true 
+    }
+  },
   "provider": {
     "localai": {
       "npm": "@ai-sdk/openai-compatible",
@@ -45,25 +57,6 @@
       "mode": "subagent",
       "description": "Fine-tuning orchestration with LocalAI and Modal.",
       "permission": { "read": "allow", "glob": "allow", "grep": "allow", "edit": "allow", "bash": "allow" }
-    }
-  },
-  "command": {
-    "scan": {
-      "description": "Scan codebase files for classes, interfaces, structs, enums using LocalAI",
-      "agent": "code-scanner",
-      "template": "Scan the provided files/directories and identify all class, interface, struct, and enum declarations. $ARGUMENTS"
-    },
-    "remember": {
-      "description": "Store a fact in long-term memory",
-      "template": "Add this to long-term memory: $ARGUMENTS. Update .opencode/memory/long-term.json facts array with a new entry {id, timestamp, fact, category}."
-    },
-    "infra": {
-      "description": "Snapshot Docker infrastructure state into long-term memory",
-      "template": "Run bash .opencode/scripts/infra-snapshot.sh and report the current container states."
-    },
-    "ps": {
-      "description": "List running Docker containers with ports and status",
-      "template": "Run docker ps --format 'table {{.Names}}\\t{{.Ports}}\\t{{.Status}}' and show results."
     }
   }
 }

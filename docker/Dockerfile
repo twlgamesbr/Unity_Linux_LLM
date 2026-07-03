@@ -27,6 +27,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libc6 \
     libstdc++6 \
     libgcc-s1 \
+    libgtk-3-0 \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
@@ -38,7 +39,7 @@ RUN groupadd -r npc && useradd -r -g npc -d /server -s /sbin/nologin npc && \
 FROM base AS with-build
 
 # Copy the server build if it exists — empty directory is fine (COPY won't fail).
-COPY Builds/Server3/ /server/
+COPY Builds/Server/ /server/
 
 RUN chmod +x /server/*.x86_64 2>/dev/null; chown -R npc:npc /server/; true
 
@@ -50,7 +51,9 @@ COPY --chmod=755 docker/entrypoint.sh /entrypoint.sh
 # Copy server files from the build stage (with correct ownership)
 COPY --from=with-build --chown=npc:npc /server /server
 
-USER npc
+# Dev bind-mount: run as root so the server can write to /server/
+# even when the bind-mount overrides the image's ownership.
+# For production, switch back to USER npc with a dedicated volume.
 WORKDIR /server
 
 # Unity Transport UDP + TCP (server default port)
