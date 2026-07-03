@@ -1,7 +1,7 @@
 # Scene Initialization Workflow
 
 **Last verified:** 2026-07-01 13:54 -03  
-**Scene:** `Assets/Scenes/NPCDialoguePrototype.unity`  
+**Scene:** `Assets/Scenes/NPCDialoguePrototype1.unity`  
 **GladeKit bridge:** `0.7.12`  
 **LocalAI endpoint:** `http://localhost:8080`
 

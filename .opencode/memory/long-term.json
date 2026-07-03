@@ -1,0 +1,134 @@
+{
+  "project": {
+    "name": "Unity_Linux_LLM",
+    "type": "Unity 6 NPC dialogue prototype",
+    "unity_version": "6000.5.1f1",
+    "main_scene": "Assets/Scenes/NPCDialoguePrototype1.unity"
+  },
+  "user": {
+    "name": "athar",
+    "modal_workspace": "andretwl",
+    "localai_endpoint": "http://localhost:8080",
+    "modal_vllm_endpoint": "https://andretwl--modal-qwen-vllm-serve.modal.run/v1",
+    "modal_ollama_endpoint": "https://andretwl--example-ollama-llama-serve.modal.run/v1"
+  },
+  "infrastructure": {
+    "localai_running": true,
+    "modal_vllm_deployed": true,
+    "qdrant_available": true,
+    "cognee_available": false
+  },
+  "docker_containers": {
+    "pc-resource-localai": {
+      "image": "localai/localai:latest-gpu-nvidia-cuda-13",
+      "port": 8080,
+      "status": "up_37h",
+      "compose_file": "/mnt/data/Projects_SSD/pc-resource-agent-team/localai/compose.yaml",
+      "gpu": "all",
+      "mem_limit": "12g",
+      "notes": "Watchdog idle timeout 30m, memory reclaimer active, agent pool enabled with chromem vector engine"
+    },
+    "unity-linux-llm-auth-db": {
+      "image": "postgres:16",
+      "port": 5433,
+      "internal_port": 5432,
+      "status": "up_34h_healthy",
+      "compose_file": "/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Backend/PlayerAuthService/docker-compose.yml",
+      "database": "unity_linux_llm_auth",
+      "user": "postgres",
+      "password": "postgres",
+      "network": "playerauthservice_default",
+      "notes": "Auth service database for player authentication"
+    },
+    "qdrant-codebase": {
+      "image": "qdrant/qdrant:latest",
+      "port": 6333,
+      "grpc_port": 6334,
+      "status": "up_37h",
+      "version": "v1.18.2",
+      "network": "bridge",
+      "notes": "Vector database for codebase embeddings and RAG"
+    },
+    "npc-dedicated-server": {
+      "image": "docker-npc-server (custom)",
+      "port": 11474,
+      "status": "up_3h",
+      "network_mode": "host",
+      "compose_file": "/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/docker/docker-compose.yml",
+      "build_dockerfile": "/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/docker/Dockerfile",
+      "volume": "/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Builds/Server:/server:ro",
+      "notes": "Unity dedicated server for multiplayer. Host networking reaches LocalAI:8080, Qdrant:6333, Auth:5433 directly. Font/UI warnings in console but non-critical."
+    }
+  },
+  "network_map": {
+    "localai_api": "http://localhost:8080/v1",
+    "localai_health": "http://localhost:8080/health",
+    "qdrant_http": "http://localhost:6333",
+    "qdrant_grpc": "localhost:6334",
+    "postgres": "localhost:5433",
+    "npc_server": "localhost:11474",
+    "auth_service_api": "http://localhost:6000 (host mode, shares NPC server namespace)"
+  },
+  "facts": [
+    {
+      "id": 1,
+      "timestamp": "2026-07-03T08:07:25Z",
+      "fact": "Infrastructure tracking system built. Docker containers: LocalAI:8080, Qdrant:6333, PostgreSQL:5433, NPC-server:11474. Snapshot via /infra command.",
+      "category": "system"
+    },
+    {
+      "id": 2,
+      "timestamp": "2026-07-03T08:07:25Z",
+      "fact": "3-tier model routing: LocalAI small (1.5B/3B) for bulk, LocalAI medium (8B) for balanced, Modal remote (Qwen3-8B H100 / 32B A100) for heavy lifting.",
+      "category": "system"
+    },
+    {
+      "id": 3,
+      "timestamp": "2026-07-03T08:07:25Z",
+      "fact": "Subagents available: code-scanner (read-only, LocalAI 1.5B), architect (design/refactor, LocalAI 8B/Modal), trainer (fine-tuning).",
+      "category": "system"
+    },
+    {
+      "id": 4,
+      "timestamp": "2026-07-03T08:07:25Z",
+      "fact": "Modal endpoints: vLLM (Qwen3-8B on H100) proxied as modal-vllm-qwen in LocalAI. Direct API at andretwl--modal-qwen-vllm-serve.modal.run/v1. Ollama (qwen2.5:32b on A100) at andretwl--example-ollama-llama-serve.modal.run/v1.",
+      "category": "system"
+    }
+  ],
+  "session_count": 1,
+  "last_session": "2026-07-03T08:07:25Z",
+  "infrastructure_snapshot": {
+    "timestamp": "2026-07-03T08:07:25Z",
+    "containers": {
+      "npc-dedicated-server": {
+        "image": "docker-npc-server",
+        "status": "Up_3 hours",
+        "created": "2026-07-03 02:13:30 -0300 -03",
+        "ports": "",
+        "state": "running"
+      },
+      "unity-linux-llm-auth-db": {
+        "image": "postgres:16",
+        "status": "Up_34 hours (healthy)",
+        "created": "2026-07-01 19:25:06 -0300 -03",
+        "ports": "0.0.0.0:5433->5432/tcp, [::]:5433->5432/tcp",
+        "state": "running"
+      },
+      "pc-resource-localai": {
+        "image": "localai/localai:latest-gpu-nvidia-cuda-13",
+        "status": "Up_37 hours (healthy)",
+        "created": "2026-06-30 19:36:06 -0300 -03",
+        "ports": "",
+        "state": "running"
+      },
+      "qdrant-codebase": {
+        "image": "qdrant/qdrant:latest",
+        "status": "Up_37 hours",
+        "created": "2026-06-30 13:16:09 -0300 -03",
+        "ports": "0.0.0.0:6333-6334->6333-6334/tcp, [::]:6333-6334->6333-6334/tcp",
+        "state": "running"
+      }
+    }
+  },
+  "last_infra_check": "2026-07-03T08:07:25Z"
+}

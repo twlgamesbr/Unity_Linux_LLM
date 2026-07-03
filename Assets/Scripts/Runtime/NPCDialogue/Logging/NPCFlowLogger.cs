@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using EditorAttributes;
-using GladeAgenticAI.Core.Memory;
 using UnityEngine;
 
 namespace NPCSystem
@@ -86,19 +85,6 @@ namespace NPCSystem
             }
         }
 
-        void Awake()
-        {
-            if (_instance != null && _instance != this)
-            {
-                Log(NPCFlowStage.SceneBootstrap, NPCFlowStatus.Warning, NPCFlowLogLevel.Warning,
-                    "Duplicate NPCFlowLogger detected; keeping existing instance.", source: nameof(NPCFlowLogger));
-                return;
-            }
-
-            _instance = this;
-            EnsureLogPath();
-            SubscribeCogneeDiagnostics();
-        }
 
         void OnDestroy()
         {
@@ -470,30 +456,6 @@ namespace NPCSystem
             return $"unity-{DateTime.UtcNow:yyyyMMdd-HHmmss}-{Guid.NewGuid().ToString("N").Substring(0, 8)}";
         }
 
-        static void SubscribeCogneeDiagnostics()
-        {
-            try
-            {
-                var cogneeType = typeof(CogneeMemoryService);
-                var diagField = cogneeType.GetField("OnDiagnostic", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public);
-                if (diagField != null)
-                {
-                    Action<int, int, int, string, string, Dictionary<string, object>> handler =
-                        (level, stageOrd, statusOrd, message, source, data) =>
-                        {
-                            NPCFlowStage stage = (NPCFlowStage)stageOrd;
-                            NPCFlowStatus status = (NPCFlowStatus)statusOrd;
-                            NPCFlowLogLevel logLevel = (NPCFlowLogLevel)level;
-                            _instance.Log(stage, status, logLevel, message, source, null, null, null, data);
-                        };
-                    diagField.SetValue(null, handler);
-                }
-            }
-            catch (Exception ex)
-            {
-                UnityEngine.Debug.LogWarning($"[NPCFlowLogger] Failed to hook CogneeMemoryService diagnostics: {ex.Message}");
-            }
-        }
 
         // ── Validation helpers for EditorAttributes ──
         bool IncludeTextOrRaw() => includeTextSnippets || includeRawTextPayloads;

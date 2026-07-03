@@ -187,7 +187,7 @@ Before generating:
 | Issue | Fix |
 |-------|-----|
 | "Template not found" | Check file path, use forward slashes |
-| "Prototype scene not found" | Verify `Assets/Scenes/NPCDialoguePrototype.unity` exists |
+| "Prototype scene not found" | Verify `Assets/Scenes/NPCDialoguePrototype1.unity` exists |
 | "Output scene already exists" | Delete or rename existing scene |
 | NPCs not loading | Check NPCProfile ScriptableObjects created in `Assets/Data/MysteryScenes/` |
 | Knowledge not working | Verify markdown format, check RAG embeddings built |

@@ -1,7 +1,7 @@
 {
   "caseSlug": "victorian-manor-vendetta-9759",
   "displayName": "The Victorian Manor Vendetta",
-  "prototypeScenePath": "Assets/Scenes/NPCDialoguePrototype.unity",
+  "prototypeScenePath": "Assets/Scenes/NPCDialoguePrototype1.unity",
   "outputScenePath": "Assets/Scenes/GeneratedMysteries/victorian-manor-vendetta-9759.unity",
   "ragEmbeddingPath": "RAG/victorian-manor-vendetta-9759/NPCDialogues-minilm-chunked.rag",
   "correctAnswers": {

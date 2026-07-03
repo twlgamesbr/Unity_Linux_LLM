@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using EditorAttributes;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -132,10 +133,16 @@ namespace NPCSystem
     [DisallowMultipleComponent]
     public class PlayerAuthService : MonoBehaviour
     {
+        [Title("Player Auth Service")]
+        [HelpBox("Client-side gateway for login/register/session restore against the backend auth service. This component should only own HTTP auth/session concerns; multiplayer spawn and NGO ownership stay in AuthNetworkBridge and NetworkManager.", MessageMode.Log, drawAbove: true)]
         [Header("Service")]
         [SerializeField] string serviceBaseUrl = "http://localhost:5100";
         [SerializeField] float requestTimeoutSeconds = 15f;
         [SerializeField] bool validateStoredSessionOnStart = true;
+
+        [SerializeField, ReadOnly] string lastAuthStatus = "Idle";
+        [SerializeField, ReadOnly] string lastAuthRoute = string.Empty;
+        [SerializeField, ReadOnly] long lastAuthDurationMs;
 
         bool _initialized;
 
@@ -143,22 +150,80 @@ namespace NPCSystem
         public bool IsAuthenticated => CurrentSession != null
             && !string.IsNullOrWhiteSpace(CurrentSession.sessionToken)
             && !PlayerSessionStore.IsExpired(CurrentSession.expiresAtUtc);
+        public string ServiceBaseUrl => serviceBaseUrl?.Trim() ?? string.Empty;
+
+        [ShowInInspector]
+        string ServiceBaseUrlPreview => serviceBaseUrl?.Trim() ?? string.Empty;
+
+        [ShowInInspector]
+        string AuthSessionPreview => CurrentSession == null ? "<none>" : $"{CurrentSession.username} ({CurrentSession.sessionId})";
+
+        [ShowInInspector]
+        string BackendHealthPreview => $"{BuildUrl("api/auth/login")} | timeout={Mathf.Max(1, Mathf.CeilToInt(requestTimeoutSeconds))}s";
+
+        [Button("Validate Auth Service Settings")]
+        void ValidateAuthServiceSettings()
+        {
+            bool validUrl = !string.IsNullOrWhiteSpace(serviceBaseUrl)
+                && (serviceBaseUrl.StartsWith("http://") || serviceBaseUrl.StartsWith("https://"));
+            bool validTimeout = requestTimeoutSeconds > 0f;
+            lastAuthStatus = validUrl && validTimeout
+                ? $"Auth service settings look valid: {BackendHealthPreview}"
+                : "Auth service settings are incomplete. Check serviceBaseUrl and requestTimeoutSeconds.";
+
+            NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.ConfigurationValidation,
+                validUrl && validTimeout ? NPCFlowStatus.Success : NPCFlowStatus.Warning,
+                validUrl && validTimeout ? NPCFlowLogLevel.Info : NPCFlowLogLevel.Warning,
+                lastAuthStatus,
+                source: nameof(PlayerAuthService),
+                data: new System.Collections.Generic.Dictionary<string, object>
+                {
+                    ["serviceBaseUrl"] = serviceBaseUrl ?? string.Empty,
+                    ["requestTimeoutSeconds"] = requestTimeoutSeconds,
+                    ["validateStoredSessionOnStart"] = validateStoredSessionOnStart
+                });
+        }
 
         public async Task<PlayerAuthSessionResponse> InitializeAsync()
         {
             if (_initialized)
                 return IsAuthenticated ? CurrentSession : null;
 
+            using var scope = NPCFlowScope.Start(NPCFlowLogger.FindOrCreate(), NPCFlowStage.AuthSession, nameof(PlayerAuthService),
+                data: new System.Collections.Generic.Dictionary<string, object>
+                {
+                    ["validateStoredSessionOnStart"] = validateStoredSessionOnStart,
+                    ["serviceBaseUrl"] = serviceBaseUrl ?? string.Empty
+                });
+
             CurrentSession = PlayerSessionStore.Load();
             _initialized = true;
 
             if (CurrentSession == null)
+            {
+                lastAuthStatus = "No stored auth session found.";
+                scope.Skipped(lastAuthStatus);
                 return null;
+            }
 
             if (!validateStoredSessionOnStart)
+            {
+                lastAuthStatus = IsAuthenticated ? $"Stored auth session loaded for {CurrentSession.username}." : "Stored auth session is not valid.";
+                scope.Success(lastAuthStatus, BuildSessionData(CurrentSession));
                 return IsAuthenticated ? CurrentSession : null;
+            }
 
-            return await TryRestoreStoredSessionAsync();
+            PlayerAuthSessionResponse restored = await TryRestoreStoredSessionAsync();
+            if (restored == null)
+            {
+                scope.Warning("Stored auth session could not be restored.");
+            }
+            else
+            {
+                scope.Success($"Stored auth session restored for {restored.username}.", BuildSessionData(restored));
+            }
+
+            return restored;
         }
 
         public async Task<PlayerAuthRegisterResponse> RegisterAsync(string username, string password)
@@ -237,9 +302,13 @@ namespace NPCSystem
                 return;
             }
 
+            using var scope = NPCFlowScope.Start(NPCFlowLogger.FindOrCreate(), NPCFlowStage.AuthSession, nameof(PlayerAuthService),
+                data: BuildSessionData(CurrentSession));
             try
             {
                 await SendRequestAsync<PlayerAuthEmptyResponse>("api/auth/logout", UnityWebRequest.kHttpVerbPOST, "{}", CurrentSession.sessionToken);
+                lastAuthStatus = $"Logged out auth session for {CurrentSession.username}.";
+                scope.Success(lastAuthStatus);
             }
             finally
             {
@@ -250,9 +319,22 @@ namespace NPCSystem
         async Task<TResponse> SendRequestAsync<TResponse>(string route, string method, string jsonBody = null, string bearerToken = null)
         {
             string url = BuildUrl(route);
+            NPCFlowLogger logger = NPCFlowLogger.FindOrCreate();
+            int timeoutSeconds = Mathf.Max(1, Mathf.CeilToInt(requestTimeoutSeconds));
+            lastAuthRoute = route?.Trim() ?? string.Empty;
+            var data = new System.Collections.Generic.Dictionary<string, object>
+            {
+                ["route"] = route ?? string.Empty,
+                ["method"] = method ?? string.Empty,
+                ["url"] = url,
+                ["timeoutSeconds"] = timeoutSeconds,
+                ["hasJsonBody"] = !string.IsNullOrWhiteSpace(jsonBody),
+                ["hasBearerToken"] = !string.IsNullOrWhiteSpace(bearerToken)
+            };
+            using var scope = NPCFlowScope.Start(logger, NPCFlowStage.AuthRequest, nameof(PlayerAuthService), data: data);
             using var request = new UnityWebRequest(url, method);
             request.downloadHandler = new DownloadHandlerBuffer();
-            request.timeout = Mathf.Max(1, Mathf.CeilToInt(requestTimeoutSeconds));
+            request.timeout = timeoutSeconds;
             request.SetRequestHeader("Accept", "application/json");
 
             if (!string.IsNullOrWhiteSpace(jsonBody))
@@ -274,16 +356,38 @@ namespace NPCSystem
 
             if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
             {
-                throw new InvalidOperationException(ParseErrorMessage(request.downloadHandler.text, request.error));
+                string error = ParseErrorMessage(request.downloadHandler.text, request.error);
+                lastAuthDurationMs = scope.ElapsedMilliseconds;
+                lastAuthStatus = $"Auth request failed: {route} -> {error}";
+                scope.Error(new InvalidOperationException(error), lastAuthStatus, new System.Collections.Generic.Dictionary<string, object>
+                {
+                    ["responseText"] = request.downloadHandler.text ?? string.Empty
+                });
+                throw new InvalidOperationException(error);
             }
 
             string responseText = request.downloadHandler.text;
             if (string.IsNullOrWhiteSpace(responseText))
+            {
+                lastAuthDurationMs = scope.ElapsedMilliseconds;
+                lastAuthStatus = $"Auth request succeeded with empty response: {route}";
+                scope.Success(lastAuthStatus);
                 return default;
+            }
 
             TResponse response = JsonUtility.FromJson<TResponse>(responseText);
             if (response == null)
-                throw new InvalidOperationException("Auth server returned an unreadable response.");
+            {
+                string error = "Auth server returned an unreadable response.";
+                lastAuthDurationMs = scope.ElapsedMilliseconds;
+                lastAuthStatus = $"{route} failed: {error}";
+                scope.Error(new InvalidOperationException(error), lastAuthStatus);
+                throw new InvalidOperationException(error);
+            }
+
+            lastAuthDurationMs = scope.ElapsedMilliseconds;
+            lastAuthStatus = $"Auth request succeeded: {route}";
+            scope.Success(lastAuthStatus);
 
             return response;
         }
@@ -316,6 +420,17 @@ namespace NPCSystem
             return string.IsNullOrWhiteSpace(SystemInfo.deviceUniqueIdentifier)
                 ? SystemInfo.deviceName
                 : SystemInfo.deviceUniqueIdentifier;
+        }
+
+        static System.Collections.Generic.Dictionary<string, object> BuildSessionData(PlayerAuthSessionResponse session)
+        {
+            return new System.Collections.Generic.Dictionary<string, object>
+            {
+                ["sessionId"] = session?.sessionId ?? string.Empty,
+                ["playerId"] = session?.playerId ?? string.Empty,
+                ["username"] = session?.username ?? string.Empty,
+                ["expiresAtUtc"] = session?.expiresAtUtc ?? string.Empty
+            };
         }
     }
 }

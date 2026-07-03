@@ -1,7 +1,7 @@
 {
   "caseSlug": "your-mystery-slug",
   "displayName": "Your Mystery Title",
-  "prototypeScenePath": "Assets/Scenes/NPCDialoguePrototype.unity",
+  "prototypeScenePath": "Assets/Scenes/NPCDialoguePrototype1.unity",
   "outputScenePath": "Assets/Scenes/GeneratedMysteries/your-mystery-slug.unity",
   "ragEmbeddingPath": "RAG/your-mystery-slug/NPCDialogues-minilm-chunked.rag",
   "caseMetadata": {

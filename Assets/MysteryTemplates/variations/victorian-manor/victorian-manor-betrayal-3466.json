@@ -1,7 +1,7 @@
 {
   "caseSlug": "victorian-manor-betrayal-3466",
   "displayName": "The Victorian Manor Betrayal",
-  "prototypeScenePath": "Assets/Scenes/NPCDialoguePrototype.unity",
+  "prototypeScenePath": "Assets/Scenes/NPCDialoguePrototype1.unity",
   "outputScenePath": "Assets/Scenes/GeneratedMysteries/victorian-manor-betrayal-3466.unity",
   "ragEmbeddingPath": "RAG/victorian-manor-betrayal-3466/NPCDialogues-minilm-chunked.rag",
   "correctAnswers": {

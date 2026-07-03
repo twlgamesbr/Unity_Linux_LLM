@@ -12,7 +12,7 @@ namespace NPCSystem.Editor
     public static class MysterySceneTemplateGenerator
 {
     const string DefaultTemplatePath = "Assets/MysteryTemplates/welltodo-style-mystery-template.json";
-    const string DefaultPrototypeScenePath = "Assets/Scenes/NPCDialoguePrototype.unity";
+    const string DefaultPrototypeScenePath = "Assets/Scenes/NPCDialoguePrototype1.unity";
 
     [MenuItem("Tools/Mystery Scenes/Generate From Template JSON...")]
     public static void GenerateFromTemplatePicker()
@@ -181,6 +181,7 @@ namespace NPCSystem.Editor
             bootstrapper.defaultNpcSlug = profiles[0].GetNpcSlug();
         }
 
+#if !UNITY_SERVER
         NPCDialogueUIController ui = UnityEngine.Object.FindAnyObjectByType<NPCDialogueUIController>(FindObjectsInactive.Include);
         if (ui != null)
         {
@@ -199,6 +200,7 @@ namespace NPCSystem.Editor
             SetDropdownOptions(notebook.answer3, template.choices.evidence);
             EditorUtility.SetDirty(notebook);
         }
+#endif
 
         EditorUtility.SetDirty(dialogueManager);
         if (bootstrapper != null) EditorUtility.SetDirty(bootstrapper);

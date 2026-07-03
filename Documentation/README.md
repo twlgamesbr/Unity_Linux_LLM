@@ -44,7 +44,7 @@ Assets/
 │       └── NPCSystem.Tests.asmdef
 ├── LLMUnity/                        # In-game LLM runtime library
 ├── Scenes/
-│   └── NPCDialoguePrototype.unity   # Main prototype scene
+│   └── NPCDialoguePrototype1.unity   # Main prototype scene
 ├── Prefabs/
 │   └── NPC templates and UI
 ├── Resources/
@@ -128,7 +128,7 @@ Unit and integration tests for core systems.
 
 ## Getting Started: First 5 Minutes
 
-1. **Understand the Scene**: Open `NPCDialoguePrototype.unity` in Unity Editor
+1. **Understand the Scene**: Open `NPCDialoguePrototype1.unity` in Unity Editor
 2. **Review Profile Data**: Look at `Assets/Resources/NPC/` for NPC profiles
 3. **Inspect RAG Data**: Check `Assets/Resources/RAG/` for knowledge bases
 4. **Check Configuration**: Review `NPCDialogueManager` component settings

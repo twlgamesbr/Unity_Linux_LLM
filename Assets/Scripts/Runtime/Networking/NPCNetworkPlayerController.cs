@@ -1,6 +1,9 @@
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+#if !UNITY_SERVER
 using UnityEngine.InputSystem;
+#endif
 
 namespace NPCSystem
 {
@@ -21,8 +24,10 @@ namespace NPCSystem
         public CharacterController characterController;
         public Animator animator;
         public Transform cameraFollowTarget;
+#if !UNITY_SERVER
         public PlayerInput playerInput;
         public InputActionAsset inputActions;
+#endif
         public string actionMapName = "Player";
         public string moveActionName = "Move";
         public string lookActionName = "Look";
@@ -53,12 +58,16 @@ namespace NPCSystem
         Vector2 _lookInput;
         float _verticalVelocity;
         float _yaw;
+#if !UNITY_SERVER
         InputAction _moveAction;
         InputAction _lookAction;
         InputAction _jumpAction;
         InputAction _sprintAction;
+#endif
         Camera _mainCamera;
+#if !UNITY_SERVER
         bool _inputEnabled;
+#endif
 
         public bool HasInputAuthority => !Application.isPlaying || IsOwner;
 
@@ -78,13 +87,28 @@ namespace NPCSystem
             base.OnNetworkSpawn();
             ResolveReferences();
 
+            LogAuthorityEvent(NPCFlowStatus.Start, "Network player controller spawned.");
+
             if (IsOwner)
             {
+#if !UNITY_SERVER
                 EnableInput();
+#endif
                 if (logSpawnDiagnostics)
                 {
+#if !UNITY_SERVER
                     string resolvedMoveAction = _moveAction != null ? _moveAction.name : "missing";
-                    Debug.Log($"NPCNetworkPlayerController owner input enabled. ownerClientId={OwnerClientId}, localClientId={NetworkManager.Singleton?.LocalClientId}, actionMap={actionMapName}, moveAction={resolvedMoveAction}", this);
+#else
+                    string resolvedMoveAction = "missing";
+#endif
+                    LogAuthorityEvent(NPCFlowStatus.Success,
+                        "Owner input enabled for spawned player controller.",
+                        new Dictionary<string, object>
+                        {
+                            ["localClientId"] = NetworkManager.Singleton != null ? NetworkManager.Singleton.LocalClientId : 0ul,
+                            ["actionMap"] = actionMapName,
+                            ["moveAction"] = resolvedMoveAction
+                        });
                 }
 
                 if (lockCursorForOwner)
@@ -95,18 +119,24 @@ namespace NPCSystem
             }
             else
             {
+#if !UNITY_SERVER
                 if (playerInput != null)
                 {
                     playerInput.DeactivateInput();
                 }
 
                 DisableInput();
+#endif
+                LogAuthorityEvent(NPCFlowStatus.Success, "Spawned non-owner controller; local input disabled.");
             }
         }
 
         public override void OnNetworkDespawn()
         {
+#if !UNITY_SERVER
             DisableInput();
+#endif
+            LogAuthorityEvent(NPCFlowStatus.Warning, "Network player controller despawned.");
             base.OnNetworkDespawn();
         }
 
@@ -114,52 +144,81 @@ namespace NPCSystem
         {
             if (!Application.isPlaying || (IsSpawned && IsOwner))
             {
+#if !UNITY_SERVER
                 EnableInput();
+#endif
             }
         }
 
         void OnDisable()
         {
+#if !UNITY_SERVER
             DisableInput();
+#endif
         }
 
         void Update()
         {
             if (!HasInputAuthority)
             {
+#if !UNITY_SERVER
                 UpdateAnimator(Vector2.zero, false, IsGrounded());
+#else
+                // Server: no input-driven animation; skip
+#endif
                 return;
             }
 
+#if !UNITY_SERVER
             ReadInput();
+#endif
             MoveCharacter(Time.deltaTime);
             UpdateOwnerCamera(Time.deltaTime);
         }
 
         public void ResolveReferences()
-        {
-            if (characterController == null)
-            {
-                characterController = GetComponent<CharacterController>();
-            }
+ {
+     if (characterController == null)
+     {
+         characterController = GetComponent<CharacterController>();
+     }
 
-            if (animator == null)
-            {
-                animator = GetComponentInChildren<Animator>(true);
-            }
+     if (animator == null)
+     {
+         animator = GetComponentInChildren<Animator>(true);
+     }
 
-            if (playerInput == null)
-            {
-                playerInput = GetComponent<PlayerInput>();
-            }
+ #if !UNITY_SERVER
+     if (playerInput == null)
+     {
+         playerInput = GetComponent<PlayerInput>();
+     }
+ #endif
 
-            if (cameraFollowTarget == null)
-            {
-                cameraFollowTarget = transform;
-            }
-        }
+     if (cameraFollowTarget == null)
+     {
+         cameraFollowTarget = transform;
+     }
+ }
 
-        void EnableInput()
+ void LogAuthorityEvent(NPCFlowStatus status, string message, Dictionary<string, object> data = null)
+ {
+     data ??= new Dictionary<string, object>();
+     data["ownerClientId"] = OwnerClientId;
+     data["isOwner"] = IsOwner;
+     data["isServer"] = IsServer;
+     data["isSpawned"] = IsSpawned;
+     NPCFlowLogger.FindOrCreate()?.Log(
+         NPCFlowStage.OwnershipAuthority,
+         status,
+         status == NPCFlowStatus.Warning ? NPCFlowLogLevel.Warning : NPCFlowLogLevel.Info,
+         message,
+         source: nameof(NPCNetworkPlayerController),
+         data: data);
+ }
+
+ #if !UNITY_SERVER
+ void EnableInput()
         {
             if (usePlayerInputCopy && playerInput != null)
             {
@@ -234,6 +293,7 @@ namespace NPCSystem
                 _moveInput = Vector2.ClampMagnitude(fallbackMove, 1f);
             }
         }
+#endif // !UNITY_SERVER
 
         void MoveCharacter(float deltaTime)
         {
@@ -245,6 +305,7 @@ namespace NPCSystem
                 _verticalVelocity = groundedStickVelocity;
             }
 
+#if !UNITY_SERVER
             if (grounded && _jumpAction != null && _jumpAction.WasPressedThisFrame())
             {
                 _verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
@@ -255,6 +316,9 @@ namespace NPCSystem
             }
 
             bool sprinting = (_sprintAction != null && _sprintAction.IsPressed()) || (allowKeyboardFallback && Keyboard.current != null && (Keyboard.current.leftShiftKey.isPressed || Keyboard.current.rightShiftKey.isPressed));
+#else
+            bool sprinting = false;
+#endif
             float targetSpeed = sprinting ? sprintSpeed : walkSpeed;
             Vector3 planarMove = new Vector3(_moveInput.x, 0f, _moveInput.y);
             planarMove = Vector3.ClampMagnitude(planarMove, 1f);
@@ -272,7 +336,9 @@ namespace NPCSystem
             _verticalVelocity += gravity * deltaTime;
             Vector3 velocity = planarMove * targetSpeed + Vector3.up * _verticalVelocity;
             characterController.Move(velocity * deltaTime);
+#if !UNITY_SERVER
             UpdateAnimator(_moveInput, sprinting, characterController.isGrounded);
+#endif
         }
 
         bool IsGrounded()
@@ -302,6 +368,7 @@ namespace NPCSystem
             _mainCamera.transform.LookAt(cameraFollowTarget.position + Vector3.up * 1.25f);
         }
 
+#if !UNITY_SERVER
         void UpdateAnimator(Vector2 move, bool sprinting, bool grounded)
         {
             if (animator == null) return;
@@ -312,5 +379,6 @@ namespace NPCSystem
             animator.SetBool(GroundedHash, grounded);
             animator.SetBool(SprintingHash, sprinting);
         }
+#endif
     }
 }

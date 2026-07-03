@@ -1,7 +1,7 @@
 # Multiplayer Workflow and Scene Reliability Rules
 
 **Last verified:** 2026-07-01 12:44 -03  
-**Scene:** `Assets/Scenes/NPCDialoguePrototype.unity`  
+**Scene:** `Assets/Scenes/NPCDialoguePrototype1.unity`  
 **Networking stack:** Unity Netcode for GameObjects `2.13.0`, Unity Transport via `UnityTransport`, Multiplayer Play Mode package present.
 
 This project must use a documentation-first, GladeKit-verified workflow for multiplayer changes. The scene is still small enough that every NetworkManager, NetworkObject, transport field, bridge reference, and UI binding should be explicitly checked before and after edits.

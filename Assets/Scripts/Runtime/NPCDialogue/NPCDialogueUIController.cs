@@ -1,3 +1,4 @@
+#if !UNITY_SERVER
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -444,3 +445,4 @@ namespace NPCSystem
         }
     }
 }
+#endif // !UNITY_SERVER

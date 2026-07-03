@@ -1,6 +1,6 @@
 # Mystery Scene Templates
 
-This folder contains JSON templates for generating LLM dialogue mystery scenes from `Assets/Scenes/NPCDialoguePrototype.unity`. The `MysterySceneTemplateGenerator.cs` Editor tool deserializes these JSON files and generates Unity scenes with configured `NPCProfile` assets, knowledge markdown files, and solve-panel dropdowns.
+This folder contains JSON templates for generating LLM dialogue mystery scenes from `Assets/Scenes/NPCDialoguePrototype1.unity`. The `MysterySceneTemplateGenerator.cs` Editor tool deserializes these JSON files and generates Unity scenes with configured `NPCProfile` assets, knowledge markdown files, and solve-panel dropdowns.
 
 ---
 
@@ -47,7 +47,7 @@ Generated variations are saved under `Assets/MysteryTemplates/variations/<theme>
 |-------|------|----------|-------------|
 | `caseSlug` | `string` | Yes | Unique identifier for generated assets, RAG categories, and history paths. Lowercase alphanumeric with hyphens. |
 | `displayName` | `string` | Yes | Human-readable title shown in the scene and logs. |
-| `prototypeScenePath` | `string` | No | Source `.unity` scene to copy. Defaults to `Assets/Scenes/NPCDialoguePrototype.unity`. |
+| `prototypeScenePath` | `string` | No | Source `.unity` scene to copy. Defaults to `Assets/Scenes/NPCDialoguePrototype1.unity`. |
 | `outputScenePath` | `string` | No | Destination path for the generated scene. Generator refuses to overwrite existing scenes. Defaults to `Assets/Scenes/GeneratedMysteries/<caseSlug>.unity`. |
 | `ragEmbeddingPath` | `string` | No | StreamingAssets path to the RAG embedding index. Defaults to `RAG/<caseSlug>/NPCDialogues-minilm-chunked.rag`. |
 | `correctAnswers` | `object` | Yes | The three correct solve answers (see below). |

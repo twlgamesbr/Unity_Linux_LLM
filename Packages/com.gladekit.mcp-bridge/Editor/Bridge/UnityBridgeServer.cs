@@ -86,12 +86,47 @@ namespace GladeAgenticAI.Bridge
             // Runtime log capture is owned by RuntimeLogStream ([InitializeOnLoad]
             // in unity-bridge/Editor/Services/RuntimeLogStream.cs). It subscribes
             // on its own static ctor; no hookup needed here.
-            StartServer();
+            if (ShouldAutoStartInThisEditorInstance())
+            {
+                StartServer();
+            }
+            else
+            {
+                Debug.Log("[UnityBridge] Skipping auto-start in secondary Multiplayer Play Mode editor instance.");
+            }
         }
 
         private static void OnCompilationFinished(object obj)
         {
             _compilationCount++;
+        }
+
+        private static bool ShouldAutoStartInThisEditorInstance()
+        {
+            string[] args = Environment.GetCommandLineArgs();
+            for (int index = 0; index < args.Length - 1; index++)
+            {
+                if (!string.Equals(args[index], "-name", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                string candidate = args[index + 1]?.Trim();
+                if (string.IsNullOrWhiteSpace(candidate))
+                {
+                    return true;
+                }
+
+                if (candidate.StartsWith("Player", StringComparison.OrdinalIgnoreCase) &&
+                    int.TryParse(candidate.Substring("Player".Length).Trim(), out int playerIndex))
+                {
+                    return playerIndex <= 1;
+                }
+
+                return true;
+            }
+
+            return true;
         }
 
         /// <summary>

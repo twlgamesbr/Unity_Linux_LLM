@@ -15,6 +15,7 @@ namespace NPCSystem.Tests
                 NPCSceneInitializationPhase.SceneReferences,
                 NPCSceneInitializationPhase.NetworkTransport,
                 NPCSceneInitializationPhase.DialogueServices,
+                NPCSceneInitializationPhase.BackendReadiness,
                 NPCSceneInitializationPhase.NetworkBridge,
                 NPCSceneInitializationPhase.Validation,
                 NPCSceneInitializationPhase.Spawning
@@ -30,7 +31,14 @@ namespace NPCSystem.Tests
             AssertExecutionOrder<NPCDialogueManager>(-1500);
             AssertExecutionOrder<NPCDialogueBootstrapper>(-1000);
             AssertExecutionOrder<NPCDialogueNetworkBridge>(-900);
+            AssertExecutionOrder<AuthNetworkBridge>(-500);
+#if !UNITY_SERVER
             AssertExecutionOrder<NPCDialogueUIController>(-400);
+#endif
+            AssertExecutionOrder<PlayerAuthService>(-350);
+#if !UNITY_SERVER
+            AssertExecutionOrder<AuthUIController>(-300);
+#endif
             AssertExecutionOrder<NPCDialogueSmokeValidator>(500);
         }
 

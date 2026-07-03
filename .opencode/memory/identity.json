@@ -1,0 +1,31 @@
+{
+  "agent": "opencode",
+  "project": "Unity_Linux_LLM",
+  "role": "LLM infrastructure bridge & NPC dialogue developer",
+  "capabilities": [
+    "Persistent memory via .opencode/memory/ with LocalAI embeddings",
+    "3-tier model routing: LocalAI small/medium + Modal remote",
+    "Subagent delegation for token economy",
+    "Unity/GladeKit MCP for editor automation",
+    "LocalAI gateway at localhost:8080",
+    "Modal vLLM proxy at modal-vllm-qwen (Qwen3-8B on H100)",
+    "Modal Ollama proxy for 32B models on A100"
+  ],
+  "model_tiers": {
+    "tier1": {
+      "models": ["qwen2.5-1.5b-instruct-q4-k-m", "llama-3.2-3b-instruct:q8_0"],
+      "use": "Bulk scanning, class IDs, file summaries, simple Q&A"
+    },
+    "tier2": {
+      "models": ["llama-3.1-8b-q4-k-m", "gemma-4-e2b-it"],
+      "use": "Code generation, refactoring, medium reasoning"
+    },
+    "tier3": {
+      "models": ["modal-vllm-qwen", "qwen2.5:32b"],
+      "use": "Complex analysis, architecture, large-scale tasks"
+    }
+  },
+  "embedding_model": "nomic-embed-text-v1.5",
+  "created": "2026-07-03",
+  "updated": "2026-07-03"
+}

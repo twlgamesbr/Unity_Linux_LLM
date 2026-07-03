@@ -4,17 +4,17 @@
     "references": [
         "NPCSystem.Runtime",
         "GladeKit.Bridge",
-        "GladeAgenticAI.Core",
-        "undream.llmunity.Runtime",
-        "Unity.Nuget.Newtonsoft-Json"
+        "Unity.Netcode.Runtime"
     ],
     "includePlatforms": [
         "Editor"
     ],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Newtonsoft.Json.dll"
+    ],
     "autoReferenced": false,
     "defineConstraints": [],
     "versionDefines": [],

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
-using LLMUnity;
 using UnityEngine;
 
 namespace NPCSystem
@@ -40,12 +39,11 @@ namespace NPCSystem
         public static string GetMetadataPath(string ragEmbeddingPath)
         {
             if (string.IsNullOrWhiteSpace(ragEmbeddingPath)) return string.Empty;
-            return LLMUnitySetup.GetAssetPath(ragEmbeddingPath.Trim().Replace('\\', '/') + ".json");
+            return NPCSearchable.ResolveAssetPath(ragEmbeddingPath.Trim().Replace('\\', '/') + ".json");
         }
 
         public static NPCRAGMetadata CreateExpected(
             string ragEmbeddingPath,
-            LLM embeddingLlm,
             IEnumerable<NPCProfile> profiles,
             int chunkCharacters,
             int chunkCount = 0)
@@ -54,8 +52,8 @@ namespace NPCSystem
             {
                 importerVersion = ImporterVersion,
                 ragPath = NormalizePath(ragEmbeddingPath),
-                embeddingModel = embeddingLlm != null ? embeddingLlm.model : string.Empty,
-                embeddingLength = embeddingLlm != null ? embeddingLlm.embeddingLength : 0,
+                embeddingModel = "localai-embedding",
+                embeddingLength = 0,
                 chunkCharacters = chunkCharacters,
                 chunkCount = chunkCount,
                 builtAtUtc = DateTime.UtcNow.ToString("o")

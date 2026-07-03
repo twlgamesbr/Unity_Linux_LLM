@@ -7,7 +7,7 @@ This repository is a Unity 6 NPC dialogue prototype built around LLMUnity, direc
 ## 1. Current project state
 
 - Unity version: `6000.5.1f1`
-- Main scene: `Assets/Scenes/NPCDialoguePrototype.unity`
+- Main scene: `Assets/Scenes/NPCDialoguePrototype1.unity`
 - Secondary scene present: `Assets/Scenes/SampleScene.unity`
 - Root runtime assembly: `Assets/Scripts/Runtime/NPCSystem.Runtime.asmdef`
 - Editor assembly: `Assets/Scripts/Editor/NPCSystem.Editor.asmdef`
@@ -24,7 +24,7 @@ This repository is a Unity 6 NPC dialogue prototype built around LLMUnity, direc
 
 ## 2. Actual scene wiring
 
-The authoritative scene is `Assets/Scenes/NPCDialoguePrototype.unity`.
+The authoritative scene is `Assets/Scenes/NPCDialoguePrototype1.unity`.
 
 ### `NPCDialogueSystem` GameObject
 
@@ -267,7 +267,7 @@ Useful commands:
 cd Tools/CodebaseEmbedder
 env UV_CACHE_DIR=/tmp/uv-cache UV_TOOL_DIR=/tmp/uv-tools uv run codebase-embedder status --root ../..
 env UV_CACHE_DIR=/tmp/uv-cache UV_TOOL_DIR=/tmp/uv-tools uv run codebase-embedder query --root ../.. --local "<concept>"
-env UV_CACHE_DIR=/tmp/uv-cache UV_TOOL_DIR=/tmp/uv-tools uv run codebase-embedder audit --root ../.. --scene Assets/Scenes/NPCDialoguePrototype.unity --scenario localai-llmunity --local
+env UV_CACHE_DIR=/tmp/uv-cache UV_TOOL_DIR=/tmp/uv-tools uv run codebase-embedder audit --root ../.. --scene Assets/Scenes/NPCDialoguePrototype1.unity --scenario localai-llmunity --local
 ```
 
 Use `/tmp` cache/tool dirs if the default `uv` cache location is read-only in the current session.
@@ -298,7 +298,7 @@ env UV_CACHE_DIR=/tmp/uv-cache UV_TOOL_DIR=/tmp/uv-tools uv run --extra test pyt
 
 ## 8. Documentation rules for future edits
 
-- Prefer documenting what is actually wired in `Assets/Scenes/NPCDialoguePrototype.unity`, not the intended architecture from older notes.
+- Prefer documenting what is actually wired in `Assets/Scenes/NPCDialoguePrototype1.unity`, not the intended architecture from older notes.
 - Distinguish clearly between:
   - present in code
   - present in scene

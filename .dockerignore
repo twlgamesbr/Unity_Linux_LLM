@@ -1,0 +1,12 @@
+# Docker context ignore
+.git/
+.gitignore
+Library/
+Logs/
+obj/
+Temp/
+*.csproj
+*.sln
+Builds/Build1/
+Builds/Client/
+Builds/Server/*.log

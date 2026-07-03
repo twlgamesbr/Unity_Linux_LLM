@@ -13,7 +13,7 @@ uv run codebase-embedder index --root ../.. --no-qdrant
 uv run codebase-embedder index --root ../.. --reuse-artifacts --use-vector-cache --timings-json ../../.codebase-index/benchmarks/index-cache.json
 uv run codebase-embedder query --root ../.. --local "where is qdrant rag search implemented"
 uv run codebase-embedder audit --root ../.. --script Assets/Scripts/Runtime/NPCDialogue/QdrantRAGService.cs --scenario localai-llmunity
-uv run codebase-embedder audit --root ../.. --scene Assets/Scenes/NPCDialoguePrototype.unity --scenario localai-llmunity --local
+uv run codebase-embedder audit --root ../.. --scene Assets/Scenes/NPCDialoguePrototype1.unity --scenario localai-llmunity --local
 uv run codebase-embedder unity-validate --root ../..
 ```
 

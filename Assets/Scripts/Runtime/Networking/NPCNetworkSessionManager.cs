@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using EditorAttributes;
 using UnityEngine;
 
 namespace NPCSystem
@@ -7,14 +8,22 @@ namespace NPCSystem
     [DisallowMultipleComponent]
     public class NPCNetworkSessionManager : MonoBehaviour
     {
+        [Title("NPC Network Session Manager")]
+        [HelpBox("Server-side session cache for per-client dialogue state, selected NPC, evidence snapshot, and resolved player display name.", MessageMode.Log, drawAbove: true)]
+        [SerializeField, ReadOnly] string inspectorSummary = "Per-client dialogue/session state cache.";
+
         class NPCClientDialogueSession
         {
+            public string playerDisplayName = string.Empty;
             public string selectedNpcSlug = string.Empty;
             public Dictionary<string, List<DialogueEntry>> historyByNpc = new Dictionary<string, List<DialogueEntry>>(StringComparer.OrdinalIgnoreCase);
             public NPCEvidenceStateSnapshot evidenceSnapshot = new NPCEvidenceStateSnapshot();
         }
 
         readonly Dictionary<ulong, NPCClientDialogueSession> _sessionsByClientId = new Dictionary<ulong, NPCClientDialogueSession>();
+
+        [ShowInInspector]
+        int ActiveSessionCount => _sessionsByClientId.Count;
 
         public void SetSelectedNpcSlug(ulong clientId, string npcSlug)
         {
@@ -39,6 +48,26 @@ namespace NPCSystem
         public bool HasSession(ulong clientId)
         {
             return _sessionsByClientId.ContainsKey(clientId);
+        }
+
+        public void SetPlayerDisplayName(ulong clientId, string playerDisplayName)
+        {
+            NPCClientDialogueSession session = GetOrCreateSession(clientId);
+            session.playerDisplayName = string.IsNullOrWhiteSpace(playerDisplayName)
+                ? string.Empty
+                : playerDisplayName.Trim();
+        }
+
+        public string GetPlayerDisplayName(ulong clientId)
+        {
+            if (!_sessionsByClientId.TryGetValue(clientId, out NPCClientDialogueSession session))
+            {
+                return string.Empty;
+            }
+
+            return string.IsNullOrWhiteSpace(session.playerDisplayName)
+                ? string.Empty
+                : session.playerDisplayName;
         }
 
         public void SetHistorySnapshot(ulong clientId, string npcSlug, List<DialogueEntry> history)
@@ -96,6 +125,43 @@ namespace NPCSystem
             GetOrCreateSession(clientId).evidenceSnapshot = snapshot?.Clone() ?? new NPCEvidenceStateSnapshot();
         }
 
+        public bool AddInventoryItem(ulong clientId, string itemId)
+        {
+            string normalizedItemId = NormalizeItemId(itemId);
+            if (string.IsNullOrWhiteSpace(normalizedItemId))
+            {
+                return false;
+            }
+
+            NPCEvidenceStateSnapshot snapshot = GetEvidenceSnapshot(clientId);
+            if (snapshot.obtainedItems.Contains(normalizedItemId))
+            {
+                return false;
+            }
+
+            snapshot.obtainedItems.Add(normalizedItemId);
+            SetEvidenceSnapshot(clientId, snapshot);
+            return true;
+        }
+
+        public bool RemoveInventoryItem(ulong clientId, string itemId)
+        {
+            string normalizedItemId = NormalizeItemId(itemId);
+            if (string.IsNullOrWhiteSpace(normalizedItemId))
+            {
+                return false;
+            }
+
+            NPCEvidenceStateSnapshot snapshot = GetEvidenceSnapshot(clientId);
+            bool removed = snapshot.obtainedItems.Remove(normalizedItemId);
+            if (removed)
+            {
+                SetEvidenceSnapshot(clientId, snapshot);
+            }
+
+            return removed;
+        }
+
         public NPCEvidenceStateSnapshot GetEvidenceSnapshot(ulong clientId)
         {
             return _sessionsByClientId.TryGetValue(clientId, out NPCClientDialogueSession session)
@@ -111,6 +177,18 @@ namespace NPCSystem
         public void ClearAllSessions()
         {
             _sessionsByClientId.Clear();
+        }
+
+        [Button("Log Active Sessions")]
+        void LogActiveSessions()
+        {
+            NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.ClientSession, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
+                $"Session manager currently holds {_sessionsByClientId.Count} client session(s).",
+                source: nameof(NPCNetworkSessionManager),
+                data: new Dictionary<string, object>
+                {
+                    ["activeSessionCount"] = _sessionsByClientId.Count
+                });
         }
 
         NPCClientDialogueSession GetOrCreateSession(ulong clientId)
@@ -129,6 +207,13 @@ namespace NPCSystem
             return string.IsNullOrWhiteSpace(npcSlug)
                 ? string.Empty
                 : npcSlug.Trim().ToLowerInvariant();
+        }
+
+        static string NormalizeItemId(string itemId)
+        {
+            return string.IsNullOrWhiteSpace(itemId)
+                ? string.Empty
+                : itemId.Trim().ToLowerInvariant();
         }
 
         static List<DialogueEntry> CloneEntries(List<DialogueEntry> history)

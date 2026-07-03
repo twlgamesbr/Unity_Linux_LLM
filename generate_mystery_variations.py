@@ -611,7 +611,7 @@ class MysteryVariationGenerator:
         template = {
             "caseSlug": case_slug,
             "displayName": display_name,
-            "prototypeScenePath": "Assets/Scenes/NPCDialoguePrototype.unity",
+            "prototypeScenePath": "Assets/Scenes/NPCDialoguePrototype1.unity",
             "outputScenePath": f"Assets/Scenes/GeneratedMysteries/{case_slug}.unity",
             "ragEmbeddingPath": f"RAG/{case_slug}/NPCDialogues-minilm-chunked.rag",
             "correctAnswers": {

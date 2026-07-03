@@ -21,13 +21,16 @@ namespace NPCSystem.Tests
             Assert.That(prefab.GetComponent<NetworkObject>(), Is.Not.Null);
             Assert.That(prefab.GetComponent<NPCOwnerNetworkTransform>(), Is.Not.Null);
             Assert.That(prefab.GetComponent<CharacterController>(), Is.Not.Null);
-            Assert.That(prefab.GetComponent<Animator>(), Is.Not.Null);
-            Assert.That(prefab.GetComponent<NetworkAnimator>(), Is.Not.Null);
             Assert.That(prefab.GetComponent<NPCPlayerNetworkAvatar>(), Is.Not.Null);
             Assert.That(prefab.GetComponent<NPCNetworkPlayerController>(), Is.Not.Null);
+            Assert.That(prefab.GetComponent<NPCPlayerInventory>(), Is.Not.Null);
+            Assert.That(prefab.GetComponent<NPCNetworkItemInteractor>(), Is.Not.Null);
+#if !UNITY_SERVER
             Assert.That(prefab.GetComponent<PlayerInput>(), Is.Not.Null);
+#endif
         }
 
+#if !UNITY_SERVER
         [Test]
         public void PlayerPrefabIsOwnerAuthoritativeAndUsesPlayerInputActions()
         {
@@ -43,6 +46,7 @@ namespace NPCSystem.Tests
             Assert.That(controller.allowKeyboardFallback, Is.True);
             Assert.That(networkAnimator.AuthorityMode, Is.EqualTo(NetworkAnimator.AuthorityModes.Owner));
         }
+#endif
 
         [Test]
         public void PlayerInputActionsExposeMovementJumpLookAndSprint()
@@ -54,6 +58,9 @@ namespace NPCSystem.Tests
             Assert.That(player.FindAction("Look", true).expectedControlType, Is.EqualTo("Vector2"));
             Assert.That(player.FindAction("Jump", true).type, Is.EqualTo(InputActionType.Button));
             Assert.That(player.FindAction("Sprint", true).type, Is.EqualTo(InputActionType.Button));
+            Assert.That(player.FindAction("Interact", true).type, Is.EqualTo(InputActionType.Button));
+            Assert.That(player.FindAction("Previous", true).type, Is.EqualTo(InputActionType.Button));
+            Assert.That(player.FindAction("Next", true).type, Is.EqualTo(InputActionType.Button));
         }
     }
 }

@@ -26,8 +26,8 @@ namespace NPCSystem
             {
                 connectAddress = "127.0.0.1",
                 listenAddress = "0.0.0.0",
-                port = 7777,
-                useWebSockets = true,
+                port = 11474,  // non-standard, avoids common port conflicts
+                useWebSockets = false,
                 webSocketPath = "/npc-dialogue",
                 autoStartMode = NPCNetworkAutoStartMode.Manual
             };

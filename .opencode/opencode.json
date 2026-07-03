@@ -1,0 +1,69 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": ["AGENTS.md"],
+  "provider": {
+    "localai": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "LocalAI (RTX 3060)",
+      "options": {
+        "baseURL": "http://localhost:8080/v1"
+      },
+      "models": {
+        "qwen2.5-1.5b-instruct-q4-k-m": {
+          "name": "Qwen 2.5 1.5B (Local)",
+          "limit": { "context": 16384, "output": 4096 }
+        },
+        "llama-3.2-3b-instruct:q8_0": {
+          "name": "Llama 3.2 3B (Local)",
+          "limit": { "context": 8192, "output": 4096 }
+        },
+        "llama-3.1-8b-q4-k-m": {
+          "name": "Llama 3.1 8B (Local)",
+          "limit": { "context": 8192, "output": 4096 }
+        }
+      }
+    }
+  },
+  "skills": {
+    "paths": [".opencode/skills"]
+  },
+  "agent": {
+    "code-scanner": {
+      "model": "localai/qwen2.5-1.5b-instruct-q4-k-m",
+      "mode": "subagent",
+      "description": "Scans and analyzes code using LocalAI small models. Bulk file processing, class identification.",
+      "permission": { "read": "allow", "glob": "allow", "grep": "allow", "edit": "deny", "bash": "deny" }
+    },
+    "architect": {
+      "model": "localai/llama-3.1-8b-q4-k-m",
+      "mode": "subagent",
+      "description": "System design and architecture using LocalAI medium or Modal remote models.",
+      "permission": { "read": "allow", "glob": "allow", "grep": "allow", "edit": "allow", "bash": "allow" }
+    },
+    "trainer": {
+      "model": "localai/llama-3.1-8b-q4-k-m",
+      "mode": "subagent",
+      "description": "Fine-tuning orchestration with LocalAI and Modal.",
+      "permission": { "read": "allow", "glob": "allow", "grep": "allow", "edit": "allow", "bash": "allow" }
+    }
+  },
+  "command": {
+    "scan": {
+      "description": "Scan codebase files for classes, interfaces, structs, enums using LocalAI",
+      "agent": "code-scanner",
+      "template": "Scan the provided files/directories and identify all class, interface, struct, and enum declarations. $ARGUMENTS"
+    },
+    "remember": {
+      "description": "Store a fact in long-term memory",
+      "template": "Add this to long-term memory: $ARGUMENTS. Update .opencode/memory/long-term.json facts array with a new entry {id, timestamp, fact, category}."
+    },
+    "infra": {
+      "description": "Snapshot Docker infrastructure state into long-term memory",
+      "template": "Run bash .opencode/scripts/infra-snapshot.sh and report the current container states."
+    },
+    "ps": {
+      "description": "List running Docker containers with ports and status",
+      "template": "Run docker ps --format 'table {{.Names}}\\t{{.Ports}}\\t{{.Status}}' and show results."
+    }
+  }
+}

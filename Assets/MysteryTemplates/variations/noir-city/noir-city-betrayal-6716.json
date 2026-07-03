@@ -1,7 +1,7 @@
 {
   "caseSlug": "noir-city-betrayal-6716",
   "displayName": "The Noir City Betrayal",
-  "prototypeScenePath": "Assets/Scenes/NPCDialoguePrototype.unity",
+  "prototypeScenePath": "Assets/Scenes/NPCDialoguePrototype1.unity",
   "outputScenePath": "Assets/Scenes/GeneratedMysteries/noir-city-betrayal-6716.unity",
   "ragEmbeddingPath": "RAG/noir-city-betrayal-6716/NPCDialogues-minilm-chunked.rag",
   "correctAnswers": {

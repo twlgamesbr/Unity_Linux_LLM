@@ -53,6 +53,11 @@ namespace NPCSystem.Tests
         {
             var gameObject = new GameObject("NPCNetworkingTests");
             var playerPrefab = new GameObject("NPCPlayerPrefab");
+            playerPrefab.AddComponent<NetworkObject>();
+            var serverNpcPrefab = new GameObject("NPCServerPrefab");
+            serverNpcPrefab.AddComponent<NetworkObject>();
+            var transferableItemPrefab = new GameObject("NPCTransferableItemPrefab");
+            transferableItemPrefab.AddComponent<NetworkObject>();
             var networkManager = gameObject.AddComponent<NetworkManager>();
             var unityTransport = gameObject.AddComponent<UnityTransport>();
             var bootstrap = gameObject.AddComponent<NPCNetworkBootstrap>();
@@ -62,6 +67,8 @@ namespace NPCSystem.Tests
                 bootstrap.networkManager = networkManager;
                 bootstrap.unityTransport = unityTransport;
                 bootstrap.playerPrefab = playerPrefab;
+                bootstrap.serverNpcPrefab = serverNpcPrefab;
+                bootstrap.transferableItemPrefab = transferableItemPrefab;
                 bootstrap.transportConfig = new NPCTransportConfig
                 {
                     connectAddress = "10.0.0.25",
@@ -81,12 +88,35 @@ namespace NPCSystem.Tests
                 Assert.That(unityTransport.ConnectionData.WebSocketPath, Is.EqualTo("/npc-dialogue"));
                 Assert.That(networkManager.NetworkConfig.NetworkTransport, Is.SameAs(unityTransport));
                 Assert.That(networkManager.NetworkConfig.PlayerPrefab, Is.SameAs(playerPrefab));
+                Assert.That(networkManager.NetworkConfig.Prefabs.Add(new NetworkPrefab { Prefab = serverNpcPrefab }), Is.False);
+                Assert.That(networkManager.NetworkConfig.Prefabs.Add(new NetworkPrefab { Prefab = transferableItemPrefab }), Is.False);
             }
             finally
             {
                 Object.DestroyImmediate(gameObject);
                 Object.DestroyImmediate(playerPrefab);
+                Object.DestroyImmediate(serverNpcPrefab);
+                Object.DestroyImmediate(transferableItemPrefab);
             }
+        }
+
+        [Test]
+        public void PlayModeResolverParsesPlayerIndexFromPlayerName()
+        {
+            Assert.That(NPCPlayModeInstanceResolver.TryParsePlayerIndex("Player1", out int playerOne), Is.True);
+            Assert.That(playerOne, Is.EqualTo(1));
+            Assert.That(NPCPlayModeInstanceResolver.TryParsePlayerIndex("Player3", out int playerThree), Is.True);
+            Assert.That(playerThree, Is.EqualTo(3));
+            Assert.That(NPCPlayModeInstanceResolver.TryParsePlayerIndex("Editor", out _), Is.False);
+        }
+
+        [Test]
+        public void PlayModeResolverAssignsUniqueClientBindPortsForAdditionalPlayers()
+        {
+            Assert.That(NPCPlayModeInstanceResolver.ResolveClientBindPortForPlayerIndex(1, 11474), Is.EqualTo((ushort)0));
+            Assert.That(NPCPlayModeInstanceResolver.ResolveClientBindPortForPlayerIndex(2, 11474), Is.EqualTo((ushort)11475));
+            Assert.That(NPCPlayModeInstanceResolver.ResolveClientBindPortForPlayerIndex(3, 11474), Is.EqualTo((ushort)11476));
+            Assert.That(NPCPlayModeInstanceResolver.ResolveClientBindPortForPlayerIndex(4, 11474, 13000), Is.EqualTo((ushort)13000));
         }
     }
 }

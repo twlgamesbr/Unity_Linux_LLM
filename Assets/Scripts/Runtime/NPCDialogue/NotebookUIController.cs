@@ -1,3 +1,4 @@
+#if !UNITY_SERVER
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -287,3 +288,4 @@ namespace NPCSystem
         }
     }
 }
+#endif // !UNITY_SERVER

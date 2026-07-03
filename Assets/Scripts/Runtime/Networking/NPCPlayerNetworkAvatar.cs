@@ -52,6 +52,17 @@ namespace NPCSystem
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
+            playerDisplayName.OnValueChanged += HandleDisplayNameChanged;
+            RefreshHierarchyName();
+            NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.PlayerSpawn, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
+                $"Player avatar spawned for client {OwnerClientId}.",
+                source: nameof(NPCPlayerNetworkAvatar),
+                data: new System.Collections.Generic.Dictionary<string, object>
+                {
+                    ["ownerClientId"] = OwnerClientId,
+                    ["isOwner"] = IsOwner,
+                    ["isServer"] = IsServer
+                });
 
             // Server: set default fallback name if not set by the bridge
             if (IsServer && string.IsNullOrEmpty(playerDisplayName.Value))
@@ -71,6 +82,19 @@ namespace NPCSystem
             }
         }
 
+        public override void OnNetworkDespawn()
+        {
+            playerDisplayName.OnValueChanged -= HandleDisplayNameChanged;
+            NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.PlayerSpawn, NPCFlowStatus.Warning, NPCFlowLogLevel.Info,
+                $"Player avatar despawned for client {OwnerClientId}.",
+                source: nameof(NPCPlayerNetworkAvatar),
+                data: new System.Collections.Generic.Dictionary<string, object>
+                {
+                    ["ownerClientId"] = OwnerClientId
+                });
+            base.OnNetworkDespawn();
+        }
+
         /// <summary>
         /// Server-only: set the player's display name on the synced NetworkVariable.
         /// Called either by AuthNetworkBridge (for the host) or via RPC (for clients).
@@ -87,10 +111,27 @@ namespace NPCSystem
         [Rpc(SendTo.Server)]
         void RegisterPlayerNameServerRpc(string name, RpcParams rpcParams = default)
         {
+            NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.RpcTraffic, NPCFlowStatus.Start, NPCFlowLogLevel.Info,
+                "Received player-name registration RPC.",
+                source: nameof(NPCPlayerNetworkAvatar),
+                data: new System.Collections.Generic.Dictionary<string, object>
+                {
+                    ["senderClientId"] = rpcParams.Receive.SenderClientId,
+                    ["ownerClientId"] = OwnerClientId,
+                    ["requestedName"] = name ?? string.Empty
+                });
+
             // Only the owner of this avatar can set their own name
             if (rpcParams.Receive.SenderClientId != OwnerClientId)
             {
-                Debug.LogWarning($"[NPCPlayerNetworkAvatar] Rejected name registration from client {rpcParams.Receive.SenderClientId} (avatar owner is {OwnerClientId}).");
+                NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.OwnershipAuthority, NPCFlowStatus.Warning, NPCFlowLogLevel.Warning,
+                    "Rejected player-name registration RPC because sender is not the avatar owner.",
+                    source: nameof(NPCPlayerNetworkAvatar),
+                    data: new System.Collections.Generic.Dictionary<string, object>
+                    {
+                        ["senderClientId"] = rpcParams.Receive.SenderClientId,
+                        ["ownerClientId"] = OwnerClientId
+                    });
                 return;
             }
 
@@ -101,7 +142,24 @@ namespace NPCSystem
             }
 
             playerDisplayName.Value = sanitized;
-            Debug.Log($"[NPCPlayerNetworkAvatar] Registered player name '{sanitized}' for client {OwnerClientId}.");
+            NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.PlayerNameRegistration, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
+                $"Registered player name '{sanitized}' for client {OwnerClientId}.",
+                source: nameof(NPCPlayerNetworkAvatar),
+                data: new System.Collections.Generic.Dictionary<string, object>
+                {
+                    ["ownerClientId"] = OwnerClientId,
+                    ["registeredName"] = sanitized
+                });
+        }
+
+        void HandleDisplayNameChanged(string _, string __)
+        {
+            RefreshHierarchyName();
+        }
+
+        void RefreshHierarchyName()
+        {
+            gameObject.name = $"NPCPlayerAvatar_Client{OwnerClientId}_{DisplayName}";
         }
     }
 }

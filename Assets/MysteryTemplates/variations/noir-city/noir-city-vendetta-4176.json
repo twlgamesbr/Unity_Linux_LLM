@@ -1,7 +1,7 @@
 {
   "caseSlug": "noir-city-vendetta-4176",
   "displayName": "The Noir City Vendetta",
-  "prototypeScenePath": "Assets/Scenes/NPCDialoguePrototype.unity",
+  "prototypeScenePath": "Assets/Scenes/NPCDialoguePrototype1.unity",
   "outputScenePath": "Assets/Scenes/GeneratedMysteries/noir-city-vendetta-4176.unity",
   "ragEmbeddingPath": "RAG/noir-city-vendetta-4176/NPCDialogues-minilm-chunked.rag",
   "correctAnswers": {

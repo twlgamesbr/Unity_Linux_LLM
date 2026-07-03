@@ -8,7 +8,7 @@ namespace NPCSystem.Editor
 {
     public static void Run()
     {
-        EditorSceneManager.OpenScene("Assets/Scenes/NPCDialoguePrototype.unity");
+        EditorSceneManager.OpenScene("Assets/Scenes/NPCDialoguePrototype1.unity");
         EditorApplication.isPlaying = true;
     }
 }

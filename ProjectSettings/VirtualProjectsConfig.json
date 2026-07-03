@@ -1,6 +1,8 @@
 {
   "PlayerTags": [
-    "Client"
+    "Client",
+    "Host",
+    "Client1"
   ],
   "version": "6000.5.1f1"
 }

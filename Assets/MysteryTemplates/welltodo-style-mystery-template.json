@@ -1,7 +1,7 @@
 {
   "caseSlug": "museum-clockwork-case",
   "displayName": "The Clockwork Gallery Case",
-  "prototypeScenePath": "Assets/Scenes/NPCDialoguePrototype.unity",
+  "prototypeScenePath": "Assets/Scenes/NPCDialoguePrototype1.unity",
   "outputScenePath": "Assets/Scenes/GeneratedMysteries/museum-clockwork-case.unity",
   "ragEmbeddingPath": "RAG/museum-clockwork-case/NPCDialogues-minilm-chunked.rag",
   "correctAnswers": {

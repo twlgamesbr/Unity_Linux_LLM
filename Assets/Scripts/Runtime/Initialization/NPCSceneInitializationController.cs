@@ -11,6 +11,7 @@ namespace NPCSystem
         SceneReferences,
         NetworkTransport,
         DialogueServices,
+        BackendReadiness,
         NetworkBridge,
         Validation,
         Spawning
@@ -24,8 +25,8 @@ namespace NPCSystem
         {
             NPCSceneInitializationPhase.Logger,
             NPCSceneInitializationPhase.SceneReferences,
-            NPCSceneInitializationPhase.NetworkTransport,
             NPCSceneInitializationPhase.DialogueServices,
+            NPCSceneInitializationPhase.BackendReadiness,
             NPCSceneInitializationPhase.NetworkBridge,
             NPCSceneInitializationPhase.Validation,
             NPCSceneInitializationPhase.Spawning
@@ -35,13 +36,15 @@ namespace NPCSystem
         public NPCFlowLogger flowLogger;
         public NPCNetworkBootstrap networkBootstrap;
         public NPCDialogueManager dialogueManager;
+        public NPCBackendReadinessService backendReadiness;
         public NPCDialogueNetworkBridge networkBridge;
         public NPCDialogueSmokeValidator smokeValidator;
 
         [Header("Startup")]
         public bool initializeOnStart = true;
-        public bool configureNetworkTransport = true;
+        public bool configureNetworkTransport = false;
         public bool initializeDialogueManager = true;
+        public bool verifyBackendsDuringInitialization = true;
         public bool initializeNetworkBridge = true;
         public bool validateAfterInitialization = true;
         public bool startNetworkingAfterInitialization = false;
@@ -132,6 +135,12 @@ namespace NPCSystem
                             await dialogueManager.InitializeAsync();
                         }
                         break;
+                    case NPCSceneInitializationPhase.BackendReadiness:
+                        if (verifyBackendsDuringInitialization && backendReadiness != null)
+                        {
+                            await backendReadiness.ProbeAsync();
+                        }
+                        break;
                     case NPCSceneInitializationPhase.NetworkBridge:
                         if (initializeNetworkBridge && networkBridge != null)
                         {
@@ -147,6 +156,24 @@ namespace NPCSystem
                     case NPCSceneInitializationPhase.Spawning:
                         if (startNetworkingAfterInitialization && networkBootstrap != null)
                         {
+                            bool skipForBatchmodeBootstrap = Application.isBatchMode &&
+                                networkBootstrap.transportConfig.autoStartMode != NPCNetworkAutoStartMode.Manual;
+
+                            if (skipForBatchmodeBootstrap)
+                            {
+                                logger.Log(NPCFlowStage.SceneBootstrap,
+                                    NPCFlowStatus.Skipped,
+                                    NPCFlowLogLevel.Info,
+                                    "Skipped scene initialization network start because batchmode bootstrap auto-start is active.",
+                                    source: nameof(NPCSceneInitializationController),
+                                    data: new Dictionary<string, object>
+                                    {
+                                        ["phase"] = phase.ToString(),
+                                        ["autoStartMode"] = networkBootstrap.transportConfig.autoStartMode.ToString()
+                                    });
+                                break;
+                            }
+
                             bool started = networkBootstrap.StartConfiguredMode();
                             logger.Log(NPCFlowStage.SceneBootstrap,
                                 started ? NPCFlowStatus.Success : NPCFlowStatus.Skipped,
@@ -195,6 +222,11 @@ namespace NPCSystem
             if (networkBridge == null)
             {
                 networkBridge = FindAnyObjectByType<NPCDialogueNetworkBridge>(FindObjectsInactive.Include);
+            }
+
+            if (backendReadiness == null)
+            {
+                backendReadiness = FindAnyObjectByType<NPCBackendReadinessService>(FindObjectsInactive.Include);
             }
 
             if (smokeValidator == null)

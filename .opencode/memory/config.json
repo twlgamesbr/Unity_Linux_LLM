@@ -1,0 +1,10 @@
+{
+  "memory_dir": ".opencode/memory/",
+  "sessions_dir": ".opencode/memory/sessions/",
+  "embedding_model": "nomic-embed-text-v1.5",
+  "max_long_term_entries": 500,
+  "max_session_age_days": 90,
+  "semantic_search_top_k": 5,
+  "auto_save_on_session_end": true,
+  "auto_load_on_session_start": true
+}

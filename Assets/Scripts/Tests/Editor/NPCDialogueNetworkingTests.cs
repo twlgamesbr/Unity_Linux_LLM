@@ -142,5 +142,26 @@ namespace NPCSystem.Tests
                 Object.DestroyImmediate(gameObject);
             }
         }
+
+        [Test]
+        public void NetworkSessionManagerStoresIndependentPlayerNamesPerClient()
+        {
+            var gameObject = new GameObject("NPCNetworkSessionManagerTests");
+            var sessionManager = gameObject.AddComponent<NPCNetworkSessionManager>();
+
+            try
+            {
+                sessionManager.SetPlayerDisplayName(11ul, "Alice");
+                sessionManager.SetPlayerDisplayName(22ul, "Bob");
+
+                Assert.That(sessionManager.GetPlayerDisplayName(11ul), Is.EqualTo("Alice"));
+                Assert.That(sessionManager.GetPlayerDisplayName(22ul), Is.EqualTo("Bob"));
+                Assert.That(sessionManager.GetPlayerDisplayName(33ul), Is.EqualTo(string.Empty));
+            }
+            finally
+            {
+                Object.DestroyImmediate(gameObject);
+            }
+        }
     }
 }

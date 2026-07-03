@@ -4,7 +4,7 @@ Current-state documentation for the Unity NPC dialogue prototype in this reposit
 
 ## Overview
 
-This project is a Unity `6000.5.1f1` prototype centered on `Assets/Scenes/NPCDialoguePrototype.unity`. It combines:
+This project is a Unity `6000.5.1f1` prototype centered on `Assets/Scenes/NPCDialoguePrototype1.unity`. It combines:
 
 - direct LocalAI chat requests from `NPCDialogueManager`
 - local LLMUnity `.rag` retrieval with a MiniLM embedding model
@@ -201,7 +201,7 @@ Useful commands:
 cd Tools/CodebaseEmbedder
 env UV_CACHE_DIR=/tmp/uv-cache UV_TOOL_DIR=/tmp/uv-tools uv run codebase-embedder status --root ../..
 env UV_CACHE_DIR=/tmp/uv-cache UV_TOOL_DIR=/tmp/uv-tools uv run codebase-embedder query --root ../.. --local "NPC dialogue architecture"
-env UV_CACHE_DIR=/tmp/uv-cache UV_TOOL_DIR=/tmp/uv-tools uv run codebase-embedder audit --root ../.. --scene Assets/Scenes/NPCDialoguePrototype.unity --scenario localai-llmunity --local
+env UV_CACHE_DIR=/tmp/uv-cache UV_TOOL_DIR=/tmp/uv-tools uv run codebase-embedder audit --root ../.. --scene Assets/Scenes/NPCDialoguePrototype1.unity --scenario localai-llmunity --local
 ```
 
 If `uv` tries to use a read-only cache path in your session, keep the `/tmp` overrides.

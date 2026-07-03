@@ -1,3 +1,4 @@
+#if !UNITY_SERVER
 using EditorAttributes;
 using UnityEngine;
 
@@ -105,3 +106,4 @@ namespace NPCSystem.EditorUX
         bool HasLocalAiModel() => !string.IsNullOrWhiteSpace(localAiModel);
     }
 }
+#endif // !UNITY_SERVER

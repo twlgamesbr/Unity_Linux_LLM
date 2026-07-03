@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using LLMUnity;
 using UnityEngine;
 
 namespace NPCSystem
@@ -10,10 +9,8 @@ namespace NPCSystem
     public class NPCDialogueSmokeValidator : MonoBehaviour
     {
         public NPCDialogueManager dialogueManager;
-        public LLM chatLLM;
-        public LLM ragLLM;
-        public LLMAgent llmAgent;
-        public RAG rag;
+        public NPCLocalAIClient chatClient;
+        public NPCLocalRAG localRag;
         public bool validateOnStart = true;
         public bool runFirstQuestionSmokeOnStart = false;
         public string smokeQuestion = "What should I investigate first?";
@@ -45,44 +42,14 @@ namespace NPCSystem
             NPCFlowLogger logger = NPCFlowLogger.FindOrCreate();
             bool ok = true;
             ok &= Require(logger, dialogueManager != null, "NPCDialogueManager is assigned.");
-            ok &= Require(logger, chatLLM != null, "Chat LLM is assigned.");
-            ok &= Require(logger, ragLLM != null, "RAG LLM is assigned.");
-            ok &= Require(logger, llmAgent != null, "LLMAgent is assigned.");
-            ok &= Require(logger, rag != null, "RAG is assigned.");
+            ok &= Require(logger, chatClient != null, "NPCLocalAIClient is assigned.");
+            ok &= Require(logger, localRag != null, "NPCLocalRAG is assigned.");
 
             if (dialogueManager != null)
             {
-                ok &= Require(logger, dialogueManager.llm == chatLLM, "NPCDialogueManager.llm points to the chat LLM.");
-                ok &= Require(logger, dialogueManager.llmAgent == llmAgent, "NPCDialogueManager.llmAgent points to LLMAgent.");
-                ok &= Require(logger, dialogueManager.rag == rag, "NPCDialogueManager.rag points to RAG.");
+                ok &= Require(logger, dialogueManager.chatClient == chatClient, "NPCDialogueManager.chatClient points to the chat client.");
+                ok &= Require(logger, dialogueManager.localRag == localRag, "NPCDialogueManager.localRag points to the local RAG.");
                 ok &= Require(logger, !string.IsNullOrWhiteSpace(dialogueManager.ragEmbeddingPath), "NPCDialogueManager.ragEmbeddingPath is set.");
-            }
-
-            if (chatLLM != null)
-            {
-                ok &= Require(logger, !chatLLM.embeddingsOnly, $"Chat LLM is completion-capable ({chatLLM.model}).");
-            }
-
-            if (ragLLM != null)
-            {
-                ok &= Require(logger, ragLLM.embeddingsOnly, $"RAG LLM is embedding-only ({ragLLM.model}).");
-                ok &= Require(logger, ragLLM.embeddingLength > 0, $"RAG LLM embedding length is set ({ragLLM.embeddingLength}).");
-            }
-
-            if (llmAgent != null)
-            {
-                ok &= Require(logger, llmAgent.llm == chatLLM, "LLMAgent.llm points to the chat LLM.");
-            }
-
-            if (rag != null && rag.search != null && rag.search.llmEmbedder != null)
-            {
-                ok &= Require(logger, rag.search.llmEmbedder.llm == ragLLM, "RAG embedder points to the RAG LLM.");
-            }
-            else if (rag != null)
-            {
-                ok = false;
-                logger.Log(NPCFlowStage.SmokeValidation, NPCFlowStatus.Error, NPCFlowLogLevel.Error,
-                    "RAG search/embedder is not initialized.", source: nameof(NPCDialogueSmokeValidator));
             }
 
             logger.Log(NPCFlowStage.SmokeValidation,
@@ -211,11 +178,9 @@ namespace NPCSystem
         void ResolveReferences()
         {
             if (dialogueManager == null) dialogueManager = FindAnyObjectByType<NPCDialogueManager>(FindObjectsInactive.Include);
-            if (llmAgent == null) llmAgent = FindAnyObjectByType<LLMAgent>(FindObjectsInactive.Include);
-            if (rag == null) rag = FindAnyObjectByType<RAG>(FindObjectsInactive.Include);
-            if (chatLLM == null && dialogueManager != null) chatLLM = dialogueManager.llm;
-            if (chatLLM == null && llmAgent != null) chatLLM = llmAgent.llm;
-            if (ragLLM == null && rag != null && rag.search != null && rag.search.llmEmbedder != null) ragLLM = rag.search.llmEmbedder.llm;
+            if (chatClient == null && dialogueManager != null) chatClient = dialogueManager.chatClient;
+            if (chatClient == null) chatClient = FindAnyObjectByType<NPCLocalAIClient>(FindObjectsInactive.Include);
+            if (localRag == null) localRag = FindAnyObjectByType<NPCLocalRAG>(FindObjectsInactive.Include);
         }
 
         void HandleSmokeResponseComplete(string npcName, string response)

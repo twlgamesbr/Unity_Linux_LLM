@@ -1,3 +1,4 @@
+#if !UNITY_SERVER
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -335,3 +336,4 @@ namespace NPCSystem.Tests
         }
     }
 }
+#endif

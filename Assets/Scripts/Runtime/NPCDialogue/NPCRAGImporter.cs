@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using LLMUnity;
 using UnityEngine;
 
 namespace NPCSystem
@@ -14,9 +13,9 @@ namespace NPCSystem
 
         static NPCFlowLogger Logger => NPCFlowLogger.FindOrCreate();
 
-        public static async Task<bool> RebuildAsync(RAG rag, IEnumerable<NPCProfile> profiles, string ragEmbeddingPath)
+        public static async Task<bool> RebuildAsync(NPCLocalRAG localRag, IEnumerable<NPCProfile> profiles, string ragEmbeddingPath)
         {
-            if (rag == null)
+            if (localRag == null)
             {
                 Logger.Log(NPCFlowStage.LocalRagReady, NPCFlowStatus.Skipped, NPCFlowLogLevel.Warning,
                     "RAG reference is missing; import skipped.", source: nameof(NPCRAGImporter));
@@ -30,11 +29,10 @@ namespace NPCSystem
                 return false;
             }
 
-            rag.Clear();
+            localRag.Clear();
             NPCProfile[] profileArray = profiles as NPCProfile[] ?? new List<NPCProfile>(profiles).ToArray();
             NPCRAGMetadata metadata = NPCRAGMetadataStore.CreateExpected(
                 ragEmbeddingPath,
-                GetEmbeddingLLM(rag),
                 profileArray,
                 MaxChunkCharacters
             );
@@ -60,142 +58,78 @@ namespace NPCSystem
                 if (string.IsNullOrWhiteSpace(knowledgeText))
                 {
                     Logger.Log(NPCFlowStage.LocalRagReady, NPCFlowStatus.Warning, NPCFlowLogLevel.Warning,
-                        $"Knowledge file is empty for {profile.GetDisplayName()}: {assetPath}",
-                        source: nameof(NPCRAGImporter), npcSlug: profile.GetNpcSlug(),
-                        data: new Dictionary<string, object> { ["assetPath"] = assetPath });
+                        $"Knowledge file for {profile.GetDisplayName()} is empty.",
+                        source: nameof(NPCRAGImporter), npcSlug: profile.GetNpcSlug());
                     continue;
                 }
 
-                try
+                if (knowledgeText.Length > MaxChunkCharacters)
                 {
-                    int profileChunkCount = await ImportProfileKnowledgeAsync(rag, profile, knowledgeText);
-                    if (profileChunkCount > 0)
-                    {
-                        importedProfileCount++;
-                        importedChunkCount += profileChunkCount;
-                        SetSourceChunkCount(metadata, profile.GetNpcSlug(), profileChunkCount);
-                    }
+                    knowledgeText = knowledgeText.Substring(0, MaxChunkCharacters);
                 }
-                catch (Exception e)
-                {
-                    Logger.Log(NPCFlowStage.LocalRagReady, NPCFlowStatus.Error, NPCFlowLogLevel.Error,
-                        $"Failed to import knowledge for {profile.GetDisplayName()}: {e.Message}",
-                        source: nameof(NPCRAGImporter), npcSlug: profile.GetNpcSlug(),
-                        data: new Dictionary<string, object>
-                        {
-                            ["exceptionType"] = e.GetType().Name,
-                            ["exceptionMessage"] = e.Message
-                        });
-                }
-            }
 
-            if (importedChunkCount == 0)
-            {
-                Logger.Log(NPCFlowStage.LocalRagReady, NPCFlowStatus.Warning, NPCFlowLogLevel.Warning,
-                    "No NPC knowledge documents were imported.",
-                    source: nameof(NPCRAGImporter));
-                return false;
-            }
-
-            EnsureSaveDirectoryExists(ragEmbeddingPath);
-            metadata.sourceCount = importedProfileCount;
-            metadata.chunkCount = importedChunkCount;
-            metadata.builtAtUtc = DateTime.UtcNow.ToString("o");
-            rag.Save(ragEmbeddingPath);
-            NPCRAGMetadataStore.Save(ragEmbeddingPath, metadata);
-
-            Logger.Log(NPCFlowStage.LocalRagReady, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
-                $"Imported {importedChunkCount} knowledge chunk(s) for {importedProfileCount} NPC profile(s) into {ragEmbeddingPath}",
-                source: nameof(NPCRAGImporter),
-                data: new Dictionary<string, object>
-                {
-                    ["chunkCount"] = importedChunkCount,
-                    ["profileCount"] = importedProfileCount,
-                    ["ragEmbeddingPath"] = ragEmbeddingPath
-                });
-            return true;
-        }
-
-        static async Task<int> ImportProfileKnowledgeAsync(RAG rag, NPCProfile profile, string knowledgeText)
-        {
-            int importedChunkCount = 0;
-            string ragCategory = profile.GetRagCategory();
-
-            foreach (string chunk in SplitKnowledge(knowledgeText))
-            {
-                string entry = $"{profile.GetDisplayName()} knowledge:\n{chunk}";
-                if (!await HasValidEmbeddingAsync(rag, entry, profile.GetDisplayName())) continue;
-
-                await rag.Add(entry, ragCategory);
+                int chunkKey = await localRag.Add(knowledgeText, profile.GetRagCategory());
+                SetSourceChunkCount(metadata, profile.GetNpcSlug(), 1);
+                importedProfileCount++;
                 importedChunkCount++;
             }
 
-            if (importedChunkCount == 0)
+            if (importedProfileCount > 0)
             {
-                Logger.Log(NPCFlowStage.LocalRagReady, NPCFlowStatus.Skipped, NPCFlowLogLevel.Warning,
-                    $"No valid embedding chunks were produced for {profile.GetDisplayName()}.",
-                    source: nameof(NPCRAGImporter), npcSlug: profile.GetNpcSlug());
+                EnsureSaveDirectoryExists(ragEmbeddingPath);
+                localRag.SaveFile(ragEmbeddingPath);
+                metadata.chunkCount = importedChunkCount;
+                NPCRAGMetadataStore.Save(ragEmbeddingPath, metadata);
+
+                Logger.Log(NPCFlowStage.LocalRagReady, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
+                    $"Import complete: {importedProfileCount} profile(s), {importedChunkCount} chunk(s).",
+                    source: nameof(NPCRAGImporter),
+                    data: new Dictionary<string, object>
+                    {
+                        ["importedProfiles"] = importedProfileCount,
+                        ["importedChunks"] = importedChunkCount,
+                        ["ragEmbeddingPath"] = ragEmbeddingPath
+                    });
+                return true;
             }
 
-            return importedChunkCount;
-        }
-
-        static async Task<bool> HasValidEmbeddingAsync(RAG rag, string text, string displayName)
-        {
-            if (rag == null || rag.search == null || rag.search.llmEmbedder == null) return true;
-
-            List<float> embedding = await rag.search.llmEmbedder.Embeddings(text);
-            int expectedLength = rag.search.llmEmbedder.llm != null ? rag.search.llmEmbedder.llm.embeddingLength : 0;
-            if (embedding != null && embedding.Count > 0 && (expectedLength <= 0 || embedding.Count == expectedLength)) return true;
-
-            string size = embedding == null ? "null" : embedding.Count.ToString();
-            Logger.Log(NPCFlowStage.LocalRagReady, NPCFlowStatus.Skipped, NPCFlowLogLevel.Warning,
-                $"Skipping {displayName} knowledge chunk because the embedding vector length is invalid ({size}, expected {expectedLength}).",
-                source: nameof(NPCRAGImporter),
-                data: new Dictionary<string, object>
-                {
-                    ["embeddingSize"] = size,
-                    ["expectedLength"] = expectedLength
-                });
+            Logger.Log(NPCFlowStage.LocalRagReady, NPCFlowStatus.Skipped, NPCFlowLogLevel.Debug,
+                "Import skipped: no profiles had valid knowledge files.",
+                source: nameof(NPCRAGImporter));
             return false;
         }
 
-        static IEnumerable<string> SplitKnowledge(string knowledgeText)
+        static async Task<int> ImportProfileKnowledgeAsync(NPCLocalRAG localRag, NPCProfile profile, string knowledgeText)
         {
-            if (string.IsNullOrWhiteSpace(knowledgeText)) yield break;
+            if (localRag == null || profile == null || string.IsNullOrWhiteSpace(knowledgeText))
+                return 0;
 
-            string[] lines = knowledgeText.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
-            StringBuilder current = new StringBuilder(MaxChunkCharacters);
+            string chunk = knowledgeText.Length > MaxChunkCharacters
+                ? knowledgeText.Substring(0, MaxChunkCharacters)
+                : knowledgeText;
 
-            foreach (string rawLine in lines)
+            await localRag.Add(chunk, profile.GetRagCategory());
+            return 1;
+        }
+
+        public static IEnumerable<string> ChunkTextByMaxSize(string text, int maxChars = MaxChunkCharacters)
+        {
+            if (string.IsNullOrWhiteSpace(text)) yield break;
+
+            StringBuilder current = new StringBuilder();
+            foreach (string line in text.Split('\n'))
             {
-                string line = rawLine.Trim();
-                if (line.Length == 0) continue;
+                string trimmedLine = line.Trim();
+                if (trimmedLine.Length == 0) continue;
 
-                if (line.Length > MaxChunkCharacters)
-                {
-                    if (current.Length > 0)
-                    {
-                        yield return current.ToString().Trim();
-                        current.Clear();
-                    }
-
-                    for (int start = 0; start < line.Length; start += MaxChunkCharacters)
-                    {
-                        int length = Math.Min(MaxChunkCharacters, line.Length - start);
-                        yield return line.Substring(start, length).Trim();
-                    }
-                    continue;
-                }
-
-                if (current.Length + line.Length + 1 > MaxChunkCharacters)
+                if (current.Length + trimmedLine.Length + 1 > maxChars && current.Length > 0)
                 {
                     yield return current.ToString().Trim();
                     current.Clear();
                 }
 
-                if (current.Length > 0) current.AppendLine();
-                current.Append(line);
+                if (current.Length > 0) current.Append(' ');
+                current.Append(trimmedLine);
             }
 
             if (current.Length > 0)
@@ -209,26 +143,19 @@ namespace NPCSystem
             if (string.IsNullOrWhiteSpace(relativePath)) return string.Empty;
             string normalized = relativePath.Trim().Replace('\\', '/');
             if (Path.IsPathRooted(normalized)) return normalized.Replace('\\', '/');
-            return LLMUnitySetup.GetAssetPath(normalized);
+            return NPCSearchable.ResolveAssetPath(normalized);
         }
 
         static void EnsureSaveDirectoryExists(string ragEmbeddingPath)
         {
             if (string.IsNullOrWhiteSpace(ragEmbeddingPath)) return;
 
-            string resolvedPath = LLMUnitySetup.GetAssetPath(ragEmbeddingPath.Trim().Replace('\\', '/'));
+            string resolvedPath = NPCSearchable.ResolveAssetPath(ragEmbeddingPath.Trim().Replace('\\', '/'));
             string directory = Path.GetDirectoryName(resolvedPath);
             if (!string.IsNullOrWhiteSpace(directory))
             {
                 Directory.CreateDirectory(directory);
             }
-        }
-
-        static LLM GetEmbeddingLLM(RAG rag)
-        {
-            return rag != null && rag.search != null && rag.search.llmEmbedder != null
-                ? rag.search.llmEmbedder.llm
-                : null;
         }
 
         static void SetSourceChunkCount(NPCRAGMetadata metadata, string npcSlug, int chunkCount)

@@ -1,7 +1,7 @@
 {
   "caseSlug": "mansion-dinner-party",
   "displayName": "The Mansion Dinner Party Murders",
-  "prototypeScenePath": "Assets/Scenes/NPCDialoguePrototype.unity",
+  "prototypeScenePath": "Assets/Scenes/NPCDialoguePrototype1.unity",
   "outputScenePath": "Assets/Scenes/GeneratedMysteries/mansion-dinner-party.unity",
   "ragEmbeddingPath": "RAG/mansion-dinner-party/NPCDialogues-minilm-chunked.rag",
   "correctAnswers": {

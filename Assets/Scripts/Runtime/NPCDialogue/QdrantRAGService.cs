@@ -5,17 +5,20 @@ using System.Threading.Tasks;
 using EditorAttributes;
 using UnityEngine;
 using UnityEngine.Networking;
-using LLMUnity;
 
 namespace NPCSystem
 {
     public class QdrantRAGService : MonoBehaviour
     {
         [Title("Qdrant Endpoint")]
-        [HelpBox("Qdrant is optional in the shipped scene. Use these fields when NPCDialogueManager.useQdrantRag is enabled or when running codebase-retrieval samples.", MessageMode.Log, drawAbove: true)]
+        [HelpBox("Qdrant is the primary vector database for NPC knowledge. Uses NPCLocalAIEmbedder for query encoding.", MessageMode.Log, drawAbove: true)]
         public string qdrantUrl = "http://localhost:6333";
 
         public string collectionName = "npc_knowledge";
+
+        [Title("Embedder")]
+        [HelpBox("Assign the NPCLocalAIEmbedder used to encode queries before searching Qdrant.", MessageMode.Log)]
+        public NPCLocalAIEmbedder embedder;
 
         [SerializeField, ReadOnly]
         string inspectorStatus = "Not validated yet.";
@@ -45,7 +48,7 @@ namespace NPCSystem
                 });
             inspectorStatus = $"Logged Qdrant configuration: {BuildSearchEndpoint()}";
         }
-        
+
         void Awake()
         {
             NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.SceneBootstrap, NPCFlowStatus.Success, NPCFlowLogLevel.Debug,
@@ -85,7 +88,7 @@ namespace NPCSystem
             public string text;
         }
 
-        public async Task<string> SearchMemoryAsync(RAG rag, string query, int limit = 3, string requestId = null, string npcSlug = null)
+        public async Task<string> SearchMemoryAsync(string query, int limit = 3, string requestId = null, string npcSlug = null)
         {
             using var scope = NPCFlowScope.Start(NPCFlowLogger.Instance, NPCFlowStage.QdrantSearch, source: nameof(QdrantRAGService), requestId: requestId, npcSlug: npcSlug, data: new Dictionary<string, object>
             {
@@ -93,19 +96,24 @@ namespace NPCSystem
                 ["collection"] = collectionName,
                 ["limit"] = limit
             });
-            if (rag == null || rag.search == null || rag.search.llmEmbedder == null)
+
+            if (embedder == null)
             {
-                NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.QdrantSearch, NPCFlowStatus.Skipped, NPCFlowLogLevel.Warning,
-                    "RAG or LLMEmbedder is null; Qdrant search skipped.",
-                    source: nameof(QdrantRAGService), requestId: requestId, npcSlug: npcSlug);
-                scope.Skipped("RAG embedder missing; Qdrant skipped.");
-                return string.Empty;
+                embedder = FindAnyObjectByType<NPCLocalAIEmbedder>(FindObjectsInactive.Include);
+                if (embedder == null)
+                {
+                    NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.QdrantSearch, NPCFlowStatus.Skipped, NPCFlowLogLevel.Warning,
+                        "NPCLocalAIEmbedder not found; Qdrant search skipped.",
+                        source: nameof(QdrantRAGService), requestId: requestId, npcSlug: npcSlug);
+                    scope.Skipped("Embedder missing; Qdrant skipped.");
+                    return string.Empty;
+                }
             }
 
             try
             {
-                // Embed the query using LLMUnity
-                List<float> queryVector = await rag.search.llmEmbedder.Embeddings(query);
+                // Embed the query using NPCLocalAIEmbedder (HTTP to LocalAI)
+                List<float> queryVector = await embedder.Embeddings(query);
                 if (queryVector == null || queryVector.Count == 0)
                 {
                     NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.QdrantEmbedding, NPCFlowStatus.Fallback, NPCFlowLogLevel.Warning,
