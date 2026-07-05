@@ -153,7 +153,19 @@ namespace NPCSystem
                     case NPCSceneInitializationPhase.Validation:
                         if (validateAfterInitialization && smokeValidator != null)
                         {
-                            smokeValidator.ValidateConfiguration();
+                            if (dialogueManager != null && !dialogueManager.isInitialized)
+                            {
+                                logger.Log(NPCFlowStage.SceneBootstrap,
+                                    NPCFlowStatus.Skipped,
+                                    NPCFlowLogLevel.Info,
+                                    "Skipped scene initialization smoke validation because dialogue manager is not initialized yet (deferred loading active).",
+                                    source: nameof(NPCSceneInitializationController),
+                                    data: new Dictionary<string, object> { ["phase"] = phase.ToString() });
+                            }
+                            else
+                            {
+                                smokeValidator.ValidateConfiguration();
+                            }
                         }
                         break;
                     case NPCSceneInitializationPhase.Spawning:

@@ -100,6 +100,19 @@ namespace NPCSystem
         {
             AutoAssignReferences();
 
+            // Proactively initialize auth service to resolve dynamic URL on WebGL before probing
+            if (authService != null)
+            {
+                try
+                {
+                    await authService.InitializeAsync();
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogWarning($"[NPCBackendReadinessService] Pre-probe authService initialization failed: {ex.Message}");
+                }
+            }
+
             NPCFlowLogger logger = NPCFlowLogger.FindOrCreate();
             using var scope = NPCFlowScope.Start(logger, NPCFlowStage.BackendRequest, nameof(NPCBackendReadinessService), data: new Dictionary<string, object>
             {

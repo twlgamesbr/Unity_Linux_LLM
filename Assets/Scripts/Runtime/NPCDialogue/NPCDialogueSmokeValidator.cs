@@ -25,7 +25,16 @@ namespace NPCSystem
 
             if (validateOnStart)
             {
-                ValidateConfiguration();
+                if (dialogueManager != null && !dialogueManager.isInitialized)
+                {
+                    NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.SmokeValidation, NPCFlowStatus.Skipped, NPCFlowLogLevel.Info,
+                        "Skipping Start validation because NPCDialogueManager is not initialized yet (deferred loading active).",
+                        source: nameof(NPCDialogueSmokeValidator));
+                }
+                else
+                {
+                    ValidateConfiguration();
+                }
             }
 
             if (runFirstQuestionSmokeOnStart)

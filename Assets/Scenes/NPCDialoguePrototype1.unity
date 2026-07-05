@@ -2538,17 +2538,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aa13969832e95e24c8be96d2f50718aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPCSystem.NPCDialogueUIController
-  dialogueManager: {fileID: 0}
-  networkBridge: {fileID: 0}
+  dialogueManager: {fileID: 1778380623}
+  networkBridge: {fileID: 1471440990}
   legacyKnowledgeBaseController: {fileID: 0}
-  characterSelect: {fileID: 0}
-  playerInput: {fileID: 0}
-  aiText: {fileID: 0}
-  stopButton: {fileID: 0}
-  butlerImage: {fileID: 0}
-  maidImage: {fileID: 0}
-  chefImage: {fileID: 0}
-  notebookController: {fileID: 0}
+  characterSelect: {fileID: 1821864875}
+  playerInput: {fileID: 283994679}
+  aiText: {fileID: 681685488}
+  stopButton: {fileID: 39745288}
+  butlerImage: {fileID: 574317512}
+  maidImage: {fileID: 961591108}
+  chefImage: {fileID: 718663248}
+  notebookController: {fileID: 489627716}
 --- !u!114 &489627716
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2561,25 +2561,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09548caa4451badddbccea93bbdaf442, type: 3}
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NotebookUIController
-  dialogueManager: {fileID: 0}
-  networkBridge: {fileID: 0}
-  notesButton: {fileID: 0}
-  mapButton: {fileID: 0}
-  solveButton: {fileID: 0}
-  helpButton: {fileID: 0}
-  submitButton: {fileID: 0}
-  notebookImage: {fileID: 0}
-  notesPanel: {fileID: 0}
-  solvePanel: {fileID: 0}
-  helpPanel: {fileID: 0}
-  mapImage: {fileID: 0}
-  successImage: {fileID: 0}
-  failText: {fileID: 0}
-  answer1: {fileID: 0}
-  answer2: {fileID: 0}
-  answer3: {fileID: 0}
-  notesText1: {fileID: 0}
-  notesText2: {fileID: 0}
+  dialogueManager: {fileID: 1778380623}
+  networkBridge: {fileID: 1471440990}
+  notesButton: {fileID: 1568690080}
+  mapButton: {fileID: 692572909}
+  solveButton: {fileID: 1023571710}
+  helpButton: {fileID: 1696547302}
+  submitButton: {fileID: 964505547}
+  notebookImage: {fileID: 828313583}
+  notesPanel: {fileID: 1301879205}
+  solvePanel: {fileID: 1260794225}
+  helpPanel: {fileID: 1385587314}
+  mapImage: {fileID: 964460963}
+  successImage: {fileID: 1723006218}
+  failText: {fileID: 1626244059}
+  answer1: {fileID: 1290124570}
+  answer2: {fileID: 504847329}
+  answer3: {fileID: 1278063795}
+  notesText1: {fileID: 1927269720}
+  notesText2: {fileID: 1839907271}
   correctAnswer1: Professor Pluot
   correctAnswer2: Living Room
   correctAnswer3: A Hollow Bible
@@ -3316,13 +3316,14 @@ GameObject:
   - component: {fileID: 574317511}
   - component: {fileID: 574317513}
   - component: {fileID: 574317512}
+  - component: {fileID: 574317514}
   m_Layer: 5
   m_Name: ButlerImage
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &574317511
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3377,6 +3378,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 574317510}
   m_CullTransparentMesh: 1
+--- !u!1652712579 &574317514
+MultiplayerRolesData:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 574317510}
+  m_GameObjectRolesMask: 1
+  m_ComponentsRolesMasks:
+  - m_Object: {fileID: 574317513}
+    m_RolesMask: 1
 --- !u!1 &643671669
 GameObject:
   m_ObjectHideFlags: 0
@@ -3572,6 +3584,7 @@ GameObject:
   - component: {fileID: 681685487}
   - component: {fileID: 681685489}
   - component: {fileID: 681685488}
+  - component: {fileID: 681685490}
   m_Layer: 5
   m_Name: AIText
   m_TagString: Untagged
@@ -3642,6 +3655,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 681685486}
   m_CullTransparentMesh: 1
+--- !u!1652712579 &681685490
+MultiplayerRolesData:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 681685486}
+  m_GameObjectRolesMask: 1
+  m_ComponentsRolesMasks:
+  - m_Object: {fileID: 681685489}
+    m_RolesMask: 1
 --- !u!1 &682368998
 GameObject:
   m_ObjectHideFlags: 0
@@ -3702,6 +3726,7 @@ GameObject:
   - component: {fileID: 692572911}
   - component: {fileID: 692572910}
   - component: {fileID: 692572909}
+  - component: {fileID: 692572912}
   m_Layer: 5
   m_Name: MapButton
   m_TagString: Untagged
@@ -3811,6 +3836,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 692572907}
   m_CullTransparentMesh: 1
+--- !u!1652712579 &692572912
+MultiplayerRolesData:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 692572907}
+  m_GameObjectRolesMask: 1
+  m_ComponentsRolesMasks:
+  - m_Object: {fileID: 692572911}
+    m_RolesMask: 1
 --- !u!1 &708191810
 GameObject:
   m_ObjectHideFlags: 0
@@ -4045,6 +4081,7 @@ GameObject:
   - component: {fileID: 718663247}
   - component: {fileID: 718663249}
   - component: {fileID: 718663248}
+  - component: {fileID: 718663250}
   m_Layer: 5
   m_Name: ChefImage
   m_TagString: Untagged
@@ -4106,6 +4143,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 718663246}
   m_CullTransparentMesh: 1
+--- !u!1652712579 &718663250
+MultiplayerRolesData:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 718663246}
+  m_GameObjectRolesMask: 1
+  m_ComponentsRolesMasks:
+  - m_Object: {fileID: 718663249}
+    m_RolesMask: 1
 --- !u!1 &725219862
 GameObject:
   m_ObjectHideFlags: 0
@@ -4448,7 +4496,7 @@ MonoBehaviour:
   smokeValidator: {fileID: 1778380626}
   initializeOnStart: 1
   configureNetworkTransport: 0
-  initializeDialogueManager: 1
+  initializeDialogueManager: 0
   verifyBackendsDuringInitialization: 1
   initializeNetworkBridge: 1
   validateAfterInitialization: 1
@@ -4622,6 +4670,7 @@ GameObject:
   - component: {fileID: 828313582}
   - component: {fileID: 828313584}
   - component: {fileID: 828313583}
+  - component: {fileID: 828313585}
   m_Layer: 5
   m_Name: NotebookImage
   m_TagString: Untagged
@@ -4686,6 +4735,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 828313581}
   m_CullTransparentMesh: 1
+--- !u!1652712579 &828313585
+MultiplayerRolesData:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 828313581}
+  m_GameObjectRolesMask: 1
+  m_ComponentsRolesMasks:
+  - m_Object: {fileID: 828313584}
+    m_RolesMask: 1
 --- !u!1 &837143834
 GameObject:
   m_ObjectHideFlags: 0
@@ -5677,6 +5737,7 @@ GameObject:
   - component: {fileID: 912104312}
   - component: {fileID: 912104314}
   - component: {fileID: 912104313}
+  - component: {fileID: 912104315}
   m_Layer: 5
   m_Name: SolveText
   m_TagString: Untagged
@@ -5747,6 +5808,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 912104311}
   m_CullTransparentMesh: 1
+--- !u!1652712579 &912104315
+MultiplayerRolesData:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 912104311}
+  m_GameObjectRolesMask: 1
+  m_ComponentsRolesMasks:
+  - m_Object: {fileID: 912104314}
+    m_RolesMask: 1
 --- !u!1 &916385102
 GameObject:
   m_ObjectHideFlags: 0
@@ -6280,6 +6352,7 @@ GameObject:
   - component: {fileID: 961591107}
   - component: {fileID: 961591109}
   - component: {fileID: 961591108}
+  - component: {fileID: 961591110}
   m_Layer: 5
   m_Name: MaidImage
   m_TagString: Untagged
@@ -6341,6 +6414,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 961591106}
   m_CullTransparentMesh: 1
+--- !u!1652712579 &961591110
+MultiplayerRolesData:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 961591106}
+  m_GameObjectRolesMask: 1
+  m_ComponentsRolesMasks:
+  - m_Object: {fileID: 961591109}
+    m_RolesMask: 1
 --- !u!1 &962643237
 GameObject:
   m_ObjectHideFlags: 0
@@ -6404,6 +6488,7 @@ GameObject:
   - component: {fileID: 964460962}
   - component: {fileID: 964460964}
   - component: {fileID: 964460963}
+  - component: {fileID: 964460965}
   m_Layer: 5
   m_Name: MapImage
   m_TagString: Untagged
@@ -6465,6 +6550,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 964460961}
   m_CullTransparentMesh: 1
+--- !u!1652712579 &964460965
+MultiplayerRolesData:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 964460961}
+  m_GameObjectRolesMask: 1
+  m_ComponentsRolesMasks:
+  - m_Object: {fileID: 964460964}
+    m_RolesMask: 1
 --- !u!1 &964505545
 GameObject:
   m_ObjectHideFlags: 0
@@ -6787,6 +6883,7 @@ GameObject:
   - component: {fileID: 1023571712}
   - component: {fileID: 1023571711}
   - component: {fileID: 1023571710}
+  - component: {fileID: 1023571713}
   m_Layer: 5
   m_Name: SolveButton
   m_TagString: Untagged
@@ -6896,6 +6993,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1023571708}
   m_CullTransparentMesh: 1
+--- !u!1652712579 &1023571713
+MultiplayerRolesData:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1023571708}
+  m_GameObjectRolesMask: 1
+  m_ComponentsRolesMasks:
+  - m_Object: {fileID: 1023571712}
+    m_RolesMask: 1
 --- !u!1 &1026801761
 GameObject:
   m_ObjectHideFlags: 0
@@ -7703,6 +7811,7 @@ GameObject:
   - component: {fileID: 1171575133}
   - component: {fileID: 1171575135}
   - component: {fileID: 1171575134}
+  - component: {fileID: 1171575136}
   m_Layer: 5
   m_Name: AIImage
   m_TagString: Untagged
@@ -7768,6 +7877,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1171575132}
   m_CullTransparentMesh: 1
+--- !u!1652712579 &1171575136
+MultiplayerRolesData:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1171575132}
+  m_GameObjectRolesMask: 1
+  m_ComponentsRolesMasks:
+  - m_Object: {fileID: 1171575135}
+    m_RolesMask: 1
 --- !u!1 &1178147971
 GameObject:
   m_ObjectHideFlags: 0
@@ -10184,6 +10304,7 @@ GameObject:
   - component: {fileID: 1468962048}
   - component: {fileID: 1468962047}
   - component: {fileID: 1468962046}
+  - component: {fileID: 1468962049}
   m_Layer: 5
   m_Name: ExitButton
   m_TagString: Untagged
@@ -10305,6 +10426,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1468962044}
   m_CullTransparentMesh: 1
+--- !u!1652712579 &1468962049
+MultiplayerRolesData:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1468962044}
+  m_GameObjectRolesMask: 1
+  m_ComponentsRolesMasks:
+  - m_Object: {fileID: 1468962048}
+    m_RolesMask: 1
 --- !u!1 &1471440987
 GameObject:
   m_ObjectHideFlags: 0
@@ -11893,6 +12025,7 @@ GameObject:
   - component: {fileID: 1696547304}
   - component: {fileID: 1696547303}
   - component: {fileID: 1696547302}
+  - component: {fileID: 1696547305}
   m_Layer: 5
   m_Name: HelpButton
   m_TagString: Untagged
@@ -12002,6 +12135,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1696547300}
   m_CullTransparentMesh: 1
+--- !u!1652712579 &1696547305
+MultiplayerRolesData:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1696547300}
+  m_GameObjectRolesMask: 1
+  m_ComponentsRolesMasks:
+  - m_Object: {fileID: 1696547304}
+    m_RolesMask: 1
 --- !u!1 &1697542415
 GameObject:
   m_ObjectHideFlags: 0
@@ -12108,6 +12252,7 @@ GameObject:
   - component: {fileID: 1723006217}
   - component: {fileID: 1723006219}
   - component: {fileID: 1723006218}
+  - component: {fileID: 1723006220}
   m_Layer: 5
   m_Name: SuccessImage
   m_TagString: Untagged
@@ -12169,6 +12314,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1723006216}
   m_CullTransparentMesh: 1
+--- !u!1652712579 &1723006220
+MultiplayerRolesData:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1723006216}
+  m_GameObjectRolesMask: 1
+  m_ComponentsRolesMasks:
+  - m_Object: {fileID: 1723006219}
+    m_RolesMask: 1
 --- !u!1 &1766894170
 GameObject:
   m_ObjectHideFlags: 0
@@ -13822,6 +13978,7 @@ GameObject:
   - component: {fileID: 1931178648}
   - component: {fileID: 1931178650}
   - component: {fileID: 1931178649}
+  - component: {fileID: 1931178651}
   m_Layer: 5
   m_Name: NotesText
   m_TagString: Untagged
@@ -13892,6 +14049,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1931178647}
   m_CullTransparentMesh: 1
+--- !u!1652712579 &1931178651
+MultiplayerRolesData:
+  m_ObjectHideFlags: 2
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1931178647}
+  m_GameObjectRolesMask: 1
+  m_ComponentsRolesMasks:
+  - m_Object: {fileID: 1931178650}
+    m_RolesMask: 1
 --- !u!1 &1944043758
 GameObject:
   m_ObjectHideFlags: 0

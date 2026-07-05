@@ -119,7 +119,6 @@
   <Project Path="Unity.Multiplayer.Tools.NetworkProfiler.Runtime.csproj" />
   <Project Path="Unity.RenderPipelines.Core.Runtime.Shared.csproj" />
   <Project Path="Unity.InputSystem.ForUI.csproj" />
-  <Project Path="NPCSystem.Editor.csproj" />
   <Project Path="Unity.RenderPipelines.Core.Editor.Shared.csproj" />
   <Project Path="Unity.DedicatedServer.Editor.Bridge.csproj" />
   <Project Path="Unity.AI.Navigation.csproj" />

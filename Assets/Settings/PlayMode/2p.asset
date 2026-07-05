@@ -33,7 +33,6 @@ MonoBehaviour:
       Hash: c16915d1f789adfc5d3631ffc39c502e
     m_InstanceItems:
     - rid: 6195600735939068097
-    - rid: 6195600766015373535
   references:
     version: 2
     RefIds:
@@ -49,17 +48,4 @@ MonoBehaviour:
           PlayerTag: Client
           RoleMask: 1
           InitialScene: {fileID: 102900000, guid: a2ee64be8a829337ba9b1b62d8d4f756, type: 3}
-        m_Decorators: []
-    - rid: 6195600766015373535
-      type: {class: 'InstanceItem`2[[Unity.Multiplayer.PlayMode.Editor.CloneEditorController, UnityEditor.MultiplayerModule],[Unity.Multiplayer.PlayMode.Editor.CloneEditorController/InstanceSettings, UnityEditor.MultiplayerModule]]', ns: Unity.Multiplayer.PlayMode.Editor, asm: UnityEditor.MultiplayerModule}
-      data:
-        m_Id: 4659265a4d8146208ec00089014a5d56
-        m_Name: Player 2
-        m_RunMode: 0
-        m_Settings:
-          PlayerTag: Client
-          RoleMask: 1
-          PlayerInstanceIndex: 1
-          StreamLogsToMainEditor: 1
-          LogsColor: {r: 0.8666667, g: 0.37930048, b: 0.36470592, a: 1}
         m_Decorators: []

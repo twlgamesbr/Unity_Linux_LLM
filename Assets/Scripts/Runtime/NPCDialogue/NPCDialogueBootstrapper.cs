@@ -80,6 +80,13 @@ namespace NPCSystem
                 await bridge.InitializeAsync();
             }
 
+            // Run smoke validator configuration check post-login once dialogue systems are active
+            var validator = FindAnyObjectByType<NPCDialogueSmokeValidator>(FindObjectsInactive.Include);
+            if (validator != null)
+            {
+                validator.ValidateConfiguration();
+            }
+
             if (!autoSelectDefaultNPC || dialogueManager.currentProfile != null)
             {
                 logger.Log(NPCFlowStage.NPCSwitch, NPCFlowStatus.Skipped, NPCFlowLogLevel.Info,

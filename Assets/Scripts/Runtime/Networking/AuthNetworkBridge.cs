@@ -153,7 +153,7 @@ namespace NPCSystem
         }
 #endif
 
-        void HandleAuthSuccess(string username)
+        async void HandleAuthSuccess(string username)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
             if (string.IsNullOrWhiteSpace(hostAddress) || hostAddress == "127.0.0.1" || hostAddress == "localhost")
@@ -196,7 +196,7 @@ namespace NPCSystem
                 _logger?.Log(NPCFlowStage.SceneBootstrap, NPCFlowStatus.Start, NPCFlowLogLevel.Info,
                     "Triggering on-demand dialogue and RAG system initialization.",
                     source: nameof(AuthNetworkBridge));
-                _ = bootstrapper.InitializeOnDemandAsync();
+                await bootstrapper.InitializeOnDemandAsync();
             }
 
             if (resolvedMode == ResolvedNetworkStartupMode.Host)
