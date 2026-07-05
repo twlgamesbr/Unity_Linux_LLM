@@ -8,7 +8,7 @@ namespace NPCSystem.Tests
 {
     public class NPCNetworkNpcPrefabTests
     {
-        const string NpcPrefabPath = "Assets/Resources/Networking/NPCServerCharacter.prefab";
+        const string NpcPrefabPath = "Assets/Prefabs/Networking/NPCServerCharacter.prefab";
 
         [Test]
         public void NpcPrefabHasRequiredServerCharacterComponents()

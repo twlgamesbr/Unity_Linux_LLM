@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System.Reflection;
 using UnityEngine;
 
 namespace NPCSystem.Tests
@@ -34,7 +35,9 @@ namespace NPCSystem.Tests
 
             try
             {
-                bridge.SendMessage("Reset", SendMessageOptions.DontRequireReceiver);
+                typeof(AuthNetworkBridge)
+                    .GetMethod("ResolveReferences", BindingFlags.Instance | BindingFlags.NonPublic)
+                    ?.Invoke(bridge, null);
 
                 Assert.That(bridge.authController, Is.SameAs(authController));
             }
@@ -49,7 +52,7 @@ namespace NPCSystem.Tests
         {
             NPCTestHelpers.OpenMainScene();
 
-            AuthNetworkBridge bridge = NPCTestHelpers.RequireComponent<AuthNetworkBridge>("Canvas/AuthUI");
+            AuthNetworkBridge bridge = NPCTestHelpers.RequireComponent<AuthNetworkBridge>("AuthUI");
 
             Assert.That(bridge.authController, Is.Not.Null, "AuthNetworkBridge.authController must be assigned so auth success can bind events.");
             Assert.That(bridge.networkBootstrap, Is.Not.Null, "AuthNetworkBridge.networkBootstrap must be assigned so networking is delegated to NPCNetworkBootstrap.");

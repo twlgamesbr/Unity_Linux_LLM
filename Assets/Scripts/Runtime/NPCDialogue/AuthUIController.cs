@@ -25,6 +25,11 @@ namespace NPCSystem
         [SerializeField] TMP_Text switchModeText;
         [SerializeField] TMP_Text errorText;
         [SerializeField] PlayerAuthService authService;
+        [SerializeField] Canvas authCanvas;
+        [SerializeField] GraphicRaycaster authRaycaster;
+        [SerializeField] Canvas gameplayCanvas;
+        [SerializeField] GraphicRaycaster gameplayRaycaster;
+        [SerializeField] int authCanvasSortingOrder = 100;
 
         [Header("Validation")]
         [SerializeField] int minUsernameLength = 3;
@@ -54,11 +59,18 @@ namespace NPCSystem
         void Awake()
         {
             ResolveReferences();
-            BindRuntimeEvents();
             ConfigureInputs();
             NormalizeVisualLayout();
             ApplyMode(_isRegisterMode);
             HideError();
+            ApplyCanvasFocus(isAuthVisible: true);
+        }
+
+        void OnEnable()
+        {
+            ResolveReferences();
+            BindRuntimeEvents();
+            ApplyCanvasFocus(isAuthVisible: true);
         }
 
         async void Start()
@@ -68,7 +80,6 @@ namespace NPCSystem
                 source: nameof(AuthUIController));
 
             ResolveReferences();
-            BindRuntimeEvents();
             ConfigureInputs();
             NormalizeVisualLayout();
             ApplyMode(_isRegisterMode);
@@ -95,6 +106,12 @@ namespace NPCSystem
         void OnDestroy()
         {
             UnbindRuntimeEvents();
+        }
+
+        void OnDisable()
+        {
+            UnbindRuntimeEvents();
+            ApplyCanvasFocus(isAuthVisible: false);
         }
 
         async Task InitializeAsync()
@@ -135,6 +152,10 @@ namespace NPCSystem
             errorText = errorText != null ? errorText : FindChildComponent<TMP_Text>(root, "AuthContent/ErrorText");
             authService = authService != null ? authService : GetComponent<PlayerAuthService>();
             authService = authService != null ? authService : FindAnyObjectByType<PlayerAuthService>(FindObjectsInactive.Include);
+            authCanvas = authCanvas != null ? authCanvas : authPanel != null ? authPanel.GetComponent<Canvas>() : null;
+            authRaycaster = authRaycaster != null ? authRaycaster : authPanel != null ? authPanel.GetComponent<GraphicRaycaster>() : null;
+            gameplayCanvas = gameplayCanvas != null ? gameplayCanvas : FindGameplayCanvas(authPanel);
+            gameplayRaycaster = gameplayRaycaster != null ? gameplayRaycaster : gameplayCanvas != null ? gameplayCanvas.GetComponent<GraphicRaycaster>() : null;
         }
 
         void BindRuntimeEvents()
@@ -208,6 +229,26 @@ namespace NPCSystem
             if (switchModeText != null) switchModeText.text = registerMode ? "Switch to Login" : "Switch to Register";
             if (confirmPasswordGroup != null) confirmPasswordGroup.SetActive(registerMode);
             if (rememberToggle != null) rememberToggle.gameObject.SetActive(!registerMode);
+        }
+
+        void ApplyCanvasFocus(bool isAuthVisible)
+        {
+            if (authCanvas != null)
+            {
+                authCanvas.overrideSorting = true;
+                authCanvas.sortingOrder = authCanvasSortingOrder;
+                authCanvas.enabled = true;
+            }
+
+            if (authRaycaster != null)
+            {
+                authRaycaster.enabled = isAuthVisible;
+            }
+
+            if (gameplayRaycaster != null)
+            {
+                gameplayRaycaster.enabled = !isAuthVisible;
+            }
         }
 
         public void ToggleMode()
@@ -363,6 +404,7 @@ namespace NPCSystem
 
         public void ClosePanel()
         {
+            ApplyCanvasFocus(isAuthVisible: false);
             if (authPanel != null)
             {
                 authPanel.SetActive(false);
@@ -416,6 +458,24 @@ namespace NPCSystem
         static GameObject FindObject(string path)
         {
             return GameObject.Find(path);
+        }
+
+        static Canvas FindGameplayCanvas(GameObject authPanelObject)
+        {
+            Canvas[] canvases = FindObjectsByType<Canvas>(FindObjectsInactive.Include);
+            foreach (Canvas canvas in canvases)
+            {
+                if (canvas == null)
+                    continue;
+
+                if (authPanelObject != null && canvas.gameObject == authPanelObject)
+                    continue;
+
+                if (canvas.gameObject.name == "Canvas")
+                    return canvas;
+            }
+
+            return null;
         }
     }
 }

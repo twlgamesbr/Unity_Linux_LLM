@@ -1,0 +1,21 @@
+{
+    "name": "NPCSystem.Editor",
+    "rootNamespace": "NPCSystem.Editor",
+    "references": [
+        "NPCSystem.Runtime",
+        "UnityEditor.TestRunner",
+        "Unity.TestTools.CodeCoverage.Editor",
+        "Unity.Performance.Profile-Analyzer.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

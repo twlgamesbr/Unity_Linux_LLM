@@ -1,7 +1,6 @@
 using NUnit.Framework;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
-using UnityEngine;
 
 namespace NPCSystem.Tests
 {
@@ -35,9 +34,9 @@ namespace NPCSystem.Tests
             NPCTestHelpers.RequireComponent<NPCDialogueNetworkBridge>("NPCDialogueRuntimeBridge");
 
 #if !UNITY_SERVER
-            var authController = NPCTestHelpers.RequireComponent<AuthUIController>("Canvas/AuthUI");
-            NPCTestHelpers.RequireComponent<PlayerAuthService>("Canvas/AuthUI");
-            var authBridge = NPCTestHelpers.RequireComponent<AuthNetworkBridge>("Canvas/AuthUI");
+            var authController = NPCTestHelpers.RequireComponent<AuthUIController>("AuthUI");
+            NPCTestHelpers.RequireComponent<PlayerAuthService>("AuthUI");
+            var authBridge = NPCTestHelpers.RequireComponent<AuthNetworkBridge>("AuthUI");
             Assert.That(authBridge.authController, Is.SameAs(authController));
             Assert.That(authBridge.networkBootstrap, Is.SameAs(networkBootstrap));
 #endif

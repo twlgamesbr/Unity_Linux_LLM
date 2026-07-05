@@ -17,7 +17,7 @@ namespace NPCSystem.Tests
             Assert.That(isValid, Is.True, errorMessage);
             Assert.That(config.connectAddress, Is.EqualTo("127.0.0.1"));
             Assert.That(config.listenAddress, Is.EqualTo("0.0.0.0"));
-            Assert.That(config.port, Is.EqualTo((ushort)7777));
+            Assert.That(config.port, Is.EqualTo((ushort)11474));
             Assert.That(config.webSocketPath, Is.EqualTo("/npc-dialogue"));
             Assert.That(config.autoStartMode, Is.EqualTo(NPCNetworkAutoStartMode.Manual));
         }
@@ -88,8 +88,8 @@ namespace NPCSystem.Tests
                 Assert.That(unityTransport.ConnectionData.WebSocketPath, Is.EqualTo("/npc-dialogue"));
                 Assert.That(networkManager.NetworkConfig.NetworkTransport, Is.SameAs(unityTransport));
                 Assert.That(networkManager.NetworkConfig.PlayerPrefab, Is.SameAs(playerPrefab));
-                Assert.That(networkManager.NetworkConfig.Prefabs.Add(new NetworkPrefab { Prefab = serverNpcPrefab }), Is.False);
-                Assert.That(networkManager.NetworkConfig.Prefabs.Add(new NetworkPrefab { Prefab = transferableItemPrefab }), Is.False);
+                Assert.That(networkManager.NetworkConfig.Prefabs.Contains(serverNpcPrefab), Is.True);
+                Assert.That(networkManager.NetworkConfig.Prefabs.Contains(transferableItemPrefab), Is.True);
             }
             finally
             {

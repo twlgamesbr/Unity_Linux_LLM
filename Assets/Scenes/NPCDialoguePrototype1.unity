@@ -6066,19 +6066,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 917727509}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1351714794}
-        m_TargetAssemblyTypeName: NPCSystem.AuthUIController, NPCSystem.Runtime
-        m_MethodName: ToggleMode
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!1 &928480507
 GameObject:
   m_ObjectHideFlags: 0
@@ -8201,7 +8189,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 100
   m_TargetDisplay: 0
 --- !u!114 &1205281775
 MonoBehaviour:
@@ -9668,6 +9656,11 @@ MonoBehaviour:
   switchModeText: {fileID: 1959037736}
   errorText: {fileID: 1644186502}
   authService: {fileID: 1351714796}
+  authCanvas: {fileID: 1205281774}
+  authRaycaster: {fileID: 1205281776}
+  gameplayCanvas: {fileID: 898411688}
+  gameplayRaycaster: {fileID: 898411686}
+  authCanvasSortingOrder: 100
   minUsernameLength: 3
   minPasswordLength: 6
   events:

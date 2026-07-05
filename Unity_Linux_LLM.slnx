@@ -166,6 +166,7 @@
   <Project Path="Unity.Multiplayer.Tools.Adapters.Utp2.csproj" />
   <Project Path="Unity.Multiplayer.Tools.NetworkSolutionInterface.Tests.Editor.csproj" />
   <Project Path="Unity.Toolchain.Linux-x86_64-Linux.csproj" />
+  <Project Path="NPCSystem.Editor.csproj" />
   <Project Path="Unity.Rendering.LightTransport.Editor.csproj" />
   <Project Path="Unity.Collections.Editor.csproj" />
   <Project Path="Unity.Mathematics.csproj" />

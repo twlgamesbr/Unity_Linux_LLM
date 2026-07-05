@@ -8,7 +8,7 @@ namespace NPCSystem.Tests
 {
     public class NPCNetworkTransferableItemPrefabTests
     {
-        const string ItemPrefabPath = "Assets/Resources/Networking/NPCTransferableItem.prefab";
+        const string ItemPrefabPath = "Assets/Prefabs/Networking/NPCTransferableItem.prefab";
 
         [Test]
         public void TransferableItemPrefabHasRequiredOwnershipTransferComponents()

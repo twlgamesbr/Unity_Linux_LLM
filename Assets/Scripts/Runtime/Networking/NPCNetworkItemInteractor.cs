@@ -162,7 +162,7 @@ namespace NPCSystem
 
             NPCTransferableItem nearestItem = null;
             float nearestDistance = pickupRange;
-            NPCTransferableItem[] items = FindObjectsByType<NPCTransferableItem>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            NPCTransferableItem[] items = FindObjectsByType<NPCTransferableItem>(FindObjectsInactive.Include);
             foreach (NPCTransferableItem item in items)
             {
                 if (item == null || !item.IsSpawned || item.IsHeldByPlayer)
@@ -183,7 +183,7 @@ namespace NPCSystem
 
         NPCTransferableItem FindHeldItem(ulong clientId)
         {
-            NPCTransferableItem[] items = FindObjectsByType<NPCTransferableItem>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            NPCTransferableItem[] items = FindObjectsByType<NPCTransferableItem>(FindObjectsInactive.Include);
             foreach (NPCTransferableItem item in items)
             {
                 if (item != null && item.IsSpawned && item.IsHeldByPlayer && item.OwnerClientId == clientId)
@@ -205,7 +205,7 @@ namespace NPCSystem
 
             NPCPlayerNetworkAvatar nearestPlayer = null;
             float nearestDistance = transferRange;
-            NPCPlayerNetworkAvatar[] avatars = FindObjectsByType<NPCPlayerNetworkAvatar>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            NPCPlayerNetworkAvatar[] avatars = FindObjectsByType<NPCPlayerNetworkAvatar>(FindObjectsInactive.Include);
             foreach (NPCPlayerNetworkAvatar avatar in avatars)
             {
                 if (avatar == null || avatar.OwnerClientId == clientId || !avatar.IsSpawned)
@@ -234,7 +234,7 @@ namespace NPCSystem
 
             NPCServerCharacter nearestNpc = null;
             float nearestDistance = transferRange;
-            NPCServerCharacter[] npcs = FindObjectsByType<NPCServerCharacter>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            NPCServerCharacter[] npcs = FindObjectsByType<NPCServerCharacter>(FindObjectsInactive.Include);
             foreach (NPCServerCharacter npc in npcs)
             {
                 if (npc == null || !npc.IsSpawned)
@@ -261,7 +261,7 @@ namespace NPCSystem
 
         NPCPlayerNetworkAvatar FindPlayerAvatar(ulong clientId)
         {
-            NPCPlayerNetworkAvatar[] avatars = FindObjectsByType<NPCPlayerNetworkAvatar>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            NPCPlayerNetworkAvatar[] avatars = FindObjectsByType<NPCPlayerNetworkAvatar>(FindObjectsInactive.Include);
             foreach (NPCPlayerNetworkAvatar avatar in avatars)
             {
                 if (avatar != null && avatar.IsSpawned && avatar.OwnerClientId == clientId)

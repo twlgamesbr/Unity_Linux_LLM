@@ -85,6 +85,12 @@ namespace NPCSystem.EditorUX
         [Button(nameof(useQdrantDiagnostics), ConditionResult.ShowHide, buttonLabel: "Validate Qdrant Settings")]
         void ValidateQdrantSettings()
         {
+            if (!useQdrantDiagnostics)
+            {
+                lastValidationStatus = "Qdrant diagnostics are disabled for this pilot component.";
+                return;
+            }
+
             if (qdrantRag == null)
             {
                 lastValidationStatus = "Qdrant diagnostics enabled but no QdrantRAGService is assigned.";

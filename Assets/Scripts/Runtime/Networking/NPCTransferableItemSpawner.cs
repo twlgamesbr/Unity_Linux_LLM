@@ -103,7 +103,7 @@ namespace NPCSystem
                 return;
             }
 
-            NPCTransferableItem[] existingItems = FindObjectsByType<NPCTransferableItem>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            NPCTransferableItem[] existingItems = FindObjectsByType<NPCTransferableItem>(FindObjectsInactive.Include);
             foreach (NPCTransferableItem existing in existingItems)
             {
                 if (existing == null)
@@ -127,7 +127,7 @@ namespace NPCSystem
             NPCTransferableItem item = instance.GetComponent<NPCTransferableItem>();
             networkObject.Spawn(destroyWithScene: true);
 
-            NPCServerCharacter[] npcs = FindObjectsByType<NPCServerCharacter>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            NPCServerCharacter[] npcs = FindObjectsByType<NPCServerCharacter>(FindObjectsInactive.Include);
             NPCServerCharacter initialNpc = null;
             foreach (NPCServerCharacter npc in npcs)
             {

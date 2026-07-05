@@ -1,0 +1,10 @@
+{
+  "lsp": {
+    "csharp": {
+      "priority": 100,
+      "env": {
+        "PATH": "/home/athar/.dotnet/tools:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+      }
+    }
+  }
+}

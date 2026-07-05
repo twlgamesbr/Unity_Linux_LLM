@@ -7,19 +7,21 @@ var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.UseUrls(builder.Configuration.GetValue<string>("Urls") ?? "http://localhost:5100");
 builder.Services.AddSingleton(_ =>
 {
-    string connectionString = builder.Configuration.GetConnectionString("AuthDatabase")
+    string connectionString =
+        builder.Configuration.GetConnectionString("AuthDatabase")
         ?? throw new InvalidOperationException("Missing connection string 'AuthDatabase'.");
     return NpgsqlDataSource.Create(connectionString);
 });
 
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
+    options.AddPolicy(
+        "AllowAll",
+        policy =>
+        {
+            policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+        }
+    );
 });
 
 var app = builder.Build();
@@ -27,123 +29,157 @@ var app = builder.Build();
 app.UseCors("AllowAll");
 
 int sessionHours = Math.Max(1, builder.Configuration.GetValue("Auth:SessionHours", 12));
-int rememberedSessionDays = Math.Max(1, builder.Configuration.GetValue("Auth:RememberedSessionDays", 30));
-int passwordIterations = Math.Max(10000, builder.Configuration.GetValue("Auth:PasswordIterations", 100000));
+int rememberedSessionDays = Math.Max(
+    1,
+    builder.Configuration.GetValue("Auth:RememberedSessionDays", 30)
+);
+int passwordIterations = Math.Max(
+    10000,
+    builder.Configuration.GetValue("Auth:PasswordIterations", 100000)
+);
 
 await EnsureDatabaseAsync(app.Services, app.Environment.ContentRootPath);
 
 app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
 
-app.MapPost("/api/auth/register", async (
-    [FromBody] RegisterRequest request,
-    NpgsqlDataSource dataSource) =>
-{
-    string? validationError = ValidateCredentials(request.Username, request.Password);
-    if (validationError != null)
-        return Results.BadRequest(new ErrorResponse(validationError));
+app.MapPost(
+    "/api/auth/register",
+    async ([FromBody] RegisterRequest request, NpgsqlDataSource dataSource) =>
+    {
+        string? validationError = ValidateCredentials(request.Username, request.Password);
+        if (validationError != null)
+            return Results.BadRequest(new ErrorResponse(validationError));
 
-    string username = request.Username.Trim();
-    string normalizedUsername = NormalizeUsername(username);
-    byte[] salt = RandomNumberGenerator.GetBytes(16);
-    byte[] passwordHash = HashPassword(request.Password, salt, passwordIterations);
+        string username = request.Username.Trim();
+        string normalizedUsername = NormalizeUsername(username);
+        byte[] salt = RandomNumberGenerator.GetBytes(16);
+        byte[] passwordHash = HashPassword(request.Password, salt, passwordIterations);
 
-    await using NpgsqlConnection connection = await dataSource.OpenConnectionAsync();
-    await using NpgsqlCommand command = new(@"
+        await using NpgsqlConnection connection = await dataSource.OpenConnectionAsync();
+        await using NpgsqlCommand command = new(
+            @"
 insert into players (username, username_normalized, password_hash, password_salt, password_iterations)
 values (@username, @username_normalized, @password_hash, @password_salt, @password_iterations)
-returning player_id, username, created_at_utc;", connection);
+returning player_id, username, created_at_utc;",
+            connection
+        );
 
-    command.Parameters.AddWithValue("username", username);
-    command.Parameters.AddWithValue("username_normalized", normalizedUsername);
-    command.Parameters.AddWithValue("password_hash", passwordHash);
-    command.Parameters.AddWithValue("password_salt", salt);
-    command.Parameters.AddWithValue("password_iterations", passwordIterations);
+        command.Parameters.AddWithValue("username", username);
+        command.Parameters.AddWithValue("username_normalized", normalizedUsername);
+        command.Parameters.AddWithValue("password_hash", passwordHash);
+        command.Parameters.AddWithValue("password_salt", salt);
+        command.Parameters.AddWithValue("password_iterations", passwordIterations);
 
-    try
-    {
-        await using NpgsqlDataReader reader = await command.ExecuteReaderAsync();
-        await reader.ReadAsync();
+        try
+        {
+            await using NpgsqlDataReader reader = await command.ExecuteReaderAsync();
+            await reader.ReadAsync();
 
-        return Results.Created($"/api/auth/players/{reader.GetGuid(0)}", new RegisterResponse(
-            reader.GetGuid(0).ToString(),
-            reader.GetString(1),
-            ToIsoUtc(reader.GetFieldValue<DateTime>(2))));
+            return Results.Created(
+                $"/api/auth/players/{reader.GetGuid(0)}",
+                new RegisterResponse(
+                    reader.GetGuid(0).ToString(),
+                    reader.GetString(1),
+                    ToIsoUtc(reader.GetFieldValue<DateTime>(2))
+                )
+            );
+        }
+        catch (PostgresException ex) when (ex.SqlState == PostgresErrorCodes.UniqueViolation)
+        {
+            return Results.Conflict(new ErrorResponse("Username is already taken."));
+        }
     }
-    catch (PostgresException ex) when (ex.SqlState == PostgresErrorCodes.UniqueViolation)
+);
+
+app.MapPost(
+    "/api/auth/login",
+    async ([FromBody] LoginRequest request, NpgsqlDataSource dataSource) =>
     {
-        return Results.Conflict(new ErrorResponse("Username is already taken."));
-    }
-});
+        string? validationError = ValidateCredentials(request.Username, request.Password);
+        if (validationError != null)
+            return Results.BadRequest(new ErrorResponse(validationError));
 
-app.MapPost("/api/auth/login", async (
-    [FromBody] LoginRequest request,
-    NpgsqlDataSource dataSource) =>
-{
-    string? validationError = ValidateCredentials(request.Username, request.Password);
-    if (validationError != null)
-        return Results.BadRequest(new ErrorResponse(validationError));
+        string normalizedUsername = NormalizeUsername(request.Username);
 
-    string normalizedUsername = NormalizeUsername(request.Username);
-
-    await using NpgsqlConnection connection = await dataSource.OpenConnectionAsync();
-    await using NpgsqlCommand playerCommand = new(@"
+        await using NpgsqlConnection connection = await dataSource.OpenConnectionAsync();
+        await using NpgsqlCommand playerCommand = new(
+            @"
 select player_id, username, password_hash, password_salt, password_iterations
 from players
 where username_normalized = @username_normalized
-limit 1;", connection);
-    playerCommand.Parameters.AddWithValue("username_normalized", normalizedUsername);
+limit 1;",
+            connection
+        );
+        playerCommand.Parameters.AddWithValue("username_normalized", normalizedUsername);
 
-    await using NpgsqlDataReader playerReader = await playerCommand.ExecuteReaderAsync();
-    if (!await playerReader.ReadAsync())
-        return Results.Unauthorized();
+        await using NpgsqlDataReader playerReader = await playerCommand.ExecuteReaderAsync();
+        if (!await playerReader.ReadAsync())
+            return Results.Unauthorized();
 
-    string playerId = playerReader.GetGuid(0).ToString();
-    string username = playerReader.GetString(1);
-    byte[] storedHash = playerReader.GetFieldValue<byte[]>(2);
-    byte[] storedSalt = playerReader.GetFieldValue<byte[]>(3);
-    int iterations = playerReader.GetInt32(4);
+        string playerId = playerReader.GetGuid(0).ToString();
+        string username = playerReader.GetString(1);
+        byte[] storedHash = playerReader.GetFieldValue<byte[]>(2);
+        byte[] storedSalt = playerReader.GetFieldValue<byte[]>(3);
+        int iterations = playerReader.GetInt32(4);
 
-    await playerReader.DisposeAsync();
+        await playerReader.DisposeAsync();
 
-    if (!VerifyPassword(request.Password, storedSalt, storedHash, iterations))
-        return Results.Unauthorized();
+        if (!VerifyPassword(request.Password, storedSalt, storedHash, iterations))
+            return Results.Unauthorized();
 
-    string sessionToken = CreateSessionToken();
-    string tokenHash = HashToken(sessionToken);
-    DateTime expiresAtUtc = DateTime.UtcNow.Add(request.RememberMe ? TimeSpan.FromDays(rememberedSessionDays) : TimeSpan.FromHours(sessionHours));
+        string sessionToken = CreateSessionToken();
+        string tokenHash = HashToken(sessionToken);
+        DateTime expiresAtUtc = DateTime.UtcNow.Add(
+            request.RememberMe
+                ? TimeSpan.FromDays(rememberedSessionDays)
+                : TimeSpan.FromHours(sessionHours)
+        );
 
-    await using NpgsqlCommand sessionCommand = new(@"
+        await using NpgsqlCommand sessionCommand = new(
+            @"
 insert into player_sessions (player_id, session_token_hash, device_id, remember_me, expires_at_utc)
 values (@player_id, @session_token_hash, @device_id, @remember_me, @expires_at_utc)
-returning session_id, created_at_utc, expires_at_utc, last_seen_at_utc;", connection);
+returning session_id, created_at_utc, expires_at_utc, last_seen_at_utc;",
+            connection
+        );
 
-    sessionCommand.Parameters.AddWithValue("player_id", Guid.Parse(playerId));
-    sessionCommand.Parameters.AddWithValue("session_token_hash", tokenHash);
-    sessionCommand.Parameters.AddWithValue("device_id", (object?)request.DeviceId?.Trim() ?? DBNull.Value);
-    sessionCommand.Parameters.AddWithValue("remember_me", request.RememberMe);
-    sessionCommand.Parameters.AddWithValue("expires_at_utc", expiresAtUtc);
+        sessionCommand.Parameters.AddWithValue("player_id", Guid.Parse(playerId));
+        sessionCommand.Parameters.AddWithValue("session_token_hash", tokenHash);
+        sessionCommand.Parameters.AddWithValue(
+            "device_id",
+            (object?)request.DeviceId?.Trim() ?? DBNull.Value
+        );
+        sessionCommand.Parameters.AddWithValue("remember_me", request.RememberMe);
+        sessionCommand.Parameters.AddWithValue("expires_at_utc", expiresAtUtc);
 
-    await using NpgsqlDataReader sessionReader = await sessionCommand.ExecuteReaderAsync();
-    await sessionReader.ReadAsync();
+        await using NpgsqlDataReader sessionReader = await sessionCommand.ExecuteReaderAsync();
+        await sessionReader.ReadAsync();
 
-    return Results.Ok(new SessionResponse(
-        sessionReader.GetGuid(0).ToString(),
-        playerId,
-        username,
-        sessionToken,
-        ToIsoUtc(sessionReader.GetFieldValue<DateTime>(1)),
-        ToIsoUtc(sessionReader.GetFieldValue<DateTime>(2)),
-        ToIsoUtc(sessionReader.GetFieldValue<DateTime>(3))));
-});
+        return Results.Ok(
+            new SessionResponse(
+                sessionReader.GetGuid(0).ToString(),
+                playerId,
+                username,
+                sessionToken,
+                ToIsoUtc(sessionReader.GetFieldValue<DateTime>(1)),
+                ToIsoUtc(sessionReader.GetFieldValue<DateTime>(2)),
+                ToIsoUtc(sessionReader.GetFieldValue<DateTime>(3))
+            )
+        );
+    }
+);
 
-app.MapGet("/api/auth/session", async (HttpRequest httpRequest, NpgsqlDataSource dataSource) =>
-{
-    string? bearerToken = GetBearerToken(httpRequest);
-    if (string.IsNullOrWhiteSpace(bearerToken))
-        return Results.Unauthorized();
+app.MapGet(
+    "/api/auth/session",
+    async (HttpRequest httpRequest, NpgsqlDataSource dataSource) =>
+    {
+        string? bearerToken = GetBearerToken(httpRequest);
+        if (string.IsNullOrWhiteSpace(bearerToken))
+            return Results.Unauthorized();
 
-    await using NpgsqlConnection connection = await dataSource.OpenConnectionAsync();
-    await using NpgsqlCommand command = new(@"
+        await using NpgsqlConnection connection = await dataSource.OpenConnectionAsync();
+        await using NpgsqlCommand command = new(
+            @"
 with updated_session as (
     update player_sessions
     set last_seen_at_utc = timezone('utc', now())
@@ -159,41 +195,53 @@ select updated_session.session_id,
        updated_session.expires_at_utc,
        updated_session.last_seen_at_utc
 from updated_session
-join players on players.player_id = updated_session.player_id;", connection);
+join players on players.player_id = updated_session.player_id;",
+            connection
+        );
 
-    command.Parameters.AddWithValue("session_token_hash", HashToken(bearerToken));
+        command.Parameters.AddWithValue("session_token_hash", HashToken(bearerToken));
 
-    await using NpgsqlDataReader reader = await command.ExecuteReaderAsync();
-    if (!await reader.ReadAsync())
-        return Results.Unauthorized();
+        await using NpgsqlDataReader reader = await command.ExecuteReaderAsync();
+        if (!await reader.ReadAsync())
+            return Results.Unauthorized();
 
-    return Results.Ok(new SessionResponse(
-        reader.GetGuid(0).ToString(),
-        reader.GetGuid(1).ToString(),
-        reader.GetString(2),
-        string.Empty,
-        ToIsoUtc(reader.GetFieldValue<DateTime>(3)),
-        ToIsoUtc(reader.GetFieldValue<DateTime>(4)),
-        ToIsoUtc(reader.GetFieldValue<DateTime>(5))));
-});
+        return Results.Ok(
+            new SessionResponse(
+                reader.GetGuid(0).ToString(),
+                reader.GetGuid(1).ToString(),
+                reader.GetString(2),
+                string.Empty,
+                ToIsoUtc(reader.GetFieldValue<DateTime>(3)),
+                ToIsoUtc(reader.GetFieldValue<DateTime>(4)),
+                ToIsoUtc(reader.GetFieldValue<DateTime>(5))
+            )
+        );
+    }
+);
 
-app.MapPost("/api/auth/logout", async (HttpRequest httpRequest, NpgsqlDataSource dataSource) =>
-{
-    string? bearerToken = GetBearerToken(httpRequest);
-    if (string.IsNullOrWhiteSpace(bearerToken))
-        return Results.Unauthorized();
+app.MapPost(
+    "/api/auth/logout",
+    async (HttpRequest httpRequest, NpgsqlDataSource dataSource) =>
+    {
+        string? bearerToken = GetBearerToken(httpRequest);
+        if (string.IsNullOrWhiteSpace(bearerToken))
+            return Results.Unauthorized();
 
-    await using NpgsqlConnection connection = await dataSource.OpenConnectionAsync();
-    await using NpgsqlCommand command = new(@"
+        await using NpgsqlConnection connection = await dataSource.OpenConnectionAsync();
+        await using NpgsqlCommand command = new(
+            @"
 update player_sessions
 set revoked_at_utc = timezone('utc', now())
 where session_token_hash = @session_token_hash
-  and revoked_at_utc is null;", connection);
-    command.Parameters.AddWithValue("session_token_hash", HashToken(bearerToken));
+  and revoked_at_utc is null;",
+            connection
+        );
+        command.Parameters.AddWithValue("session_token_hash", HashToken(bearerToken));
 
-    await command.ExecuteNonQueryAsync();
-    return Results.Ok(new { success = true });
-});
+        await command.ExecuteNonQueryAsync();
+        return Results.Ok(new { success = true });
+    }
+);
 
 await app.RunAsync();
 
@@ -243,7 +291,8 @@ static bool VerifyPassword(string password, byte[] salt, byte[] storedHash, int 
 
 static string CreateSessionToken()
 {
-    return Convert.ToBase64String(RandomNumberGenerator.GetBytes(32))
+    return Convert
+        .ToBase64String(RandomNumberGenerator.GetBytes(32))
         .TrimEnd('=')
         .Replace('+', '-')
         .Replace('/', '_');
@@ -270,8 +319,11 @@ static string ToIsoUtc(DateTime timestamp)
 }
 
 sealed record RegisterRequest(string Username, string Password);
+
 sealed record LoginRequest(string Username, string Password, bool RememberMe, string? DeviceId);
+
 sealed record RegisterResponse(string PlayerId, string Username, string CreatedAtUtc);
+
 sealed record SessionResponse(
     string SessionId,
     string PlayerId,
@@ -279,5 +331,7 @@ sealed record SessionResponse(
     string SessionToken,
     string CreatedAtUtc,
     string ExpiresAtUtc,
-    string LastSeenAtUtc);
+    string LastSeenAtUtc
+);
+
 sealed record ErrorResponse(string Error);

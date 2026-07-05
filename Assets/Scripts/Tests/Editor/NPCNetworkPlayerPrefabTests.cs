@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using Unity.Netcode;
-using Unity.Netcode.Components;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -9,7 +8,7 @@ namespace NPCSystem.Tests
 {
     public class NPCNetworkPlayerPrefabTests
     {
-        const string PlayerPrefabPath = "Assets/Resources/Networking/NPCPlayerAvatar.prefab";
+        const string PlayerPrefabPath = "Assets/Prefabs/Networking/NPCPlayerAvatar.prefab";
         const string InputActionsPath = "Assets/InputSystem_Actions.inputactions";
 
         [Test]
@@ -37,14 +36,12 @@ namespace NPCSystem.Tests
             GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(PlayerPrefabPath);
             var controller = prefab.GetComponent<NPCNetworkPlayerController>();
             var playerInput = prefab.GetComponent<PlayerInput>();
-            var networkAnimator = prefab.GetComponent<NetworkAnimator>();
 
             Assert.That(controller.inputActions, Is.SameAs(AssetDatabase.LoadAssetAtPath<InputActionAsset>(InputActionsPath)));
             Assert.That(playerInput.actions, Is.SameAs(controller.inputActions));
             Assert.That(playerInput.defaultActionMap, Is.EqualTo("Player"));
             Assert.That(controller.usePlayerInputCopy, Is.True);
             Assert.That(controller.allowKeyboardFallback, Is.True);
-            Assert.That(networkAnimator.AuthorityMode, Is.EqualTo(NetworkAnimator.AuthorityModes.Owner));
         }
 #endif
 

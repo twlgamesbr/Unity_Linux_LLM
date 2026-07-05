@@ -182,7 +182,7 @@ namespace NPCSystem
 
         void ClearExistingNpcCharacters()
         {
-            NPCServerCharacter[] characters = FindObjectsByType<NPCServerCharacter>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            NPCServerCharacter[] characters = FindObjectsByType<NPCServerCharacter>(FindObjectsInactive.Include);
             foreach (NPCServerCharacter character in characters)
             {
                 if (character == null)

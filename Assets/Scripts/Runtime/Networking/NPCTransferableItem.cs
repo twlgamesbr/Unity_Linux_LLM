@@ -163,7 +163,7 @@ namespace NPCSystem
             if (IsHeldByNpc)
             {
                 string npcSlug = _npcHolderSlug.Value.ToString();
-                NPCServerCharacter[] npcCharacters = FindObjectsByType<NPCServerCharacter>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+                NPCServerCharacter[] npcCharacters = FindObjectsByType<NPCServerCharacter>(FindObjectsInactive.Include);
                 foreach (NPCServerCharacter npcCharacter in npcCharacters)
                 {
                     if (npcCharacter != null && npcCharacter.Slug == npcSlug)
@@ -180,7 +180,7 @@ namespace NPCSystem
                 return null;
             }
 
-            NPCPlayerNetworkAvatar[] playerAvatars = FindObjectsByType<NPCPlayerNetworkAvatar>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+            NPCPlayerNetworkAvatar[] playerAvatars = FindObjectsByType<NPCPlayerNetworkAvatar>(FindObjectsInactive.Include);
             foreach (NPCPlayerNetworkAvatar avatar in playerAvatars)
             {
                 if (avatar != null && avatar.OwnerClientId == OwnerClientId)

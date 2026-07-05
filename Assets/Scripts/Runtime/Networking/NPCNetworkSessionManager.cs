@@ -10,7 +10,7 @@ namespace NPCSystem
     {
         [Title("NPC Network Session Manager")]
         [HelpBox("Server-side session cache for per-client dialogue state, selected NPC, evidence snapshot, and resolved player display name.", MessageMode.Log, drawAbove: true)]
-        [SerializeField, ReadOnly] string inspectorSummary = "Per-client dialogue/session state cache.";
+        [ShowInInspector, ReadOnly] string InspectorSummary => "Per-client dialogue/session state cache.";
 
         class NPCClientDialogueSession
         {

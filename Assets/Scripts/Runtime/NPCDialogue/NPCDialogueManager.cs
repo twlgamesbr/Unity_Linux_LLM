@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using EditorAttributes;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Networking;
 
 namespace NPCSystem
 {
@@ -78,7 +77,7 @@ namespace NPCSystem
         [ShowInInspector]
         string LastBackendStatusPreview => lastBackendStatus;
 
-        bool enableRemoteServer = true; // Always true for LocalAI-only mode
+        bool enableRemoteServer => true;
 
         [Title("Events")]
         [Header("Events")]
@@ -341,7 +340,7 @@ namespace NPCSystem
             onNPCChanged?.Invoke(profile.GetDisplayName());
         }
 
-        public void SendMessage(string playerMessage)
+        public new void SendMessage(string playerMessage)
         {
             if (_currentNPC == null)
             {
