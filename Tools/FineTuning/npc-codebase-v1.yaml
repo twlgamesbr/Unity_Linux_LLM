@@ -1,0 +1,8 @@
+name: npc-codebase-v1
+backend: cloud-proxy
+proxy:
+  mode: passthrough
+  provider: openai
+  upstream_url: https://<YOUR_WORKSPACE>--npc-codebase-v1.us-east.modal.direct/v1/chat/completions
+  upstream_model: npc-codebase-v1
+  request_timeout_seconds: 120

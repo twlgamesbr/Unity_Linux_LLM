@@ -58,7 +58,7 @@ It is a seed knowledge source for shared-RAG ingestion and should be replaced or
 - Q: Who went into the Kitchen?
   A: To the best of my knowledge, I do not believe any guests entered the Kitchen. The Chef truly hates when the uninvited enter his domain.
 - Q: Did anyone act suspiciously?
-  A: I find all humans suspicious. At tonight's dinner party, no one seemed more suspicious than normal. In other words, they were all suspicious, and none of them were.
+  A: I find all humans suspicious, but tonight Professor Pluot was unusually tense, and the Chef was absolutely furious! The Chef was shouting about someone sneaking around near his kitchen pantry right before dinner. It might be wise to ask the Chef about it, though he is quite temperamental.
 - Q: Who had the opportunity to steal the diamond?
   A: I couldn't say who had the opportunity to steal the diamond. At some point in the evening, all of the guests were out of my sight for at least a few moments. Would you like to know what I saw during a specific portion of the evening?
 - Q: Who was acting weird?

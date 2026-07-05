@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace NPCSystem.Tests
 {
@@ -34,11 +36,7 @@ namespace NPCSystem.Tests
 
             try
             {
-                List<float> result = null;
-                Assert.DoesNotThrowAsync(async () =>
-                {
-                    result = await embedder.Embeddings(null);
-                });
+                List<float> result = embedder.Embeddings(null).GetAwaiter().GetResult();
                 Assert.That(result, Is.Empty);
             }
             finally
@@ -55,11 +53,7 @@ namespace NPCSystem.Tests
 
             try
             {
-                List<float> result = null;
-                Assert.DoesNotThrowAsync(async () =>
-                {
-                    result = await embedder.Embeddings("   ");
-                });
+                List<float> result = embedder.Embeddings("   ").GetAwaiter().GetResult();
                 Assert.That(result, Is.Empty);
             }
             finally
@@ -80,11 +74,7 @@ namespace NPCSystem.Tests
 
             try
             {
-                List<float> result = null;
-                Assert.DoesNotThrowAsync(async () =>
-                {
-                    result = await embedder.Embeddings("test query");
-                });
+                List<float> result = embedder.Embeddings("test query").GetAwaiter().GetResult();
                 Assert.That(result, Is.Not.Null);
                 Assert.That(result.Count, Is.EqualTo(3));
                 Assert.That(result[0], Is.EqualTo(0.1f).Within(0.001));
@@ -110,11 +100,8 @@ namespace NPCSystem.Tests
 
             try
             {
-                List<float> result = null;
-                Assert.DoesNotThrowAsync(async () =>
-                {
-                    result = await embedder.Embeddings("test query");
-                });
+                LogAssert.Expect(LogType.Error, new Regex(@"\[NPCLocalAIEmbedder\] Unexpected response format from http://127\.0\.0\.1:19999/v1/embeddings"));
+                List<float> result = embedder.Embeddings("test query").GetAwaiter().GetResult();
                 Assert.That(result, Is.Empty);
             }
             finally
@@ -135,11 +122,7 @@ namespace NPCSystem.Tests
 
             try
             {
-                List<float> result = null;
-                Assert.DoesNotThrowAsync(async () =>
-                {
-                    result = await embedder.Embeddings("test query");
-                });
+                List<float> result = embedder.Embeddings("test query").GetAwaiter().GetResult();
                 Assert.That(result, Is.Empty);
             }
             finally
@@ -160,10 +143,7 @@ namespace NPCSystem.Tests
 
             try
             {
-                Assert.DoesNotThrowAsync(async () =>
-                {
-                    await embedder.Embeddings("hello world");
-                });
+                embedder.Embeddings("hello world").GetAwaiter().GetResult();
                 Assert.That(embedder.lastRequestedJson, Does.Contain("\"input\":\"hello world\""));
                 Assert.That(embedder.lastRequestedJson, Does.Contain("\"model\":\"default-embedding\""));
             }
@@ -180,12 +160,11 @@ namespace NPCSystem.Tests
         public string lastRequestedUri;
         public string lastRequestedJson;
 
-        protected override async Task<string> SendEmbeddingRequestAsync(string uri, string json)
+        protected override Task<string> SendEmbeddingRequestAsync(string uri, string json)
         {
-            await Task.Yield();
             lastRequestedUri = uri;
             lastRequestedJson = json;
-            return mockResponse;
+            return Task.FromResult(mockResponse);
         }
     }
 }

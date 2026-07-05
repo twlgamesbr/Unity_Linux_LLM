@@ -296,6 +296,9 @@ namespace NPCSystem
                 ulong clientId = _activeClientId.Value;
                 SyncSessionFromManagerState(clientId);
 
+                // Try to detect and perform verbal item transfer
+                TryVerbalItemTransfer(clientId, response);
+
                 var payload = BuildResponsePayload(response);
                 payload.displayName = npcDisplayName;
                 LogRoutingEvent(clientId, _activeRequestId, NPCFlowStatus.Success, "Relaying completed NPC response to requesting client.");
@@ -312,6 +315,83 @@ namespace NPCSystem
                 onResponseComplete?.Invoke(npcDisplayName, response);
                 UpdateNotebookStateLocal();
             }
+        }
+
+        public void TryVerbalItemTransfer(ulong clientId, string response)
+        {
+            if (string.IsNullOrWhiteSpace(response)) return;
+
+            string lower = response.ToLowerInvariant();
+            System.Text.RegularExpressions.Regex givePattern = new System.Text.RegularExpressions.Regex(
+                @"\b(?:take\s+(?:this|it)|here\s+(?:you\s+go|is|are)|have\s+this|this\s+is\s+(?:for\s+)?you)\b",
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+            if (!givePattern.IsMatch(lower)) return;
+
+            string[] itemIndicators = { 
+                "key", "letter", "note", "map", "diary", "book",
+                "candle", "pocket watch", "brooch", "ring", "photograph", "will", "document",
+                "ledger", "account book", "journal", "manuscript" 
+            };
+
+            string matchedIndicator = null;
+            foreach (string item in itemIndicators)
+            {
+                if (lower.Contains(item))
+                {
+                    matchedIndicator = item;
+                    break;
+                }
+            }
+
+            if (matchedIndicator == null) return;
+
+            NPCTransferableItem targetItem = null;
+            NPCTransferableItem[] items = FindObjectsByType<NPCTransferableItem>(FindObjectsInactive.Include);
+            foreach (NPCTransferableItem item in items)
+            {
+                if (item != null && (item.IsSpawned || !Application.isPlaying) && item.ItemId.ToLowerInvariant().Contains(matchedIndicator))
+                {
+                    targetItem = item;
+                    break;
+                }
+            }
+
+            if (targetItem == null)
+            {
+                NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.OwnershipAuthority, NPCFlowStatus.Warning, NPCFlowLogLevel.Warning,
+                    $"Response matched verbal give of '{matchedIndicator}', but no spawned NPCTransferableItem with matching ItemId was found.",
+                    source: nameof(NPCDialogueNetworkBridge),
+                    data: new Dictionary<string, object> { ["matchedIndicator"] = matchedIndicator });
+                return;
+            }
+
+            NPCPlayerNetworkAvatar[] avatars = FindObjectsByType<NPCPlayerNetworkAvatar>(FindObjectsInactive.Include);
+            NPCNetworkItemInteractor interactor = null;
+            foreach (NPCPlayerNetworkAvatar avatar in avatars)
+            {
+                if (avatar != null && (avatar.IsSpawned || !Application.isPlaying) && avatar.OwnerClientId == clientId)
+                {
+                    interactor = avatar.GetComponent<NPCNetworkItemInteractor>();
+                    break;
+                }
+            }
+
+            if (interactor == null)
+            {
+                NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.OwnershipAuthority, NPCFlowStatus.Error, NPCFlowLogLevel.Error,
+                    $"Failed to perform verbal item transfer of '{targetItem.ItemId}' because NPCNetworkItemInteractor was not found for client {clientId}.",
+                    source: nameof(NPCDialogueNetworkBridge),
+                    data: new Dictionary<string, object> { ["itemId"] = targetItem.ItemId, ["clientId"] = clientId });
+                return;
+            }
+
+            NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.OwnershipAuthority, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
+                $"Verbal item transfer triggered. Transferring '{targetItem.ItemId}' from dialogue to player client {clientId}.",
+                source: nameof(NPCDialogueNetworkBridge),
+                data: new Dictionary<string, object> { ["itemId"] = targetItem.ItemId, ["clientId"] = clientId });
+
+            interactor.TransferItemToPlayer(targetItem, clientId);
         }
 
         void HandleManagerError(string error)

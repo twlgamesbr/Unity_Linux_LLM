@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
+using Unity.Netcode;
 
 namespace NPCSystem.Tests
 {
@@ -282,6 +283,107 @@ namespace NPCSystem.Tests
             finally
             {
                 Object.DestroyImmediate(bridgeObject);
+            }
+        }
+
+        private static void SetOwnerClientId(NetworkBehaviour behaviour, ulong clientId)
+        {
+            var netObj = behaviour.GetComponent<Unity.Netcode.NetworkObject>();
+            if (netObj == null)
+            {
+                netObj = behaviour.gameObject.AddComponent<Unity.Netcode.NetworkObject>();
+            }
+
+            var netObjType = typeof(Unity.Netcode.NetworkObject);
+            var fields = netObjType.GetFields(System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            foreach (var f in fields)
+            {
+                if (f.Name.Contains("OwnerClientId") || f.Name.Contains("ownerClientId") || f.Name.Equals("m_OwnerClientId"))
+                {
+                    try { f.SetValue(netObj, clientId); } catch {}
+                }
+            }
+
+            var netBehType = typeof(Unity.Netcode.NetworkBehaviour);
+            var behFields = netBehType.GetFields(System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            foreach (var f in behFields)
+            {
+                if (f.Name.Contains("OwnerClientId") || f.Name.Contains("ownerClientId") || f.Name.Equals("m_OwnerClientId"))
+                {
+                    try { f.SetValue(behaviour, clientId); } catch {}
+                }
+            }
+        }
+
+        [Test]
+        public void TryVerbalItemTransfer_WithValidGivePattern_TriggersTransfer()
+        {
+            var bridgeObject = new GameObject("Bridge");
+            var bridge = bridgeObject.AddComponent<NPCDialogueNetworkBridge>();
+
+            var itemObject = new GameObject("Item_Ledger");
+            var item = itemObject.AddComponent<NPCTransferableItem>();
+            item.itemId = "evidence-ledger";
+            item.displayName = "Evidence Ledger";
+
+            var avatarObject = new GameObject("Avatar");
+            var avatar = avatarObject.AddComponent<NPCPlayerNetworkAvatar>();
+            SetOwnerClientId(avatar, 42ul);
+
+            var interactor = avatarObject.AddComponent<NPCNetworkItemInteractor>();
+            
+            var sessionManagerObject = new GameObject("SessionManager");
+            var sessionManager = sessionManagerObject.AddComponent<NPCNetworkSessionManager>();
+
+            try
+            {
+                string response = "Take this ledger! It contains everything you need to solve the mystery!";
+                bridge.TryVerbalItemTransfer(42ul, response);
+
+                Assert.That(sessionManager.GetEvidenceSnapshot(42ul).obtainedItems, Contains.Item("evidence-ledger"));
+            }
+            finally
+            {
+                Object.DestroyImmediate(bridgeObject);
+                Object.DestroyImmediate(itemObject);
+                Object.DestroyImmediate(avatarObject);
+                Object.DestroyImmediate(sessionManagerObject);
+            }
+        }
+
+        [Test]
+        public void TryVerbalItemTransfer_WithoutGivePattern_DoesNotTriggerTransfer()
+        {
+            var bridgeObject = new GameObject("Bridge");
+            var bridge = bridgeObject.AddComponent<NPCDialogueNetworkBridge>();
+
+            var itemObject = new GameObject("Item_Ledger");
+            var item = itemObject.AddComponent<NPCTransferableItem>();
+            item.itemId = "evidence-ledger";
+            item.displayName = "Evidence Ledger";
+
+            var avatarObject = new GameObject("Avatar");
+            var avatar = avatarObject.AddComponent<NPCPlayerNetworkAvatar>();
+            SetOwnerClientId(avatar, 42ul);
+
+            var interactor = avatarObject.AddComponent<NPCNetworkItemInteractor>();
+            
+            var sessionManagerObject = new GameObject("SessionManager");
+            var sessionManager = sessionManagerObject.AddComponent<NPCNetworkSessionManager>();
+
+            try
+            {
+                string response = "I have a ledger in my cabinet, but I am too busy cooking to show it to you.";
+                bridge.TryVerbalItemTransfer(42ul, response);
+
+                Assert.That(sessionManager.GetEvidenceSnapshot(42ul).obtainedItems, Is.Not.Contains("evidence-ledger"));
+            }
+            finally
+            {
+                Object.DestroyImmediate(bridgeObject);
+                Object.DestroyImmediate(itemObject);
+                Object.DestroyImmediate(avatarObject);
+                Object.DestroyImmediate(sessionManagerObject);
             }
         }
     }

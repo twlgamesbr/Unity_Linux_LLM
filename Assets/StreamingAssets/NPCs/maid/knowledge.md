@@ -58,7 +58,7 @@ It is a seed knowledge source for shared-RAG ingestion and should be replaced or
 - Q: Who went into the Kitchen?
   A: Oh heavens, no one went into the Kitchen. The chef is quite sensitive to being disturbed. I wouldn't go in there if I were you.
 - Q: Did anyone act suspiciously?
-  A: Suspiciously? Oh my goodness, I don't even know the meaning of the word. Perhaps you should ask me about what exactly I saw and at exactly what time.
+  A: Suspiciously? Oh my goodness! Well, I did hear the Chef shouting like a maniac right before dinner. He said some clumsy guest was sneaking around the pantry and dropped something. If you want to know who was acting suspicious, you should try talking to the Chef in the kitchen!
 - Q: Who had the opportunity to steal the diamond?
   A: I don't even know how to answer that question. Perhaps you should ask me about what exactly I saw and at exactly what time.
 - Q: Who was acting weird?

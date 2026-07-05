@@ -103,6 +103,11 @@ namespace GladeAgenticAI.Bridge
 
         private static bool ShouldAutoStartInThisEditorInstance()
         {
+            if (Application.isBatchMode)
+            {
+                return false;
+            }
+
             string[] args = Environment.GetCommandLineArgs();
             for (int index = 0; index < args.Length - 1; index++)
             {

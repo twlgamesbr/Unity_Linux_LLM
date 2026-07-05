@@ -48,8 +48,8 @@ namespace NPCSystem
             NetworkVariableReadPermission.Everyone,
             NetworkVariableWritePermission.Server);
 
-        public string ItemId => itemIdValue.Value.ToString();
-        public string DisplayName => displayNameValue.Value.ToString();
+        public string ItemId => (itemIdValue.Value.Length > 0) ? itemIdValue.Value.ToString() : itemId;
+        public string DisplayName => (displayNameValue.Value.Length > 0) ? displayNameValue.Value.ToString() : displayName;
         public bool IsHeldByPlayer => _holderType.Value == (int)HolderType.Player;
         public bool IsHeldByNpc => _holderType.Value == (int)HolderType.Npc;
 

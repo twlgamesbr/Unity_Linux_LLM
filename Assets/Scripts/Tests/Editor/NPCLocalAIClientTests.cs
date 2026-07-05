@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace NPCSystem.Tests
 {
@@ -24,18 +26,16 @@ namespace NPCSystem.Tests
         public void ChatAsync_WithNullMessages_DoesNotThrow()
         {
             var clientObject = new GameObject(nameof(NPCLocalAIClientTests));
-            var client = clientObject.AddComponent<NPCLocalAIClient>();
+            var client = clientObject.AddComponent<TestableLocalAIClient>();
             client.host = "127.0.0.1";
             client.port = 19999;
             client.numRetries = 0;
+            client.mockResponse = null;
 
             try
             {
-                Assert.DoesNotThrowAsync(async () =>
-                {
-                    string result = await client.ChatAsync(null);
-                    Assert.That(result, Is.Empty);
-                });
+                string result = client.ChatAsync(null).GetAwaiter().GetResult();
+                Assert.That(result, Is.Empty);
             }
             finally
             {
@@ -75,12 +75,8 @@ namespace NPCSystem.Tests
 
             try
             {
-                string result = null;
-                Assert.DoesNotThrowAsync(async () =>
-                {
-                    var messages = new[] { new NPCOpenAIMessage { role = "user", content = "Hi" } };
-                    result = await client.ChatAsync(messages);
-                });
+                var messages = new[] { new NPCOpenAIMessage { role = "user", content = "Hi" } };
+                string result = client.ChatAsync(messages).GetAwaiter().GetResult();
                 Assert.That(result, Is.EqualTo("Hello there!"));
                 Assert.That(client.lastRequestedUri, Does.Contain("127.0.0.1:19999"));
                 Assert.That(client.lastRequestedJson, Does.Contain("\"model\":\"default-llm\""));
@@ -103,12 +99,9 @@ namespace NPCSystem.Tests
 
             try
             {
-                string result = null;
-                Assert.DoesNotThrowAsync(async () =>
-                {
-                    var messages = new[] { new NPCOpenAIMessage { role = "user", content = "Hi" } };
-                    result = await client.ChatAsync(messages);
-                });
+                LogAssert.Expect(LogType.Error, new Regex(@"\[NPCLocalAIClient\] Unexpected response format from http://127\.0\.0\.1:19999/v1/chat/completions"));
+                var messages = new[] { new NPCOpenAIMessage { role = "user", content = "Hi" } };
+                string result = client.ChatAsync(messages).GetAwaiter().GetResult();
                 Assert.That(result, Is.Empty);
             }
             finally
@@ -129,12 +122,8 @@ namespace NPCSystem.Tests
 
             try
             {
-                string result = null;
-                Assert.DoesNotThrowAsync(async () =>
-                {
-                    var messages = new[] { new NPCOpenAIMessage { role = "user", content = "Hi" } };
-                    result = await client.ChatAsync(messages);
-                });
+                var messages = new[] { new NPCOpenAIMessage { role = "user", content = "Hi" } };
+                string result = client.ChatAsync(messages).GetAwaiter().GetResult();
                 Assert.That(result, Is.EqualTo("Hello!"));
             }
             finally
@@ -155,12 +144,8 @@ namespace NPCSystem.Tests
 
             try
             {
-                string result = null;
-                Assert.DoesNotThrowAsync(async () =>
-                {
-                    var messages = new[] { new NPCOpenAIMessage { role = "user", content = "Hi" } };
-                    result = await client.ChatAsync(messages);
-                });
+                var messages = new[] { new NPCOpenAIMessage { role = "user", content = "Hi" } };
+                string result = client.ChatAsync(messages).GetAwaiter().GetResult();
                 Assert.That(result, Is.Empty);
             }
             finally
@@ -176,12 +161,11 @@ namespace NPCSystem.Tests
         public string lastRequestedUri;
         public string lastRequestedJson;
 
-        protected override async Task<string> SendChatRequestAsync(string uri, string json)
+        protected override Task<string> SendChatRequestAsync(string uri, string json)
         {
-            await Task.Yield();
             lastRequestedUri = uri;
             lastRequestedJson = json;
-            return mockResponse;
+            return Task.FromResult(mockResponse);
         }
     }
 }

@@ -42,9 +42,9 @@ MonoBehaviour:
   suspicion: 0.75
   helpfulness: 0.45
   sarcasm: 0.35
-  canGivePuzzleHints: 0
+  canGivePuzzleHints: 1
   canAccuseSuspects: 1
-  canRevealSecrets: 0
+  canRevealSecrets: 1
   preferredActionFunctions:
   - SceneFocus
   - PuzzleHint

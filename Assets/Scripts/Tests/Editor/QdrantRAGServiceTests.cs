@@ -172,11 +172,7 @@ namespace NPCSystem.Tests
 
             try
             {
-                string result = null;
-                Assert.DoesNotThrowAsync(async () =>
-                {
-                    result = await service.SearchMemoryAsync("test query");
-                });
+                string result = service.SearchMemoryAsync("test query").GetAwaiter().GetResult();
                 Assert.That(result, Is.EqualTo("Found knowledge"));
                 Assert.That(service.lastRequestedEndpoint, Does.Contain("test_collection/points/search"));
             }
@@ -203,11 +199,7 @@ namespace NPCSystem.Tests
 
             try
             {
-                string result = null;
-                Assert.DoesNotThrowAsync(async () =>
-                {
-                    result = await service.SearchMemoryAsync("test query");
-                });
+                string result = service.SearchMemoryAsync("test query").GetAwaiter().GetResult();
                 Assert.That(result, Is.Empty);
             }
             finally
@@ -233,11 +225,7 @@ namespace NPCSystem.Tests
 
             try
             {
-                string result = null;
-                Assert.DoesNotThrowAsync(async () =>
-                {
-                    result = await service.SearchMemoryAsync("test query");
-                });
+                string result = service.SearchMemoryAsync("test query").GetAwaiter().GetResult();
                 Assert.That(result, Is.Empty);
             }
             finally
@@ -262,11 +250,7 @@ namespace NPCSystem.Tests
 
             try
             {
-                string result = null;
-                Assert.DoesNotThrowAsync(async () =>
-                {
-                    result = await service.SearchMemoryAsync("test query");
-                });
+                string result = service.SearchMemoryAsync("test query").GetAwaiter().GetResult();
                 Assert.That(result, Is.Empty);
             }
             finally
@@ -292,11 +276,7 @@ namespace NPCSystem.Tests
 
             try
             {
-                string result = null;
-                Assert.DoesNotThrowAsync(async () =>
-                {
-                    result = await service.SearchMemoryAsync("test query");
-                });
+                string result = service.SearchMemoryAsync("test query").GetAwaiter().GetResult();
                 Assert.That(result, Is.Empty);
             }
             finally
@@ -322,11 +302,7 @@ namespace NPCSystem.Tests
 
             try
             {
-                string result = null;
-                Assert.DoesNotThrowAsync(async () =>
-                {
-                    result = await service.SearchMemoryAsync("test query");
-                });
+                string result = service.SearchMemoryAsync("test query").GetAwaiter().GetResult();
                 Assert.That(result, Is.EqualTo("First result\nSecond result"));
             }
             finally
@@ -343,12 +319,11 @@ namespace NPCSystem.Tests
         public string lastRequestedEndpoint;
         public string lastRequestedJson;
 
-        protected override async Task<string> SendSearchRequestAsync(string endpoint, string json)
+        protected override Task<string> SendSearchRequestAsync(string endpoint, string json)
         {
-            await Task.Yield();
             lastRequestedEndpoint = endpoint;
             lastRequestedJson = json;
-            return mockResponse;
+            return Task.FromResult(mockResponse);
         }
     }
 }

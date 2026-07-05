@@ -112,8 +112,14 @@ namespace NPCSystem
             item.AssignToNpc(npc.Slug);
         }
 
-        void TransferItemToPlayer(NPCTransferableItem item, ulong targetClientId)
+        public void TransferItemToPlayer(NPCTransferableItem item, ulong targetClientId)
         {
+            if (!Application.isPlaying)
+            {
+                AddItemToPlayer(item, targetClientId);
+                return;
+            }
+
             ulong previousOwnerClientId = item.OwnerClientId;
             bool hadPlayerOwner = item.IsHeldByPlayer;
 
