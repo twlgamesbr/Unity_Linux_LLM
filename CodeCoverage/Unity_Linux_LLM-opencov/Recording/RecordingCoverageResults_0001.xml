@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CoverageSession xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="0.0.0.0">
+  <Summary numSequencePoints="119" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0.0" branchCoverage="0.0" maxCyclomaticComplexity="22" minCyclomaticComplexity="0" maxCrapScore="506" minCrapScore="0" visitedClasses="0" numClasses="12" visitedMethods="0" numMethods="11" />
+  <Modules>
+    <Module>
+      <Summary numSequencePoints="102" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0.0" branchCoverage="0.0" maxCyclomaticComplexity="22" minCyclomaticComplexity="0" maxCrapScore="506" minCrapScore="0" visitedClasses="0" numClasses="10" visitedMethods="0" numMethods="8" />
+      <ModuleTime>0001-01-01T00:00:00</ModuleTime>
+      <ModuleName>NPCSystem.Runtime</ModuleName>
+      <Files>
+        <File uid="3" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/Helpers/EventSystemAutoSetup.cs" />
+        <File uid="4" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/Initialization/NPCBackendReadinessService.cs" />
+        <File uid="5" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/Initialization/NPCSceneInitializationController.cs" />
+        <File uid="6" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/LocalAI/NPCLocalAIClient.cs" />
+        <File uid="7" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/LocalAI/NPCLocalAIEmbedder.cs" />
+        <File uid="8" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/LocalRAG/NPCChunking.cs" />
+        <File uid="9" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/LocalRAG/NPCLocalRAG.cs" />
+        <File uid="10" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/LocalRAG/NPCSearchable.cs" />
+        <File uid="11" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/LocalRAG/NPCSentenceSplitter.cs" />
+        <File uid="12" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/LocalRAG/NPCSimpleSearch.cs" />
+        <File uid="13" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/LocalRAG/NPCTokenSplitter.cs" />
+        <File uid="14" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/LocalRAG/NPCWordSplitter.cs" />
+        <File uid="15" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/NPCDialogue/AuthUIController.cs" />
+        <File uid="16" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/NPCDialogue/Logging/NPCFlowEvent.cs" />
+        <File uid="17" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/NPCDialogue/Logging/NPCFlowLogger.cs" />
+        <File uid="18" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/NPCDialogue/Logging/NPCFlowScope.cs" />
+        <File uid="19" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/NPCDialogue/Logging/NPCFlowTextSanitizer.cs" />
+        <File uid="20" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/NPCDialogue/NPCDialogueActionHandler.cs" />
+        <File uid="21" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/NPCDialogue/NPCDialogueActionPlanner.cs" />
+        <File uid="22" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/NPCDialogue/NPCDialogueBootstrapper.cs" />
+        <File uid="23" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/NPCDialogue/NPCDialogueManager.cs" />
+        <File uid="24" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/NPCDialogue/NPCDialogueSmokeValidator.cs" />
+        <File uid="25" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/NPCDialogue/NPCDialogueUIController.cs" />
+        <File uid="26" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/NPCDialogue/NPCEvidenceState.cs" />
+        <File uid="27" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/NPCDialogue/NPCHistoryStore.cs" />
+        <File uid="28" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/NPCDialogue/NPCNotebookStateFormatter.cs" />
+        <File uid="29" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/NPCDialogue/NPCProfile.cs" />
+        <File uid="30" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/NPCDialogue/NPCProfilePromptComposer.cs" />
+        <File uid="31" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/NPCDialogue/NPCRAGImporter.cs" />
+        <File uid="32" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/NPCDialogue/NPCRAGMetadata.cs" />
+        <File uid="33" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/NPCDialogue/NotebookUIController.cs" />
+        <File uid="34" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/NPCDialogue/PlayerAuthService.cs" />
+        <File uid="35" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/NPCDialogue/QdrantRAGService.cs" />
+        <File uid="36" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/Networking/AuthNetworkBridge.cs" />
+        <File uid="37" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/Networking/NPCDialogueMessageModels.cs" />
+        <File uid="38" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/Networking/NPCDialogueNetworkBridge.cs" />
+        <File uid="39" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/Networking/NPCNetworkBootstrap.cs" />
+        <File uid="40" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/Networking/NPCNetworkItemInteractor.cs" />
+        <File uid="41" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/Networking/NPCNetworkPlayerController.cs" />
+        <File uid="42" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/Networking/NPCNetworkSessionManager.cs" />
+        <File uid="43" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/Networking/NPCOwnerNetworkTransform.cs" />
+        <File uid="44" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/Networking/NPCPlayModeInstanceResolver.cs" />
+        <File uid="45" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/Networking/NPCPlayerInventory.cs" />
+        <File uid="46" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/Networking/NPCPlayerNetworkAvatar.cs" />
+        <File uid="47" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/Networking/NPCServerCharacter.cs" />
+        <File uid="48" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/Networking/NPCServerCharacterSpawner.cs" />
+        <File uid="49" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/Networking/NPCTransferableItem.cs" />
+        <File uid="50" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/Networking/NPCTransferableItemSpawner.cs" />
+        <File uid="51" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/Networking/NPCTransportConfig.cs" />
+        <File uid="52" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Runtime/EditorUX/NPCInspectorDiagnosticsPilot.cs" />
+      </Files>
+      <Classes>
+        <Class>
+          <Summary numSequencePoints="28" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0.0" branchCoverage="0.0" maxCyclomaticComplexity="5" minCyclomaticComplexity="3" maxCrapScore="30" minCrapScore="12" visitedClasses="0" numClasses="1" visitedMethods="0" numMethods="2" />
+          <FullName>NPCSystem.NPCSearchable</FullName>
+          <Methods>
+            <Method visited="false" cyclomaticComplexity="5" nPathComplexity="0" sequenceCoverage="0.0" branchCoverage="0" crapScore="30" isConstructor="false" isStatic="false" isGetter="false" isSetter="false">
+              <Summary numSequencePoints="20" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0.0" branchCoverage="0" maxCyclomaticComplexity="5" minCyclomaticComplexity="5" maxCrapScore="30" minCrapScore="30" visitedClasses="0" numClasses="0" visitedMethods="0" numMethods="1" />
+              <MetadataToken>100663442</MetadataToken>
+              <Name>T NPCSystem.NPCSearchable::ConstructComponent[T](System.Type, System.Action[T,T])</Name>
+              <FileRef uid="10" />
+              <SequencePoints>
+                <SequencePoint vc="0" uspid="75780" ordinal="0" offset="0" sl="43" sc="0" el="43" ec="0" bec="0" bev="0" fileid="10" />
+                <SequencePoint vc="0" uspid="75781" ordinal="0" offset="2" sl="52" sc="0" el="52" ec="0" bec="0" bev="0" fileid="10" />
+                <SequencePoint vc="0" uspid="75782" ordinal="0" offset="29" sl="54" sc="0" el="54" ec="0" bec="0" bev="0" fileid="10" />
+                <SequencePoint vc="0" uspid="75783" ordinal="0" offset="45" sl="55" sc="0" el="55" ec="0" bec="0" bev="0" fileid="10" />
+                <SequencePoint vc="0" uspid="75784" ordinal="0" offset="46" sl="56" sc="0" el="56" ec="0" bec="0" bev="0" fileid="10" />
+                <SequencePoint vc="0" uspid="75785" ordinal="0" offset="54" sl="57" sc="0" el="57" ec="0" bec="0" bev="0" fileid="10" />
+                <SequencePoint vc="0" uspid="75786" ordinal="0" offset="57" sl="59" sc="0" el="59" ec="0" bec="0" bev="0" fileid="10" />
+                <SequencePoint vc="0" uspid="75787" ordinal="0" offset="58" sl="60" sc="0" el="60" ec="0" bec="0" bev="0" fileid="10" />
+                <SequencePoint vc="0" uspid="75788" ordinal="0" offset="79" sl="61" sc="0" el="61" ec="0" bec="0" bev="0" fileid="10" />
+                <SequencePoint vc="0" uspid="75789" ordinal="0" offset="80" sl="62" sc="0" el="62" ec="0" bec="0" bev="0" fileid="10" />
+                <SequencePoint vc="0" uspid="75790" ordinal="0" offset="82" sl="63" sc="0" el="63" ec="0" bec="0" bev="0" fileid="10" />
+                <SequencePoint vc="0" uspid="75791" ordinal="0" offset="85" sl="65" sc="0" el="65" ec="0" bec="0" bev="0" fileid="10" />
+                <SequencePoint vc="0" uspid="75792" ordinal="0" offset="86" sl="66" sc="0" el="66" ec="0" bec="0" bev="0" fileid="10" />
+                <SequencePoint vc="0" uspid="75793" ordinal="0" offset="94" sl="67" sc="0" el="67" ec="0" bec="0" bev="0" fileid="10" />
+                <SequencePoint vc="0" uspid="75794" ordinal="0" offset="107" sl="67" sc="0" el="67" ec="0" bec="0" bev="0" fileid="10" />
+                <SequencePoint vc="0" uspid="75795" ordinal="0" offset="121" sl="69" sc="0" el="69" ec="0" bec="0" bev="0" fileid="10" />
+                <SequencePoint vc="0" uspid="75796" ordinal="0" offset="133" sl="73" sc="0" el="73" ec="0" bec="0" bev="0" fileid="10" />
+                <SequencePoint vc="0" uspid="75797" ordinal="0" offset="134" sl="74" sc="0" el="74" ec="0" bec="0" bev="0" fileid="10" />
+                <SequencePoint vc="0" uspid="75798" ordinal="0" offset="135" sl="75" sc="0" el="75" ec="0" bec="0" bev="0" fileid="10" />
+                <SequencePoint vc="0" uspid="75799" ordinal="0" offset="140" sl="76" sc="0" el="76" ec="0" bec="0" bev="0" fileid="10" />
+              </SequencePoints>
+              <BranchPoints />
+            </Method>
+            <Method visited="false" cyclomaticComplexity="3" nPathComplexity="0" sequenceCoverage="0.0" branchCoverage="0" crapScore="12" isConstructor="false" isStatic="false" isGetter="false" isSetter="false">
+              <Summary numSequencePoints="8" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0.0" branchCoverage="0" maxCyclomaticComplexity="3" minCyclomaticComplexity="3" maxCrapScore="12" minCrapScore="12" visitedClasses="0" numClasses="0" visitedMethods="0" numMethods="1" />
+              <MetadataToken>100663450</MetadataToken>
+              <Name>T NPCSystem.NPCSearchable::&lt;ConstructComponent&gt;g__Construct|16_0[T](System.Type)</Name>
+              <FileRef uid="10" />
+              <SequencePoints>
+                <SequencePoint vc="0" uspid="75840" ordinal="0" offset="0" sl="45" sc="0" el="45" ec="0" bec="0" bev="0" fileid="10" />
+                <SequencePoint vc="0" uspid="75841" ordinal="0" offset="1" sl="46" sc="0" el="46" ec="0" bec="0" bev="0" fileid="10" />
+                <SequencePoint vc="0" uspid="75842" ordinal="0" offset="12" sl="46" sc="0" el="46" ec="0" bec="0" bev="0" fileid="10" />
+                <SequencePoint vc="0" uspid="75843" ordinal="0" offset="25" sl="47" sc="0" el="47" ec="0" bec="0" bev="0" fileid="10" />
+                <SequencePoint vc="0" uspid="75844" ordinal="0" offset="43" sl="48" sc="0" el="48" ec="0" bec="0" bev="0" fileid="10" />
+                <SequencePoint vc="0" uspid="75845" ordinal="0" offset="65" sl="48" sc="0" el="48" ec="0" bec="0" bev="0" fileid="10" />
+                <SequencePoint vc="0" uspid="75846" ordinal="0" offset="72" sl="49" sc="0" el="49" ec="0" bec="0" bev="0" fileid="10" />
+                <SequencePoint vc="0" uspid="75847" ordinal="0" offset="77" sl="50" sc="0" el="50" ec="0" bec="0" bev="0" fileid="10" />
+              </SequencePoints>
+              <BranchPoints />
+            </Method>
+          </Methods>
+        </Class>
+        <Class>
+          <Summary numSequencePoints="0" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0" branchCoverage="0" maxCyclomaticComplexity="0" minCyclomaticComplexity="0" maxCrapScore="0" minCrapScore="0" visitedClasses="0" numClasses="1" visitedMethods="0" numMethods="0" />
+          <FullName>NPCSystem.NPCArchiveSaver</FullName>
+          <Methods />
+        </Class>
+        <Class>
+          <Summary numSequencePoints="4" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0.0" branchCoverage="0.0" maxCyclomaticComplexity="3" minCyclomaticComplexity="3" maxCrapScore="12" minCrapScore="12" visitedClasses="0" numClasses="1" visitedMethods="0" numMethods="1" />
+          <FullName>NPCSystem.AuthUIController</FullName>
+          <Methods>
+            <Method visited="false" cyclomaticComplexity="3" nPathComplexity="0" sequenceCoverage="0.0" branchCoverage="0" crapScore="12" isConstructor="false" isStatic="true" isGetter="false" isSetter="false">
+              <Summary numSequencePoints="4" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0.0" branchCoverage="0" maxCyclomaticComplexity="3" minCyclomaticComplexity="3" maxCrapScore="12" minCrapScore="12" visitedClasses="0" numClasses="0" visitedMethods="0" numMethods="1" />
+              <MetadataToken>100663582</MetadataToken>
+              <Name>static T NPCSystem.AuthUIController::FindChildComponent[T](UnityEngine.Transform, System.String)</Name>
+              <FileRef uid="15" />
+              <SequencePoints>
+                <SequencePoint vc="0" uspid="76478" ordinal="0" offset="0" sl="444" sc="0" el="444" ec="0" bec="0" bev="0" fileid="15" />
+                <SequencePoint vc="0" uspid="76479" ordinal="0" offset="1" sl="445" sc="0" el="445" ec="0" bec="0" bev="0" fileid="15" />
+                <SequencePoint vc="0" uspid="76480" ordinal="0" offset="9" sl="446" sc="0" el="446" ec="0" bec="0" bev="0" fileid="15" />
+                <SequencePoint vc="0" uspid="76481" ordinal="0" offset="38" sl="447" sc="0" el="447" ec="0" bec="0" bev="0" fileid="15" />
+              </SequencePoints>
+              <BranchPoints />
+            </Method>
+          </Methods>
+        </Class>
+        <Class>
+          <Summary numSequencePoints="0" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0" branchCoverage="0" maxCyclomaticComplexity="0" minCyclomaticComplexity="0" maxCrapScore="0" minCrapScore="0" visitedClasses="0" numClasses="1" visitedMethods="0" numMethods="0" />
+          <FullName>NPCSystem.NPCDialogueUIController</FullName>
+          <Methods />
+        </Class>
+        <Class>
+          <Summary numSequencePoints="4" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0.0" branchCoverage="0.0" maxCyclomaticComplexity="3" minCyclomaticComplexity="3" maxCrapScore="12" minCrapScore="12" visitedClasses="0" numClasses="1" visitedMethods="0" numMethods="1" />
+          <FullName>NPCSystem.NotebookUIController</FullName>
+          <Methods>
+            <Method visited="false" cyclomaticComplexity="3" nPathComplexity="0" sequenceCoverage="0.0" branchCoverage="0" crapScore="12" isConstructor="false" isStatic="true" isGetter="false" isSetter="false">
+              <Summary numSequencePoints="4" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0.0" branchCoverage="0" maxCyclomaticComplexity="3" minCyclomaticComplexity="3" maxCrapScore="12" minCrapScore="12" visitedClasses="0" numClasses="0" visitedMethods="0" numMethods="1" />
+              <MetadataToken>100663972</MetadataToken>
+              <Name>static T NPCSystem.NotebookUIController::FindComponent[T](System.String)</Name>
+              <FileRef uid="33" />
+              <SequencePoints>
+                <SequencePoint vc="0" uspid="79369" ordinal="0" offset="0" sl="296" sc="0" el="296" ec="0" bec="0" bev="0" fileid="33" />
+                <SequencePoint vc="0" uspid="79370" ordinal="0" offset="1" sl="297" sc="0" el="297" ec="0" bec="0" bev="0" fileid="33" />
+                <SequencePoint vc="0" uspid="79371" ordinal="0" offset="8" sl="298" sc="0" el="298" ec="0" bec="0" bev="0" fileid="33" />
+                <SequencePoint vc="0" uspid="79372" ordinal="0" offset="37" sl="299" sc="0" el="299" ec="0" bec="0" bev="0" fileid="33" />
+              </SequencePoints>
+              <BranchPoints />
+            </Method>
+          </Methods>
+        </Class>
+        <Class>
+          <Summary numSequencePoints="52" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0.0" branchCoverage="0.0" maxCyclomaticComplexity="22" minCyclomaticComplexity="22" maxCrapScore="506" minCrapScore="506" visitedClasses="0" numClasses="1" visitedMethods="0" numMethods="1" />
+          <FullName>NPCSystem.PlayerAuthService&lt;SendRequestAsync&gt;d__27[TResponse]</FullName>
+          <Methods>
+            <Method visited="false" cyclomaticComplexity="22" nPathComplexity="0" sequenceCoverage="0.0" branchCoverage="0" crapScore="506" isConstructor="false" isStatic="false" isGetter="false" isSetter="false">
+              <Summary numSequencePoints="52" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0.0" branchCoverage="0" maxCyclomaticComplexity="22" minCyclomaticComplexity="22" maxCrapScore="506" minCrapScore="506" visitedClasses="0" numClasses="0" visitedMethods="0" numMethods="1" />
+              <MetadataToken>100664019</MetadataToken>
+              <Name>System.Void NPCSystem.PlayerAuthService&lt;SendRequestAsync&gt;d__27[TResponse]::MoveNext()</Name>
+              <FileRef uid="34" />
+              <SequencePoints>
+                <SequencePoint vc="0" uspid="79527" ordinal="0" offset="17" sl="340" sc="0" el="340" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79528" ordinal="0" offset="18" sl="341" sc="0" el="341" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79529" ordinal="0" offset="41" sl="342" sc="0" el="342" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79530" ordinal="0" offset="52" sl="343" sc="0" el="343" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79531" ordinal="0" offset="80" sl="344" sc="0" el="344" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79532" ordinal="0" offset="118" sl="345" sc="0" el="345" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79533" ordinal="0" offset="286" sl="354" sc="0" el="354" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79534" ordinal="0" offset="325" sl="355" sc="0" el="355" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79535" ordinal="0" offset="359" sl="356" sc="0" el="356" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79536" ordinal="0" offset="376" sl="357" sc="0" el="357" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79537" ordinal="0" offset="394" sl="358" sc="0" el="358" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79538" ordinal="0" offset="416" sl="360" sc="0" el="360" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79539" ordinal="0" offset="434" sl="361" sc="0" el="361" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79540" ordinal="0" offset="435" sl="362" sc="0" el="362" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79541" ordinal="0" offset="468" sl="363" sc="0" el="363" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79542" ordinal="0" offset="490" sl="364" sc="0" el="364" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79543" ordinal="0" offset="491" sl="366" sc="0" el="366" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79544" ordinal="0" offset="509" sl="367" sc="0" el="367" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79545" ordinal="0" offset="510" sl="368" sc="0" el="368" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79546" ordinal="0" offset="543" sl="369" sc="0" el="369" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79547" ordinal="0" offset="544" sl="371" sc="0" el="371" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79548" ordinal="0" offset="563" sl="373" sc="0" el="373" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79549" ordinal="0" offset="564" sl="374" sc="0" el="374" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79550" ordinal="0" offset="667" sl="375" sc="0" el="375" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79551" ordinal="0" offset="668" sl="372" sc="0" el="372" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79552" ordinal="0" offset="688" sl="377" sc="0" el="377" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79553" ordinal="0" offset="728" sl="378" sc="0" el="378" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79554" ordinal="0" offset="729" sl="379" sc="0" el="379" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79555" ordinal="0" offset="767" sl="380" sc="0" el="380" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79556" ordinal="0" offset="789" sl="381" sc="0" el="381" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79557" ordinal="0" offset="827" sl="382" sc="0" el="382" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79558" ordinal="0" offset="903" sl="386" sc="0" el="386" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79559" ordinal="0" offset="915" sl="389" sc="0" el="389" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79560" ordinal="0" offset="937" sl="390" sc="0" el="390" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79561" ordinal="0" offset="954" sl="391" sc="0" el="391" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79562" ordinal="0" offset="955" sl="392" sc="0" el="392" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79563" ordinal="0" offset="977" sl="393" sc="0" el="393" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79564" ordinal="0" offset="1004" sl="394" sc="0" el="394" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79565" ordinal="0" offset="1028" sl="395" sc="0" el="395" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79566" ordinal="0" offset="1041" sl="398" sc="0" el="398" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79567" ordinal="0" offset="1058" sl="399" sc="0" el="399" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79568" ordinal="0" offset="1078" sl="400" sc="0" el="400" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79569" ordinal="0" offset="1079" sl="401" sc="0" el="401" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79570" ordinal="0" offset="1090" sl="402" sc="0" el="402" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79571" ordinal="0" offset="1112" sl="403" sc="0" el="403" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79572" ordinal="0" offset="1145" sl="404" sc="0" el="404" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79573" ordinal="0" offset="1180" sl="405" sc="0" el="405" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79574" ordinal="0" offset="1192" sl="408" sc="0" el="408" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79575" ordinal="0" offset="1214" sl="409" sc="0" el="409" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79576" ordinal="0" offset="1241" sl="410" sc="0" el="410" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79577" ordinal="0" offset="1265" sl="412" sc="0" el="412" ec="0" bec="0" bev="0" fileid="34" />
+                <SequencePoint vc="0" uspid="79578" ordinal="0" offset="1414" sl="413" sc="0" el="413" ec="0" bec="0" bev="0" fileid="34" />
+              </SequencePoints>
+              <BranchPoints />
+            </Method>
+          </Methods>
+        </Class>
+        <Class>
+          <Summary numSequencePoints="3" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0.0" branchCoverage="0.0" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" maxCrapScore="2" minCrapScore="2" visitedClasses="0" numClasses="1" visitedMethods="0" numMethods="1" />
+          <FullName>NPCSystem.NPCDialogueSelectionMessage</FullName>
+          <Methods>
+            <Method visited="false" cyclomaticComplexity="1" nPathComplexity="0" sequenceCoverage="0.0" branchCoverage="0" crapScore="2" isConstructor="false" isStatic="false" isGetter="false" isSetter="false">
+              <Summary numSequencePoints="3" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0.0" branchCoverage="0" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" maxCrapScore="2" minCrapScore="2" visitedClasses="0" numClasses="0" visitedMethods="0" numMethods="1" />
+              <MetadataToken>100664070</MetadataToken>
+              <Name>System.Void NPCSystem.NPCDialogueSelectionMessage::NetworkSerialize[T](Unity.Netcode.BufferSerializer[T])</Name>
+              <FileRef uid="37" />
+              <SequencePoints>
+                <SequencePoint vc="0" uspid="79944" ordinal="0" offset="0" sl="19" sc="0" el="19" ec="0" bec="0" bev="0" fileid="37" />
+                <SequencePoint vc="0" uspid="79945" ordinal="0" offset="1" sl="20" sc="0" el="20" ec="0" bec="0" bev="0" fileid="37" />
+                <SequencePoint vc="0" uspid="79946" ordinal="0" offset="16" sl="21" sc="0" el="21" ec="0" bec="0" bev="0" fileid="37" />
+              </SequencePoints>
+              <BranchPoints />
+            </Method>
+          </Methods>
+        </Class>
+        <Class>
+          <Summary numSequencePoints="5" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0.0" branchCoverage="0.0" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" maxCrapScore="2" minCrapScore="2" visitedClasses="0" numClasses="1" visitedMethods="0" numMethods="1" />
+          <FullName>NPCSystem.NPCDialogueRequestMessage</FullName>
+          <Methods>
+            <Method visited="false" cyclomaticComplexity="1" nPathComplexity="0" sequenceCoverage="0.0" branchCoverage="0" crapScore="2" isConstructor="false" isStatic="false" isGetter="false" isSetter="false">
+              <Summary numSequencePoints="5" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0.0" branchCoverage="0" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" maxCrapScore="2" minCrapScore="2" visitedClasses="0" numClasses="0" visitedMethods="0" numMethods="1" />
+              <MetadataToken>100664072</MetadataToken>
+              <Name>System.Void NPCSystem.NPCDialogueRequestMessage::NetworkSerialize[T](Unity.Netcode.BufferSerializer[T])</Name>
+              <FileRef uid="37" />
+              <SequencePoints>
+                <SequencePoint vc="0" uspid="79952" ordinal="0" offset="0" sl="45" sc="0" el="45" ec="0" bec="0" bev="0" fileid="37" />
+                <SequencePoint vc="0" uspid="79953" ordinal="0" offset="1" sl="46" sc="0" el="46" ec="0" bec="0" bev="0" fileid="37" />
+                <SequencePoint vc="0" uspid="79954" ordinal="0" offset="16" sl="47" sc="0" el="47" ec="0" bec="0" bev="0" fileid="37" />
+                <SequencePoint vc="0" uspid="79955" ordinal="0" offset="31" sl="48" sc="0" el="48" ec="0" bec="0" bev="0" fileid="37" />
+                <SequencePoint vc="0" uspid="79956" ordinal="0" offset="46" sl="49" sc="0" el="49" ec="0" bec="0" bev="0" fileid="37" />
+              </SequencePoints>
+              <BranchPoints />
+            </Method>
+          </Methods>
+        </Class>
+        <Class>
+          <Summary numSequencePoints="6" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0.0" branchCoverage="0.0" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" maxCrapScore="2" minCrapScore="2" visitedClasses="0" numClasses="1" visitedMethods="0" numMethods="1" />
+          <FullName>NPCSystem.NPCDialogueResponseMessage</FullName>
+          <Methods>
+            <Method visited="false" cyclomaticComplexity="1" nPathComplexity="0" sequenceCoverage="0.0" branchCoverage="0" crapScore="2" isConstructor="false" isStatic="false" isGetter="false" isSetter="false">
+              <Summary numSequencePoints="6" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0.0" branchCoverage="0" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" maxCrapScore="2" minCrapScore="2" visitedClasses="0" numClasses="0" visitedMethods="0" numMethods="1" />
+              <MetadataToken>100664074</MetadataToken>
+              <Name>System.Void NPCSystem.NPCDialogueResponseMessage::NetworkSerialize[T](Unity.Netcode.BufferSerializer[T])</Name>
+              <FileRef uid="37" />
+              <SequencePoints>
+                <SequencePoint vc="0" uspid="79963" ordinal="0" offset="0" sl="69" sc="0" el="69" ec="0" bec="0" bev="0" fileid="37" />
+                <SequencePoint vc="0" uspid="79964" ordinal="0" offset="1" sl="70" sc="0" el="70" ec="0" bec="0" bev="0" fileid="37" />
+                <SequencePoint vc="0" uspid="79965" ordinal="0" offset="16" sl="71" sc="0" el="71" ec="0" bec="0" bev="0" fileid="37" />
+                <SequencePoint vc="0" uspid="79966" ordinal="0" offset="31" sl="72" sc="0" el="72" ec="0" bec="0" bev="0" fileid="37" />
+                <SequencePoint vc="0" uspid="79967" ordinal="0" offset="46" sl="73" sc="0" el="73" ec="0" bec="0" bev="0" fileid="37" />
+                <SequencePoint vc="0" uspid="79968" ordinal="0" offset="61" sl="74" sc="0" el="74" ec="0" bec="0" bev="0" fileid="37" />
+              </SequencePoints>
+              <BranchPoints />
+            </Method>
+          </Methods>
+        </Class>
+        <Class>
+          <Summary numSequencePoints="0" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0" branchCoverage="0" maxCyclomaticComplexity="0" minCyclomaticComplexity="0" maxCrapScore="0" minCrapScore="0" visitedClasses="0" numClasses="1" visitedMethods="0" numMethods="0" />
+          <FullName>NPCSystem.NPCNotebookStateMessage</FullName>
+          <Methods />
+        </Class>
+      </Classes>
+    </Module>
+    <Module>
+      <Summary numSequencePoints="17" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0.0" branchCoverage="0.0" maxCyclomaticComplexity="2" minCyclomaticComplexity="1" maxCrapScore="6" minCrapScore="2" visitedClasses="0" numClasses="2" visitedMethods="0" numMethods="3" />
+      <ModuleTime>0001-01-01T00:00:00</ModuleTime>
+      <ModuleName>NPCSystem.Tests</ModuleName>
+      <Files>
+        <File uid="53" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Tests/Editor/AuthNetworkBridgeTests.cs" />
+        <File uid="54" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Tests/Editor/NPCBackendReadinessTests.cs" />
+        <File uid="55" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Tests/Editor/NPCDialogueNetworkingTests.cs" />
+        <File uid="56" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Tests/Editor/NPCFlowLoggerPlatformTests.cs" />
+        <File uid="57" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Tests/Editor/NPCFlowLoggerTests.cs" />
+        <File uid="58" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Tests/Editor/NPCMainSceneWiringTests.cs" />
+        <File uid="59" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Tests/Editor/NPCNetworkNpcPrefabTests.cs" />
+        <File uid="60" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Tests/Editor/NPCNetworkPlayerPrefabTests.cs" />
+        <File uid="61" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Tests/Editor/NPCNetworkTransferableItemPrefabTests.cs" />
+        <File uid="62" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Tests/Editor/NPCNetworkingTests.cs" />
+        <File uid="63" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Tests/Editor/NPCNotebookStateTests.cs" />
+        <File uid="64" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Tests/Editor/NPCPlayerInventoryTests.cs" />
+        <File uid="65" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Tests/Editor/NPCSceneInitializationTests.cs" />
+        <File uid="66" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Tests/Editor/NPCStartupAuthorityStaticTests.cs" />
+        <File uid="67" fullPath="/mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM/Assets/Scripts/Tests/Editor/NPCTestHelpers.cs" />
+      </Files>
+      <Classes>
+        <Class>
+          <Summary numSequencePoints="5" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0.0" branchCoverage="0.0" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" maxCrapScore="2" minCrapScore="2" visitedClasses="0" numClasses="1" visitedMethods="0" numMethods="1" />
+          <FullName>NPCSystem.Tests.NPCSceneInitializationTests</FullName>
+          <Methods>
+            <Method visited="false" cyclomaticComplexity="1" nPathComplexity="0" sequenceCoverage="0.0" branchCoverage="0" crapScore="2" isConstructor="false" isStatic="true" isGetter="false" isSetter="false">
+              <Summary numSequencePoints="5" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0.0" branchCoverage="0" maxCyclomaticComplexity="1" minCyclomaticComplexity="1" maxCrapScore="2" minCrapScore="2" visitedClasses="0" numClasses="0" visitedMethods="0" numMethods="1" />
+              <MetadataToken>100663348</MetadataToken>
+              <Name>static System.Void NPCSystem.Tests.NPCSceneInitializationTests::AssertExecutionOrder[T](System.Int32)</Name>
+              <FileRef uid="65" />
+              <SequencePoints>
+                <SequencePoint vc="0" uspid="82556" ordinal="0" offset="0" sl="58" sc="0" el="58" ec="0" bec="0" bev="0" fileid="65" />
+                <SequencePoint vc="0" uspid="82557" ordinal="0" offset="1" sl="59" sc="0" el="59" ec="0" bec="0" bev="0" fileid="65" />
+                <SequencePoint vc="0" uspid="82558" ordinal="0" offset="32" sl="60" sc="0" el="60" ec="0" bec="0" bev="0" fileid="65" />
+                <SequencePoint vc="0" uspid="82559" ordinal="0" offset="79" sl="61" sc="0" el="61" ec="0" bec="0" bev="0" fileid="65" />
+                <SequencePoint vc="0" uspid="82560" ordinal="0" offset="132" sl="62" sc="0" el="62" ec="0" bec="0" bev="0" fileid="65" />
+              </SequencePoints>
+              <BranchPoints />
+            </Method>
+          </Methods>
+        </Class>
+        <Class>
+          <Summary numSequencePoints="12" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0.0" branchCoverage="0.0" maxCyclomaticComplexity="2" minCyclomaticComplexity="2" maxCrapScore="6" minCrapScore="6" visitedClasses="0" numClasses="1" visitedMethods="0" numMethods="2" />
+          <FullName>NPCSystem.Tests.NPCTestHelpers</FullName>
+          <Methods>
+            <Method visited="false" cyclomaticComplexity="2" nPathComplexity="0" sequenceCoverage="0.0" branchCoverage="0" crapScore="6" isConstructor="false" isStatic="true" isGetter="false" isSetter="false">
+              <Summary numSequencePoints="4" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0.0" branchCoverage="0" maxCyclomaticComplexity="2" minCyclomaticComplexity="2" maxCrapScore="6" minCrapScore="6" visitedClasses="0" numClasses="0" visitedMethods="0" numMethods="1" />
+              <MetadataToken>100663355</MetadataToken>
+              <Name>static T NPCSystem.Tests.NPCTestHelpers::CreateComponent[T](System.String)</Name>
+              <FileRef uid="67" />
+              <SequencePoints>
+                <SequencePoint vc="0" uspid="82593" ordinal="0" offset="0" sl="13" sc="0" el="13" ec="0" bec="0" bev="0" fileid="67" />
+                <SequencePoint vc="0" uspid="82594" ordinal="0" offset="1" sl="14" sc="0" el="14" ec="0" bec="0" bev="0" fileid="67" />
+                <SequencePoint vc="0" uspid="82595" ordinal="0" offset="27" sl="15" sc="0" el="15" ec="0" bec="0" bev="0" fileid="67" />
+                <SequencePoint vc="0" uspid="82596" ordinal="0" offset="36" sl="16" sc="0" el="16" ec="0" bec="0" bev="0" fileid="67" />
+              </SequencePoints>
+              <BranchPoints />
+            </Method>
+            <Method visited="false" cyclomaticComplexity="2" nPathComplexity="0" sequenceCoverage="0.0" branchCoverage="0" crapScore="6" isConstructor="false" isStatic="true" isGetter="false" isSetter="false">
+              <Summary numSequencePoints="8" visitedSequencePoints="0" numBranchPoints="0" visitedBranchPoints="0" sequenceCoverage="0.0" branchCoverage="0" maxCyclomaticComplexity="2" minCyclomaticComplexity="2" maxCrapScore="6" minCrapScore="6" visitedClasses="0" numClasses="0" visitedMethods="0" numMethods="1" />
+              <MetadataToken>100663359</MetadataToken>
+              <Name>static T NPCSystem.Tests.NPCTestHelpers::RequireComponent[T](System.String)</Name>
+              <FileRef uid="67" />
+              <SequencePoints>
+                <SequencePoint vc="0" uspid="82619" ordinal="0" offset="0" sl="46" sc="0" el="46" ec="0" bec="0" bev="0" fileid="67" />
+                <SequencePoint vc="0" uspid="82620" ordinal="0" offset="1" sl="47" sc="0" el="47" ec="0" bec="0" bev="0" fileid="67" />
+                <SequencePoint vc="0" uspid="82621" ordinal="0" offset="8" sl="48" sc="0" el="48" ec="0" bec="0" bev="0" fileid="67" />
+                <SequencePoint vc="0" uspid="82622" ordinal="0" offset="15" sl="49" sc="0" el="49" ec="0" bec="0" bev="0" fileid="67" />
+                <SequencePoint vc="0" uspid="82623" ordinal="0" offset="31" sl="50" sc="0" el="50" ec="0" bec="0" bev="0" fileid="67" />
+                <SequencePoint vc="0" uspid="82624" ordinal="0" offset="32" sl="51" sc="0" el="51" ec="0" bec="0" bev="0" fileid="67" />
+                <SequencePoint vc="0" uspid="82625" ordinal="0" offset="95" sl="54" sc="0" el="54" ec="0" bec="0" bev="0" fileid="67" />
+                <SequencePoint vc="0" uspid="82626" ordinal="0" offset="99" sl="55" sc="0" el="55" ec="0" bec="0" bev="0" fileid="67" />
+              </SequencePoints>
+              <BranchPoints />
+            </Method>
+          </Methods>
+        </Class>
+      </Classes>
+    </Module>
+  </Modules>
+</CoverageSession>

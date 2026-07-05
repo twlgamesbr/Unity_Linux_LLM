@@ -1,3 +1,5 @@
+using System;
+using System.IO;
 using NUnit.Framework;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -15,13 +17,13 @@ namespace NPCSystem.Tests
             return gameObject.AddComponent<T>();
         }
 
-        public static void Destroy(params Object[] objects)
+        public static void Destroy(params UnityEngine.Object[] objects)
         {
-            foreach (Object obj in objects)
+            foreach (UnityEngine.Object obj in objects)
             {
                 if (obj != null)
                 {
-                    Object.DestroyImmediate(obj);
+                    UnityEngine.Object.DestroyImmediate(obj);
                 }
             }
         }
@@ -52,6 +54,32 @@ namespace NPCSystem.Tests
             }
 
             return component;
+        }
+
+        /// <summary>
+        /// Create a unique temporary directory and return its full path.
+        /// Caller is responsible for cleanup with Directory.Delete(dir, recursive: true).
+        /// </summary>
+        public static string CreateTempDirectory()
+        {
+            string path = Path.Combine(Path.GetTempPath(), "NPCTest", Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(path);
+            return path;
+        }
+
+        /// <summary>
+        /// Create a minimal NPCProfile for testing without loading from asset.
+        /// </summary>
+        public static NPCProfile CreateMinimalProfile(string slug, string displayName)
+        {
+            var profile = ScriptableObject.CreateInstance<NPCProfile>();
+            profile.npcSlug = slug;
+            profile.displayName = displayName;
+            profile.systemPrompt = "You are a helpful NPC.";
+            profile.maxTokens = 64;
+            profile.ragResults = 1;
+            profile.historySaveFile = $"NPCDialogue/{slug}.json";
+            return profile;
         }
     }
 }

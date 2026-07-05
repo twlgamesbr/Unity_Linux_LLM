@@ -209,18 +209,18 @@ namespace NPCSystem
             return string.Empty;
         }
 
-        bool HasValidQdrantUrl()
+        public bool HasValidQdrantUrl()
         {
             return !string.IsNullOrWhiteSpace(qdrantUrl)
                 && (qdrantUrl.StartsWith("http://") || qdrantUrl.StartsWith("https://"));
         }
 
-        bool HasValidCollectionName()
+        public bool HasValidCollectionName()
         {
             return !string.IsNullOrWhiteSpace(collectionName) && !collectionName.Contains(" ");
         }
 
-        string BuildSearchEndpoint()
+        public string BuildSearchEndpoint()
         {
             string baseUrl = string.IsNullOrWhiteSpace(qdrantUrl) ? "<missing-qdrant-url>" : qdrantUrl.TrimEnd('/');
             string collection = string.IsNullOrWhiteSpace(collectionName) ? "<missing-collection>" : collectionName;

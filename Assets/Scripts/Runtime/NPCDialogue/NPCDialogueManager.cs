@@ -373,7 +373,7 @@ namespace NPCSystem
             _activePlayerClientIdOverride = null;
         }
 
-        static bool IsTechnicalCodebaseQuestion(string playerMessage)
+        public static bool IsTechnicalCodebaseQuestion(string playerMessage)
         {
             if (string.IsNullOrWhiteSpace(playerMessage)) return false;
 

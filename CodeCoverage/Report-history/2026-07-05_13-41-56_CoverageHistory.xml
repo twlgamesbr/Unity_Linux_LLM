@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<coverage version="1.0" date="2026-07-05_13-41-56" tag="">
+  <assembly name="NPCSystem.Editor">
+    <class name="NPCSystem.Editor.NPCDeveloperDiagnostics" coveredlines="0" coverablelines="174" totallines="310" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.Editor.NPCDeveloperDiagnosticsWindow" coveredlines="0" coverablelines="92" totallines="129" coveredbranches="0" totalbranches="0" />
+  </assembly>
+  <assembly name="NPCSystem.Runtime">
+    <class name="NPCSystem.AuthNetworkBridge" coveredlines="104" coverablelines="237" totallines="497" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.AuthUIController" coveredlines="209" coverablelines="302" totallines="481" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.ClueEntry" coveredlines="0" coverablelines="6" totallines="308" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.DialogueActionResult" coveredlines="0" coverablelines="9" totallines="308" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.DialogueEntry" coveredlines="0" coverablelines="7" totallines="214" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.DialogueHistoryFile" coveredlines="0" coverablelines="1" totallines="214" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.EditorUX.NPCInspectorDiagnosticsPilot" coveredlines="9" coverablelines="47" totallines="115" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.EventSystemAutoSetup" coveredlines="0" coverablelines="33" totallines="61" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NotebookUIController" coveredlines="110" coverablelines="192" totallines="306" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCArchiveSaver" coveredlines="0" coverablelines="30" totallines="400" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCBackendReadinessService" coveredlines="83" coverablelines="108" totallines="241" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCBackendReadinessSnapshot" coveredlines="5" coverablelines="5" totallines="241" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCChunking" coveredlines="0" coverablelines="125" totallines="175" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCDialogueActionHandler" coveredlines="0" coverablelines="117" totallines="262" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCDialogueActionPlan" coveredlines="0" coverablelines="6" totallines="113" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCDialogueActionPlanner" coveredlines="6" coverablelines="42" totallines="113" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCDialogueBootstrapper" coveredlines="41" coverablelines="60" totallines="109" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCDialogueManager" coveredlines="141" coverablelines="569" totallines="1005" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCDialogueNetworkBridge" coveredlines="169" coverablelines="510" totallines="818" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCDialogueRequestMessage" coveredlines="10" coverablelines="10" totallines="98" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCDialogueResponseMessage" coveredlines="6" coverablelines="12" totallines="98" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCDialogueSelectionMessage" coveredlines="6" coverablelines="6" totallines="98" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCDialogueSmokeValidator" coveredlines="43" coverablelines="126" totallines="231" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCDialogueUIController" coveredlines="233" coverablelines="327" totallines="527" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCEvidenceState" coveredlines="28" coverablelines="150" totallines="308" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCEvidenceStateSnapshot" coveredlines="10" coverablelines="10" totallines="308" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCFlowEvent" coveredlines="13" coverablelines="13" totallines="42" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCFlowJson" coveredlines="1" coverablelines="1" totallines="42" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCFlowLogger" coveredlines="145" coverablelines="265" totallines="491" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCFlowScope" coveredlines="31" coverablelines="47" totallines="88" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCFlowTextSanitizer" coveredlines="26" coverablelines="35" totallines="58" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCHistoryStore" coveredlines="11" coverablelines="91" totallines="214" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCLocalAIClient" coveredlines="11" coverablelines="58" totallines="144" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCLocalAIEmbedder" coveredlines="5" coverablelines="51" totallines="119" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCLocalRAG" coveredlines="16" coverablelines="60" totallines="118" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCNetworkBootstrap" coveredlines="164" coverablelines="303" totallines="536" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCNetworkItemInteractor" coveredlines="28" coverablelines="186" totallines="302" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCNetworkPlayerController" coveredlines="205" coverablelines="233" totallines="380" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCNetworkSessionManager" coveredlines="9" coverablelines="128" totallines="236" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCNotebookStateFormatter" coveredlines="50" coverablelines="70" totallines="108" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCNotebookStateMessage" coveredlines="10" coverablelines="10" totallines="98" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCOwnerNetworkTransform" coveredlines="3" coverablelines="3" totallines="17" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCPlayerInventory" coveredlines="23" coverablelines="62" totallines="118" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCPlayerNetworkAvatar" coveredlines="42" coverablelines="67" totallines="165" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCPlayModeInstanceResolver" coveredlines="25" coverablelines="59" totallines="98" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCProfile" coveredlines="37" coverablelines="69" totallines="154" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCProfilePromptComposer" coveredlines="0" coverablelines="46" totallines="93" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCRAGImporter" coveredlines="0" coverablelines="101" totallines="175" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCRAGMetadata" coveredlines="0" coverablelines="1" totallines="206" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCRAGMetadataStore" coveredlines="0" coverablelines="99" totallines="206" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCSceneInitializationController" coveredlines="82" coverablelines="138" totallines="278" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCSearchable" coveredlines="21" coverablelines="68" totallines="400" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCSearchMethod" coveredlines="7" coverablelines="135" totallines="400" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCSearchPlugin" coveredlines="0" coverablelines="9" totallines="400" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCSentenceSplitter" coveredlines="0" coverablelines="27" totallines="45" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCServerCharacter" coveredlines="25" coverablelines="45" totallines="90" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCServerCharacterSpawner" coveredlines="35" coverablelines="126" totallines="212" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCSimpleSearch" coveredlines="2" coverablelines="66" totallines="103" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCTokenSplitter" coveredlines="0" coverablelines="39" totallines="60" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCTransferableItem" coveredlines="52" coverablelines="130" totallines="234" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCTransferableItemSpawner" coveredlines="32" coverablelines="100" totallines="164" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCTransportConfig" coveredlines="15" coverablelines="33" totallines="80" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.NPCWordSplitter" coveredlines="0" coverablelines="26" totallines="44" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.PlayerAuthService" coveredlines="35" coverablelines="118" totallines="456" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.PlayerSessionStore" coveredlines="16" coverablelines="45" totallines="456" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.QdrantRAGService" coveredlines="6" coverablelines="88" totallines="230" coveredbranches="0" totalbranches="0" />
+  </assembly>
+  <assembly name="NPCSystem.Tests">
+    <class name="NPCSystem.Tests.AuthNetworkBridgeTests" coveredlines="0" coverablelines="35" totallines="66" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.Tests.NPCBackendReadinessTests" coveredlines="0" coverablelines="29" totallines="58" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.Tests.NPCDialogueNetworkingTests" coveredlines="0" coverablelines="94" totallines="167" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.Tests.NPCFlowLoggerPlatformTests" coveredlines="0" coverablelines="6" totallines="20" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.Tests.NPCFlowLoggerTests" coveredlines="0" coverablelines="66" totallines="120" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.Tests.NPCMainSceneWiringTests" coveredlines="0" coverablelines="26" totallines="45" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.Tests.NPCNetworkingTests" coveredlines="0" coverablelines="75" totallines="122" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.Tests.NPCNetworkNpcPrefabTests" coveredlines="0" coverablelines="8" totallines="25" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.Tests.NPCNetworkPlayerPrefabTests" coveredlines="0" coverablelines="33" totallines="63" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.Tests.NPCNetworkTransferableItemPrefabTests" coveredlines="0" coverablelines="8" totallines="25" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.Tests.NPCNotebookStateTests" coveredlines="0" coverablelines="24" totallines="46" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.Tests.NPCPlayerInventoryTests" coveredlines="0" coverablelines="14" totallines="31" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.Tests.NPCSceneInitializationTests" coveredlines="0" coverablelines="28" totallines="64" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.Tests.NPCStartupAuthorityStaticTests" coveredlines="0" coverablelines="29" totallines="54" coveredbranches="0" totalbranches="0" />
+    <class name="NPCSystem.Tests.NPCTestHelpers" coveredlines="0" coverablelines="31" totallines="57" coveredbranches="0" totalbranches="0" />
+  </assembly>
+</coverage>

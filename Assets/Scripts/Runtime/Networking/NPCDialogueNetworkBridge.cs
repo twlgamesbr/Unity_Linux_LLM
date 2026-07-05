@@ -334,7 +334,7 @@ namespace NPCSystem
             }
         }
 
-        bool ShouldRelayLocally()
+        public bool ShouldRelayLocally()
         {
             return !Application.isPlaying || NetworkManager == null || !NetworkManager.IsListening || IsServer;
         }
@@ -717,7 +717,7 @@ namespace NPCSystem
                 $"Synchronized dialogue manager state back into session cache for '{sessionManager.GetPlayerDisplayName(clientId)}'.");
         }
 
-        NPCProfile FindProfileBySlug(string npcSlug)
+        public NPCProfile FindProfileBySlug(string npcSlug)
         {
             if (dialogueManager == null || string.IsNullOrWhiteSpace(npcSlug)) return null;
 
@@ -732,7 +732,7 @@ namespace NPCSystem
             return null;
         }
 
-        static Dictionary<string, List<DialogueEntry>> CloneHistorySnapshot(Dictionary<string, List<DialogueEntry>> historyByNpc)
+        public static Dictionary<string, List<DialogueEntry>> CloneHistorySnapshot(Dictionary<string, List<DialogueEntry>> historyByNpc)
         {
             var clone = new Dictionary<string, List<DialogueEntry>>(StringComparer.OrdinalIgnoreCase);
             foreach (var pair in historyByNpc ?? new Dictionary<string, List<DialogueEntry>>(StringComparer.OrdinalIgnoreCase))
@@ -771,7 +771,7 @@ namespace NPCSystem
             return avatar != null ? avatar.DisplayName : $"Player {clientId}";
         }
 
-        static bool LooksLikeFallbackPlayerName(string playerName)
+        public static bool LooksLikeFallbackPlayerName(string playerName)
         {
             if (string.IsNullOrWhiteSpace(playerName)) return true;
 

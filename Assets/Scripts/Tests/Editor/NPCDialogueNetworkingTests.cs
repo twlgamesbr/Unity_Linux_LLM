@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -161,6 +162,126 @@ namespace NPCSystem.Tests
             finally
             {
                 Object.DestroyImmediate(gameObject);
+            }
+        }
+
+        [Test]
+        public void LooksLikeFallbackPlayerName_DetectsFallbackNames()
+        {
+            Assert.That(NPCDialogueNetworkBridge.LooksLikeFallbackPlayerName(null), Is.True);
+            Assert.That(NPCDialogueNetworkBridge.LooksLikeFallbackPlayerName(""), Is.True);
+            Assert.That(NPCDialogueNetworkBridge.LooksLikeFallbackPlayerName("  "), Is.True);
+            Assert.That(NPCDialogueNetworkBridge.LooksLikeFallbackPlayerName("Player 123"), Is.True);
+            Assert.That(NPCDialogueNetworkBridge.LooksLikeFallbackPlayerName("Player 0"), Is.True);
+            Assert.That(NPCDialogueNetworkBridge.LooksLikeFallbackPlayerName("Alice"), Is.False);
+            Assert.That(NPCDialogueNetworkBridge.LooksLikeFallbackPlayerName("Player"), Is.False);
+            Assert.That(NPCDialogueNetworkBridge.LooksLikeFallbackPlayerName(" Player 42 "), Is.True);
+        }
+
+        [Test]
+        public void CloneHistorySnapshot_DeepCopies()
+        {
+            var original = new Dictionary<string, List<DialogueEntry>>
+            {
+                ["butler"] = new List<DialogueEntry>
+                {
+                    new DialogueEntry("user", "Hello"),
+                    new DialogueEntry("assistant", "Hi")
+                },
+                ["maid"] = new List<DialogueEntry>
+                {
+                    new DialogueEntry("user", "Clean the room"),
+                    new DialogueEntry("assistant", "Of course")
+                }
+            };
+
+            var clone = NPCDialogueNetworkBridge.CloneHistorySnapshot(original);
+
+            Assert.That(clone, Has.Count.EqualTo(2));
+            Assert.That(clone["butler"][0].content, Is.EqualTo("Hello"));
+            Assert.That(clone["maid"][1].content, Is.EqualTo("Of course"));
+
+            clone["butler"][0].content = "Modified";
+            Assert.That(original["butler"][0].content, Is.EqualTo("Hello"), "Clone should be a deep copy");
+        }
+
+        [Test]
+        public void CloneHistorySnapshot_HandlesNullInput()
+        {
+            var clone = NPCDialogueNetworkBridge.CloneHistorySnapshot(null);
+            Assert.That(clone, Is.Empty);
+        }
+
+        [Test]
+        public void CloneHistorySnapshot_SkipsNullEntries()
+        {
+            var original = new Dictionary<string, List<DialogueEntry>>
+            {
+                ["butler"] = new List<DialogueEntry>
+                {
+                    new DialogueEntry("user", "Hello"),
+                    null,
+                    new DialogueEntry("assistant", "Hi")
+                }
+            };
+
+            var clone = NPCDialogueNetworkBridge.CloneHistorySnapshot(original);
+            Assert.That(clone["butler"], Has.Count.EqualTo(2));
+        }
+
+        [Test]
+        public void FindProfileBySlug_WithDialogueManager_ReturnsMatchingProfile()
+        {
+            var bridgeObject = new GameObject(nameof(NPCDialogueNetworkingTests));
+            var bridge = bridgeObject.AddComponent<NPCDialogueNetworkBridge>();
+            var dialogueObject = new GameObject("DialogueManager");
+            var manager = dialogueObject.AddComponent<NPCDialogueManager>();
+            var profile = ScriptableObject.CreateInstance<NPCProfile>();
+            profile.npcSlug = "test-npc";
+            profile.displayName = "Test NPC";
+            profile.systemPrompt = "Test";
+            profile.maxTokens = 64;
+            profile.ragResults = 1;
+            profile.historySaveFile = "NPCDialogue/test.json";
+            manager.profiles = new[] { profile };
+
+            try
+            {
+                bridge.dialogueManager = manager;
+
+                NPCProfile found = bridge.FindProfileBySlug("test-npc");
+                Assert.That(found, Is.SameAs(profile));
+
+                NPCProfile notFound = bridge.FindProfileBySlug("nonexistent");
+                Assert.That(notFound, Is.Null);
+
+                NPCProfile nullResult = bridge.FindProfileBySlug(null);
+                Assert.That(nullResult, Is.Null);
+
+                NPCProfile emptyResult = bridge.FindProfileBySlug("  ");
+                Assert.That(emptyResult, Is.Null);
+            }
+            finally
+            {
+                Object.DestroyImmediate(bridgeObject);
+                Object.DestroyImmediate(dialogueObject);
+                Object.DestroyImmediate(profile);
+            }
+        }
+
+        [Test]
+        public void ShouldRelayLocally_DefaultsToTrueInEditMode()
+        {
+            var bridgeObject = new GameObject(nameof(NPCDialogueNetworkingTests));
+            var bridge = bridgeObject.AddComponent<NPCDialogueNetworkBridge>();
+
+            try
+            {
+                Assert.That(bridge.ShouldRelayLocally(), Is.True);
+            }
+            finally
+            {
+                Object.DestroyImmediate(bridgeObject);
             }
         }
     }

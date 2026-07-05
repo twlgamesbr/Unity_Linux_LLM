@@ -4,9 +4,7 @@
     "references": [
         "Unity.Burst",
         "Unity.Collections",
-        "Unity.Mathematics",
-        "Unity.Services.Relay",
-        "Unity.Logging"
+        "Unity.Mathematics"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

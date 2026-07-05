@@ -35,6 +35,8 @@ if [[ ${EXIT_CODE} -eq 0 ]]; then
     echo "Inspect ${LOG_ROOT}/${TEST_PLATFORM}-coverage.log for Unity Code Coverage package errors." >&2
     exit 2
   fi
+
+  "${PROJECT_ROOT}/Tools/Diagnostics/generate-coverage-report.sh" "${COVERAGE_ROOT}"
 fi
 
 exit "${EXIT_CODE}"
