@@ -15,6 +15,7 @@ uv run codebase-embedder query --root ../.. --local "where is qdrant rag search 
 uv run codebase-embedder audit --root ../.. --script Assets/Scripts/Runtime/NPCDialogue/QdrantRAGService.cs --scenario localai-llmunity
 uv run codebase-embedder audit --root ../.. --scene Assets/Scenes/NPCDialoguePrototype1.unity --scenario localai-llmunity --local
 uv run codebase-embedder unity-validate --root ../..
+python3 scripts/export_relations_graph.py --relations ../../.codebase-index/relations.jsonl --out-dir ../../.codebase-index/graph --exclude-calls
 ```
 
 The scanner writes artifacts under `.codebase-index/` at the Unity project root:
@@ -26,6 +27,8 @@ The scanner writes artifacts under `.codebase-index/` at the Unity project root:
 - `chunks.jsonl`
 - `index-report.md`
 
+If `CodeCoverage/Report/Summary.json` exists, the scanner also enriches runtime records with Unity coverage metadata and emits `coverage_summary` records for low-confidence or hotspot-aware retrieval.
+
 ## Design
 
 The v1 indexer scans filesystem assets, asmdef files, package metadata, selected docs, and C# syntax. It does not require Unity to be open. GladeKit MCP is optional for validation/enrichment.
@@ -35,7 +38,7 @@ The `audit` command is the best way to evaluate retrieval quality for holistic U
 - script-level structural audit (namespaces, asmdef ownership, symbol counts, relation counts)
 - smoke-query retrieval checks
 - scenario presets such as `localai-llmunity` to inspect how well runtime/backend scripts outrank editor/docs for LocalAI + LLMUnity tasks
-- optional scene-aware overlay via `--scene Assets/...unity` that parses the Unity scene YAML and reports LocalAI transport wiring, dedicated-agent splits, and Qdrant/Cognee/FunctionCalling hotspots in one report
+- optional scene-aware overlay via `--scene Assets/...unity` that parses the Unity scene YAML and reports LocalAI transport wiring, dedicated-agent splits, and Qdrant/FunctionCalling hotspots in one report
 - an explicit workflow section that classifies each prompt and recommends a GladeKit MCP pre-phase before repo-only retrieval when scene/component truth matters
 
 ## Recommended Workflow
@@ -57,7 +60,7 @@ This matters most for:
 - scene wiring questions
 - component enablement / remote flag questions
 - LLMAgent / LLM / LocalAI transport questions
-- Qdrant / Cognee integration ownership
+- Qdrant integration ownership
 - inspector-state mismatches between intended and actual runtime setup
 
 The `query` command now prints a short workflow header before ranked results, and `--json` includes:
@@ -65,6 +68,18 @@ The `query` command now prints a short workflow header before ranked results, an
 - `workflow.query_class`
 - `workflow.preferred_sources`
 - `results`
+
+Coverage-aware retrieval:
+
+- behavior and scene questions now get a modest confidence boost from covered runtime paths
+- coverage/risk/hotspot questions prefer `coverage_summary` records and method hotspot metadata
+- result lines show `coverage=<rate>%` when coverage data is available for the matched record
+
+Relations graph export:
+
+- `python3 scripts/export_relations_graph.py --relations ../../.codebase-index/relations.jsonl --out-dir ../../.codebase-index/graph --exclude-calls`
+- import `nodes.csv` and `edges.csv` from `.codebase-index/graph/` into Gephi or Cytoscape
+- keep `calls` excluded for first-pass visualization unless you want the very dense call graph
 
 Qdrant collection: `unity_linux_llm_codebase_v1`.
 

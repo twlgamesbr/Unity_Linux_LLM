@@ -19,6 +19,7 @@ class CodebaseEmbedderConfig:
     localai_base_url: str = "http://localhost:8080/v1"
     embedding_model: str = "nomic-embed-text-v1.5"
     artifact_dir_name: str = ".codebase-index"
+    coverage_report_dir_name: str = "CodeCoverage/Report"
     collection_profile: str = "runtime"
     include_scenes: bool = False
     include_samples: bool = False

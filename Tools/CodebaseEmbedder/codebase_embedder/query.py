@@ -1,12 +1,21 @@
 from __future__ import annotations
 
 import json
-import re
-from pathlib import Path
 
 from .config import CodebaseEmbedderConfig
 from .embeddings import EmbeddingClient
 from .indexer import load_chunks
+from .query_support import (
+    camel_words,
+    coverage_confidence_boost,
+    coverage_record_boost,
+    format_coverage_suffix,
+    is_coverage_query,
+    path_term_boost,
+    payload_aliases,
+    select_results,
+    symbol_name_boost,
+)
 from .qdrant_store import QdrantStore
 from .workflow import (
     QUERY_CLASS_BEHAVIOR,
@@ -28,6 +37,7 @@ STRUCTURAL_RECORD_BOOSTS = {
     "namespace": 52.0,
     "namespace_summary": 48.0,
     "runtime_summary": 26.0,
+    "coverage_summary": 24.0,
     "using_directive": 14.0,
     "file_overview": 34.0,
     "assembly": 28.0,
@@ -58,10 +68,11 @@ def lexical_query(config: CodebaseEmbedderConfig, question: str, limit: int = 8)
     owner_intent = query_class == QUERY_CLASS_OWNERSHIP
     behavior_intent = query_class == QUERY_CLASS_BEHAVIOR
     scene_intent = query_class == QUERY_CLASS_SCENE_INTEGRATION
+    coverage_intent = is_coverage_query(question)
     results = []
     for rec in load_chunks(config.artifact_dir):
-        raw_hay = rec.text + " " + json.dumps(rec.payload) + " " + _payload_aliases(rec.payload)
-        hay = (raw_hay + " " + _camel_words(raw_hay)).lower()
+        raw_hay = rec.text + " " + json.dumps(rec.payload) + " " + payload_aliases(rec.payload)
+        hay = (raw_hay + " " + camel_words(raw_hay)).lower()
         score = sum(min(hay.count(t), 3) for t in terms)
         if not structural and rec.record_type in {"type", "member", "serialized_field"}:
             score *= 3
@@ -69,20 +80,17 @@ def lexical_query(config: CodebaseEmbedderConfig, question: str, limit: int = 8)
         score += _owner_record_boost(rec.payload, owner_intent)
         score += _behavior_record_boost(rec.payload, behavior_intent)
         score += _scene_record_boost(rec.payload, scene_intent)
-        score += _symbol_name_boost(rec.payload, terms)
-        score += _path_term_boost(rec.payload, terms)
+        score += coverage_record_boost(rec.payload, coverage_intent)
+        score += coverage_confidence_boost(rec.payload, behavior_intent, owner_intent, scene_intent)
+        score += symbol_name_boost(rec.payload, terms)
+        score += path_term_boost(rec.payload, terms)
         if terms and all(t in hay for t in terms):
             score += 25
         if score:
             results.append({"score": float(score), "payload": {**rec.payload, "text": rec.text}})
     # Primary sort: high score first; secondary: Runtime before Editor before other
     results.sort(key=lambda r: (-r["score"], _region_sort_key(r.get("payload", {}))))
-    return _select_results(results, limit, structural)
-
-
-def _camel_words(text: str) -> str:
-    tokens = re.findall(r"[A-Z]?[a-z]+|[A-Z]+(?=[A-Z]|$)|\d+", text)
-    return " ".join(tokens)
+    return select_results(results, limit, structural)
 
 
 def _query_terms(question: str) -> list[str]:
@@ -107,6 +115,7 @@ def qdrant_query(config: CodebaseEmbedderConfig, question: str, limit: int = 8) 
     owner_intent = query_class == QUERY_CLASS_OWNERSHIP
     behavior_intent = query_class == QUERY_CLASS_BEHAVIOR
     scene_intent = query_class == QUERY_CLASS_SCENE_INTEGRATION
+    coverage_intent = is_coverage_query(question)
     emb = EmbeddingClient(config.localai_base_url, config.embedding_model)
     vec = emb.embed([question])[0]
     candidate_limit = max(80 if structural else 50, limit * (20 if structural else 10))
@@ -126,8 +135,8 @@ def qdrant_query(config: CodebaseEmbedderConfig, question: str, limit: int = 8) 
     terms = _query_terms(question)
     for item in candidates:
         payload = item.get("payload", {})
-        raw_hay = json.dumps(payload) + " " + _payload_aliases(payload)
-        hay = (raw_hay + " " + _camel_words(raw_hay)).lower()
+        raw_hay = json.dumps(payload) + " " + payload_aliases(payload)
+        hay = (raw_hay + " " + camel_words(raw_hay)).lower()
         lexical_boost = sum(0.03 * min(hay.count(t), 3) for t in terms)
         if terms and all(t in hay for t in terms):
             lexical_boost += 0.20
@@ -135,12 +144,14 @@ def qdrant_query(config: CodebaseEmbedderConfig, question: str, limit: int = 8) 
         lexical_boost += 0.02 * _owner_record_boost(payload, owner_intent)
         lexical_boost += 0.02 * _behavior_record_boost(payload, behavior_intent)
         lexical_boost += 0.02 * _scene_record_boost(payload, scene_intent)
-        lexical_boost += 0.02 * _symbol_name_boost(payload, terms)
-        lexical_boost += 0.02 * _path_term_boost(payload, terms)
+        lexical_boost += 0.02 * coverage_record_boost(payload, coverage_intent)
+        lexical_boost += 0.02 * coverage_confidence_boost(payload, behavior_intent, owner_intent, scene_intent)
+        lexical_boost += 0.02 * symbol_name_boost(payload, terms)
+        lexical_boost += 0.02 * path_term_boost(payload, terms)
         item["score"] = float(item.get("score", 0.0)) + lexical_boost
     # Primary sort: high score first; secondary: Runtime before Editor before other
     candidates.sort(key=lambda r: (-r.get("score", 0.0), _region_sort_key(r.get("payload", {}))))
-    return _select_results(candidates, limit, structural)
+    return select_results(candidates, limit, structural)
 
 
 def format_results(results: list[dict]) -> str:
@@ -153,7 +164,8 @@ def format_results(results: list[dict]) -> str:
         asm = payload.get("asmdef", "")
         record_type = payload.get("record_type", "")
         loc = f"{path}:{line}" if line else path
-        lines.append(f"{i}. score={item.get('score', 0):.3f} {loc} {symbol} {asm} {record_type}".strip())
+        coverage = format_coverage_suffix(payload)
+        lines.append(f"{i}. score={item.get('score', 0):.3f} {loc} {symbol} {asm} {record_type}{coverage}".strip())
     return "\n".join(lines)
 
 
@@ -257,95 +269,3 @@ def _scene_record_boost(payload: dict, scene_intent: bool) -> float:
     elif region == "Scene":
         bonus += 8.0
     return bonus
-
-
-def _symbol_name_boost(payload: dict, terms: list[str]) -> float:
-    if not terms:
-        return 0.0
-    symbol = str(payload.get("type_name") or payload.get("member_name") or payload.get("using_namespace") or "")
-    if not symbol:
-        return 0.0
-    symbol_words = _camel_words(symbol).lower().split()
-    if not symbol_words:
-        return 0.0
-    matched = sum(1 for term in terms if term in symbol_words)
-    bonus = 6.0 * matched
-    if matched == len(terms):
-        bonus += 18.0
-    return bonus
-
-
-def _path_term_boost(payload: dict, terms: list[str]) -> float:
-    if not terms:
-        return 0.0
-    path_text = str(payload.get("path") or "") + " " + str(payload.get("relative_dir") or "")
-    words = _camel_words(path_text).lower().split()
-    if not words:
-        return 0.0
-    matched = sum(1 for term in terms if term in words)
-    bonus = 4.0 * matched
-    if matched >= 2:
-        bonus += 8.0
-    return bonus
-
-
-def _payload_aliases(payload: dict) -> str:
-    record_type = payload.get("record_type", "")
-    aliases = {
-        "namespace": "namespace namespaces declared declaration",
-        "namespace_summary": "namespace namespaces hierarchy summary overview types members using directives",
-        "runtime_summary": "runtime runtime ownership transport service bootstrapper logger history qdrant cognee scene dialogue",
-        "using_directive": "using usings import imports reference references dependency dependencies",
-        "file_overview": "file overview namespace namespaces using usings type types member members reference references",
-        "assembly": "assembly asmdef reference references dependency dependencies",
-        "relation": "relation relations reference references dependency dependencies graph edge",
-        "type": "type types class classes interface interfaces enum enums struct structs",
-        "member": "member members method methods field fields function functions",
-        "serialized_field": "field fields serialized serializefield member members",
-    }
-    return aliases.get(record_type, "")
-
-
-def _select_results(results: list[dict], limit: int, structural: bool) -> list[dict]:
-    if not structural:
-        return results[:limit]
-
-    selected: list[dict] = []
-    type_limits = {
-        "namespace": 4,
-        "namespace_summary": 4,
-        "runtime_summary": 4,
-        "file_overview": 3,
-        "assembly": 3,
-        "relation": 4,
-        "using_directive": 2,
-        "type": 3,
-        "member": 2,
-        "serialized_field": 1,
-    }
-    type_counts: dict[str, int] = {}
-    using_paths: set[str] = set()
-    seen_keys: set[tuple[str, str, str]] = set()
-
-    for item in results:
-        payload = item.get("payload", {})
-        record_type = payload.get("record_type", "")
-        path = payload.get("path", "")
-        identity = payload.get("namespace") or payload.get("using_namespace") or payload.get("stable_key", "")
-        seen_key = (record_type, path, identity)
-        if seen_key in seen_keys:
-            continue
-        if type_counts.get(record_type, 0) >= type_limits.get(record_type, limit):
-            continue
-        if record_type == "using_directive" and path in using_paths:
-            continue
-
-        selected.append(item)
-        seen_keys.add(seen_key)
-        type_counts[record_type] = type_counts.get(record_type, 0) + 1
-        if record_type == "using_directive":
-            using_paths.add(path)
-        if len(selected) >= limit:
-            break
-
-    return selected

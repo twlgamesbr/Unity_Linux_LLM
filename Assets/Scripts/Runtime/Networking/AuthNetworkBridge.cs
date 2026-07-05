@@ -19,7 +19,7 @@ namespace NPCSystem
     [DefaultExecutionOrder(-500)]
     public class AuthNetworkBridge : MonoBehaviour
     {
-        enum ResolvedNetworkStartupMode
+        public enum ResolvedNetworkStartupMode
         {
             Host,
             Client
@@ -252,7 +252,7 @@ namespace NPCSystem
             return startAsHost ? ResolvedNetworkStartupMode.Host : ResolvedNetworkStartupMode.Client;
         }
 
-        static bool TryGetCommandLineStartupMode(out ResolvedNetworkStartupMode mode)
+        public static bool TryGetCommandLineStartupMode(out ResolvedNetworkStartupMode mode)
         {
             string[] args = Environment.GetCommandLineArgs();
             foreach (string arg in args)

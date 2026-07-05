@@ -8,6 +8,8 @@ from typing import Any
 from .asmdef_parser import parse_asmdefs
 from .chunking import chunk_docs, records_to_embedding_chunks
 from .config import CodebaseEmbedderConfig
+from .coverage import load_coverage_report
+from .coverage_records import apply_coverage_to_records, build_coverage_summary_records
 from .csharp_analyzer import analyze_csharp_files
 from .discovery import discover_project_files
 from .package_parser import parse_package_manifest
@@ -24,16 +26,22 @@ class IndexResult:
 
 def build_index(config: CodebaseEmbedderConfig, write_artifacts: bool = True) -> IndexResult:
     files = discover_project_files(config)
+    coverage_report = load_coverage_report(config.project_root, config.coverage_report_dir_name)
     assemblies, asm_relations = parse_asmdefs(config.project_root, files.asmdefs)
     records: list[IndexRecord] = [parse_package_manifest(config.project_root, config.project_slug)]
     records.extend(asm.to_index_record(config.project_slug) for asm in assemblies)
     symbol_records, symbol_relations = analyze_csharp_files(config.project_root, files.csharp, assemblies, config.project_slug)
     records.extend(symbol_records)
     records.extend(chunk_docs(config.project_slug, config.project_root, files.docs))
+    if coverage_report is not None:
+        apply_coverage_to_records(records, coverage_report)
     if config.collection_profile == "hierarchy":
         records.extend(_build_namespace_summary_records(symbol_records, config.project_slug))
     if config.collection_profile == "runtime":
         records.extend(_build_runtime_summary_records(records, config.project_slug))
+    if coverage_report is not None:
+        apply_coverage_to_records(records, coverage_report)
+        records.extend(build_coverage_summary_records(records, coverage_report, config.project_slug))
     relations = asm_relations + symbol_relations
     # Keep the full relation graph in relations.jsonl, but only embed high-signal
     # structural edges into Qdrant. Per-invocation `calls` and containment edges
@@ -45,11 +53,13 @@ def build_index(config: CodebaseEmbedderConfig, write_artifacts: bool = True) ->
         "csharp_files": len(files.csharp), "asmdef_files": len(files.asmdefs), "doc_files": len(files.docs),
         "records": len(records), "relations": len(relations), "chunks": len(chunks),
     }
+    if coverage_report is not None:
+        counts["coverage_classes"] = len(coverage_report.classes)
     if write_artifacts:
         art = config.artifact_dir
         write_json(art / "manifest.json", {"project": config.project_slug, "collection": config.collection_name, "indexed_at": utc_now(), "counts": counts})
         write_json(art / "asmdefs.json", [asdict(asm) for asm in assemblies])
-        write_jsonl(art / "symbols.jsonl", [r for r in symbol_records if r.record_type in {"type", "member", "serialized_field", "namespace", "using_directive", "file_overview", "namespace_summary", "runtime_summary"}])
+        write_jsonl(art / "symbols.jsonl", [r for r in records if r.record_type in {"type", "member", "serialized_field", "namespace", "using_directive", "file_overview", "namespace_summary", "runtime_summary", "coverage_summary"}])
         write_jsonl(art / "relations.jsonl", [asdict(r) for r in relations])
         write_jsonl(art / "chunks.jsonl", chunks)
         _write_report(art / "index-report.md", counts, records)

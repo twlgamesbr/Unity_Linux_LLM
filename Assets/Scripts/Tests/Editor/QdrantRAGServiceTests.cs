@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -152,6 +154,201 @@ namespace NPCSystem.Tests
             {
                 Object.DestroyImmediate(serviceObject);
             }
+        }
+
+        [Test]
+        public void SearchMemoryAsync_WithMockEmbedderAndResponse_ReturnsText()
+        {
+            var serviceObject = new GameObject(nameof(QdrantRAGServiceTests));
+            var embedderObject = new GameObject("MockEmbedder");
+            var embedder = embedderObject.AddComponent<TestableLocalAIEmbedder>();
+            embedder.mockResponse = "{\"data\":[{\"embedding\":[0.1,0.2,0.3],\"index\":0}]}";
+
+            var service = serviceObject.AddComponent<TestableQdrantRAGService>();
+            service.qdrantUrl = "http://localhost:6333";
+            service.collectionName = "test_collection";
+            service.embedder = embedder;
+            service.mockResponse = "{\"result\":[{\"score\":0.95,\"payload\":{\"text\":\"Found knowledge\"}}]}";
+
+            try
+            {
+                string result = null;
+                Assert.DoesNotThrowAsync(async () =>
+                {
+                    result = await service.SearchMemoryAsync("test query");
+                });
+                Assert.That(result, Is.EqualTo("Found knowledge"));
+                Assert.That(service.lastRequestedEndpoint, Does.Contain("test_collection/points/search"));
+            }
+            finally
+            {
+                Object.DestroyImmediate(serviceObject);
+                Object.DestroyImmediate(embedderObject);
+            }
+        }
+
+        [Test]
+        public void SearchMemoryAsync_WithNullMockResponse_ReturnsEmpty()
+        {
+            var serviceObject = new GameObject(nameof(QdrantRAGServiceTests));
+            var embedderObject = new GameObject("MockEmbedder");
+            var embedder = embedderObject.AddComponent<TestableLocalAIEmbedder>();
+            embedder.mockResponse = "{\"data\":[{\"embedding\":[0.1,0.2,0.3],\"index\":0}]}";
+
+            var service = serviceObject.AddComponent<TestableQdrantRAGService>();
+            service.qdrantUrl = "http://localhost:6333";
+            service.collectionName = "test_collection";
+            service.embedder = embedder;
+            service.mockResponse = null;
+
+            try
+            {
+                string result = null;
+                Assert.DoesNotThrowAsync(async () =>
+                {
+                    result = await service.SearchMemoryAsync("test query");
+                });
+                Assert.That(result, Is.Empty);
+            }
+            finally
+            {
+                Object.DestroyImmediate(serviceObject);
+                Object.DestroyImmediate(embedderObject);
+            }
+        }
+
+        [Test]
+        public void SearchMemoryAsync_WithEmptyQdrantResult_ReturnsEmpty()
+        {
+            var serviceObject = new GameObject(nameof(QdrantRAGServiceTests));
+            var embedderObject = new GameObject("MockEmbedder");
+            var embedder = embedderObject.AddComponent<TestableLocalAIEmbedder>();
+            embedder.mockResponse = "{\"data\":[{\"embedding\":[0.1,0.2,0.3],\"index\":0}]}";
+
+            var service = serviceObject.AddComponent<TestableQdrantRAGService>();
+            service.qdrantUrl = "http://localhost:6333";
+            service.collectionName = "test_collection";
+            service.embedder = embedder;
+            service.mockResponse = "{\"result\":[]}";
+
+            try
+            {
+                string result = null;
+                Assert.DoesNotThrowAsync(async () =>
+                {
+                    result = await service.SearchMemoryAsync("test query");
+                });
+                Assert.That(result, Is.Empty);
+            }
+            finally
+            {
+                Object.DestroyImmediate(serviceObject);
+                Object.DestroyImmediate(embedderObject);
+            }
+        }
+
+        [Test]
+        public void SearchMemoryAsync_EmbedsderReturnsEmptyVector_ReturnsEmpty()
+        {
+            var serviceObject = new GameObject(nameof(QdrantRAGServiceTests));
+            var embedderObject = new GameObject("MockEmbedder");
+            var embedder = embedderObject.AddComponent<TestableLocalAIEmbedder>();
+            embedder.mockResponse = "{}";
+
+            var service = serviceObject.AddComponent<TestableQdrantRAGService>();
+            service.qdrantUrl = "http://localhost:6333";
+            service.collectionName = "test_collection";
+            service.embedder = embedder;
+
+            try
+            {
+                string result = null;
+                Assert.DoesNotThrowAsync(async () =>
+                {
+                    result = await service.SearchMemoryAsync("test query");
+                });
+                Assert.That(result, Is.Empty);
+            }
+            finally
+            {
+                Object.DestroyImmediate(serviceObject);
+                Object.DestroyImmediate(embedderObject);
+            }
+        }
+
+        [Test]
+        public void SearchMemoryAsync_NoEmbedderAssigned_FindsInScene()
+        {
+            var serviceObject = new GameObject(nameof(QdrantRAGServiceTests));
+            var embedderObject = new GameObject("MockEmbedder");
+            var embedder = embedderObject.AddComponent<TestableLocalAIEmbedder>();
+            embedder.mockResponse = "{\"data\":[{\"embedding\":[0.1],\"index\":0}]}";
+
+            var service = serviceObject.AddComponent<TestableQdrantRAGService>();
+            service.qdrantUrl = "http://localhost:6333";
+            service.collectionName = "test_collection";
+            service.embedder = null;
+            service.mockResponse = "{\"result\":[]}";
+
+            try
+            {
+                string result = null;
+                Assert.DoesNotThrowAsync(async () =>
+                {
+                    result = await service.SearchMemoryAsync("test query");
+                });
+                Assert.That(result, Is.Empty);
+            }
+            finally
+            {
+                Object.DestroyImmediate(serviceObject);
+                Object.DestroyImmediate(embedderObject);
+            }
+        }
+
+        [Test]
+        public void SearchMemoryAsync_ReturnsMultipleResults()
+        {
+            var serviceObject = new GameObject(nameof(QdrantRAGServiceTests));
+            var embedderObject = new GameObject("MockEmbedder");
+            var embedder = embedderObject.AddComponent<TestableLocalAIEmbedder>();
+            embedder.mockResponse = "{\"data\":[{\"embedding\":[0.1,0.2,0.3],\"index\":0}]}";
+
+            var service = serviceObject.AddComponent<TestableQdrantRAGService>();
+            service.qdrantUrl = "http://localhost:6333";
+            service.collectionName = "test_collection";
+            service.embedder = embedder;
+            service.mockResponse = "{\"result\":[{\"score\":0.95,\"payload\":{\"text\":\"First result\"}},{\"score\":0.80,\"payload\":{\"text\":\"Second result\"}}]}";
+
+            try
+            {
+                string result = null;
+                Assert.DoesNotThrowAsync(async () =>
+                {
+                    result = await service.SearchMemoryAsync("test query");
+                });
+                Assert.That(result, Is.EqualTo("First result\nSecond result"));
+            }
+            finally
+            {
+                Object.DestroyImmediate(serviceObject);
+                Object.DestroyImmediate(embedderObject);
+            }
+        }
+    }
+
+    public class TestableQdrantRAGService : QdrantRAGService
+    {
+        public string mockResponse;
+        public string lastRequestedEndpoint;
+        public string lastRequestedJson;
+
+        protected override async Task<string> SendSearchRequestAsync(string endpoint, string json)
+        {
+            await Task.Yield();
+            lastRequestedEndpoint = endpoint;
+            lastRequestedJson = json;
+            return mockResponse;
         }
     }
 }

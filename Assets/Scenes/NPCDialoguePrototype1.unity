@@ -2549,7 +2549,7 @@ MonoBehaviour:
   maidImage: {fileID: 961591108}
   chefImage: {fileID: 718663248}
   notebookController: {fileID: 489627716}
-  exitButton: {fileID: 0}
+  exitButton: {fileID: 1468962046}
   initializeOnStart: 0
 --- !u!114 &489627716
 MonoBehaviour:
@@ -10647,7 +10647,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9ff7619e10321088a74f38d26847a89, type: 3}
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCNetworkSessionManager
-  inspectorSummary: Per-client dialogue/session state cache.
 --- !u!1652712579 &1471440992
 MultiplayerRolesData:
   m_ObjectHideFlags: 2

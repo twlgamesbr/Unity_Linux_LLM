@@ -17,7 +17,6 @@ SCENARIOS: dict[str, list[str]] = {
         "where is llm client implemented",
         "where is qdrant rag search implemented",
         "which script manages embeddings for llm rag",
-        "where is cognee memory service implemented",
     ],
 }
 
@@ -26,7 +25,6 @@ FOCUS_COMPONENTS = {
     "NPCDialogueBootstrapper",
     "NPCDialogueSmokeValidator",
     "QdrantRAGService",
-    "CogneeMemoryService",
     "FunctionCalling",
     "LLMAgent",
     "LLM",
@@ -281,15 +279,12 @@ def _scenario_insights(smoke_queries: list[dict[str, Any]], scenario: str | None
             strengths.append("Qdrant/NPC retrieval prompt resolves to NPC runtime integration code.")
         if "LLMClient.cs" in path or "LLMUnitySetup.cs" in path:
             strengths.append("LLMUnity/LocalAI prompts resolve to runtime/backend-adjacent scripts.")
-        if "CogneeMemoryService.cs" in path:
-            strengths.append("Memory integration prompt resolves to project-specific Cognee bridge code.")
-
     recommendations: list[str]
     if scenario == "localai-llmunity":
         if not strengths:
             warnings.append("LocalAI + LLMUnity scenario did not surface obvious runtime integration hotspots.")
         recommendations = [
-            "Inspect runtime hits first: LLMClient/LLMUnitySetup/QdrantRAGService/CogneeMemoryService before touching editor utilities.",
+            "Inspect runtime hits first: LLMClient/LLMUnitySetup/QdrantRAGService before touching editor utilities.",
             "Use asmdef boundaries to keep LocalAI backend changes inside Runtime assemblies unless the change is truly editor tooling.",
             "If documentation outranks runtime code for backend prompts, improve summaries or add explicit backend-focused records for those scripts.",
         ]

@@ -395,7 +395,7 @@ def test_audit_project_scene_overlay_reports_localai_transport_and_hotspots(tmp_
     assert scene["transport"]["function_calling_dedicated_agent"] is True
     assert any(hotspot["game_object"] == "NPCDialogueSystem" for hotspot in scene["hotspots"])
     assert any("QdrantRAGService.cs" in path for path in scene["component_paths"])
-    assert any("CogneeMemoryService.cs" in path for path in report["insights"]["candidate_paths"])
+    assert not any("CogneeMemoryService.cs" in path for path in report["insights"]["candidate_paths"])
     assert any("direct LocalAI HTTP" in strength for strength in report["insights"]["strengths"])
     assert report["workflow"]["pre_phase"]["live_scene_required"] is True
     assert "NPCDialogueSystem" in report["workflow"]["pre_phase"]["scene_targets"]

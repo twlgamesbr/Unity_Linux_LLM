@@ -53,13 +53,20 @@ class QdrantStore:
         keyword_fields = [
             "project", "record_type", "path", "unity_region", "asmdef", "namespace",
             "type_name", "member_name", "symbol_kind", "runtime_role", "relation_kind", "source", "target", "using_namespace",
+            "coverage_bucket", "coverage_method_bucket", "coverage_class_name",
         ]
         integer_fields = ["line_start", "line_end", "chunk_index"]
+        float_fields = [
+            "coverage_line_rate", "coverage_method_rate", "coverage_file_line_rate", "coverage_file_method_rate",
+            "coverage_project_line_rate", "coverage_project_method_rate", "coverage_method_line_rate", "coverage_method_crap_score",
+        ]
         text_fields = ["heading"]
         for field in keyword_fields:
             self._create_payload_index(field, "keyword")
         for field in integer_fields:
             self._create_payload_index(field, "integer")
+        for field in float_fields:
+            self._create_payload_index(field, "float")
         for field in text_fields:
             self._create_payload_index(field, "text")
 

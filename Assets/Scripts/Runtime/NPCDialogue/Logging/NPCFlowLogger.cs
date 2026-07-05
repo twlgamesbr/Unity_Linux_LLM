@@ -108,7 +108,8 @@ namespace NPCSystem
             }
 
             var loggerObject = new GameObject("NPCFlowLogger");
-            DontDestroyOnLoad(loggerObject);
+            if (Application.isPlaying)
+                DontDestroyOnLoad(loggerObject);
             _instance = loggerObject.AddComponent<NPCFlowLogger>();
             _instance.ApplyPlatformLoggingOverrides();
             _instance.Log(NPCFlowStage.SceneBootstrap, NPCFlowStatus.Warning, NPCFlowLogLevel.Warning,

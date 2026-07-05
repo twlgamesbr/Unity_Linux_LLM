@@ -19,14 +19,13 @@ SUMMARY_RE = re.compile(r"///\s*<summary>\s*(.*?)\s*</summary>", re.DOTALL)
 _PURPOSE_KW = {
     "Client": "LLM client: handles remote/local LLM requests, completions, tokenization, and embedding tasks over the LocalAI backend",
     "Service": "background service: provides runtime functionality for NPC dialogue systems, LLM integration, and remote backend requests",
-    "Manager": "manager: coordinates NPC dialogue, LLM backend configuration, remote server host/port, Qdrant RAG, and Cognee memory",
+    "Manager": "manager: coordinates NPC dialogue, LLM backend configuration, remote server host/port, and Qdrant-backed retrieval",
     "Agent": "LLM agent: dialogue selector/session agent that routes LLM requests and manages function-calling transport to the remote backend",
     "Setup": "setup: configures LLMUnity connection, backend LocalAI URLs, local model paths, and remote server parameters",
     "Bootstrapper": "bootstrap: initializes NPC dialogue system, auto-selects default NPC, and prewarms LLM and RAG connections",
     "Validator": "validator: smoke-tests NPC dialogue system health, verifies LLM connectivity, RAG backend, and integration checks",
     "RAG": "RAG retrieval: searches vector memory in Qdrant for context-relevant NPC knowledge embeddings and semantic queries",
     "Qdrant": "Qdrant RAG: manages Qdrant vector collections for NPC knowledge, embeddings search, semantic memory, and RAG queries",
-    "Cognee": "Cognee memory: syncs and retrieves long-term NPC dialogue memory via Cognee knowledge graph and RAG embeddings",
 }
 
 
@@ -72,7 +71,6 @@ def _method_end_line(text: str, start: int) -> int:
 
 
 def _extract_summary(text: str, type_start: int, type_name: str) -> str:
-    """Extract the XML doc /// <summary> block that precedes the type declaration."""
     preceding = text[:type_start]
     matches = list(SUMMARY_RE.finditer(preceding))
     if not matches:
@@ -85,7 +83,6 @@ def _extract_summary(text: str, type_start: int, type_name: str) -> str:
 
 
 def _purpose_text(type_name: str, ns: str, region: str, asm_name: str) -> str:
-    """Synthesise a short contextual-purpose line from naming patterns."""
     for keyword, purpose in _PURPOSE_KW.items():
         if keyword.lower() in type_name.lower():
             return purpose

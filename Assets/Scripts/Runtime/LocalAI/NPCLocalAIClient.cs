@@ -8,10 +8,6 @@ using UnityEngine.Networking;
 
 namespace NPCSystem
 {
-    /// <summary>
-    /// Standalone HTTP chat client for LocalAI's /v1/chat/completions endpoint.
-    /// Replaces the LLMUnity LLM + LLMAgent dependency for remote-only use.
-    /// </summary>
     [DefaultExecutionOrder(-1)]
     public class NPCLocalAIClient : MonoBehaviour
     {
@@ -54,47 +50,30 @@ namespace NPCSystem
                 try
                 {
                     string json = JsonUtility.ToJson(payload);
-                    byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+                    string responseJson = await SendChatRequestAsync(uri, json);
 
-                    using (UnityWebRequest request = new UnityWebRequest(uri, "POST"))
+                    if (string.IsNullOrEmpty(responseJson))
                     {
-                        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-                        request.downloadHandler = new DownloadHandlerBuffer();
-                        request.timeout = 60;
-                        request.SetRequestHeader("Content-Type", "application/json");
-                        if (!string.IsNullOrEmpty(apiKey))
-                            request.SetRequestHeader("Authorization", $"Bearer {apiKey}");
-
-                        var operation = request.SendWebRequest();
-                        while (!operation.isDone) await Task.Yield();
-
-                        if (request.result == UnityWebRequest.Result.ConnectionError ||
-                            request.result == UnityWebRequest.Result.ProtocolError)
+                        if (attempt < numRetries)
                         {
-                            Debug.LogError($"[NPCLocalAIClient] Request failed (attempt {attempt + 1}/{numRetries + 1}): {request.error}");
-                            if (attempt < numRetries)
-                            {
-                                await Task.Delay(500 * (attempt + 1));
-                                continue;
-                            }
-                            return string.Empty;
+                            await Task.Delay(500 * (attempt + 1));
+                            continue;
                         }
-
-                        string responseJson = request.downloadHandler.text;
-                        var response = JsonUtility.FromJson<NPCOpenAIChatResponse>(responseJson);
-
-                        if (response?.choices != null && response.choices.Length > 0 && response.choices[0].message != null)
-                        {
-                            string rawContent = response.choices[0].message.content ?? string.Empty;
-                            // Strip <think>...</think> blocks
-                            rawContent = Regex.Replace(rawContent, @"<think>.*?</think>", "",
-                                RegexOptions.Singleline).Trim();
-                            return rawContent;
-                        }
-
-                        Debug.LogError($"[NPCLocalAIClient] Unexpected response format from {uri}");
                         return string.Empty;
                     }
+
+                    var response = JsonUtility.FromJson<NPCOpenAIChatResponse>(responseJson);
+
+                    if (response?.choices != null && response.choices.Length > 0 && response.choices[0].message != null)
+                    {
+                        string rawContent = response.choices[0].message.content ?? string.Empty;
+                        rawContent = Regex.Replace(rawContent, @"<think>.*?</think>", "",
+                            RegexOptions.Singleline).Trim();
+                        return rawContent;
+                    }
+
+                    Debug.LogError($"[NPCLocalAIClient] Unexpected response format from {uri}");
+                    return string.Empty;
                 }
                 catch (Exception ex)
                 {
@@ -108,6 +87,33 @@ namespace NPCSystem
             }
 
             return string.Empty;
+        }
+
+        protected virtual async Task<string> SendChatRequestAsync(string uri, string json)
+        {
+            byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+
+            using (UnityWebRequest request = new UnityWebRequest(uri, "POST"))
+            {
+                request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+                request.downloadHandler = new DownloadHandlerBuffer();
+                request.timeout = 60;
+                request.SetRequestHeader("Content-Type", "application/json");
+                if (!string.IsNullOrEmpty(apiKey))
+                    request.SetRequestHeader("Authorization", $"Bearer {apiKey}");
+
+                var operation = request.SendWebRequest();
+                while (!operation.isDone) await Task.Yield();
+
+                if (request.result == UnityWebRequest.Result.ConnectionError ||
+                    request.result == UnityWebRequest.Result.ProtocolError)
+                {
+                    Debug.LogError($"[NPCLocalAIClient] Request failed: {request.error}");
+                    return null;
+                }
+
+                return request.downloadHandler.text;
+            }
         }
     }
 

@@ -13,6 +13,7 @@ namespace NPCSystem.Tests
         {
             var managerObject = new GameObject(nameof(NPCDialogueManagerTests));
             var manager = managerObject.AddComponent<NPCDialogueManager>();
+            AttachMinimalChatClient(managerObject, manager);
             var profile = CreateProfile("butler", "Butler");
             manager.profiles = new[] { profile };
             manager.persistHistory = false;
@@ -37,10 +38,11 @@ namespace NPCSystem.Tests
         }
 
         [Test]
-        public void SendingBlankMessageRaisesErrorInsteadOfSilentlyReturning()
+        public void SendingBlankMessage_DoesNotRaiseErrorOrStartResponse()
         {
             var managerObject = new GameObject(nameof(NPCDialogueManagerTests));
             var manager = managerObject.AddComponent<NPCDialogueManager>();
+            AttachMinimalChatClient(managerObject, manager);
             var profile = CreateProfile("maid", "Maid");
             manager.profiles = new[] { profile };
             manager.persistHistory = false;
@@ -48,14 +50,18 @@ namespace NPCSystem.Tests
             manager.initializeOnStart = false;
 
             string errorMessage = null;
+            string responseStart = null;
             manager.onError.AddListener(message => errorMessage = message);
+            manager.onResponseStart.AddListener(message => responseStart = message);
 
             try
             {
                 manager.SwitchToNPCAsync("maid").GetAwaiter().GetResult();
                 manager.SendMessage("   ");
 
-                Assert.That(errorMessage, Is.EqualTo("Player message is required."));
+                Assert.That(errorMessage, Is.Null);
+                Assert.That(responseStart, Is.Null);
+                Assert.That(manager.isResponding, Is.False);
             }
             finally
             {
@@ -69,6 +75,7 @@ namespace NPCSystem.Tests
         {
             var managerObject = new GameObject(nameof(NPCDialogueManagerTests));
             var manager = managerObject.AddComponent<NPCDialogueManager>();
+            AttachMinimalChatClient(managerObject, manager);
             manager.profiles = Array.Empty<NPCProfile>();
             manager.persistHistory = false;
             manager.enableRAG = false;
@@ -234,6 +241,7 @@ namespace NPCSystem.Tests
         {
             var managerObject = new GameObject(nameof(NPCDialogueManagerTests));
             var manager = managerObject.AddComponent<NPCDialogueManager>();
+            AttachMinimalChatClient(managerObject, manager);
             var profile = CreateProfile("butler", "Butler");
             profile.historySaveFile = $"NPCDialogue/test_clear{Guid.NewGuid():N}.json";
             manager.profiles = new[] { profile };
@@ -263,6 +271,7 @@ namespace NPCSystem.Tests
         {
             var managerObject = new GameObject(nameof(NPCDialogueManagerTests));
             var manager = managerObject.AddComponent<NPCDialogueManager>();
+            AttachMinimalChatClient(managerObject, manager);
             var profile = CreateProfile("butler", "Butler");
             manager.profiles = new[] { profile };
             manager.persistHistory = true;
@@ -302,6 +311,7 @@ namespace NPCSystem.Tests
         {
             var managerObject = new GameObject(nameof(NPCDialogueManagerTests));
             var manager = managerObject.AddComponent<NPCDialogueManager>();
+            AttachMinimalChatClient(managerObject, manager);
             manager.profiles = Array.Empty<NPCProfile>();
             manager.persistHistory = false;
             manager.enableRAG = false;
@@ -324,6 +334,7 @@ namespace NPCSystem.Tests
         {
             var managerObject = new GameObject(nameof(NPCDialogueManagerTests));
             var manager = managerObject.AddComponent<NPCDialogueManager>();
+            AttachMinimalChatClient(managerObject, manager);
             var profile = CreateProfile("chef", "Chef");
             manager.profiles = new[] { profile };
             manager.persistHistory = false;
@@ -352,6 +363,14 @@ namespace NPCSystem.Tests
             profile.ragResults = 1;
             profile.historySaveFile = $"NPCDialogue/{slug}.json";
             return profile;
+        }
+
+        static void AttachMinimalChatClient(GameObject managerObject, NPCDialogueManager manager)
+        {
+            manager.chatClient = managerObject.AddComponent<NPCLocalAIClient>();
+            manager.chatClient.numRetries = 0;
+            manager.chatClient.host = "127.0.0.1";
+            manager.chatClient.port = 19999;
         }
     }
 }

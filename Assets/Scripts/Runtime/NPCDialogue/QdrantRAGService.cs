@@ -112,7 +112,6 @@ namespace NPCSystem
 
             try
             {
-                // Embed the query using NPCLocalAIEmbedder (HTTP to LocalAI)
                 List<float> queryVector = await embedder.Embeddings(query);
                 if (queryVector == null || queryVector.Count == 0)
                 {
@@ -134,64 +133,51 @@ namespace NPCSystem
                 string jsonRequest = JsonUtility.ToJson(requestBody);
                 string searchEndpoint = $"{qdrantUrl}/collections/{collectionName}/points/search";
 
-                using (UnityWebRequest request = new UnityWebRequest(searchEndpoint, "POST"))
+                string responseText = await SendSearchRequestAsync(searchEndpoint, jsonRequest);
+
+                if (responseText == null)
                 {
-                    byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonRequest);
-                    request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-                    request.downloadHandler = new DownloadHandlerBuffer();
-                    request.SetRequestHeader("Content-Type", "application/json");
-
-                    var operation = request.SendWebRequest();
-                    while (!operation.isDone)
-                    {
-                        await Task.Yield();
-                    }
-
-                    if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
-                    {
-                        NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.QdrantSearch, NPCFlowStatus.Error, NPCFlowLogLevel.Error,
-                            $"Qdrant request failed: {request.error}",
-                            source: nameof(QdrantRAGService), requestId: requestId, npcSlug: npcSlug,
-                            data: new Dictionary<string, object>
-                            {
-                                ["endpoint"] = searchEndpoint,
-                                ["vectorLength"] = queryVector.Count
-                            });
-                        scope.Error(null, $"Qdrant request failed: {request.error}", new Dictionary<string, object>
+                    NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.QdrantSearch, NPCFlowStatus.Error, NPCFlowLogLevel.Error,
+                        "Qdrant request failed.",
+                        source: nameof(QdrantRAGService), requestId: requestId, npcSlug: npcSlug,
+                        data: new Dictionary<string, object>
                         {
                             ["endpoint"] = searchEndpoint,
                             ["vectorLength"] = queryVector.Count
                         });
-                        return string.Empty;
-                    }
-
-                    string responseText = request.downloadHandler.text;
-                    QdrantSearchResponse response = JsonUtility.FromJson<QdrantSearchResponse>(responseText);
-
-                    if (response != null && response.result != null && response.result.Count > 0)
+                    scope.Error(null, "Qdrant request failed.", new Dictionary<string, object>
                     {
-                        List<string> results = new List<string>();
-                        foreach (var point in response.result)
+                        ["endpoint"] = searchEndpoint,
+                        ["vectorLength"] = queryVector.Count
+                    });
+                    return string.Empty;
+                }
+
+                QdrantSearchResponse response = JsonUtility.FromJson<QdrantSearchResponse>(responseText);
+
+                if (response != null && response.result != null && response.result.Count > 0)
+                {
+                    List<string> results = new List<string>();
+                    foreach (var point in response.result)
+                    {
+                        if (point.payload != null && !string.IsNullOrEmpty(point.payload.text))
                         {
-                            if (point.payload != null && !string.IsNullOrEmpty(point.payload.text))
-                            {
-                                results.Add(point.payload.text);
-                            }
+                            results.Add(point.payload.text);
                         }
-                        scope.Success("Qdrant results retrieved.", new Dictionary<string, object>
-                        {
-                            ["resultCount"] = results.Count,
-                            ["vectorLength"] = queryVector.Count,
-                            ["endpoint"] = searchEndpoint
-                        });
-                        return string.Join("\n", results);
                     }
-                    scope.Skipped("Qdrant returned empty.", new Dictionary<string, object>
+                    scope.Success("Qdrant results retrieved.", new Dictionary<string, object>
                     {
+                        ["resultCount"] = results.Count,
                         ["vectorLength"] = queryVector.Count,
                         ["endpoint"] = searchEndpoint
                     });
+                    return string.Join("\n", results);
                 }
+                scope.Skipped("Qdrant returned empty.", new Dictionary<string, object>
+                {
+                    ["vectorLength"] = queryVector.Count,
+                    ["endpoint"] = searchEndpoint
+                });
             }
             catch (Exception e)
             {
@@ -207,6 +193,32 @@ namespace NPCSystem
             }
 
             return string.Empty;
+        }
+
+        protected virtual async Task<string> SendSearchRequestAsync(string endpoint, string json)
+        {
+            byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+
+            using (UnityWebRequest request = new UnityWebRequest(endpoint, "POST"))
+            {
+                request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+                request.downloadHandler = new DownloadHandlerBuffer();
+                request.SetRequestHeader("Content-Type", "application/json");
+
+                var operation = request.SendWebRequest();
+                while (!operation.isDone)
+                {
+                    await Task.Yield();
+                }
+
+                if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
+                {
+                    Debug.LogError($"[QdrantRAGService] Request failed: {request.error}");
+                    return null;
+                }
+
+                return request.downloadHandler.text;
+            }
         }
 
         public bool HasValidQdrantUrl()

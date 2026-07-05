@@ -7,10 +7,6 @@ using UnityEngine.Networking;
 
 namespace NPCSystem
 {
-    /// <summary>
-    /// Standalone HTTP embedding client for LocalAI's /v1/embeddings endpoint.
-    /// Replaces the LLMUnity LLMEmbedder dependency for remote-only use.
-    /// </summary>
     [DefaultExecutionOrder(-2)]
     public class NPCLocalAIEmbedder : MonoBehaviour
     {
@@ -44,43 +40,27 @@ namespace NPCSystem
                     };
 
                     string json = JsonUtility.ToJson(payload);
-                    byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+                    string responseText = await SendEmbeddingRequestAsync(uri, json);
 
-                    using (UnityWebRequest request = new UnityWebRequest(uri, "POST"))
+                    if (string.IsNullOrEmpty(responseText))
                     {
-                        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-                        request.downloadHandler = new DownloadHandlerBuffer();
-                        request.timeout = 30;
-                        request.SetRequestHeader("Content-Type", "application/json");
-                        if (!string.IsNullOrEmpty(apiKey))
-                            request.SetRequestHeader("Authorization", $"Bearer {apiKey}");
-
-                        var operation = request.SendWebRequest();
-                        while (!operation.isDone) await Task.Yield();
-
-                        if (request.result == UnityWebRequest.Result.ConnectionError ||
-                            request.result == UnityWebRequest.Result.ProtocolError)
+                        if (attempt < numRetries)
                         {
-                            Debug.LogError($"[NPCLocalAIEmbedder] Request failed (attempt {attempt + 1}/{numRetries + 1}): {request.error}");
-                            if (attempt < numRetries)
-                            {
-                                await Task.Delay(500 * (attempt + 1));
-                                continue;
-                            }
-                            return new List<float>();
+                            await Task.Delay(500 * (attempt + 1));
+                            continue;
                         }
-
-                        string responseText = request.downloadHandler.text;
-                        var response = JsonUtility.FromJson<LocalAIEmbeddingResponse>(responseText);
-
-                        if (response?.data != null && response.data.Length > 0 && response.data[0].embedding != null)
-                        {
-                            return new List<float>(response.data[0].embedding);
-                        }
-
-                        Debug.LogError($"[NPCLocalAIEmbedder] Unexpected response format from {uri}");
                         return new List<float>();
                     }
+
+                    var response = JsonUtility.FromJson<LocalAIEmbeddingResponse>(responseText);
+
+                    if (response?.data != null && response.data.Length > 0 && response.data[0].embedding != null)
+                    {
+                        return new List<float>(response.data[0].embedding);
+                    }
+
+                    Debug.LogError($"[NPCLocalAIEmbedder] Unexpected response format from {uri}");
+                    return new List<float>();
                 }
                 catch (Exception ex)
                 {
@@ -94,6 +74,33 @@ namespace NPCSystem
             }
 
             return new List<float>();
+        }
+
+        protected virtual async Task<string> SendEmbeddingRequestAsync(string uri, string json)
+        {
+            byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+
+            using (UnityWebRequest request = new UnityWebRequest(uri, "POST"))
+            {
+                request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+                request.downloadHandler = new DownloadHandlerBuffer();
+                request.timeout = 30;
+                request.SetRequestHeader("Content-Type", "application/json");
+                if (!string.IsNullOrEmpty(apiKey))
+                    request.SetRequestHeader("Authorization", $"Bearer {apiKey}");
+
+                var operation = request.SendWebRequest();
+                while (!operation.isDone) await Task.Yield();
+
+                if (request.result == UnityWebRequest.Result.ConnectionError ||
+                    request.result == UnityWebRequest.Result.ProtocolError)
+                {
+                    Debug.LogError($"[NPCLocalAIEmbedder] Request failed: {request.error}");
+                    return null;
+                }
+
+                return request.downloadHandler.text;
+            }
         }
 
         [Serializable]

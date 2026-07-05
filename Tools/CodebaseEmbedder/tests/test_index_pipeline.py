@@ -8,6 +8,45 @@ from codebase_embedder.query import build_query_response, format_query_workflow,
 from codebase_embedder.records import IndexRecord
 
 
+def _write_coverage_report(project_root: Path, class_name: str, relative_path: str) -> None:
+    report_dir = project_root / "CodeCoverage/Report"
+    report_dir.mkdir(parents=True, exist_ok=True)
+    (report_dir / "Summary.json").write_text(
+        json.dumps(
+            {
+                "summary": {
+                    "generatedon": "2026-07-05T16:03:17Z",
+                    "linecoverage": 33.8,
+                    "methodcoverage": 41.2,
+                }
+            }
+        )
+    )
+    html = (
+        "<!DOCTYPE html>\n"
+        "<html><body>\n"
+        "<table>\n"
+        f"<tr><th>Class:</th><td title=\"{class_name}\">{class_name}</td></tr>\n"
+        "<tr><th>Assembly:</th><td title=\"NPCSystem.Runtime\">NPCSystem.Runtime</td></tr>\n"
+        f"<tr><th>File(s):</th><td><a>{project_root / relative_path}</a></td></tr>\n"
+        "</table>\n"
+        "<table>\n"
+        "<tr><th>Covered lines:</th><td title=\"8\">8</td></tr>\n"
+        "<tr><th>Coverable lines:</th><td title=\"10\">10</td></tr>\n"
+        "<tr><th>Total lines:</th><td title=\"14\">14</td></tr>\n"
+        "<tr><th>Line coverage:</th><td title=\"8 of 10\">80.0%</td></tr>\n"
+        "</table>\n"
+        "<table class=\"overview\">\n"
+        "<tbody>\n"
+        "<tr><td title=\"Bar()\"><a href=\"#file0_line1\">Bar()</a></td><td>100%</td><td>1</td><td>1</td><td>100%</td></tr>\n"
+        "<tr><td title=\"Risky()\"><a href=\"#file0_line2\">Risky()</a></td><td>100%</td><td>220</td><td>14</td><td>0%</td></tr>\n"
+        "</tbody>\n"
+        "</table>\n"
+        "</body></html>\n"
+    )
+    (report_dir / "NPCSystem.Runtime_Foo.html").write_text(html)
+
+
 def test_build_index_writes_artifacts(tmp_path: Path):
     (tmp_path / "Assets/Scripts/Runtime").mkdir(parents=True)
     (tmp_path / "Assets/Scripts/Runtime/NPCSystem.Runtime.asmdef").write_text(json.dumps({"name":"NPCSystem.Runtime","rootNamespace":"NPCSystem","references":[]}))
@@ -22,6 +61,30 @@ def test_build_index_writes_artifacts(tmp_path: Path):
     assert (tmp_path / ".codebase-index/chunks.jsonl").exists()
     assert any(r.record_type == "type" and r.payload["type_name"] == "Foo" for r in result.records)
     assert any(r.record_type == "namespace" and r.payload["namespace"] == "NPCSystem" for r in result.records)
+
+
+def test_build_index_enriches_records_with_coverage(tmp_path: Path):
+    (tmp_path / "Assets/Scripts/Runtime").mkdir(parents=True)
+    (tmp_path / "Assets/Scripts/Runtime/NPCSystem.Runtime.asmdef").write_text(
+        json.dumps({"name": "NPCSystem.Runtime", "rootNamespace": "NPCSystem", "references": []})
+    )
+    (tmp_path / "Assets/Scripts/Runtime/Foo.cs").write_text(
+        "namespace NPCSystem { public class Foo { public void Bar() {} public void Risky() {} } }"
+    )
+    (tmp_path / "Packages").mkdir()
+    (tmp_path / "Packages/manifest.json").write_text(json.dumps({"dependencies": {"com.unity.test-framework": "1.7.0"}}))
+    _write_coverage_report(tmp_path, "NPCSystem.Foo", "Assets/Scripts/Runtime/Foo.cs")
+
+    result = build_index(CodebaseEmbedderConfig(project_root=tmp_path), write_artifacts=True)
+
+    type_record = next(record for record in result.records if record.record_type == "type" and record.payload["type_name"] == "Foo")
+    coverage_record = next(record for record in result.records if record.record_type == "coverage_summary")
+
+    assert type_record.payload["coverage_line_rate"] == 80.0
+    assert type_record.payload["coverage_method_rate"] == 50.0
+    assert type_record.payload["coverage_bucket"] == "high"
+    assert coverage_record.payload["coverage_hotspot_methods"] == ["NPCSystem.Foo.Risky"]
+    assert result.counts["coverage_classes"] == 1
 
 
 def test_structural_query_prefers_namespace_records(tmp_path: Path):
@@ -41,6 +104,26 @@ def test_structural_query_prefers_namespace_records(tmp_path: Path):
 
     assert results
     assert results[0]["payload"]["record_type"] in {"namespace", "using_directive", "file_overview", "assembly", "relation"}
+
+
+def test_coverage_query_prefers_coverage_summary_records(tmp_path: Path):
+    (tmp_path / "Assets/Scripts/Runtime").mkdir(parents=True)
+    (tmp_path / "Assets/Scripts/Runtime/NPCSystem.Runtime.asmdef").write_text(
+        json.dumps({"name": "NPCSystem.Runtime", "rootNamespace": "NPCSystem", "references": []})
+    )
+    (tmp_path / "Assets/Scripts/Runtime/Foo.cs").write_text(
+        "namespace NPCSystem { public class Foo { public void Bar() {} public void Risky() {} } }"
+    )
+    (tmp_path / "Packages").mkdir()
+    (tmp_path / "Packages/manifest.json").write_text(json.dumps({"dependencies": {"com.unity.test-framework": "1.7.0"}}))
+    _write_coverage_report(tmp_path, "NPCSystem.Foo", "Assets/Scripts/Runtime/Foo.cs")
+
+    cfg = CodebaseEmbedderConfig(project_root=tmp_path)
+    build_index(cfg, write_artifacts=True)
+    results = lexical_query(cfg, "what coverage hotspots exist for foo", limit=3)
+
+    assert results
+    assert results[0]["payload"]["record_type"] == "coverage_summary"
 
 
 def test_index_record_point_id_is_stable_across_content_changes():
