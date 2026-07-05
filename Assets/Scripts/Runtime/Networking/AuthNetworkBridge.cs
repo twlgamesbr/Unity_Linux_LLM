@@ -28,9 +28,7 @@ namespace NPCSystem
         [Title("Auth Network Bridge")]
         [HelpBox("Bridges client-side auth success into NGO startup and player-name replication. This component owns login-to-spawn transition, not backend dialogue generation.", MessageMode.Log, drawAbove: true)]
         [Header("References")]
-#if !UNITY_SERVER
         public AuthUIController authController;
-#endif
         public NPCNetworkBootstrap networkBootstrap;
 
         [Header("Mode")]

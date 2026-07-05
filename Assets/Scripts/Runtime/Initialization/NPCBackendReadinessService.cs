@@ -45,7 +45,7 @@ namespace NPCSystem
         [SerializeField] float requestTimeoutSeconds = 5f;
         [SerializeField] bool requireAuthBackend = true;
         [SerializeField] bool requireLocalAiBackend = true;
-        [SerializeField] bool failInitializationOnRequiredBackendFailure = true;
+        [SerializeField] bool failInitializationOnRequiredBackendFailure = false;
 
         [Header("Runtime Diagnostics")]
         [SerializeField, ReadOnly] string lastReadinessStatus = "Not checked.";

@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
-#if !UNITY_SERVER
 using UnityEngine.InputSystem;
-#endif
 
 namespace NPCSystem
 {
@@ -24,10 +22,8 @@ namespace NPCSystem
         public CharacterController characterController;
         public Animator animator;
         public Transform cameraFollowTarget;
-#if !UNITY_SERVER
         public PlayerInput playerInput;
         public InputActionAsset inputActions;
-#endif
         public string actionMapName = "Player";
         public string moveActionName = "Move";
         public string lookActionName = "Look";

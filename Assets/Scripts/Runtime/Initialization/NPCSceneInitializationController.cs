@@ -46,7 +46,7 @@ namespace NPCSystem
         public bool configureNetworkTransport = false;
         [Tooltip("If true, initializes the dialogue manager immediately during scene start. Set to false to delay initialization until after player login (recommended for WebGL memory-smart start).")]
         public bool initializeDialogueManager = false;
-        public bool verifyBackendsDuringInitialization = true;
+        public bool verifyBackendsDuringInitialization = false;
         public bool initializeNetworkBridge = true;
         public bool validateAfterInitialization = true;
         public bool startNetworkingAfterInitialization = false;
@@ -209,11 +209,20 @@ namespace NPCSystem
             }
             catch (Exception ex)
             {
-                scope.Error(ex, "Scene initialization phase failed.", new Dictionary<string, object>
+                logger.Log(NPCFlowStage.SceneBootstrap,
+                    NPCFlowStatus.Error,
+                    NPCFlowLogLevel.Warning,
+                    $"Scene initialization phase {phase} failed: {ex.Message}",
+                    source: nameof(NPCSceneInitializationController),
+                    data: new Dictionary<string, object>
+                    {
+                        ["phase"] = phase.ToString(),
+                        ["exception"] = ex.ToString()
+                    });
+                scope.Warning($"Scene initialization phase {phase} failed: {ex.Message}", new Dictionary<string, object>
                 {
                     ["phase"] = phase.ToString()
                 });
-                throw;
             }
         }
 

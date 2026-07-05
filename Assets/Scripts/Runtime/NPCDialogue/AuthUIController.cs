@@ -1,4 +1,3 @@
-#if !UNITY_SERVER
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -420,4 +419,3 @@ namespace NPCSystem
         }
     }
 }
-#endif // !UNITY_SERVER
