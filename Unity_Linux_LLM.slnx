@@ -46,6 +46,7 @@
   <Project Path="Unity.Scenes.csproj" />
   <Project Path="Unity.2D.Animation.Editor.csproj" />
   <Project Path="Unity.Entities.Editor.csproj" />
+  <Project Path="Unity.RenderPipelines.Universal.Editor.Tests.csproj" />
   <Project Path="Unity.Searcher.Editor.csproj" />
   <Project Path="Unity.InternalAPIEngineBridge.002.csproj" />
   <Project Path="Unity.Multiplayer.Tools.MetricTypes.csproj" />
@@ -135,6 +136,7 @@
   <Project Path="UnityEditor.UI.Analytics.csproj" />
   <Project Path="Unity.PathTracing.Runtime.csproj" />
   <Project Path="Unity.Entities.UI.csproj" />
+  <Project Path="Unity.Settings.Example.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />
   <Project Path="Unity.2D.Common.Runtime.csproj" />
   <Project Path="Unity.Multiplayer.Tools.NetworkSolutionInterface.csproj" />
@@ -157,6 +159,7 @@
   <Project Path="Unity.Multiplayer.Tools.MetricEvents.csproj" />
   <Project Path="Unity.DedicatedServer.MultiplayerRoles.csproj" />
   <Project Path="Unity.EditorCoroutines.Editor.csproj" />
+  <Project Path="Unity.RenderPipelines.Universal.Runtime.Tests.csproj" />
   <Project Path="Unity.SurfaceCache.Runtime.csproj" />
   <Project Path="Unity.Multiplayer.Tools.NetStatsMonitor.Interface.Tests.Editor.csproj" />
   <Project Path="Unity.DedicatedServer.MultiplayerRoles.Editor.csproj" />

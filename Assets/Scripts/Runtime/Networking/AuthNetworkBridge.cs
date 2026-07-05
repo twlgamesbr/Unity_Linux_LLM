@@ -190,6 +190,7 @@ namespace NPCSystem
             lastBridgeStatus = $"Auth success for {_authenticatedPlayerName}; resolved mode {resolvedMode}.";
 
             // Initialize dialogue UI and backend system on demand to be memory smart!
+#if !UNITY_SERVER
             var uiController = FindAnyObjectByType<NPCDialogueUIController>(FindObjectsInactive.Include);
             if (uiController != null)
             {
@@ -205,6 +206,7 @@ namespace NPCSystem
                 await uiController.InitializeOnDemandAsync();
             }
             else
+#endif
             {
                 // Headless fallback
                 var bootstrapper = FindAnyObjectByType<NPCDialogueBootstrapper>(FindObjectsInactive.Include);
@@ -382,7 +384,7 @@ namespace NPCSystem
 
         // ── Client mode ───────────────────────────────────────────
 
-        async void StartClientAndRegisterPlayerName()
+        void StartClientAndRegisterPlayerName()
         {
             if (networkBootstrap == null)
             {

@@ -101,20 +101,20 @@ namespace NPCSystem
             }
         }
 
-        public async Task<bool> LoadFile(string filePath)
+        public Task<bool> LoadFile(string filePath)
         {
             try
             {
                 string path = ResolveAssetPath(filePath);
-                if (!File.Exists(path)) return false;
+                if (!File.Exists(path)) return Task.FromResult(false);
                 NPCArchiveSaver.Load(path, Load);
             }
             catch (Exception e)
             {
                 Debug.LogError($"[NPC] File {filePath} could not be loaded: {e.GetType()}: {e.Message}");
-                return false;
+                return Task.FromResult(false);
             }
-            return true;
+            return Task.FromResult(true);
         }
 
         public static string ResolveAssetPath(string relativePath)

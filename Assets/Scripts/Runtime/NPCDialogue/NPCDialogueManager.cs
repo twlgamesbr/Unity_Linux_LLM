@@ -654,17 +654,18 @@ namespace NPCSystem
             return basePrompt;
         }
 
-        async Task AppendConversationAsync(NPCProfile profile, string playerMessage, string response)
+        Task AppendConversationAsync(NPCProfile profile, string playerMessage, string response)
         {
-            if (profile == null) return;
+            if (profile == null) return Task.CompletedTask;
 
-            if (!persistHistory) return;
+            if (!persistHistory) return Task.CompletedTask;
 
             List<DialogueEntry> history = GetOrCreateHistory(profile);
             history.Add(new DialogueEntry("user", playerMessage));
             history.Add(new DialogueEntry("assistant", response));
             TrimHistory(history);
             NPCHistoryStore.Save(profile.GetHistorySaveFile(), history);
+            return Task.CompletedTask;
         }
 
         List<DialogueEntry> GetOrCreateHistory(NPCProfile profile)
