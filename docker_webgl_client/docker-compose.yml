@@ -2,7 +2,7 @@ services:
   npc-server:
     build:
       context: ..
-      dockerfile: docker/Dockerfile
+      dockerfile: docker_webgl_client/Dockerfile
     container_name: npc-dedicated-server
     # Host networking: the server sees localhost as the host machine,
     # so it can reach LocalAI (8080, 11435), Qdrant (6333), and
@@ -15,7 +15,7 @@ services:
     # Bind-mount the server build so you can iterate without rebuilding.
     # Read-write: Unity needs to write to _Data/ for logs and config.
     volumes:
-      - ../Builds/ServerWS:/server
+      - ../Builds/Server:/server
     restart: unless-stopped
     stop_grace_period: 30s
     logging:

@@ -142,14 +142,15 @@ public static class NPCDialogueBuild
         PlayerSettings.SetManagedStrippingLevel(target, ManagedStrippingLevel.High);
         PlayerSettings.stripUnusedMeshComponents = true;
 
-        PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Brotli;
+        PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Disabled;
         PlayerSettings.WebGL.dataCaching = true;
         PlayerSettings.WebGL.debugSymbolMode = WebGLDebugSymbolMode.Off;
         PlayerSettings.WebGL.exceptionSupport = WebGLExceptionSupport.None;
         PlayerSettings.WebGL.maximumMemorySize = 4096;
         UnityEditor.WebGL.UserBuildSettings.codeOptimization = UnityEditor.WebGL.WasmCodeOptimization.DiskSizeLTO;
 
-        Debug.Log("[NPCBuild] Applied WebGL release settings: development off, profiler off, Brotli on, debug symbols off, exception support off, max memory 4096 MB.");
+        Debug.Log("[NPCBuild] Applied WebGL release settings: development off, profiler off, compression off, debug symbols off, exception support off, max memory 4096 MB.");
+
     }
 
     static void EnsureLinuxDockerReadableArtifacts(string outputPath, bool buildSucceeded)

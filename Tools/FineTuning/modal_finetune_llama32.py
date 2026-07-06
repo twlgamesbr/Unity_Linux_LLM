@@ -1,15 +1,16 @@
 import json
 import pathlib
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Optional
 
 import modal
 
-app = modal.App("npc-codebase-finetune")
+app = modal.App("npc-llama32-finetune")
 
 train_image = (
     modal.Image.debian_slim(python_version="3.11")
+    .apt_install("git", "cmake", "build-essential")
     .uv_pip_install(
         "accelerate==1.9.0",
         "datasets==3.6.0",
@@ -37,47 +38,51 @@ with train_image.imports():
 model_cache_volume = modal.Volume.from_name("unsloth-model-cache", create_if_missing=True)
 dataset_cache_volume = modal.Volume.from_name("unsloth-dataset-cache", create_if_missing=True)
 checkpoint_volume = modal.Volume.from_name("unsloth-checkpoints", create_if_missing=True)
+gguf_volume = modal.Volume.from_name("unsloth-gguf", create_if_missing=True)
 
 GPU_TYPE = "A100-40GB"
 TIMEOUT_HOURS = 6
 MAX_RETRIES = 3
 
 LORA_TARGET_MODULES = [
-    "q_proj", "k_proj", "v_proj", "o_proj",
+    "q_proj", "v_proj", "o_proj",
     "gate_proj", "up_proj", "down_proj",
 ]
 
 
 @dataclass
 class TrainingConfig:
-    model_name: str
-    dataset_path: str
-    max_seq_length: int
-    load_in_4bit: bool
-    load_in_8bit: bool
+    model_name: str = "unsloth/Llama-3.2-3B-Instruct"
+    dataset_path: str = "/dataset_cache/npc-codebase-qa.jsonl"
+    max_seq_length: int = 8192
+    load_in_4bit: bool = True
+    load_in_8bit: bool = False
 
-    lora_r: int
-    lora_alpha: int
-    lora_dropout: float
-    lora_bias: str
-    use_rslora: bool
+    lora_r: int = 32
+    lora_alpha: int = 32
+    lora_dropout: float = 0.0
+    lora_bias: str = "none"
+    use_rslora: bool = True
 
-    optim: str
-    batch_size: int
-    gradient_accumulation_steps: int
-    packing: bool
-    use_gradient_checkpointing: str
-    learning_rate: float
-    lr_scheduler_type: str
-    warmup_ratio: float
-    weight_decay: float
-    max_steps: int
-    save_steps: int
-    eval_steps: int
-    logging_steps: int
+    optim: str = "adamw_8bit"
+    batch_size: int = 8
+    gradient_accumulation_steps: int = 1
+    packing: bool = False
+    use_gradient_checkpointing: str = "unsloth"
+    learning_rate: float = 8e-5
+    lr_scheduler_type: str = "cosine"
+    warmup_ratio: float = 0.06
+    weight_decay: float = 0.02
+    max_grad_norm: float = 1.0
+    max_steps: int = 2000
+    save_steps: int = 250
+    eval_steps: int = 250
+    logging_steps: int = 10
 
-    seed: int
+    seed: int = 42
     experiment_name: Optional[str] = None
+
+    gguf_quant: str = "q4_k_m"
 
     def __post_init__(self):
         if self.experiment_name is None:
@@ -126,6 +131,7 @@ def load_custom_dataset(jsonl_path: pathlib.Path, tokenizer, max_samples: int = 
         "/model_cache": model_cache_volume,
         "/dataset_cache": dataset_cache_volume,
         "/checkpoints": checkpoint_volume,
+        "/gguf": gguf_volume,
     },
     timeout=TIMEOUT_HOURS * 60 * 60,
     retries=modal.Retries(initial_delay=0.0, max_retries=MAX_RETRIES),
@@ -181,6 +187,7 @@ def finetune(config: TrainingConfig):
         bf16=torch.cuda.is_bf16_supported(),
         optim=config.optim,
         weight_decay=config.weight_decay,
+        max_grad_norm=config.max_grad_norm,
         lr_scheduler_type=config.lr_scheduler_type,
         output_dir=output_dir,
         report_to=None,
@@ -209,11 +216,17 @@ def finetune(config: TrainingConfig):
     final_path = exp_dir / "final_model"
     model.save_pretrained(final_path)
     tokenizer.save_pretrained(final_path)
-    print(f"Model saved to {final_path}")
+    print(f"LoRA adapter saved to {final_path}")
 
     merge_path = exp_dir / "merged_model"
     print(f"Merging LoRA weights to {merge_path}...")
     merged = model.merge_and_unload()
+    for name, param in merged.named_parameters():
+        if param.numel() > 0:
+            max_v = param.data.abs().max().item()
+            if max_v > 60000:
+                print(f"  WARNING {name}: max={max_v:.2f} — clipping to f16 range")
+                param.data.clamp_(-64000, 64000)
     merged.save_pretrained(merge_path)
     tokenizer.save_pretrained(merge_path)
     print(f"Merged model saved to {merge_path}")
@@ -221,64 +234,36 @@ def finetune(config: TrainingConfig):
     for pth in [final_path, merge_path]:
         (pth / "model_id.txt").write_text(config.model_name)
 
-    checkpoint_volume.commit()
-    print(f"Checkpoint volume committed")
-
-    return str(merge_path)
-
-
-@app.function(
-    image=train_image,
-    gpu=GPU_TYPE,
-    volumes={
-        "/model_cache": model_cache_volume,
-        "/checkpoints": checkpoint_volume,
-    },
-    timeout=30 * 60,
-    retries=modal.Retries(initial_delay=0.0, max_retries=2),
-    single_use_containers=True,
-)
-def merge_lora(experiment_name: str, model_name: str = "unsloth/Qwen3-8B"):
-    exp_dir = pathlib.Path("/checkpoints") / "experiments" / experiment_name
-    final_path = exp_dir / "final_model"
-    merge_path = exp_dir / "merged_model"
-
-    if not final_path.exists():
-        print(f"final_model not found at {final_path}")
-        return
-
-    if merge_path.exists():
-        # Check if actual weight files exist (not just config/tmp)
-        safetensors = list(merge_path.glob("*.safetensors"))
-        if safetensors:
-            print(f"merged_model already exists at {merge_path} with weights, skipping")
-            return
-        print(f"merged_model directory found but no weights, re-merging")
-
-    print(f"Loading base model: {model_name}")
-    model, tokenizer = FastLanguageModel.from_pretrained(
-        model_name=model_name,
-        max_seq_length=8192,
-        dtype=None,
-        load_in_4bit=True,
+    gguf_dir = pathlib.Path("/gguf") / config.experiment_name
+    gguf_dir.mkdir(parents=True, exist_ok=True)
+    print(f"Exporting to GGUF ({config.gguf_quant}) at {gguf_dir}...")
+    merged.save_pretrained_gguf(
+        str(gguf_dir),
+        tokenizer,
+        quantization_method=config.gguf_quant,
     )
+    print(f"GGUF export complete")
 
-    print(f"Loading LoRA adapter from {final_path}")
-    model = peft.PeftModel.from_pretrained(model, str(final_path))
-    model = model.merge_and_unload()
-
-    print(f"Saving merged model to {merge_path}")
-    model.save_pretrained(merge_path)
-    tokenizer.save_pretrained(merge_path)
-    (merge_path / "model_id.txt").write_text(model_name)
+    gguf_files = list(gguf_dir.glob("*.gguf"))
+    for f in gguf_files:
+        size_gb = f.stat().st_size / (1024**3)
+        print(f"  GGUF: {f.name} ({size_gb:.2f} GB)")
 
     checkpoint_volume.commit()
-    print(f"Merged model saved and volume committed")
+    gguf_volume.commit()
+    print(f"Volumes committed")
+
+    return {
+        "experiment": config.experiment_name,
+        "merge_path": str(merge_path),
+        "gguf_dir": str(gguf_dir),
+        "gguf_files": [str(f) for f in gguf_files],
+    }
 
 
 @app.local_entrypoint()
 def main(
-    model_name: str = "unsloth/Qwen3-8B",
+    model_name: str = "unsloth/Llama-3.2-3B-Instruct",
     dataset_path: str = "/dataset_cache/npc-codebase-qa.jsonl",
     max_seq_length: int = 8192,
     load_in_4bit: bool = True,
@@ -287,22 +272,23 @@ def main(
     lora_alpha: int = 32,
     lora_dropout: float = 0.0,
     lora_bias: str = "none",
-    use_rslora: bool = False,
+    use_rslora: bool = True,
     optim: str = "adamw_8bit",
     batch_size: int = 8,
     gradient_accumulation_steps: int = 1,
     packing: bool = False,
     use_gradient_checkpointing: str = "unsloth",
-    learning_rate: float = 2e-4,
+    learning_rate: float = 8e-5,
     lr_scheduler_type: str = "cosine",
     warmup_ratio: float = 0.06,
-    weight_decay: float = 0.01,
-    max_steps: int = 1500,
-    save_steps: int = 200,
-    eval_steps: int = 200,
+    weight_decay: float = 0.02,
+    max_steps: int = 2000,
+    save_steps: int = 250,
+    eval_steps: int = 250,
     logging_steps: int = 10,
     seed: int = 42,
     experiment_name: Optional[str] = None,
+    gguf_quant: str = "q4_k_m",
 ):
     config = TrainingConfig(
         model_name=model_name,
@@ -330,13 +316,18 @@ def main(
         logging_steps=logging_steps,
         seed=seed,
         experiment_name=experiment_name,
+        gguf_quant=gguf_quant,
     )
 
     print(f"Experiment: {config.experiment_name}")
     print(f"Model: {config.model_name}")
     print(f"LoRA: r={config.lora_r}, alpha={config.lora_alpha}")
+    print(f"GGUF quant: {config.gguf_quant}")
     print(f"Effective batch size: {config.batch_size * config.gradient_accumulation_steps}")
     print(f"Max steps: {config.max_steps}")
 
-    result_path = finetune.remote(config)
-    print(f"Training complete. Merged model at: {result_path}")
+    result = finetune.remote(config)
+    print(f"\nResults:")
+    print(f"  Experiment: {result['experiment']}")
+    print(f"  GGUF files: {result['gguf_files']}")
+    print(f"\nTo download GGUF: modal volume get unsloth-gguf {result['experiment']}/ <local_dir>")

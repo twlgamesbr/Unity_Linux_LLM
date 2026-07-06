@@ -46,7 +46,7 @@ RUN chmod +x /server/*.x86_64 2>/dev/null; chown -R npc:npc /server/; true
 # --- Stage: runtime (switch to npc user) ---
 FROM base AS runtime
 
-COPY --chmod=755 docker/entrypoint.sh /entrypoint.sh
+COPY --chmod=755 docker_webgl_client/entrypoint.sh /entrypoint.sh
 
 # Copy server files from the build stage (with correct ownership)
 COPY --from=with-build --chown=npc:npc /server /server
