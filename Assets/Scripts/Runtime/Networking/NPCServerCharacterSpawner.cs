@@ -9,7 +9,11 @@ namespace NPCSystem
     public sealed class NPCServerCharacterSpawner : MonoBehaviour
     {
         [Title("NPC Server Character Spawner")]
-        [HelpBox("Server-authoritative spawner for visible NPC network characters. Registers the prefab on all instances via NPCNetworkBootstrap, then the server instantiates one spawned character per configured NPC profile.", MessageMode.Log, drawAbove: true)]
+        [HelpBox(
+            "Server-authoritative spawner for visible NPC network characters. Registers the prefab on all instances via NPCNetworkBootstrap, then the server instantiates one spawned character per configured NPC profile.",
+            MessageMode.Log,
+            drawAbove: true
+        )]
         [Header("References")]
         public NetworkManager networkManager;
         public NPCNetworkBootstrap networkBootstrap;
@@ -24,8 +28,11 @@ namespace NPCSystem
         public bool clearExistingNpcCharactersBeforeSpawn = true;
 
         [Header("Diagnostics")]
-        [SerializeField, ReadOnly] string lastSpawnStatus = "Idle";
-        [SerializeField, ReadOnly] int lastSpawnedCount;
+        [SerializeField, ReadOnly]
+        string lastSpawnStatus = "Idle";
+
+        [SerializeField, ReadOnly]
+        int lastSpawnedCount;
 
         bool _callbacksRegistered;
 
@@ -64,25 +71,50 @@ namespace NPCSystem
             if (networkManager == null || !networkManager.IsServer)
             {
                 lastSpawnStatus = "Spawn skipped because this instance is not the server.";
-                NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.NpcSpawn, NPCFlowStatus.Skipped, NPCFlowLogLevel.Warning,
-                    lastSpawnStatus, source: nameof(NPCServerCharacterSpawner));
+                NPCFlowLogger
+                    .FindOrCreate()
+                    ?.Log(
+                        NPCFlowStage.NpcSpawn,
+                        NPCFlowStatus.Skipped,
+                        NPCFlowLogLevel.Warning,
+                        lastSpawnStatus,
+                        source: nameof(NPCServerCharacterSpawner)
+                    );
                 return;
             }
 
             if (npcPrefab == null)
             {
-                lastSpawnStatus = $"NPC prefab could not be loaded from Resources/{npcPrefabResourcesPath}.";
-                NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.NpcSpawn, NPCFlowStatus.Error, NPCFlowLogLevel.Error,
-                    lastSpawnStatus, source: nameof(NPCServerCharacterSpawner));
+                lastSpawnStatus =
+                    $"NPC prefab could not be loaded from Resources/{npcPrefabResourcesPath}.";
+                NPCFlowLogger
+                    .FindOrCreate()
+                    ?.Log(
+                        NPCFlowStage.NpcSpawn,
+                        NPCFlowStatus.Error,
+                        NPCFlowLogLevel.Error,
+                        lastSpawnStatus,
+                        source: nameof(NPCServerCharacterSpawner)
+                    );
                 return;
             }
 
-            NPCProfile[] profiles = dialogueManager == null ? System.Array.Empty<NPCProfile>() : dialogueManager.Profiles;
+            NPCProfile[] profiles =
+                dialogueManager == null
+                    ? System.Array.Empty<NPCProfile>()
+                    : dialogueManager.Profiles;
             if (profiles.Length == 0)
             {
                 lastSpawnStatus = "No NPC profiles are configured on the dialogue manager.";
-                NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.NpcSpawn, NPCFlowStatus.Warning, NPCFlowLogLevel.Warning,
-                    lastSpawnStatus, source: nameof(NPCServerCharacterSpawner));
+                NPCFlowLogger
+                    .FindOrCreate()
+                    ?.Log(
+                        NPCFlowStage.NpcSpawn,
+                        NPCFlowStatus.Warning,
+                        NPCFlowLogLevel.Warning,
+                        lastSpawnStatus,
+                        source: nameof(NPCServerCharacterSpawner)
+                    );
                 return;
             }
 
@@ -100,13 +132,25 @@ namespace NPCSystem
                     continue;
                 }
 
-                GameObject instance = Instantiate(npcPrefab, GetSpawnPosition(i), Quaternion.identity);
+                GameObject instance = Instantiate(
+                    npcPrefab,
+                    GetSpawnPosition(i),
+                    Quaternion.identity
+                );
                 if (!instance.TryGetComponent<NetworkObject>(out NetworkObject networkObject))
                 {
                     Destroy(instance);
-                    lastSpawnStatus = $"Spawned prefab '{npcPrefab.name}' is missing a NetworkObject.";
-                    NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.NpcSpawn, NPCFlowStatus.Error, NPCFlowLogLevel.Error,
-                        lastSpawnStatus, source: nameof(NPCServerCharacterSpawner));
+                    lastSpawnStatus =
+                        $"Spawned prefab '{npcPrefab.name}' is missing a NetworkObject.";
+                    NPCFlowLogger
+                        .FindOrCreate()
+                        ?.Log(
+                            NPCFlowStage.NpcSpawn,
+                            NPCFlowStatus.Error,
+                            NPCFlowLogLevel.Error,
+                            lastSpawnStatus,
+                            source: nameof(NPCServerCharacterSpawner)
+                        );
                     return;
                 }
 
@@ -121,13 +165,16 @@ namespace NPCSystem
             }
 
             lastSpawnStatus = $"Spawned {lastSpawnedCount} server NPC character(s).";
-            NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.NpcSpawn, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
-                lastSpawnStatus,
-                source: nameof(NPCServerCharacterSpawner),
-                data: new Dictionary<string, object>
-                {
-                    ["spawnedCount"] = lastSpawnedCount
-                });
+            NPCFlowLogger
+                .FindOrCreate()
+                ?.Log(
+                    NPCFlowStage.NpcSpawn,
+                    NPCFlowStatus.Success,
+                    NPCFlowLogLevel.Info,
+                    lastSpawnStatus,
+                    source: nameof(NPCServerCharacterSpawner),
+                    data: new Dictionary<string, object> { ["spawnedCount"] = lastSpawnedCount }
+                );
         }
 
         void ResolveReferences()
@@ -139,12 +186,16 @@ namespace NPCSystem
 
             if (networkBootstrap == null)
             {
-                networkBootstrap = FindAnyObjectByType<NPCNetworkBootstrap>(FindObjectsInactive.Include);
+                networkBootstrap = FindAnyObjectByType<NPCNetworkBootstrap>(
+                    FindObjectsInactive.Include
+                );
             }
 
             if (dialogueManager == null)
             {
-                dialogueManager = FindAnyObjectByType<NPCDialogueManager>(FindObjectsInactive.Include);
+                dialogueManager = FindAnyObjectByType<NPCDialogueManager>(
+                    FindObjectsInactive.Include
+                );
             }
 
             if (npcPrefab == null && !string.IsNullOrWhiteSpace(npcPrefabResourcesPath))
@@ -182,7 +233,9 @@ namespace NPCSystem
 
         void ClearExistingNpcCharacters()
         {
-            NPCServerCharacter[] characters = FindObjectsByType<NPCServerCharacter>(FindObjectsInactive.Include);
+            NPCServerCharacter[] characters = FindObjectsByType<NPCServerCharacter>(
+                FindObjectsInactive.Include
+            );
             foreach (NPCServerCharacter character in characters)
             {
                 if (character == null)

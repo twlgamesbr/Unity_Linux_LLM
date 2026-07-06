@@ -22,7 +22,8 @@ namespace NPCSystem
         public UnityEvent<string> onResponseUpdated = new UnityEvent<string>();
         public UnityEvent<string, string> onResponseComplete = new UnityEvent<string, string>();
         public UnityEvent<string> onError = new UnityEvent<string>();
-        public UnityEvent<NPCNotebookStateMessage> onNotebookStateChanged = new UnityEvent<NPCNotebookStateMessage>();
+        public UnityEvent<NPCNotebookStateMessage> onNotebookStateChanged =
+            new UnityEvent<NPCNotebookStateMessage>();
 
         ulong? _activeClientId;
         string _activeRequestId = string.Empty;
@@ -30,10 +31,16 @@ namespace NPCSystem
         NPCNotebookStateMessage _currentNotebookState;
         bool _eventsBound;
         bool _disconnectCallbackRegistered;
-        readonly Queue<PendingDialogueRequest> _pendingRequests = new Queue<PendingDialogueRequest>();
-        Dictionary<string, List<DialogueEntry>> _baselineHistorySnapshot = new Dictionary<string, List<DialogueEntry>>(StringComparer.OrdinalIgnoreCase);
+        readonly Queue<PendingDialogueRequest> _pendingRequests =
+            new Queue<PendingDialogueRequest>();
+        Dictionary<string, List<DialogueEntry>> _baselineHistorySnapshot = new Dictionary<
+            string,
+            List<DialogueEntry>
+        >(StringComparer.OrdinalIgnoreCase);
         NPCEvidenceStateSnapshot _baselineEvidenceSnapshot = new NPCEvidenceStateSnapshot();
-        [SerializeField] string lastRoutingStatus = "Idle";
+
+        [SerializeField]
+        string lastRoutingStatus = "Idle";
 
         class PendingDialogueRequest
         {
@@ -41,12 +48,21 @@ namespace NPCSystem
             public NPCDialogueRequestMessage request;
         }
 
-        public NPCProfile[] Profiles => dialogueManager == null ? Array.Empty<NPCProfile>() : dialogueManager.Profiles;
+        public NPCProfile[] Profiles =>
+            dialogueManager == null ? Array.Empty<NPCProfile>() : dialogueManager.Profiles;
         public NPCProfile currentProfile
         {
             get
             {
-                if (dialogueManager != null && (!Application.isPlaying || NetworkManager == null || !NetworkManager.IsListening || IsServer))
+                if (
+                    dialogueManager != null
+                    && (
+                        !Application.isPlaying
+                        || NetworkManager == null
+                        || !NetworkManager.IsListening
+                        || IsServer
+                    )
+                )
                 {
                     return dialogueManager.currentProfile;
                 }
@@ -58,7 +74,8 @@ namespace NPCSystem
         public bool isResponding => dialogueManager != null && dialogueManager.isResponding;
         public NPCNotebookStateMessage CurrentNotebookState => _currentNotebookState;
 
-        string ActiveClientPreview => _activeClientId.HasValue ? _activeClientId.Value.ToString() : "<none>";
+        string ActiveClientPreview =>
+            _activeClientId.HasValue ? _activeClientId.Value.ToString() : "<none>";
 
         int PendingRequestCount => _pendingRequests.Count;
 
@@ -121,11 +138,19 @@ namespace NPCSystem
 
             _localSelectedNpcSlug = selection.npcSlug;
 
-            if (!Application.isPlaying || NetworkManager == null || !NetworkManager.IsListening || IsServer)
+            if (
+                !Application.isPlaying
+                || NetworkManager == null
+                || !NetworkManager.IsListening
+                || IsServer
+            )
             {
                 if (sessionManager != null && NetworkManager != null)
                 {
-                    sessionManager.SetSelectedNpcSlug(NetworkManager.LocalClientId, selection.npcSlug);
+                    sessionManager.SetSelectedNpcSlug(
+                        NetworkManager.LocalClientId,
+                        selection.npcSlug
+                    );
                 }
 
                 if (dialogueManager != null)
@@ -146,8 +171,9 @@ namespace NPCSystem
             var request = new NPCDialogueRequestMessage
             {
                 requestId = Guid.NewGuid().ToString("N"),
-                npcSlug = currentProfile != null ? currentProfile.GetNpcSlug() : _localSelectedNpcSlug,
-                playerMessage = playerMessage
+                npcSlug =
+                    currentProfile != null ? currentProfile.GetNpcSlug() : _localSelectedNpcSlug,
+                playerMessage = playerMessage,
             };
             request.SanitizeInPlace();
 
@@ -157,7 +183,12 @@ namespace NPCSystem
                 return;
             }
 
-            if (!Application.isPlaying || NetworkManager == null || !NetworkManager.IsListening || IsServer)
+            if (
+                !Application.isPlaying
+                || NetworkManager == null
+                || !NetworkManager.IsListening
+                || IsServer
+            )
             {
                 dialogueManager?.SendMessage(request.playerMessage);
                 return;
@@ -170,7 +201,12 @@ namespace NPCSystem
         {
             ResolveReferences();
 
-            if (!Application.isPlaying || NetworkManager == null || !NetworkManager.IsListening || IsServer)
+            if (
+                !Application.isPlaying
+                || NetworkManager == null
+                || !NetworkManager.IsListening
+                || IsServer
+            )
             {
                 dialogueManager?.CancelRequests();
                 return;
@@ -183,7 +219,9 @@ namespace NPCSystem
         {
             if (dialogueManager == null)
             {
-                dialogueManager = FindAnyObjectByType<NPCDialogueManager>(FindObjectsInactive.Include);
+                dialogueManager = FindAnyObjectByType<NPCDialogueManager>(
+                    FindObjectsInactive.Include
+                );
             }
 
             if (sessionManager == null)
@@ -191,14 +229,17 @@ namespace NPCSystem
                 sessionManager = GetComponent<NPCNetworkSessionManager>();
                 if (sessionManager == null)
                 {
-                    sessionManager = FindAnyObjectByType<NPCNetworkSessionManager>(FindObjectsInactive.Include);
+                    sessionManager = FindAnyObjectByType<NPCNetworkSessionManager>(
+                        FindObjectsInactive.Include
+                    );
                 }
             }
         }
 
         void BindManagerEvents()
         {
-            if (_eventsBound || dialogueManager == null) return;
+            if (_eventsBound || dialogueManager == null)
+                return;
 
             dialogueManager.onNPCChanged.AddListener(HandleManagerNpcChanged);
             dialogueManager.onResponseStart.AddListener(HandleManagerResponseStart);
@@ -210,7 +251,8 @@ namespace NPCSystem
 
         void UnbindManagerEvents()
         {
-            if (!_eventsBound || dialogueManager == null) return;
+            if (!_eventsBound || dialogueManager == null)
+                return;
 
             dialogueManager.onNPCChanged.RemoveListener(HandleManagerNpcChanged);
             dialogueManager.onResponseStart.RemoveListener(HandleManagerResponseStart);
@@ -222,21 +264,27 @@ namespace NPCSystem
 
         void RegisterDisconnectCallback()
         {
-            if (_disconnectCallbackRegistered || NetworkManager == null) return;
+            if (_disconnectCallbackRegistered || NetworkManager == null)
+                return;
             NetworkManager.OnClientDisconnectCallback += HandleClientDisconnected;
             _disconnectCallbackRegistered = true;
         }
 
         void UnregisterDisconnectCallback()
         {
-            if (!_disconnectCallbackRegistered || NetworkManager == null) return;
+            if (!_disconnectCallbackRegistered || NetworkManager == null)
+                return;
             NetworkManager.OnClientDisconnectCallback -= HandleClientDisconnected;
             _disconnectCallbackRegistered = false;
         }
 
         void HandleClientDisconnected(ulong clientId)
         {
-            LogClientSessionEvent(clientId, NPCFlowStatus.Warning, $"Client {clientId} disconnected. Clearing queued work and session state.");
+            LogClientSessionEvent(
+                clientId,
+                NPCFlowStatus.Warning,
+                $"Client {clientId} disconnected. Clearing queued work and session state."
+            );
             RemoveQueuedRequestsForClient(clientId);
             sessionManager?.ClearClientSession(clientId);
             if (_activeClientId.HasValue && _activeClientId.Value == clientId)
@@ -259,10 +307,20 @@ namespace NPCSystem
 
         void HandleManagerResponseStart(string playerMessage)
         {
-            if (_activeClientId.HasValue && IsServer && NetworkManager != null && NetworkManager.IsListening)
+            if (
+                _activeClientId.HasValue
+                && IsServer
+                && NetworkManager != null
+                && NetworkManager.IsListening
+            )
             {
                 var payload = BuildResponsePayload(playerMessage);
-                LogRoutingEvent(_activeClientId.Value, _activeRequestId, NPCFlowStatus.Start, "Relaying response-start event to requesting client.");
+                LogRoutingEvent(
+                    _activeClientId.Value,
+                    _activeRequestId,
+                    NPCFlowStatus.Start,
+                    "Relaying response-start event to requesting client."
+                );
                 SendResponseStartToClient(_activeClientId.Value, payload);
                 return;
             }
@@ -275,10 +333,20 @@ namespace NPCSystem
 
         void HandleManagerResponseUpdated(string partialResponse)
         {
-            if (_activeClientId.HasValue && IsServer && NetworkManager != null && NetworkManager.IsListening)
+            if (
+                _activeClientId.HasValue
+                && IsServer
+                && NetworkManager != null
+                && NetworkManager.IsListening
+            )
             {
                 var payload = BuildResponsePayload(partialResponse);
-                LogRoutingEvent(_activeClientId.Value, _activeRequestId, NPCFlowStatus.Start, "Relaying response-update event to requesting client.");
+                LogRoutingEvent(
+                    _activeClientId.Value,
+                    _activeRequestId,
+                    NPCFlowStatus.Start,
+                    "Relaying response-update event to requesting client."
+                );
                 SendResponseUpdatedToClient(_activeClientId.Value, payload);
                 return;
             }
@@ -291,7 +359,12 @@ namespace NPCSystem
 
         void HandleManagerResponseComplete(string npcDisplayName, string response)
         {
-            if (_activeClientId.HasValue && IsServer && NetworkManager != null && NetworkManager.IsListening)
+            if (
+                _activeClientId.HasValue
+                && IsServer
+                && NetworkManager != null
+                && NetworkManager.IsListening
+            )
             {
                 ulong clientId = _activeClientId.Value;
                 SyncSessionFromManagerState(clientId);
@@ -301,7 +374,12 @@ namespace NPCSystem
 
                 var payload = BuildResponsePayload(response);
                 payload.displayName = npcDisplayName;
-                LogRoutingEvent(clientId, _activeRequestId, NPCFlowStatus.Success, "Relaying completed NPC response to requesting client.");
+                LogRoutingEvent(
+                    clientId,
+                    _activeRequestId,
+                    NPCFlowStatus.Success,
+                    "Relaying completed NPC response to requesting client."
+                );
                 SendResponseCompleteToClient(clientId, payload);
                 SendNotebookStateToClient(clientId, BuildNotebookStateMessage());
                 _activeClientId = null;
@@ -319,19 +397,38 @@ namespace NPCSystem
 
         public void TryVerbalItemTransfer(ulong clientId, string response)
         {
-            if (string.IsNullOrWhiteSpace(response)) return;
+            if (string.IsNullOrWhiteSpace(response))
+                return;
 
             string lower = response.ToLowerInvariant();
-            System.Text.RegularExpressions.Regex givePattern = new System.Text.RegularExpressions.Regex(
-                @"\b(?:take\s+(?:this|it)|here\s+(?:you\s+go|is|are)|have\s+this|this\s+is\s+(?:for\s+)?you)\b",
-                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            System.Text.RegularExpressions.Regex givePattern =
+                new System.Text.RegularExpressions.Regex(
+                    @"\b(?:take\s+(?:this|it)|here\s+(?:you\s+go|is|are)|have\s+this|this\s+is\s+(?:for\s+)?you)\b",
+                    System.Text.RegularExpressions.RegexOptions.IgnoreCase
+                );
 
-            if (!givePattern.IsMatch(lower)) return;
+            if (!givePattern.IsMatch(lower))
+                return;
 
-            string[] itemIndicators = { 
-                "key", "letter", "note", "map", "diary", "book",
-                "candle", "pocket watch", "brooch", "ring", "photograph", "will", "document",
-                "ledger", "account book", "journal", "manuscript" 
+            string[] itemIndicators =
+            {
+                "key",
+                "letter",
+                "note",
+                "map",
+                "diary",
+                "book",
+                "candle",
+                "pocket watch",
+                "brooch",
+                "ring",
+                "photograph",
+                "will",
+                "document",
+                "ledger",
+                "account book",
+                "journal",
+                "manuscript",
             };
 
             string matchedIndicator = null;
@@ -344,13 +441,20 @@ namespace NPCSystem
                 }
             }
 
-            if (matchedIndicator == null) return;
+            if (matchedIndicator == null)
+                return;
 
             NPCTransferableItem targetItem = null;
-            NPCTransferableItem[] items = FindObjectsByType<NPCTransferableItem>(FindObjectsInactive.Include);
+            NPCTransferableItem[] items = FindObjectsByType<NPCTransferableItem>(
+                FindObjectsInactive.Include
+            );
             foreach (NPCTransferableItem item in items)
             {
-                if (item != null && (item.IsSpawned || !Application.isPlaying) && item.ItemId.ToLowerInvariant().Contains(matchedIndicator))
+                if (
+                    item != null
+                    && (item.IsSpawned || !Application.isPlaying)
+                    && item.ItemId.ToLowerInvariant().Contains(matchedIndicator)
+                )
                 {
                     targetItem = item;
                     break;
@@ -359,18 +463,33 @@ namespace NPCSystem
 
             if (targetItem == null)
             {
-                NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.OwnershipAuthority, NPCFlowStatus.Warning, NPCFlowLogLevel.Warning,
-                    $"Response matched verbal give of '{matchedIndicator}', but no spawned NPCTransferableItem with matching ItemId was found.",
-                    source: nameof(NPCDialogueNetworkBridge),
-                    data: new Dictionary<string, object> { ["matchedIndicator"] = matchedIndicator });
+                NPCFlowLogger
+                    .FindOrCreate()
+                    ?.Log(
+                        NPCFlowStage.OwnershipAuthority,
+                        NPCFlowStatus.Warning,
+                        NPCFlowLogLevel.Warning,
+                        $"Response matched verbal give of '{matchedIndicator}', but no spawned NPCTransferableItem with matching ItemId was found.",
+                        source: nameof(NPCDialogueNetworkBridge),
+                        data: new Dictionary<string, object>
+                        {
+                            ["matchedIndicator"] = matchedIndicator,
+                        }
+                    );
                 return;
             }
 
-            NPCPlayerNetworkAvatar[] avatars = FindObjectsByType<NPCPlayerNetworkAvatar>(FindObjectsInactive.Include);
+            NPCPlayerNetworkAvatar[] avatars = FindObjectsByType<NPCPlayerNetworkAvatar>(
+                FindObjectsInactive.Include
+            );
             NPCNetworkItemInteractor interactor = null;
             foreach (NPCPlayerNetworkAvatar avatar in avatars)
             {
-                if (avatar != null && (avatar.IsSpawned || !Application.isPlaying) && avatar.OwnerClientId == clientId)
+                if (
+                    avatar != null
+                    && (avatar.IsSpawned || !Application.isPlaying)
+                    && avatar.OwnerClientId == clientId
+                )
                 {
                     interactor = avatar.GetComponent<NPCNetworkItemInteractor>();
                     break;
@@ -379,28 +498,58 @@ namespace NPCSystem
 
             if (interactor == null)
             {
-                NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.OwnershipAuthority, NPCFlowStatus.Error, NPCFlowLogLevel.Error,
-                    $"Failed to perform verbal item transfer of '{targetItem.ItemId}' because NPCNetworkItemInteractor was not found for client {clientId}.",
-                    source: nameof(NPCDialogueNetworkBridge),
-                    data: new Dictionary<string, object> { ["itemId"] = targetItem.ItemId, ["clientId"] = clientId });
+                NPCFlowLogger
+                    .FindOrCreate()
+                    ?.Log(
+                        NPCFlowStage.OwnershipAuthority,
+                        NPCFlowStatus.Error,
+                        NPCFlowLogLevel.Error,
+                        $"Failed to perform verbal item transfer of '{targetItem.ItemId}' because NPCNetworkItemInteractor was not found for client {clientId}.",
+                        source: nameof(NPCDialogueNetworkBridge),
+                        data: new Dictionary<string, object>
+                        {
+                            ["itemId"] = targetItem.ItemId,
+                            ["clientId"] = clientId,
+                        }
+                    );
                 return;
             }
 
-            NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.OwnershipAuthority, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
-                $"Verbal item transfer triggered. Transferring '{targetItem.ItemId}' from dialogue to player client {clientId}.",
-                source: nameof(NPCDialogueNetworkBridge),
-                data: new Dictionary<string, object> { ["itemId"] = targetItem.ItemId, ["clientId"] = clientId });
+            NPCFlowLogger
+                .FindOrCreate()
+                ?.Log(
+                    NPCFlowStage.OwnershipAuthority,
+                    NPCFlowStatus.Success,
+                    NPCFlowLogLevel.Info,
+                    $"Verbal item transfer triggered. Transferring '{targetItem.ItemId}' from dialogue to player client {clientId}.",
+                    source: nameof(NPCDialogueNetworkBridge),
+                    data: new Dictionary<string, object>
+                    {
+                        ["itemId"] = targetItem.ItemId,
+                        ["clientId"] = clientId,
+                    }
+                );
 
             interactor.TransferItemToPlayer(targetItem, clientId);
         }
 
         void HandleManagerError(string error)
         {
-            if (_activeClientId.HasValue && IsServer && NetworkManager != null && NetworkManager.IsListening)
+            if (
+                _activeClientId.HasValue
+                && IsServer
+                && NetworkManager != null
+                && NetworkManager.IsListening
+            )
             {
                 ulong clientId = _activeClientId.Value;
                 SyncSessionFromManagerState(clientId);
-                LogRoutingEvent(clientId, _activeRequestId, NPCFlowStatus.Error, $"Relaying dialogue error to requesting client: {error}");
+                LogRoutingEvent(
+                    clientId,
+                    _activeRequestId,
+                    NPCFlowStatus.Error,
+                    $"Relaying dialogue error to requesting client: {error}"
+                );
                 SendErrorToClient(clientId, error);
                 _activeClientId = null;
                 _activeRequestId = string.Empty;
@@ -416,7 +565,10 @@ namespace NPCSystem
 
         public bool ShouldRelayLocally()
         {
-            return !Application.isPlaying || NetworkManager == null || !NetworkManager.IsListening || IsServer;
+            return !Application.isPlaying
+                || NetworkManager == null
+                || !NetworkManager.IsListening
+                || IsServer;
         }
 
         void RaiseErrorLocal(string error)
@@ -428,12 +580,18 @@ namespace NPCSystem
         }
 
         [Rpc(SendTo.Server)]
-        void RequestNpcSelectionServerRpc(NPCDialogueSelectionMessage selection, RpcParams rpcParams = default)
+        void RequestNpcSelectionServerRpc(
+            NPCDialogueSelectionMessage selection,
+            RpcParams rpcParams = default
+        )
         {
             _ = HandleNpcSelectionServerAsync(selection, rpcParams.Receive.SenderClientId);
         }
 
-        async Task HandleNpcSelectionServerAsync(NPCDialogueSelectionMessage selection, ulong senderClientId)
+        async Task HandleNpcSelectionServerAsync(
+            NPCDialogueSelectionMessage selection,
+            ulong senderClientId
+        )
         {
             ResolveReferences();
             selection.SanitizeInPlace();
@@ -452,29 +610,53 @@ namespace NPCSystem
 
             EnsureClientSessionSeeded(senderClientId);
             sessionManager.SetSelectedNpcSlug(senderClientId, selection.npcSlug);
-            LogRoutingEvent(senderClientId, string.Empty, NPCFlowStatus.Start, $"Client selected NPC '{selection.npcSlug}'.");
+            LogRoutingEvent(
+                senderClientId,
+                string.Empty,
+                NPCFlowStatus.Start,
+                $"Client selected NPC '{selection.npcSlug}'."
+            );
 
             if (_activeClientId.HasValue)
             {
                 NPCProfile selectedProfile = FindProfileBySlug(selection.npcSlug);
-                SendNpcChangedToClient(senderClientId, selection.npcSlug, selectedProfile != null ? selectedProfile.GetDisplayName() : selection.npcSlug);
-                SendNotebookStateToClient(senderClientId, BuildNotebookStateMessageForClient(senderClientId));
+                SendNpcChangedToClient(
+                    senderClientId,
+                    selection.npcSlug,
+                    selectedProfile != null ? selectedProfile.GetDisplayName() : selection.npcSlug
+                );
+                SendNotebookStateToClient(
+                    senderClientId,
+                    BuildNotebookStateMessageForClient(senderClientId)
+                );
                 return;
             }
 
             ApplySessionStateToManager(senderClientId);
             await dialogueManager.SwitchToNPCAsync(selection.npcSlug);
-            SendNpcChangedToClient(senderClientId, selection.npcSlug, dialogueManager.currentProfile != null ? dialogueManager.currentProfile.GetDisplayName() : selection.npcSlug);
+            SendNpcChangedToClient(
+                senderClientId,
+                selection.npcSlug,
+                dialogueManager.currentProfile != null
+                    ? dialogueManager.currentProfile.GetDisplayName()
+                    : selection.npcSlug
+            );
             SendNotebookStateToClient(senderClientId, BuildNotebookStateMessage());
         }
 
         [Rpc(SendTo.Server)]
-        void SubmitDialogueServerRpc(NPCDialogueRequestMessage request, RpcParams rpcParams = default)
+        void SubmitDialogueServerRpc(
+            NPCDialogueRequestMessage request,
+            RpcParams rpcParams = default
+        )
         {
             _ = HandleSubmitDialogueServerAsync(request, rpcParams.Receive.SenderClientId);
         }
 
-        async Task HandleSubmitDialogueServerAsync(NPCDialogueRequestMessage request, ulong senderClientId)
+        async Task HandleSubmitDialogueServerAsync(
+            NPCDialogueRequestMessage request,
+            ulong senderClientId
+        )
         {
             ResolveReferences();
             request.SanitizeInPlace();
@@ -487,19 +669,26 @@ namespace NPCSystem
 
             EnsureClientSessionSeeded(senderClientId);
 
-            if (!sessionManager.TryGetSelectedNpcSlug(senderClientId, out string selectedNpcSlug) || string.IsNullOrWhiteSpace(selectedNpcSlug))
+            if (
+                !sessionManager.TryGetSelectedNpcSlug(senderClientId, out string selectedNpcSlug)
+                || string.IsNullOrWhiteSpace(selectedNpcSlug)
+            )
             {
                 SendErrorToClient(senderClientId, "No NPC selected.");
                 return;
             }
 
             request.npcSlug = selectedNpcSlug;
-            LogRoutingEvent(senderClientId, request.requestId, NPCFlowStatus.Start,
+            LogRoutingEvent(
+                senderClientId,
+                request.requestId,
+                NPCFlowStatus.Start,
                 $"Received dialogue request for NPC '{request.npcSlug}'.",
                 new Dictionary<string, object>
                 {
-                    ["messageLength"] = request.playerMessage?.Length ?? 0
-                });
+                    ["messageLength"] = request.playerMessage?.Length ?? 0,
+                }
+            );
 
             if (_activeClientId.HasValue || dialogueManager.isResponding)
             {
@@ -513,7 +702,10 @@ namespace NPCSystem
         [Rpc(SendTo.Server)]
         void CancelActiveRequestServerRpc(RpcParams rpcParams = default)
         {
-            if (_activeClientId.HasValue && _activeClientId.Value == rpcParams.Receive.SenderClientId)
+            if (
+                _activeClientId.HasValue
+                && _activeClientId.Value == rpcParams.Receive.SenderClientId
+            )
             {
                 dialogueManager?.CancelRequests();
                 _activeClientId = null;
@@ -532,7 +724,7 @@ namespace NPCSystem
                 requestId = string.Empty,
                 npcSlug = npcSlug,
                 displayName = displayName,
-                content = string.Empty
+                content = string.Empty,
             };
             payload.SanitizeInPlace();
             ReceiveNpcChangedClientRpc(payload, RpcTarget.Single(clientId, RpcTargetUse.Temp));
@@ -553,20 +745,32 @@ namespace NPCSystem
         void SendResponseCompleteToClient(ulong clientId, NPCDialogueResponseMessage payload)
         {
             payload.SanitizeInPlace();
-            ReceiveResponseCompleteClientRpc(payload, RpcTarget.Single(clientId, RpcTargetUse.Temp));
+            ReceiveResponseCompleteClientRpc(
+                payload,
+                RpcTarget.Single(clientId, RpcTargetUse.Temp)
+            );
         }
 
         void SendErrorToClient(ulong clientId, string error)
         {
-            string normalizedError = string.IsNullOrWhiteSpace(error) ? "Unknown dialogue error." : error.Trim();
-            NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.DialogueRouting, NPCFlowStatus.Error, NPCFlowLogLevel.Error,
-                $"Sending dialogue error to client {clientId}: {normalizedError}",
-                source: nameof(NPCDialogueNetworkBridge), requestId: _activeRequestId,
-                data: new Dictionary<string, object>
-                {
-                    ["clientId"] = clientId,
-                    ["error"] = normalizedError
-                });
+            string normalizedError = string.IsNullOrWhiteSpace(error)
+                ? "Unknown dialogue error."
+                : error.Trim();
+            NPCFlowLogger
+                .FindOrCreate()
+                ?.Log(
+                    NPCFlowStage.DialogueRouting,
+                    NPCFlowStatus.Error,
+                    NPCFlowLogLevel.Error,
+                    $"Sending dialogue error to client {clientId}: {normalizedError}",
+                    source: nameof(NPCDialogueNetworkBridge),
+                    requestId: _activeRequestId,
+                    data: new Dictionary<string, object>
+                    {
+                        ["clientId"] = clientId,
+                        ["error"] = normalizedError,
+                    }
+                );
             ReceiveErrorClientRpc(normalizedError, RpcTarget.Single(clientId, RpcTargetUse.Temp));
         }
 
@@ -577,26 +781,38 @@ namespace NPCSystem
         }
 
         [Rpc(SendTo.SpecifiedInParams)]
-        void ReceiveNpcChangedClientRpc(NPCDialogueResponseMessage payload, RpcParams rpcParams = default)
+        void ReceiveNpcChangedClientRpc(
+            NPCDialogueResponseMessage payload,
+            RpcParams rpcParams = default
+        )
         {
             _localSelectedNpcSlug = payload.npcSlug;
             onNPCChanged?.Invoke(payload.displayName);
         }
 
         [Rpc(SendTo.SpecifiedInParams)]
-        void ReceiveResponseStartClientRpc(NPCDialogueResponseMessage payload, RpcParams rpcParams = default)
+        void ReceiveResponseStartClientRpc(
+            NPCDialogueResponseMessage payload,
+            RpcParams rpcParams = default
+        )
         {
             onResponseStart?.Invoke(payload.content);
         }
 
         [Rpc(SendTo.SpecifiedInParams)]
-        void ReceiveResponseUpdatedClientRpc(NPCDialogueResponseMessage payload, RpcParams rpcParams = default)
+        void ReceiveResponseUpdatedClientRpc(
+            NPCDialogueResponseMessage payload,
+            RpcParams rpcParams = default
+        )
         {
             onResponseUpdated?.Invoke(payload.content);
         }
 
         [Rpc(SendTo.SpecifiedInParams)]
-        void ReceiveResponseCompleteClientRpc(NPCDialogueResponseMessage payload, RpcParams rpcParams = default)
+        void ReceiveResponseCompleteClientRpc(
+            NPCDialogueResponseMessage payload,
+            RpcParams rpcParams = default
+        )
         {
             _localSelectedNpcSlug = payload.npcSlug;
             onResponseComplete?.Invoke(payload.displayName, payload.content);
@@ -609,10 +825,15 @@ namespace NPCSystem
         }
 
         [Rpc(SendTo.SpecifiedInParams)]
-        void ReceiveNotebookStateClientRpc(NPCNotebookStateMessage payload, RpcParams rpcParams = default)
+        void ReceiveNotebookStateClientRpc(
+            NPCNotebookStateMessage payload,
+            RpcParams rpcParams = default
+        )
         {
             _currentNotebookState = payload;
-            _localSelectedNpcSlug = string.IsNullOrWhiteSpace(payload.npcSlug) ? _localSelectedNpcSlug : payload.npcSlug;
+            _localSelectedNpcSlug = string.IsNullOrWhiteSpace(payload.npcSlug)
+                ? _localSelectedNpcSlug
+                : payload.npcSlug;
             onNotebookStateChanged?.Invoke(payload);
         }
 
@@ -621,22 +842,35 @@ namespace NPCSystem
             return new NPCDialogueResponseMessage
             {
                 requestId = _activeRequestId,
-                npcSlug = dialogueManager != null && dialogueManager.currentProfile != null ? dialogueManager.currentProfile.GetNpcSlug() : _localSelectedNpcSlug,
-                displayName = dialogueManager != null && dialogueManager.currentProfile != null ? dialogueManager.currentProfile.GetDisplayName() : currentProfile != null ? currentProfile.GetDisplayName() : string.Empty,
-                content = content ?? string.Empty
+                npcSlug =
+                    dialogueManager != null && dialogueManager.currentProfile != null
+                        ? dialogueManager.currentProfile.GetNpcSlug()
+                        : _localSelectedNpcSlug,
+                displayName =
+                    dialogueManager != null && dialogueManager.currentProfile != null
+                        ? dialogueManager.currentProfile.GetDisplayName()
+                    : currentProfile != null ? currentProfile.GetDisplayName()
+                    : string.Empty,
+                content = content ?? string.Empty,
             };
         }
 
         NPCNotebookStateMessage BuildNotebookStateMessage()
         {
             return NPCNotebookStateFormatter.Build(
-                dialogueManager != null ? dialogueManager.CaptureEvidenceSnapshot() : new NPCEvidenceStateSnapshot(),
-                dialogueManager != null && dialogueManager.currentProfile != null ? dialogueManager.currentProfile.GetNpcSlug() : _localSelectedNpcSlug);
+                dialogueManager != null
+                    ? dialogueManager.CaptureEvidenceSnapshot()
+                    : new NPCEvidenceStateSnapshot(),
+                dialogueManager != null && dialogueManager.currentProfile != null
+                    ? dialogueManager.currentProfile.GetNpcSlug()
+                    : _localSelectedNpcSlug
+            );
         }
 
         void UpdateNotebookStateLocal()
         {
-            if (!ShouldRelayLocally()) return;
+            if (!ShouldRelayLocally())
+                return;
             _currentNotebookState = BuildNotebookStateMessage();
             onNotebookStateChanged?.Invoke(_currentNotebookState);
         }
@@ -650,8 +884,11 @@ namespace NPCSystem
             }
 
             return NPCNotebookStateFormatter.Build(
-                sessionManager != null ? sessionManager.GetEvidenceSnapshot(clientId) : new NPCEvidenceStateSnapshot(),
-                selectedNpcSlug);
+                sessionManager != null
+                    ? sessionManager.GetEvidenceSnapshot(clientId)
+                    : new NPCEvidenceStateSnapshot(),
+                selectedNpcSlug
+            );
         }
 
         public void RefreshNotebookStateForClient(ulong clientId)
@@ -666,24 +903,28 @@ namespace NPCSystem
 
         void CaptureBaselineState()
         {
-            if (dialogueManager == null) return;
-            _baselineHistorySnapshot = CloneHistorySnapshot(dialogueManager.CaptureHistorySnapshot());
-            _baselineEvidenceSnapshot = dialogueManager.CaptureEvidenceSnapshot()?.Clone() ?? new NPCEvidenceStateSnapshot();
+            if (dialogueManager == null)
+                return;
+            _baselineHistorySnapshot = CloneHistorySnapshot(
+                dialogueManager.CaptureHistorySnapshot()
+            );
+            _baselineEvidenceSnapshot =
+                dialogueManager.CaptureEvidenceSnapshot()?.Clone()
+                ?? new NPCEvidenceStateSnapshot();
         }
 
         void EnqueueDialogueRequest(ulong clientId, NPCDialogueRequestMessage request)
         {
-            _pendingRequests.Enqueue(new PendingDialogueRequest
-            {
-                clientId = clientId,
-                request = request
-            });
-            LogRoutingEvent(clientId, request.requestId, NPCFlowStatus.Warning,
+            _pendingRequests.Enqueue(
+                new PendingDialogueRequest { clientId = clientId, request = request }
+            );
+            LogRoutingEvent(
+                clientId,
+                request.requestId,
+                NPCFlowStatus.Warning,
                 "Dialogue request queued because another client request is in progress.",
-                new Dictionary<string, object>
-                {
-                    ["pendingRequestCount"] = _pendingRequests.Count
-                });
+                new Dictionary<string, object> { ["pendingRequestCount"] = _pendingRequests.Count }
+            );
         }
 
         async Task BeginDialogueRequestAsync(ulong clientId, NPCDialogueRequestMessage request)
@@ -692,8 +933,12 @@ namespace NPCSystem
             _activeRequestId = request.requestId;
             await WaitForResolvedPlayerNameAsync(clientId);
             ApplySessionStateToManager(clientId);
-            LogRoutingEvent(clientId, request.requestId, NPCFlowStatus.Start,
-                $"Applying client session and switching to NPC '{request.npcSlug}' before dialogue generation.");
+            LogRoutingEvent(
+                clientId,
+                request.requestId,
+                NPCFlowStatus.Start,
+                $"Applying client session and switching to NPC '{request.npcSlug}' before dialogue generation."
+            );
             await dialogueManager.SwitchToNPCAsync(request.npcSlug);
             dialogueManager.SendMessage(request.playerMessage);
         }
@@ -712,24 +957,41 @@ namespace NPCSystem
                 string updatedName = ResolvePlayerDisplayName(clientId);
                 if (!LooksLikeFallbackPlayerName(updatedName))
                 {
-                    LogClientSessionEvent(clientId, NPCFlowStatus.Success,
-                        $"Resolved player display name to '{updatedName}' before dialogue generation.");
+                    LogClientSessionEvent(
+                        clientId,
+                        NPCFlowStatus.Success,
+                        $"Resolved player display name to '{updatedName}' before dialogue generation."
+                    );
                     return;
                 }
             }
 
-            LogClientSessionEvent(clientId, NPCFlowStatus.Warning,
-                $"Player display name still unresolved before dialogue generation. Using fallback '{ResolvePlayerDisplayName(clientId)}'.");
+            LogClientSessionEvent(
+                clientId,
+                NPCFlowStatus.Warning,
+                $"Player display name still unresolved before dialogue generation. Using fallback '{ResolvePlayerDisplayName(clientId)}'."
+            );
         }
 
         void TryProcessNextQueuedRequest()
         {
-            if (_activeClientId.HasValue || dialogueManager == null || sessionManager == null || !Application.isPlaying) return;
+            if (
+                _activeClientId.HasValue
+                || dialogueManager == null
+                || sessionManager == null
+                || !Application.isPlaying
+            )
+                return;
 
             while (_pendingRequests.Count > 0)
             {
                 PendingDialogueRequest pending = _pendingRequests.Dequeue();
-                if (!sessionManager.TryGetSelectedNpcSlug(pending.clientId, out string selectedNpcSlug) || string.IsNullOrWhiteSpace(selectedNpcSlug))
+                if (
+                    !sessionManager.TryGetSelectedNpcSlug(
+                        pending.clientId,
+                        out string selectedNpcSlug
+                    ) || string.IsNullOrWhiteSpace(selectedNpcSlug)
+                )
                 {
                     continue;
                 }
@@ -742,7 +1004,8 @@ namespace NPCSystem
 
         void RemoveQueuedRequestsForClient(ulong clientId)
         {
-            if (_pendingRequests.Count == 0) return;
+            if (_pendingRequests.Count == 0)
+                return;
 
             var preservedRequests = new Queue<PendingDialogueRequest>();
             while (_pendingRequests.Count > 0)
@@ -762,48 +1025,82 @@ namespace NPCSystem
 
         void EnsureClientSessionSeeded(ulong clientId)
         {
-            if (sessionManager == null) return;
+            if (sessionManager == null)
+                return;
             if (dialogueManager != null && _baselineHistorySnapshot.Count == 0)
             {
                 CaptureBaselineState();
             }
 
             string playerDisplayName = ResolvePlayerDisplayName(clientId);
-            if (sessionManager.HasSession(clientId)) return;
+            if (sessionManager.HasSession(clientId))
+                return;
 
-            sessionManager.SetAllHistorySnapshots(clientId, CloneHistorySnapshot(_baselineHistorySnapshot));
-            sessionManager.SetEvidenceSnapshot(clientId, _baselineEvidenceSnapshot?.Clone() ?? new NPCEvidenceStateSnapshot());
+            sessionManager.SetAllHistorySnapshots(
+                clientId,
+                CloneHistorySnapshot(_baselineHistorySnapshot)
+            );
+            sessionManager.SetEvidenceSnapshot(
+                clientId,
+                _baselineEvidenceSnapshot?.Clone() ?? new NPCEvidenceStateSnapshot()
+            );
             sessionManager.SetPlayerDisplayName(clientId, playerDisplayName);
-            LogClientSessionEvent(clientId, NPCFlowStatus.Success, $"Seeded new client session for '{playerDisplayName}'.");
+            LogClientSessionEvent(
+                clientId,
+                NPCFlowStatus.Success,
+                $"Seeded new client session for '{playerDisplayName}'."
+            );
         }
 
         void ApplySessionStateToManager(ulong clientId)
         {
-            if (dialogueManager == null || sessionManager == null) return;
+            if (dialogueManager == null || sessionManager == null)
+                return;
             sessionManager.SetPlayerDisplayName(clientId, ResolvePlayerDisplayName(clientId));
             dialogueManager.ApplyHistorySnapshot(sessionManager.GetAllHistorySnapshots(clientId));
             dialogueManager.ApplyEvidenceSnapshot(sessionManager.GetEvidenceSnapshot(clientId));
-            dialogueManager.SetRuntimePlayerContext(sessionManager.GetPlayerDisplayName(clientId), clientId);
-            LogClientSessionEvent(clientId, NPCFlowStatus.Success,
-                $"Applied session to dialogue manager for '{sessionManager.GetPlayerDisplayName(clientId)}'.");
+            dialogueManager.SetRuntimePlayerContext(
+                sessionManager.GetPlayerDisplayName(clientId),
+                clientId
+            );
+            LogClientSessionEvent(
+                clientId,
+                NPCFlowStatus.Success,
+                $"Applied session to dialogue manager for '{sessionManager.GetPlayerDisplayName(clientId)}'."
+            );
         }
 
         void SyncSessionFromManagerState(ulong clientId)
         {
-            if (dialogueManager == null || sessionManager == null) return;
-            sessionManager.SetAllHistorySnapshots(clientId, dialogueManager.CaptureHistorySnapshot());
+            if (dialogueManager == null || sessionManager == null)
+                return;
+            sessionManager.SetAllHistorySnapshots(
+                clientId,
+                dialogueManager.CaptureHistorySnapshot()
+            );
             sessionManager.SetEvidenceSnapshot(clientId, dialogueManager.CaptureEvidenceSnapshot());
-            LogClientSessionEvent(clientId, NPCFlowStatus.Success,
-                $"Synchronized dialogue manager state back into session cache for '{sessionManager.GetPlayerDisplayName(clientId)}'.");
+            LogClientSessionEvent(
+                clientId,
+                NPCFlowStatus.Success,
+                $"Synchronized dialogue manager state back into session cache for '{sessionManager.GetPlayerDisplayName(clientId)}'."
+            );
         }
 
         public NPCProfile FindProfileBySlug(string npcSlug)
         {
-            if (dialogueManager == null || string.IsNullOrWhiteSpace(npcSlug)) return null;
+            if (dialogueManager == null || string.IsNullOrWhiteSpace(npcSlug))
+                return null;
 
             foreach (NPCProfile profile in dialogueManager.Profiles)
             {
-                if (profile != null && string.Equals(profile.GetNpcSlug(), npcSlug.Trim(), StringComparison.OrdinalIgnoreCase))
+                if (
+                    profile != null
+                    && string.Equals(
+                        profile.GetNpcSlug(),
+                        npcSlug.Trim(),
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                )
                 {
                     return profile;
                 }
@@ -812,21 +1109,31 @@ namespace NPCSystem
             return null;
         }
 
-        public static Dictionary<string, List<DialogueEntry>> CloneHistorySnapshot(Dictionary<string, List<DialogueEntry>> historyByNpc)
+        public static Dictionary<string, List<DialogueEntry>> CloneHistorySnapshot(
+            Dictionary<string, List<DialogueEntry>> historyByNpc
+        )
         {
-            var clone = new Dictionary<string, List<DialogueEntry>>(StringComparer.OrdinalIgnoreCase);
-            foreach (var pair in historyByNpc ?? new Dictionary<string, List<DialogueEntry>>(StringComparer.OrdinalIgnoreCase))
+            var clone = new Dictionary<string, List<DialogueEntry>>(
+                StringComparer.OrdinalIgnoreCase
+            );
+            foreach (
+                var pair in historyByNpc
+                    ?? new Dictionary<string, List<DialogueEntry>>(StringComparer.OrdinalIgnoreCase)
+            )
             {
                 List<DialogueEntry> entries = new List<DialogueEntry>();
                 foreach (DialogueEntry entry in pair.Value ?? new List<DialogueEntry>())
                 {
-                    if (entry == null) continue;
-                    entries.Add(new DialogueEntry
-                    {
-                        role = entry.role,
-                        content = entry.content,
-                        timestampUtc = entry.timestampUtc
-                    });
+                    if (entry == null)
+                        continue;
+                    entries.Add(
+                        new DialogueEntry
+                        {
+                            role = entry.role,
+                            content = entry.content,
+                            timestampUtc = entry.timestampUtc,
+                        }
+                    );
                 }
                 clone[pair.Key] = entries;
             }
@@ -836,7 +1143,10 @@ namespace NPCSystem
 
         string ResolvePlayerDisplayName(ulong clientId)
         {
-            if (NetworkManager == null || !NetworkManager.ConnectedClients.TryGetValue(clientId, out NetworkClient client))
+            if (
+                NetworkManager == null
+                || !NetworkManager.ConnectedClients.TryGetValue(clientId, out NetworkClient client)
+            )
             {
                 return $"Player {clientId}";
             }
@@ -853,7 +1163,8 @@ namespace NPCSystem
 
         public static bool LooksLikeFallbackPlayerName(string playerName)
         {
-            if (string.IsNullOrWhiteSpace(playerName)) return true;
+            if (string.IsNullOrWhiteSpace(playerName))
+                return true;
 
             string normalized = playerName.Trim();
             if (!normalized.StartsWith("Player ", StringComparison.OrdinalIgnoreCase))
@@ -864,35 +1175,59 @@ namespace NPCSystem
             return ulong.TryParse(normalized.Substring("Player ".Length), out _);
         }
 
-        void LogRoutingEvent(ulong clientId, string requestId, NPCFlowStatus status, string message, Dictionary<string, object> data = null)
+        void LogRoutingEvent(
+            ulong clientId,
+            string requestId,
+            NPCFlowStatus status,
+            string message,
+            Dictionary<string, object> data = null
+        )
         {
             lastRoutingStatus = message;
             data ??= new Dictionary<string, object>();
             data["clientId"] = clientId;
             data["activeClientId"] = _activeClientId.HasValue ? _activeClientId.Value : 0ul;
             data["pendingRequestCount"] = _pendingRequests.Count;
-            NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.DialogueRouting, status,
-                status == NPCFlowStatus.Error ? NPCFlowLogLevel.Error :
-                status == NPCFlowStatus.Warning ? NPCFlowLogLevel.Warning : NPCFlowLogLevel.Info,
-                message,
-                source: nameof(NPCDialogueNetworkBridge),
-                requestId: requestId,
-                npcSlug: dialogueManager != null && dialogueManager.currentProfile != null ? dialogueManager.currentProfile.GetNpcSlug() : _localSelectedNpcSlug,
-                data: data);
+            NPCFlowLogger
+                .FindOrCreate()
+                ?.Log(
+                    NPCFlowStage.DialogueRouting,
+                    status,
+                    status == NPCFlowStatus.Error ? NPCFlowLogLevel.Error
+                        : status == NPCFlowStatus.Warning ? NPCFlowLogLevel.Warning
+                        : NPCFlowLogLevel.Info,
+                    message,
+                    source: nameof(NPCDialogueNetworkBridge),
+                    requestId: requestId,
+                    npcSlug: dialogueManager != null && dialogueManager.currentProfile != null
+                        ? dialogueManager.currentProfile.GetNpcSlug()
+                        : _localSelectedNpcSlug,
+                    data: data
+                );
         }
 
         void LogClientSessionEvent(ulong clientId, NPCFlowStatus status, string message)
         {
             lastRoutingStatus = message;
-            NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.ClientSession, status,
-                status == NPCFlowStatus.Warning ? NPCFlowLogLevel.Warning : NPCFlowLogLevel.Info,
-                message,
-                source: nameof(NPCDialogueNetworkBridge),
-                data: new Dictionary<string, object>
-                {
-                    ["clientId"] = clientId,
-                    ["playerName"] = sessionManager != null ? sessionManager.GetPlayerDisplayName(clientId) : string.Empty
-                });
+            NPCFlowLogger
+                .FindOrCreate()
+                ?.Log(
+                    NPCFlowStage.ClientSession,
+                    status,
+                    status == NPCFlowStatus.Warning
+                        ? NPCFlowLogLevel.Warning
+                        : NPCFlowLogLevel.Info,
+                    message,
+                    source: nameof(NPCDialogueNetworkBridge),
+                    data: new Dictionary<string, object>
+                    {
+                        ["clientId"] = clientId,
+                        ["playerName"] =
+                            sessionManager != null
+                                ? sessionManager.GetPlayerDisplayName(clientId)
+                                : string.Empty,
+                    }
+                );
         }
     }
 }

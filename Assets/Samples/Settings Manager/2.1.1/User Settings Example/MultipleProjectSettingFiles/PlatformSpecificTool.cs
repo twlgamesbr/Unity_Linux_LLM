@@ -18,11 +18,7 @@ namespace UnityEditor.SettingsManagement.Examples
 #endif
 
         // This example creates two project settings repositories, A and B.
-        static readonly string[] k_ProjectRepositories = new[]
-        {
-            "Settings A",
-            "Settings B"
-        };
+        static readonly string[] k_ProjectRepositories = new[] { "Settings A", "Settings B" };
 
         // The settings manager.
         static Settings s_Settings;
@@ -50,12 +46,20 @@ namespace UnityEditor.SettingsManagement.Examples
 
         void OnEnable()
         {
-            s_Settings = new Settings(new ISettingsRepository[]
-            {
-                new UserSettingsRepository(),
-                new PackageSettingsRepository("com.unity.settings-manager-examples", k_ProjectRepositories[0]),
-                new PackageSettingsRepository("com.unity.settings-manager-examples", k_ProjectRepositories[1])
-            });
+            s_Settings = new Settings(
+                new ISettingsRepository[]
+                {
+                    new UserSettingsRepository(),
+                    new PackageSettingsRepository(
+                        "com.unity.settings-manager-examples",
+                        k_ProjectRepositories[0]
+                    ),
+                    new PackageSettingsRepository(
+                        "com.unity.settings-manager-examples",
+                        k_ProjectRepositories[1]
+                    ),
+                }
+            );
 
             m_Repository = s_Settings.Get<int>("ToolColorRepositoryName", SettingsScope.User);
 
@@ -69,7 +73,11 @@ namespace UnityEditor.SettingsManagement.Examples
             GUILayout.BeginVertical(GUILayout.MaxWidth(300));
 
             EditorGUI.BeginChangeCheck();
-            m_Repository = EditorGUILayout.IntPopup(m_Repository, k_ProjectRepositories, new int[] { 0, 1 });
+            m_Repository = EditorGUILayout.IntPopup(
+                m_Repository,
+                k_ProjectRepositories,
+                new int[] { 0, 1 }
+            );
             if (EditorGUI.EndChangeCheck())
                 m_ToolColor = GetToolColor(k_ProjectRepositories[m_Repository], Color.blue);
 
@@ -77,7 +85,11 @@ namespace UnityEditor.SettingsManagement.Examples
             m_ToolColor = EditorGUILayout.ColorField(m_ToolColor);
             if (EditorGUI.EndChangeCheck())
             {
-                s_Settings.Set<Color>(k_ToolColorSetting, m_ToolColor, k_ProjectRepositories[m_Repository]);
+                s_Settings.Set<Color>(
+                    k_ToolColorSetting,
+                    m_ToolColor,
+                    k_ProjectRepositories[m_Repository]
+                );
                 s_Settings.Save();
             }
 

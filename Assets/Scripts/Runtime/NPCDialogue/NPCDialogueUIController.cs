@@ -32,7 +32,10 @@ namespace NPCSystem
 
         [Header("Exit and Startup")]
         public Button exitButton;
-        [Tooltip("If true, UI and dialogue systems initialize on Start. If false, they initialize deferred post-login.")]
+
+        [Tooltip(
+            "If true, UI and dialogue systems initialize on Start. If false, they initialize deferred post-login."
+        )]
         public bool initializeOnStart = false;
 
         private System.Threading.Tasks.Task _onDemandInitTask;
@@ -70,9 +73,15 @@ namespace NPCSystem
 
         async System.Threading.Tasks.Task InitializeOnDemandInternalAsync()
         {
-            NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.SceneBootstrap, NPCFlowStatus.Start,
-                NPCFlowLogLevel.Debug, "NPCDialogueUIController starting on demand.",
-                source: nameof(NPCDialogueUIController));
+            NPCFlowLogger
+                .FindOrCreate()
+                .Log(
+                    NPCFlowStage.SceneBootstrap,
+                    NPCFlowStatus.Start,
+                    NPCFlowLogLevel.Debug,
+                    "NPCDialogueUIController starting on demand.",
+                    source: nameof(NPCDialogueUIController)
+                );
 
             ResolveReferences();
             DisableLegacyController();
@@ -80,7 +89,9 @@ namespace NPCSystem
             BindUiListeners();
 
             // Enforce that the bootstrapper completes its initialization first
-            var bootstrapper = FindAnyObjectByType<NPCDialogueBootstrapper>(FindObjectsInactive.Include);
+            var bootstrapper = FindAnyObjectByType<NPCDialogueBootstrapper>(
+                FindObjectsInactive.Include
+            );
             if (bootstrapper != null)
             {
                 await bootstrapper.InitializeOnDemandAsync();
@@ -89,9 +100,15 @@ namespace NPCSystem
             {
                 if (networkBridge == null && dialogueManager == null)
                 {
-                    NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.SceneBootstrap, NPCFlowStatus.Error,
-                        NPCFlowLogLevel.Error, "Neither NPCDialogueManager nor NPCDialogueNetworkBridge is available.",
-                        source: nameof(NPCDialogueUIController));
+                    NPCFlowLogger
+                        .FindOrCreate()
+                        .Log(
+                            NPCFlowStage.SceneBootstrap,
+                            NPCFlowStatus.Error,
+                            NPCFlowLogLevel.Error,
+                            "Neither NPCDialogueManager nor NPCDialogueNetworkBridge is available.",
+                            source: nameof(NPCDialogueUIController)
+                        );
                     return;
                 }
 
@@ -105,9 +122,15 @@ namespace NPCSystem
             PopulateDropdown();
             await SyncDropdownToCurrentProfileAsync();
 
-            NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.SceneBootstrap, NPCFlowStatus.Success,
-                NPCFlowLogLevel.Debug, "NPCDialogueUIController ready and initialized.",
-                source: nameof(NPCDialogueUIController));
+            NPCFlowLogger
+                .FindOrCreate()
+                .Log(
+                    NPCFlowStage.SceneBootstrap,
+                    NPCFlowStatus.Success,
+                    NPCFlowLogLevel.Debug,
+                    "NPCDialogueUIController ready and initialized.",
+                    source: nameof(NPCDialogueUIController)
+                );
         }
 
         public GameObject GetGameplayCanvas()
@@ -135,8 +158,15 @@ namespace NPCSystem
 
         void OnExitPressed()
         {
-            NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.UIInput, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
-                "UI exit pressed. Exiting game/play mode.", source: nameof(NPCDialogueUIController));
+            NPCFlowLogger
+                .FindOrCreate()
+                .Log(
+                    NPCFlowStage.UIInput,
+                    NPCFlowStatus.Success,
+                    NPCFlowLogLevel.Info,
+                    "UI exit pressed. Exiting game/play mode.",
+                    source: nameof(NPCDialogueUIController)
+                );
 
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
@@ -158,7 +188,9 @@ namespace NPCSystem
                 dialogueManager = GetComponent<NPCDialogueManager>();
                 if (dialogueManager == null)
                 {
-                    dialogueManager = FindAnyObjectByType<NPCDialogueManager>(FindObjectsInactive.Include);
+                    dialogueManager = FindAnyObjectByType<NPCDialogueManager>(
+                        FindObjectsInactive.Include
+                    );
                 }
             }
 
@@ -167,27 +199,44 @@ namespace NPCSystem
                 networkBridge = GetComponent<NPCDialogueNetworkBridge>();
                 if (networkBridge == null)
                 {
-                    networkBridge = FindAnyObjectByType<NPCDialogueNetworkBridge>(FindObjectsInactive.Include);
+                    networkBridge = FindAnyObjectByType<NPCDialogueNetworkBridge>(
+                        FindObjectsInactive.Include
+                    );
                 }
             }
 
             if (legacyKnowledgeBaseController == null)
             {
-                legacyKnowledgeBaseController = FindObjectsByType<Behaviour>(FindObjectsInactive.Include)
-                    .FirstOrDefault(behaviour => behaviour != null && behaviour.GetType().FullName == "LLMUnitySamples.KnowledgeBaseGame");
+                legacyKnowledgeBaseController = FindObjectsByType<Behaviour>(
+                        FindObjectsInactive.Include
+                    )
+                    .FirstOrDefault(behaviour =>
+                        behaviour != null
+                        && behaviour.GetType().FullName == "LLMUnitySamples.KnowledgeBaseGame"
+                    );
             }
 
-            characterSelect = characterSelect != null ? characterSelect : FindComponent<Dropdown>("Canvas/Dropdown");
-            playerInput = playerInput != null ? playerInput : FindComponent<InputField>("Canvas/PlayerInput");
+            characterSelect =
+                characterSelect != null
+                    ? characterSelect
+                    : FindComponent<Dropdown>("Canvas/Dropdown");
+            playerInput =
+                playerInput != null ? playerInput : FindComponent<InputField>("Canvas/PlayerInput");
             aiText = aiText != null ? aiText : FindComponent<Text>("Canvas/AIImage/AIText");
-            stopButton = stopButton != null ? stopButton : FindComponent<Button>("Canvas/StopButton");
+            stopButton =
+                stopButton != null ? stopButton : FindComponent<Button>("Canvas/StopButton");
 
-            butlerImage = butlerImage != null ? butlerImage : FindComponent<RawImage>("Canvas/ButlerImage");
+            butlerImage =
+                butlerImage != null ? butlerImage : FindComponent<RawImage>("Canvas/ButlerImage");
             maidImage = maidImage != null ? maidImage : FindComponent<RawImage>("Canvas/MaidImage");
             chefImage = chefImage != null ? chefImage : FindComponent<RawImage>("Canvas/ChefImage");
 
-            notebookController = notebookController != null ? notebookController : FindAnyObjectByType<NotebookUIController>(FindObjectsInactive.Include);
-            exitButton = exitButton != null ? exitButton : FindComponent<Button>("Canvas/ExitButton");
+            notebookController =
+                notebookController != null
+                    ? notebookController
+                    : FindAnyObjectByType<NotebookUIController>(FindObjectsInactive.Include);
+            exitButton =
+                exitButton != null ? exitButton : FindComponent<Button>("Canvas/ExitButton");
         }
 
         void DisableLegacyController()
@@ -200,37 +249,46 @@ namespace NPCSystem
 
         void BindUiListeners()
         {
-            if (_listenersBound) return;
+            if (_listenersBound)
+                return;
 
-            if (characterSelect != null) characterSelect.onValueChanged.AddListener(OnCharacterSelectionChanged);
+            if (characterSelect != null)
+                characterSelect.onValueChanged.AddListener(OnCharacterSelectionChanged);
             if (playerInput != null)
             {
                 playerInput.onSubmit.AddListener(OnInputFieldSubmit);
                 playerInput.onValueChanged.AddListener(OnValueChanged);
             }
-            if (stopButton != null) stopButton.onClick.AddListener(OnStopPressed);
-            if (exitButton != null) exitButton.onClick.AddListener(OnExitPressed);
+            if (stopButton != null)
+                stopButton.onClick.AddListener(OnStopPressed);
+            if (exitButton != null)
+                exitButton.onClick.AddListener(OnExitPressed);
             _listenersBound = true;
         }
 
         void UnbindUiListeners()
         {
-            if (!_listenersBound) return;
+            if (!_listenersBound)
+                return;
 
-            if (characterSelect != null) characterSelect.onValueChanged.RemoveListener(OnCharacterSelectionChanged);
+            if (characterSelect != null)
+                characterSelect.onValueChanged.RemoveListener(OnCharacterSelectionChanged);
             if (playerInput != null)
             {
                 playerInput.onSubmit.RemoveListener(OnInputFieldSubmit);
                 playerInput.onValueChanged.RemoveListener(OnValueChanged);
             }
-            if (stopButton != null) stopButton.onClick.RemoveListener(OnStopPressed);
-            if (exitButton != null) exitButton.onClick.RemoveListener(OnExitPressed);
+            if (stopButton != null)
+                stopButton.onClick.RemoveListener(OnStopPressed);
+            if (exitButton != null)
+                exitButton.onClick.RemoveListener(OnExitPressed);
             _listenersBound = false;
         }
 
         void BindRuntimeEvents()
         {
-            if (_managerBound) return;
+            if (_managerBound)
+                return;
 
             if (networkBridge != null)
             {
@@ -258,7 +316,8 @@ namespace NPCSystem
 
         void UnbindRuntimeEvents()
         {
-            if (!_managerBound) return;
+            if (!_managerBound)
+                return;
 
             if (networkBridge != null)
             {
@@ -283,17 +342,26 @@ namespace NPCSystem
 
         void PopulateDropdown()
         {
-            NPCProfile[] availableProfiles = networkBridge != null ? networkBridge.Profiles : dialogueManager.Profiles;
+            NPCProfile[] availableProfiles =
+                networkBridge != null ? networkBridge.Profiles : dialogueManager.Profiles;
             _profiles = availableProfiles.Where(profile => profile != null).ToList();
-            if (characterSelect == null) return;
+            if (characterSelect == null)
+                return;
 
             characterSelect.ClearOptions();
-            characterSelect.AddOptions(_profiles.Select(profile => profile.GetDisplayName()).ToList());
+            characterSelect.AddOptions(
+                _profiles.Select(profile => profile.GetDisplayName()).ToList()
+            );
         }
 
         async System.Threading.Tasks.Task SyncDropdownToCurrentProfileAsync()
         {
-            if ((dialogueManager == null && networkBridge == null) || characterSelect == null || _profiles.Count == 0) return;
+            if (
+                (dialogueManager == null && networkBridge == null)
+                || characterSelect == null
+                || _profiles.Count == 0
+            )
+                return;
 
             NPCProfile activeProfile = GetActiveProfile();
             if (activeProfile == null)
@@ -304,7 +372,8 @@ namespace NPCSystem
             }
 
             int index = _profiles.FindIndex(profile => profile == activeProfile);
-            if (index < 0) index = 0;
+            if (index < 0)
+                index = 0;
             characterSelect.SetValueWithoutNotify(index);
             UpdatePortrait(activeProfile);
             SetInputEnabled(true);
@@ -320,19 +389,47 @@ namespace NPCSystem
 
         void HandleResponseStart(string playerMessage)
         {
-            NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.UIInput, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
-                "UI received response-start event.", source: nameof(NPCDialogueUIController),
-                npcSlug: GetActiveProfile() != null ? GetActiveProfile().GetNpcSlug() : null,
-                data: NPCFlowTextSanitizer.MergeSummary(new Dictionary<string, object>(), "player", playerMessage, false, 0));
-            if (playerInput != null) playerInput.interactable = false;
+            NPCFlowLogger
+                .FindOrCreate()
+                .Log(
+                    NPCFlowStage.UIInput,
+                    NPCFlowStatus.Success,
+                    NPCFlowLogLevel.Info,
+                    "UI received response-start event.",
+                    source: nameof(NPCDialogueUIController),
+                    npcSlug: GetActiveProfile() != null ? GetActiveProfile().GetNpcSlug() : null,
+                    data: NPCFlowTextSanitizer.MergeSummary(
+                        new Dictionary<string, object>(),
+                        "player",
+                        playerMessage,
+                        false,
+                        0
+                    )
+                );
+            if (playerInput != null)
+                playerInput.interactable = false;
             SetAIText("...");
         }
 
         void HandleResponseComplete(string npcName, string response)
         {
-            NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.ResponseComplete, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
-                "UI received response-complete event.", source: nameof(NPCDialogueUIController), npcSlug: npcName,
-                data: NPCFlowTextSanitizer.MergeSummary(new Dictionary<string, object>(), "response", response, false, 0));
+            NPCFlowLogger
+                .FindOrCreate()
+                .Log(
+                    NPCFlowStage.ResponseComplete,
+                    NPCFlowStatus.Success,
+                    NPCFlowLogLevel.Info,
+                    "UI received response-complete event.",
+                    source: nameof(NPCDialogueUIController),
+                    npcSlug: npcName,
+                    data: NPCFlowTextSanitizer.MergeSummary(
+                        new Dictionary<string, object>(),
+                        "response",
+                        response,
+                        false,
+                        0
+                    )
+                );
             SetAIText(response);
             if (playerInput != null)
             {
@@ -344,12 +441,19 @@ namespace NPCSystem
 
         void HandleError(string error)
         {
-            string normalizedError = string.IsNullOrWhiteSpace(error) ? "Unknown dialogue error." : error.Trim();
-            NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.UIInput, NPCFlowStatus.Error, NPCFlowLogLevel.Error,
-                $"UI received dialogue error: {normalizedError}", source: nameof(NPCDialogueUIController), data: new Dictionary<string, object>
-                {
-                    ["error"] = normalizedError
-                });
+            string normalizedError = string.IsNullOrWhiteSpace(error)
+                ? "Unknown dialogue error."
+                : error.Trim();
+            NPCFlowLogger
+                .FindOrCreate()
+                .Log(
+                    NPCFlowStage.UIInput,
+                    NPCFlowStatus.Error,
+                    NPCFlowLogLevel.Error,
+                    $"UI received dialogue error: {normalizedError}",
+                    source: nameof(NPCDialogueUIController),
+                    data: new Dictionary<string, object> { ["error"] = normalizedError }
+                );
             SetAIText($"Error: {normalizedError}");
             if (GetActiveProfile() != null)
             {
@@ -360,7 +464,8 @@ namespace NPCSystem
 
         void SetAIText(string text)
         {
-            if (aiText != null) aiText.text = text;
+            if (aiText != null)
+                aiText.text = text;
         }
 
         void OnCharacterSelectionChanged(int selection)
@@ -372,20 +477,34 @@ namespace NPCSystem
         {
             if (selection < 0 || selection >= _profiles.Count)
             {
-                NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.NPCSwitch, NPCFlowStatus.Skipped, NPCFlowLogLevel.Warning,
-                    "UI profile selection index out of range.", source: nameof(NPCDialogueUIController), data: new Dictionary<string, object>
-                    {
-                        ["selection"] = selection,
-                        ["profileCount"] = _profiles.Count
-                    });
+                NPCFlowLogger
+                    .FindOrCreate()
+                    .Log(
+                        NPCFlowStage.NPCSwitch,
+                        NPCFlowStatus.Skipped,
+                        NPCFlowLogLevel.Warning,
+                        "UI profile selection index out of range.",
+                        source: nameof(NPCDialogueUIController),
+                        data: new Dictionary<string, object>
+                        {
+                            ["selection"] = selection,
+                            ["profileCount"] = _profiles.Count,
+                        }
+                    );
                 return;
             }
             NPCProfile profile = _profiles[selection];
-            NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.NPCSwitch, NPCFlowStatus.Start, NPCFlowLogLevel.Info,
-                "UI requested NPC switch.", source: nameof(NPCDialogueUIController), npcSlug: profile.GetNpcSlug(), data: new Dictionary<string, object>
-                {
-                    ["selection"] = selection
-                });
+            NPCFlowLogger
+                .FindOrCreate()
+                .Log(
+                    NPCFlowStage.NPCSwitch,
+                    NPCFlowStatus.Start,
+                    NPCFlowLogLevel.Info,
+                    "UI requested NPC switch.",
+                    source: nameof(NPCDialogueUIController),
+                    npcSlug: profile.GetNpcSlug(),
+                    data: new Dictionary<string, object> { ["selection"] = selection }
+                );
             _readyForInput = false;
             SetInputEnabled(false);
             UpdatePortrait(profile);
@@ -400,19 +519,41 @@ namespace NPCSystem
             NPCProfile activeProfile = GetActiveProfile();
             if (!_readyForInput || string.IsNullOrWhiteSpace(question) || activeProfile == null)
             {
-                NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.UIInput, NPCFlowStatus.Skipped, NPCFlowLogLevel.Info,
-                    "UI input submit ignored.", source: nameof(NPCDialogueUIController), data: new Dictionary<string, object>
-                    {
-                        ["readyForInput"] = _readyForInput,
-                        ["hasText"] = !string.IsNullOrWhiteSpace(question),
-                        ["hasManager"] = dialogueManager != null || networkBridge != null,
-                        ["hasCurrentProfile"] = activeProfile != null
-                    });
+                NPCFlowLogger
+                    .FindOrCreate()
+                    .Log(
+                        NPCFlowStage.UIInput,
+                        NPCFlowStatus.Skipped,
+                        NPCFlowLogLevel.Info,
+                        "UI input submit ignored.",
+                        source: nameof(NPCDialogueUIController),
+                        data: new Dictionary<string, object>
+                        {
+                            ["readyForInput"] = _readyForInput,
+                            ["hasText"] = !string.IsNullOrWhiteSpace(question),
+                            ["hasManager"] = dialogueManager != null || networkBridge != null,
+                            ["hasCurrentProfile"] = activeProfile != null,
+                        }
+                    );
                 return;
             }
-            NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.UIInput, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
-                "UI submitted player input.", source: nameof(NPCDialogueUIController), npcSlug: activeProfile.GetNpcSlug(),
-                data: NPCFlowTextSanitizer.MergeSummary(new Dictionary<string, object>(), "player", question, false, 0));
+            NPCFlowLogger
+                .FindOrCreate()
+                .Log(
+                    NPCFlowStage.UIInput,
+                    NPCFlowStatus.Success,
+                    NPCFlowLogLevel.Info,
+                    "UI submitted player input.",
+                    source: nameof(NPCDialogueUIController),
+                    npcSlug: activeProfile.GetNpcSlug(),
+                    data: NPCFlowTextSanitizer.MergeSummary(
+                        new Dictionary<string, object>(),
+                        "player",
+                        question,
+                        false,
+                        0
+                    )
+                );
             if (networkBridge != null)
                 networkBridge.SubmitPlayerMessage(question.Trim());
             else
@@ -421,7 +562,8 @@ namespace NPCSystem
 
         void SetInputEnabled(bool enabled)
         {
-            if (playerInput == null) return;
+            if (playerInput == null)
+                return;
 
             playerInput.interactable = enabled;
             if (enabled)
@@ -432,9 +574,16 @@ namespace NPCSystem
 
         void OnStopPressed()
         {
-            NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.UIInput, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
-                "UI stop/cancel pressed.", source: nameof(NPCDialogueUIController),
-                npcSlug: GetActiveProfile() != null ? GetActiveProfile().GetNpcSlug() : null);
+            NPCFlowLogger
+                .FindOrCreate()
+                .Log(
+                    NPCFlowStage.UIInput,
+                    NPCFlowStatus.Success,
+                    NPCFlowLogLevel.Info,
+                    "UI stop/cancel pressed.",
+                    source: nameof(NPCDialogueUIController),
+                    npcSlug: GetActiveProfile() != null ? GetActiveProfile().GetNpcSlug() : null
+                );
             if (networkBridge != null)
                 networkBridge.CancelActiveRequest();
             else
@@ -451,13 +600,16 @@ namespace NPCSystem
             RawImage[] portraits = new[] { butlerImage, maidImage, chefImage };
             foreach (RawImage portrait in portraits)
             {
-                if (portrait != null) portrait.gameObject.SetActive(false);
+                if (portrait != null)
+                    portrait.gameObject.SetActive(false);
             }
 
-            if (profile == null) return;
+            if (profile == null)
+                return;
 
             RawImage target = ResolvePortraitTarget(profile);
-            if (target == null) return;
+            if (target == null)
+                return;
 
             if (profile.portraitTexture != null)
             {
@@ -469,15 +621,27 @@ namespace NPCSystem
         RawImage ResolvePortraitTarget(NPCProfile profile)
         {
             string slug = profile.GetNpcSlug();
-            if (slug.Contains("butler")) return butlerImage != null ? butlerImage : maidImage != null ? maidImage : chefImage;
-            if (slug.Contains("maid")) return maidImage != null ? maidImage : butlerImage != null ? butlerImage : chefImage;
-            if (slug.Contains("chef")) return chefImage != null ? chefImage : butlerImage != null ? butlerImage : maidImage;
-            return butlerImage != null ? butlerImage : maidImage != null ? maidImage : chefImage;
+            if (slug.Contains("butler"))
+                return butlerImage != null ? butlerImage
+                    : maidImage != null ? maidImage
+                    : chefImage;
+            if (slug.Contains("maid"))
+                return maidImage != null ? maidImage
+                    : butlerImage != null ? butlerImage
+                    : chefImage;
+            if (slug.Contains("chef"))
+                return chefImage != null ? chefImage
+                    : butlerImage != null ? butlerImage
+                    : maidImage;
+            return butlerImage != null ? butlerImage
+                : maidImage != null ? maidImage
+                : chefImage;
         }
 
         void OnValueChanged(string newText)
         {
-            if (!IsSubmitPressed()) return;
+            if (!IsSubmitPressed())
+                return;
             if (playerInput != null && string.IsNullOrWhiteSpace(playerInput.text))
             {
                 playerInput.text = string.Empty;
@@ -496,18 +660,22 @@ namespace NPCSystem
         void Update()
         {
 #if ENABLE_INPUT_SYSTEM
-            bool mouseClicked = Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
-            Vector2 mousePosition = Mouse.current != null ? Mouse.current.position.ReadValue() : Vector2.zero;
+            bool mouseClicked =
+                Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
+            Vector2 mousePosition =
+                Mouse.current != null ? Mouse.current.position.ReadValue() : Vector2.zero;
 #else
             bool mouseClicked = Input.GetMouseButtonDown(0);
             Vector2 mousePosition = Input.mousePosition;
 #endif
-            if (!mouseClicked) return;
+            if (!mouseClicked)
+                return;
 
             notebookController?.HandleGlobalClick(mousePosition);
         }
 
-        static T FindComponent<T>(string path) where T : Component
+        static T FindComponent<T>(string path)
+            where T : Component
         {
             GameObject gameObject = FindObject(path);
             return gameObject != null ? gameObject.GetComponent<T>() : null;
@@ -515,7 +683,8 @@ namespace NPCSystem
 
         NPCProfile GetActiveProfile()
         {
-            if (networkBridge != null && networkBridge.currentProfile != null) return networkBridge.currentProfile;
+            if (networkBridge != null && networkBridge.currentProfile != null)
+                return networkBridge.currentProfile;
             return dialogueManager != null ? dialogueManager.currentProfile : null;
         }
 

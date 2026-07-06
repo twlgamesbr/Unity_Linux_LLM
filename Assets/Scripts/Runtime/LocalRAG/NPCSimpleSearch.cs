@@ -10,7 +10,8 @@ namespace NPCSystem
     public class NPCSimpleSearch : NPCSearchMethod
     {
         protected SortedDictionary<int, float[]> embeddings = new SortedDictionary<int, float[]>();
-        protected Dictionary<int, List<(int, float)>> incrementalSearchCache = new Dictionary<int, List<(int, float)>>();
+        protected Dictionary<int, List<(int, float)>> incrementalSearchCache =
+            new Dictionary<int, List<(int, float)>>();
 
         protected override void AddInternal(int key, float[] embedding)
         {
@@ -32,11 +33,14 @@ namespace NPCSystem
                 if (dataSplit.Count >= 0)
                 {
                     float[][] embeddingsSplit = new float[dataSplit.Count][];
-                    for (int i = 0; i < dataSplit.Count; i++) embeddingsSplit[i] = embeddings[dataSplit[i]];
+                    for (int i = 0; i < dataSplit.Count; i++)
+                        embeddingsSplit[i] = embeddings[dataSplit[i]];
 
                     float[] unsortedDistances = InverseDotProduct(embedding, embeddingsSplit);
-                    sortedLists = dataSplit.Zip(unsortedDistances, (first, second) => (first, second))
-                        .OrderBy(item => item.Item2).ToList();
+                    sortedLists = dataSplit
+                        .Zip(unsortedDistances, (first, second) => (first, second))
+                        .OrderBy(item => item.Item2)
+                        .ToList();
                 }
             }
             incrementalSearchCache[key] = sortedLists;
@@ -65,7 +69,8 @@ namespace NPCSystem
                 incrementalSearchCache[fetchKey].RemoveRange(0, getK);
                 completed = incrementalSearchCache[fetchKey].Count == 0;
             }
-            if (completed) IncrementalSearchComplete(fetchKey);
+            if (completed)
+                IncrementalSearchComplete(fetchKey);
 
             int[] results = new int[sortedLists.Count];
             float[] distances = new float[sortedLists.Count];
@@ -91,13 +96,23 @@ namespace NPCSystem
         protected override void SaveInternal(ZipArchive archive)
         {
             NPCArchiveSaver.Save(archive, embeddings, GetSavePath("embeddings"));
-            NPCArchiveSaver.Save(archive, incrementalSearchCache, GetSavePath("incrementalSearchCache"));
+            NPCArchiveSaver.Save(
+                archive,
+                incrementalSearchCache,
+                GetSavePath("incrementalSearchCache")
+            );
         }
 
         protected override void LoadInternal(ZipArchive archive)
         {
-            embeddings = NPCArchiveSaver.Load<SortedDictionary<int, float[]>>(archive, GetSavePath("embeddings"));
-            incrementalSearchCache = NPCArchiveSaver.Load<Dictionary<int, List<(int, float)>>>(archive, GetSavePath("incrementalSearchCache"));
+            embeddings = NPCArchiveSaver.Load<SortedDictionary<int, float[]>>(
+                archive,
+                GetSavePath("embeddings")
+            );
+            incrementalSearchCache = NPCArchiveSaver.Load<Dictionary<int, List<(int, float)>>>(
+                archive,
+                GetSavePath("incrementalSearchCache")
+            );
         }
     }
 }

@@ -31,7 +31,8 @@ namespace NPCSystem.Tests
         public void TryGetCommandLineStartupMode_NoArgs_ReturnsFalse()
         {
             bool result = AuthNetworkBridge.TryGetCommandLineStartupMode(
-                out AuthNetworkBridge.ResolvedNetworkStartupMode mode);
+                out AuthNetworkBridge.ResolvedNetworkStartupMode mode
+            );
             Assert.That(result, Is.False);
         }
 
@@ -46,9 +47,13 @@ namespace NPCSystem.Tests
             try
             {
                 bool found = AuthNetworkBridge.TryGetCommandLineStartupMode(
-                    out AuthNetworkBridge.ResolvedNetworkStartupMode _);
-                Assert.That(found, Is.False,
-                    "Should NOT find a command-line mode in edit-mode tests (no -npc-client or -npc-host args).");
+                    out AuthNetworkBridge.ResolvedNetworkStartupMode _
+                );
+                Assert.That(
+                    found,
+                    Is.False,
+                    "Should NOT find a command-line mode in edit-mode tests (no -npc-client or -npc-host args)."
+                );
             }
             finally
             {

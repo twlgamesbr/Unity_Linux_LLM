@@ -74,7 +74,11 @@ namespace NPCSystem
             NPCTransferableItem item = FindNearestPickupCandidate(clientId);
             if (item == null)
             {
-                LogInteractorEvent(clientId, NPCFlowStatus.Skipped, "No pickup candidate in range.");
+                LogInteractorEvent(
+                    clientId,
+                    NPCFlowStatus.Skipped,
+                    "No pickup candidate in range."
+                );
                 return;
             }
 
@@ -89,7 +93,11 @@ namespace NPCSystem
             NPCPlayerNetworkAvatar targetPlayer = FindNearestOtherPlayer(clientId);
             if (item == null || targetPlayer == null)
             {
-                LogInteractorEvent(clientId, NPCFlowStatus.Skipped, "Give-to-player skipped because no held item or target player was found.");
+                LogInteractorEvent(
+                    clientId,
+                    NPCFlowStatus.Skipped,
+                    "Give-to-player skipped because no held item or target player was found."
+                );
                 return;
             }
 
@@ -104,7 +112,11 @@ namespace NPCSystem
             NPCServerCharacter npc = FindNearestNpc(clientId);
             if (item == null || npc == null)
             {
-                LogInteractorEvent(clientId, NPCFlowStatus.Skipped, "Give-to-NPC skipped because no held item or NPC was found.");
+                LogInteractorEvent(
+                    clientId,
+                    NPCFlowStatus.Skipped,
+                    "Give-to-NPC skipped because no held item or NPC was found."
+                );
                 return;
             }
 
@@ -137,13 +149,21 @@ namespace NPCSystem
             NPCPlayerInventory targetInventory = FindInventory(clientId);
             targetInventory?.ServerTryAddItem(item.ItemId);
 
-            NPCNetworkSessionManager sessionManager = FindAnyObjectByType<NPCNetworkSessionManager>(FindObjectsInactive.Include);
+            NPCNetworkSessionManager sessionManager = FindAnyObjectByType<NPCNetworkSessionManager>(
+                FindObjectsInactive.Include
+            );
             sessionManager?.AddInventoryItem(clientId, item.ItemId);
 
-            NPCDialogueNetworkBridge bridge = FindAnyObjectByType<NPCDialogueNetworkBridge>(FindObjectsInactive.Include);
+            NPCDialogueNetworkBridge bridge = FindAnyObjectByType<NPCDialogueNetworkBridge>(
+                FindObjectsInactive.Include
+            );
             bridge?.RefreshNotebookStateForClient(clientId);
 
-            LogInteractorEvent(clientId, NPCFlowStatus.Success, $"Recorded item '{item.ItemId}' in player inventory.");
+            LogInteractorEvent(
+                clientId,
+                NPCFlowStatus.Success,
+                $"Recorded item '{item.ItemId}' in player inventory."
+            );
         }
 
         void RemoveItemFromPlayer(NPCTransferableItem item, ulong clientId)
@@ -151,10 +171,14 @@ namespace NPCSystem
             NPCPlayerInventory sourceInventory = FindInventory(clientId);
             sourceInventory?.ServerTryRemoveItem(item.ItemId);
 
-            NPCNetworkSessionManager sessionManager = FindAnyObjectByType<NPCNetworkSessionManager>(FindObjectsInactive.Include);
+            NPCNetworkSessionManager sessionManager = FindAnyObjectByType<NPCNetworkSessionManager>(
+                FindObjectsInactive.Include
+            );
             sessionManager?.RemoveInventoryItem(clientId, item.ItemId);
 
-            NPCDialogueNetworkBridge bridge = FindAnyObjectByType<NPCDialogueNetworkBridge>(FindObjectsInactive.Include);
+            NPCDialogueNetworkBridge bridge = FindAnyObjectByType<NPCDialogueNetworkBridge>(
+                FindObjectsInactive.Include
+            );
             bridge?.RefreshNotebookStateForClient(clientId);
         }
 
@@ -168,7 +192,9 @@ namespace NPCSystem
 
             NPCTransferableItem nearestItem = null;
             float nearestDistance = pickupRange;
-            NPCTransferableItem[] items = FindObjectsByType<NPCTransferableItem>(FindObjectsInactive.Include);
+            NPCTransferableItem[] items = FindObjectsByType<NPCTransferableItem>(
+                FindObjectsInactive.Include
+            );
             foreach (NPCTransferableItem item in items)
             {
                 if (item == null || !item.IsSpawned || item.IsHeldByPlayer)
@@ -176,7 +202,10 @@ namespace NPCSystem
                     continue;
                 }
 
-                float distance = Vector3.Distance(avatar.transform.position, item.transform.position);
+                float distance = Vector3.Distance(
+                    avatar.transform.position,
+                    item.transform.position
+                );
                 if (distance <= nearestDistance)
                 {
                     nearestDistance = distance;
@@ -189,10 +218,17 @@ namespace NPCSystem
 
         NPCTransferableItem FindHeldItem(ulong clientId)
         {
-            NPCTransferableItem[] items = FindObjectsByType<NPCTransferableItem>(FindObjectsInactive.Include);
+            NPCTransferableItem[] items = FindObjectsByType<NPCTransferableItem>(
+                FindObjectsInactive.Include
+            );
             foreach (NPCTransferableItem item in items)
             {
-                if (item != null && item.IsSpawned && item.IsHeldByPlayer && item.OwnerClientId == clientId)
+                if (
+                    item != null
+                    && item.IsSpawned
+                    && item.IsHeldByPlayer
+                    && item.OwnerClientId == clientId
+                )
                 {
                     return item;
                 }
@@ -211,7 +247,9 @@ namespace NPCSystem
 
             NPCPlayerNetworkAvatar nearestPlayer = null;
             float nearestDistance = transferRange;
-            NPCPlayerNetworkAvatar[] avatars = FindObjectsByType<NPCPlayerNetworkAvatar>(FindObjectsInactive.Include);
+            NPCPlayerNetworkAvatar[] avatars = FindObjectsByType<NPCPlayerNetworkAvatar>(
+                FindObjectsInactive.Include
+            );
             foreach (NPCPlayerNetworkAvatar avatar in avatars)
             {
                 if (avatar == null || avatar.OwnerClientId == clientId || !avatar.IsSpawned)
@@ -219,7 +257,10 @@ namespace NPCSystem
                     continue;
                 }
 
-                float distance = Vector3.Distance(sourceAvatar.transform.position, avatar.transform.position);
+                float distance = Vector3.Distance(
+                    sourceAvatar.transform.position,
+                    avatar.transform.position
+                );
                 if (distance <= nearestDistance)
                 {
                     nearestDistance = distance;
@@ -240,7 +281,9 @@ namespace NPCSystem
 
             NPCServerCharacter nearestNpc = null;
             float nearestDistance = transferRange;
-            NPCServerCharacter[] npcs = FindObjectsByType<NPCServerCharacter>(FindObjectsInactive.Include);
+            NPCServerCharacter[] npcs = FindObjectsByType<NPCServerCharacter>(
+                FindObjectsInactive.Include
+            );
             foreach (NPCServerCharacter npc in npcs)
             {
                 if (npc == null || !npc.IsSpawned)
@@ -248,7 +291,10 @@ namespace NPCSystem
                     continue;
                 }
 
-                float distance = Vector3.Distance(sourceAvatar.transform.position, npc.transform.position);
+                float distance = Vector3.Distance(
+                    sourceAvatar.transform.position,
+                    npc.transform.position
+                );
                 if (distance <= nearestDistance)
                 {
                     nearestDistance = distance;
@@ -267,7 +313,9 @@ namespace NPCSystem
 
         NPCPlayerNetworkAvatar FindPlayerAvatar(ulong clientId)
         {
-            NPCPlayerNetworkAvatar[] avatars = FindObjectsByType<NPCPlayerNetworkAvatar>(FindObjectsInactive.Include);
+            NPCPlayerNetworkAvatar[] avatars = FindObjectsByType<NPCPlayerNetworkAvatar>(
+                FindObjectsInactive.Include
+            );
             foreach (NPCPlayerNetworkAvatar avatar in avatars)
             {
                 if (avatar != null && avatar.IsSpawned && avatar.OwnerClientId == clientId)
@@ -287,7 +335,10 @@ namespace NPCSystem
                 return;
             }
 
-            InputActionMap map = _playerController.inputActions.FindActionMap(_playerController.actionMapName, false);
+            InputActionMap map = _playerController.inputActions.FindActionMap(
+                _playerController.actionMapName,
+                false
+            );
             _interactAction ??= map?.FindAction(interactActionName, false);
             _giveToPlayerAction ??= map?.FindAction(giveToPlayerActionName, false);
             _giveToNpcAction ??= map?.FindAction(giveToNpcActionName, false);
@@ -296,13 +347,16 @@ namespace NPCSystem
 
         void LogInteractorEvent(ulong clientId, NPCFlowStatus status, string message)
         {
-            NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.OwnershipAuthority, status, NPCFlowLogLevel.Info,
-                message,
-                source: nameof(NPCNetworkItemInteractor),
-                data: new Dictionary<string, object>
-                {
-                    ["clientId"] = clientId
-                });
+            NPCFlowLogger
+                .FindOrCreate()
+                ?.Log(
+                    NPCFlowStage.OwnershipAuthority,
+                    status,
+                    NPCFlowLogLevel.Info,
+                    message,
+                    source: nameof(NPCNetworkItemInteractor),
+                    data: new Dictionary<string, object> { ["clientId"] = clientId }
+                );
         }
     }
 }

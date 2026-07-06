@@ -44,8 +44,10 @@ namespace NPCSystem
         public static bool TryParsePlayerIndex(string playerName, out int playerIndex)
         {
             playerIndex = 0;
-            if (string.IsNullOrWhiteSpace(playerName) ||
-                !playerName.StartsWith(PlayerPrefix, StringComparison.OrdinalIgnoreCase))
+            if (
+                string.IsNullOrWhiteSpace(playerName)
+                || !playerName.StartsWith(PlayerPrefix, StringComparison.OrdinalIgnoreCase)
+            )
             {
                 return false;
             }
@@ -59,7 +61,13 @@ namespace NPCSystem
             string[] args = Environment.GetCommandLineArgs();
             for (int index = 0; index < args.Length - 1; index++)
             {
-                if (!string.Equals(args[index], ClientBindPortArg, StringComparison.OrdinalIgnoreCase))
+                if (
+                    !string.Equals(
+                        args[index],
+                        ClientBindPortArg,
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                )
                 {
                     continue;
                 }
@@ -74,7 +82,11 @@ namespace NPCSystem
             return false;
         }
 
-        public static ushort ResolveClientBindPortForPlayerIndex(int playerIndex, ushort serverPort, ushort explicitOverride = 0)
+        public static ushort ResolveClientBindPortForPlayerIndex(
+            int playerIndex,
+            ushort serverPort,
+            ushort explicitOverride = 0
+        )
         {
             if (explicitOverride != 0)
             {

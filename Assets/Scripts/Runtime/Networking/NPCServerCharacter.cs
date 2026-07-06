@@ -9,15 +9,24 @@ namespace NPCSystem
     {
         static NPCServerCharacter()
         {
-            UserNetworkVariableSerialization<string>.WriteValue = (FastBufferWriter writer, in string value) =>
+            UserNetworkVariableSerialization<string>.WriteValue = (
+                FastBufferWriter writer,
+                in string value
+            ) =>
             {
                 writer.WriteValueSafe(value);
             };
-            UserNetworkVariableSerialization<string>.ReadValue = (FastBufferReader reader, out string value) =>
+            UserNetworkVariableSerialization<string>.ReadValue = (
+                FastBufferReader reader,
+                out string value
+            ) =>
             {
                 reader.ReadValueSafe(out value);
             };
-            UserNetworkVariableSerialization<string>.DuplicateValue = (in string value, ref string duplicatedValue) =>
+            UserNetworkVariableSerialization<string>.DuplicateValue = (
+                in string value,
+                ref string duplicatedValue
+            ) =>
             {
                 duplicatedValue = value;
             };
@@ -26,14 +35,17 @@ namespace NPCSystem
         public readonly NetworkVariable<string> npcSlug = new NetworkVariable<string>(
             string.Empty,
             NetworkVariableReadPermission.Everyone,
-            NetworkVariableWritePermission.Server);
+            NetworkVariableWritePermission.Server
+        );
 
         public readonly NetworkVariable<string> npcDisplayName = new NetworkVariable<string>(
             string.Empty,
             NetworkVariableReadPermission.Everyone,
-            NetworkVariableWritePermission.Server);
+            NetworkVariableWritePermission.Server
+        );
 
-        public string DisplayName => string.IsNullOrWhiteSpace(npcDisplayName.Value) ? "NPC" : npcDisplayName.Value;
+        public string DisplayName =>
+            string.IsNullOrWhiteSpace(npcDisplayName.Value) ? "NPC" : npcDisplayName.Value;
         public string Slug => string.IsNullOrWhiteSpace(npcSlug.Value) ? "npc" : npcSlug.Value;
 
         public override void OnNetworkSpawn()
@@ -43,25 +55,37 @@ namespace NPCSystem
             npcDisplayName.OnValueChanged += HandleIdentityChanged;
             RefreshHierarchyName();
 
-            NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.NpcSpawn, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
-                $"Server NPC '{DisplayName}' spawned.",
-                source: nameof(NPCServerCharacter),
-                npcSlug: Slug,
-                data: new Dictionary<string, object>
-                {
-                    ["networkObjectId"] = NetworkObjectId,
-                    ["isServer"] = IsServer
-                });
+            NPCFlowLogger
+                .FindOrCreate()
+                ?.Log(
+                    NPCFlowStage.NpcSpawn,
+                    NPCFlowStatus.Success,
+                    NPCFlowLogLevel.Info,
+                    $"Server NPC '{DisplayName}' spawned.",
+                    source: nameof(NPCServerCharacter),
+                    npcSlug: Slug,
+                    data: new Dictionary<string, object>
+                    {
+                        ["networkObjectId"] = NetworkObjectId,
+                        ["isServer"] = IsServer,
+                    }
+                );
         }
 
         public override void OnNetworkDespawn()
         {
             npcSlug.OnValueChanged -= HandleIdentityChanged;
             npcDisplayName.OnValueChanged -= HandleIdentityChanged;
-            NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.NpcSpawn, NPCFlowStatus.Warning, NPCFlowLogLevel.Info,
-                $"Server NPC '{DisplayName}' despawned.",
-                source: nameof(NPCServerCharacter),
-                npcSlug: Slug);
+            NPCFlowLogger
+                .FindOrCreate()
+                ?.Log(
+                    NPCFlowStage.NpcSpawn,
+                    NPCFlowStatus.Warning,
+                    NPCFlowLogLevel.Info,
+                    $"Server NPC '{DisplayName}' despawned.",
+                    source: nameof(NPCServerCharacter),
+                    npcSlug: Slug
+                );
             base.OnNetworkDespawn();
         }
 

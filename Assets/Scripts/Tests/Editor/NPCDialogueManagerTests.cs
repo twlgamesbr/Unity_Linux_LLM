@@ -187,10 +187,26 @@ namespace NPCSystem.Tests
         [Test]
         public void IsTechnicalCodebaseQuestion_DetectsTechnicalMarkers()
         {
-            Assert.That(NPCDialogueManager.IsTechnicalCodebaseQuestion("Where is the script for PlayerController?"), Is.True);
-            Assert.That(NPCDialogueManager.IsTechnicalCodebaseQuestion("How does the RAG collection work?"), Is.True);
-            Assert.That(NPCDialogueManager.IsTechnicalCodebaseQuestion("Which file implements NPCDialogueManager?"), Is.True);
-            Assert.That(NPCDialogueManager.IsTechnicalCodebaseQuestion("Tell me about your day"), Is.False);
+            Assert.That(
+                NPCDialogueManager.IsTechnicalCodebaseQuestion(
+                    "Where is the script for PlayerController?"
+                ),
+                Is.True
+            );
+            Assert.That(
+                NPCDialogueManager.IsTechnicalCodebaseQuestion("How does the RAG collection work?"),
+                Is.True
+            );
+            Assert.That(
+                NPCDialogueManager.IsTechnicalCodebaseQuestion(
+                    "Which file implements NPCDialogueManager?"
+                ),
+                Is.True
+            );
+            Assert.That(
+                NPCDialogueManager.IsTechnicalCodebaseQuestion("Tell me about your day"),
+                Is.False
+            );
             Assert.That(NPCDialogueManager.IsTechnicalCodebaseQuestion(""), Is.False);
             Assert.That(NPCDialogueManager.IsTechnicalCodebaseQuestion("   "), Is.False);
             Assert.That(NPCDialogueManager.IsTechnicalCodebaseQuestion(null), Is.False);
@@ -290,8 +306,8 @@ namespace NPCSystem.Tests
                     ["butler"] = new List<DialogueEntry>
                     {
                         new DialogueEntry("user", "Hello"),
-                        new DialogueEntry("assistant", "Hi")
-                    }
+                        new DialogueEntry("assistant", "Hi"),
+                    },
                 };
                 manager.ApplyHistorySnapshot(modified);
 

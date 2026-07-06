@@ -12,11 +12,17 @@ namespace NPCSystem.Tests
             var snapshot = new NPCBackendReadinessSnapshot
             {
                 auth = new NPCBackendProbeResult { reachable = true },
-                localAi = new NPCBackendProbeResult { reachable = false }
+                localAi = new NPCBackendProbeResult { reachable = false },
             };
 
-            Assert.That(snapshot.AllRequiredBackendsReachable(requireAuth: true, requireLocalAi: false), Is.True);
-            Assert.That(snapshot.AllRequiredBackendsReachable(requireAuth: true, requireLocalAi: true), Is.False);
+            Assert.That(
+                snapshot.AllRequiredBackendsReachable(requireAuth: true, requireLocalAi: false),
+                Is.True
+            );
+            Assert.That(
+                snapshot.AllRequiredBackendsReachable(requireAuth: true, requireLocalAi: true),
+                Is.False
+            );
         }
 
         [Test]
@@ -39,13 +45,23 @@ namespace NPCSystem.Tests
                 service.authService = authService;
                 service.dialogueManager = dialogueManager;
 
-                MethodInfo authMethod = typeof(NPCBackendReadinessService)
-                    .GetMethod("BuildAuthProbeUrl", BindingFlags.Instance | BindingFlags.NonPublic);
-                MethodInfo localAiMethod = typeof(NPCBackendReadinessService)
-                    .GetMethod("BuildLocalAiProbeUrl", BindingFlags.Instance | BindingFlags.NonPublic);
+                MethodInfo authMethod = typeof(NPCBackendReadinessService).GetMethod(
+                    "BuildAuthProbeUrl",
+                    BindingFlags.Instance | BindingFlags.NonPublic
+                );
+                MethodInfo localAiMethod = typeof(NPCBackendReadinessService).GetMethod(
+                    "BuildLocalAiProbeUrl",
+                    BindingFlags.Instance | BindingFlags.NonPublic
+                );
 
-                Assert.That(authMethod?.Invoke(service, null) as string, Is.EqualTo("http://localhost:5100/api/auth/session"));
-                Assert.That(localAiMethod?.Invoke(service, null) as string, Is.EqualTo("http://127.0.0.1:8080/v1/models"));
+                Assert.That(
+                    authMethod?.Invoke(service, null) as string,
+                    Is.EqualTo("http://localhost:5100/api/auth/session")
+                );
+                Assert.That(
+                    localAiMethod?.Invoke(service, null) as string,
+                    Is.EqualTo("http://127.0.0.1:8080/v1/models")
+                );
             }
             finally
             {

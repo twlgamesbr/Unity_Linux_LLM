@@ -11,7 +11,11 @@ namespace NPCSystem.EditorUX
     public sealed class NPCInspectorDiagnosticsPilot : MonoBehaviour
     {
         [Title("NPC Inspector Diagnostics Pilot")]
-        [HelpBox("Pilot component for validating EditorAttributes usage around LocalAI, Qdrant, and NPC dialogue scene references.", MessageMode.Log, drawAbove: true)]
+        [HelpBox(
+            "Pilot component for validating EditorAttributes usage around LocalAI, Qdrant, and NPC dialogue scene references.",
+            MessageMode.Log,
+            drawAbove: true
+        )]
         [SerializeField, Required]
         NPCDialogueManager dialogueManager;
 
@@ -47,7 +51,8 @@ namespace NPCSystem.EditorUX
 #if UNITY_EDITOR
         void OnValidate()
         {
-            if (Application.isPlaying) return;
+            if (Application.isPlaying)
+                return;
 
             if (dialogueManager == null || qdrantRag == null)
             {
@@ -61,7 +66,9 @@ namespace NPCSystem.EditorUX
         {
             if (dialogueManager == null)
             {
-                dialogueManager = FindAnyObjectByType<NPCDialogueManager>(FindObjectsInactive.Include);
+                dialogueManager = FindAnyObjectByType<NPCDialogueManager>(
+                    FindObjectsInactive.Include
+                );
             }
 
             if (qdrantRag == null)
@@ -69,20 +76,26 @@ namespace NPCSystem.EditorUX
                 qdrantRag = FindAnyObjectByType<QdrantRAGService>(FindObjectsInactive.Include);
             }
 
-            lastValidationStatus = dialogueManager == null
-                ? "Dialogue manager not found."
-                : $"References assigned. LocalAI preview: {LocalAiBaseUrl}";
+            lastValidationStatus =
+                dialogueManager == null
+                    ? "Dialogue manager not found."
+                    : $"References assigned. LocalAI preview: {LocalAiBaseUrl}";
         }
 
         [Button("Validate LocalAI Settings")]
         void ValidateLocalAiSettings()
         {
-            lastValidationStatus = HasLocalAiHost() && HasValidLocalAiPort() && HasLocalAiModel()
-                ? $"LocalAI settings look valid: {LocalAiBaseUrl} model={localAiModel}"
-                : "LocalAI settings are incomplete. Check host, port, and model.";
+            lastValidationStatus =
+                HasLocalAiHost() && HasValidLocalAiPort() && HasLocalAiModel()
+                    ? $"LocalAI settings look valid: {LocalAiBaseUrl} model={localAiModel}"
+                    : "LocalAI settings are incomplete. Check host, port, and model.";
         }
 
-        [Button(nameof(useQdrantDiagnostics), ConditionResult.ShowHide, buttonLabel: "Validate Qdrant Settings")]
+        [Button(
+            nameof(useQdrantDiagnostics),
+            ConditionResult.ShowHide,
+            buttonLabel: "Validate Qdrant Settings"
+        )]
         void ValidateQdrantSettings()
         {
             if (!useQdrantDiagnostics)
@@ -93,16 +106,22 @@ namespace NPCSystem.EditorUX
 
             if (qdrantRag == null)
             {
-                lastValidationStatus = "Qdrant diagnostics enabled but no QdrantRAGService is assigned.";
+                lastValidationStatus =
+                    "Qdrant diagnostics enabled but no QdrantRAGService is assigned.";
                 return;
             }
 
-            bool hasUrl = !string.IsNullOrWhiteSpace(qdrantRag.qdrantUrl)
-                && (qdrantRag.qdrantUrl.StartsWith("http://") || qdrantRag.qdrantUrl.StartsWith("https://"));
+            bool hasUrl =
+                !string.IsNullOrWhiteSpace(qdrantRag.qdrantUrl)
+                && (
+                    qdrantRag.qdrantUrl.StartsWith("http://")
+                    || qdrantRag.qdrantUrl.StartsWith("https://")
+                );
             bool hasCollection = !string.IsNullOrWhiteSpace(qdrantRag.collectionName);
-            lastValidationStatus = hasUrl && hasCollection
-                ? $"Qdrant settings look valid: {qdrantRag.qdrantUrl} collection={qdrantRag.collectionName}"
-                : "Qdrant settings are incomplete. Check URL and collection name.";
+            lastValidationStatus =
+                hasUrl && hasCollection
+                    ? $"Qdrant settings look valid: {qdrantRag.qdrantUrl} collection={qdrantRag.collectionName}"
+                    : "Qdrant settings are incomplete. Check URL and collection name.";
         }
 
         bool HasLocalAiHost() => !string.IsNullOrWhiteSpace(localAiHost);

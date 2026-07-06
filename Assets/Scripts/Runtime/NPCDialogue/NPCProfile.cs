@@ -7,7 +7,11 @@ namespace NPCSystem
     public class NPCProfile : ScriptableObject
     {
         [Title("Identity")]
-        [HelpBox("NPC profile assets drive prompt construction, local knowledge paths, history persistence, and optional LoRA selection.", MessageMode.Log, drawAbove: true)]
+        [HelpBox(
+            "NPC profile assets drive prompt construction, local knowledge paths, history persistence, and optional LoRA selection.",
+            MessageMode.Log,
+            drawAbove: true
+        )]
         [OnValueChanged(nameof(RefreshInspectorPreview))]
         [Header("Identity")]
         public string npcSlug = "npc";
@@ -21,13 +25,26 @@ namespace NPCSystem
         public string systemPrompt = "You are a helpful in-game NPC.";
 
         [Header("Behavior")]
-        [TextArea(2, 5)] public string personalityBrief = "";
-        [TextArea(2, 5)] public string speakingStyle = "";
-        [TextArea(2, 5)] public string boundaries = "";
-        [TextArea(2, 5)] public string secretKnowledge = "";
-        [Range(0f, 1f)] public float suspicion = 0.3f;
-        [Range(0f, 1f)] public float helpfulness = 0.7f;
-        [Range(0f, 1f)] public float sarcasm = 0.2f;
+        [TextArea(2, 5)]
+        public string personalityBrief = "";
+
+        [TextArea(2, 5)]
+        public string speakingStyle = "";
+
+        [TextArea(2, 5)]
+        public string boundaries = "";
+
+        [TextArea(2, 5)]
+        public string secretKnowledge = "";
+
+        [Range(0f, 1f)]
+        public float suspicion = 0.3f;
+
+        [Range(0f, 1f)]
+        public float helpfulness = 0.7f;
+
+        [Range(0f, 1f)]
+        public float sarcasm = 0.2f;
 
         [Header("Gameplay Actions")]
         public bool canGivePuzzleHints = true;
@@ -38,17 +55,27 @@ namespace NPCSystem
 
         [Title("Sampling")]
         [Header("Sampling")]
-        [Range(0f, 2f)] public float temperature = 0.7f;
-        [Range(0f, 1f)] public float topP = 0.9f;
-        [Range(0f, 1f)] public float minP = 0.05f;
-        [Range(0, 100)] public int topK = 40;
-        [Range(0f, 2f)] public float repeatPenalty = 1.1f;
+        [Range(0f, 2f)]
+        public float temperature = 0.7f;
+
+        [Range(0f, 1f)]
+        public float topP = 0.9f;
+
+        [Range(0f, 1f)]
+        public float minP = 0.05f;
+
+        [Range(0, 100)]
+        public int topK = 40;
+
+        [Range(0f, 2f)]
+        public float repeatPenalty = 1.1f;
         public int maxTokens = 150;
 
         [Title("Knowledge")]
         [Header("Knowledge")]
         public string ragCategory = "";
         public int ragResults = 3;
+
         [Tooltip("Path relative to StreamingAssets, e.g. NPCs/butler/knowledge.md")]
         [FilePath(true, "md")]
         [OnValueChanged(nameof(NormalizeProfilePaths))]
@@ -60,7 +87,9 @@ namespace NPCSystem
         [FilePath(true, "gguf")]
         [OnValueChanged(nameof(NormalizeProfilePaths))]
         public string loraAdapterPath = "";
-        [Range(0f, 1f)] public float loraWeight = 0.8f;
+
+        [Range(0f, 1f)]
+        public float loraWeight = 0.8f;
 
         [Title("History")]
         [Header("History")]
@@ -92,21 +121,29 @@ namespace NPCSystem
         [Button("Validate Profile Configuration")]
         void RefreshInspectorPreview()
         {
-            inspectorPreview = HasValidNpcSlug() && HasDisplayName() && HasSystemPrompt() && HasValidMaxTokens() && HasValidRagResults()
-                ? $"Profile '{GetDisplayName()}' resolves to slug '{GetNpcSlug()}' with knowledge '{GetKnowledgeSourcePath()}'."
-                : "Profile has invalid required values. Check slug, display name, prompt, max tokens, and RAG results.";
+            inspectorPreview =
+                HasValidNpcSlug()
+                && HasDisplayName()
+                && HasSystemPrompt()
+                && HasValidMaxTokens()
+                && HasValidRagResults()
+                    ? $"Profile '{GetDisplayName()}' resolves to slug '{GetNpcSlug()}' with knowledge '{GetKnowledgeSourcePath()}'."
+                    : "Profile has invalid required values. Check slug, display name, prompt, max tokens, and RAG results.";
         }
 
         public string GetNpcSlug()
         {
-            if (!string.IsNullOrWhiteSpace(npcSlug)) return npcSlug.Trim().ToLowerInvariant();
-            if (!string.IsNullOrWhiteSpace(displayName)) return displayName.Trim().ToLowerInvariant().Replace(" ", "-");
+            if (!string.IsNullOrWhiteSpace(npcSlug))
+                return npcSlug.Trim().ToLowerInvariant();
+            if (!string.IsNullOrWhiteSpace(displayName))
+                return displayName.Trim().ToLowerInvariant().Replace(" ", "-");
             return name.Trim().ToLowerInvariant().Replace(" ", "-");
         }
 
         public string GetDisplayName()
         {
-            if (!string.IsNullOrWhiteSpace(displayName)) return displayName.Trim();
+            if (!string.IsNullOrWhiteSpace(displayName))
+                return displayName.Trim();
             return string.IsNullOrWhiteSpace(name) ? "NPC" : name.Trim();
         }
 

@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using EditorAttributes;
-using Unity.Netcode;
 using Unity.Multiplayer;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace NPCSystem
@@ -22,34 +22,47 @@ namespace NPCSystem
         public enum ResolvedNetworkStartupMode
         {
             Host,
-            Client
+            Client,
         }
 
         [Title("Auth Network Bridge")]
-        [HelpBox("Bridges client-side auth success into NGO startup and player-name replication. This component owns login-to-spawn transition, not backend dialogue generation.", MessageMode.Log, drawAbove: true)]
+        [HelpBox(
+            "Bridges client-side auth success into NGO startup and player-name replication. This component owns login-to-spawn transition, not backend dialogue generation.",
+            MessageMode.Log,
+            drawAbove: true
+        )]
         [Header("References")]
         public AuthUIController authController;
         public NPCNetworkBootstrap networkBootstrap;
 
         [Header("Mode")]
-        [Tooltip("Dedicated-server projects should keep this disabled so auth always starts a client unless an explicit CLI override is supplied. Enable only for legacy listen-server/Multiplayer Play Mode host tests.")]
+        [Tooltip(
+            "Dedicated-server projects should keep this disabled so auth always starts a client unless an explicit CLI override is supplied. Enable only for legacy listen-server/Multiplayer Play Mode host tests."
+        )]
         public bool autoDetectStartupMode = false;
 
-        [Tooltip("False for Docker/dedicated-server flow: auth starts StartClient() against the dedicated server. Enable only for intentional legacy listen-server host tests.")]
+        [Tooltip(
+            "False for Docker/dedicated-server flow: auth starts StartClient() against the dedicated server. Enable only for intentional legacy listen-server host tests."
+        )]
         public bool startAsHost = false;
 
         [Tooltip("Host address to connect to when startAsHost is false.")]
         public string hostAddress = "127.0.0.1";
 
-        [Tooltip("Host port to connect to when startAsHost is false. 0 = use bootstrap's configured port.")]
+        [Tooltip(
+            "Host port to connect to when startAsHost is false. 0 = use bootstrap's configured port."
+        )]
         public ushort hostPort = 0;
 
         [Header("Events")]
-        public UnityEngine.Events.UnityEvent<string> onHostStarted = new UnityEngine.Events.UnityEvent<string>();
+        public UnityEngine.Events.UnityEvent<string> onHostStarted =
+            new UnityEngine.Events.UnityEvent<string>();
 
         string _authenticatedPlayerName = "";
         NPCFlowLogger _logger;
-        [SerializeField, ReadOnly] string lastBridgeStatus = "Idle";
+
+        [SerializeField, ReadOnly]
+        string lastBridgeStatus = "Idle";
 
         public string PlayerName => _authenticatedPlayerName;
 
@@ -108,7 +121,9 @@ namespace NPCSystem
                 authController = FindAnyObjectByType<AuthUIController>(FindObjectsInactive.Include);
 #endif
             if (networkBootstrap == null)
-                networkBootstrap = FindAnyObjectByType<NPCNetworkBootstrap>(FindObjectsInactive.Include);
+                networkBootstrap = FindAnyObjectByType<NPCNetworkBootstrap>(
+                    FindObjectsInactive.Include
+                );
         }
 
 #if !UNITY_SERVER
@@ -118,34 +133,45 @@ namespace NPCSystem
 
             if (authController == null)
             {
-                _logger?.Log(NPCFlowStage.ConfigurationValidation, NPCFlowStatus.Error, NPCFlowLogLevel.Error,
+                _logger?.Log(
+                    NPCFlowStage.ConfigurationValidation,
+                    NPCFlowStatus.Error,
+                    NPCFlowLogLevel.Error,
                     "AuthNetworkBridge cannot bind auth events because Auth Controller is not assigned and no AuthUIController was found.",
                     source: nameof(AuthNetworkBridge),
                     data: new Dictionary<string, object>
                     {
                         ["gameObject"] = gameObject.name,
-                        ["expectedComponent"] = nameof(AuthUIController)
-                    });
-                lastBridgeStatus = "Missing Auth Controller reference; auth success cannot start networking.";
+                        ["expectedComponent"] = nameof(AuthUIController),
+                    }
+                );
+                lastBridgeStatus =
+                    "Missing Auth Controller reference; auth success cannot start networking.";
                 return;
             }
 
             authController.events.onLoginSuccess.AddListener(HandleAuthSuccess);
             authController.events.onRegisterSuccess.AddListener(HandleAuthSuccess);
 
-            _logger?.Log(NPCFlowStage.ConfigurationValidation, NPCFlowStatus.Success, NPCFlowLogLevel.Debug,
+            _logger?.Log(
+                NPCFlowStage.ConfigurationValidation,
+                NPCFlowStatus.Success,
+                NPCFlowLogLevel.Debug,
                 "AuthNetworkBridge bound AuthUIController success events.",
                 source: nameof(AuthNetworkBridge),
                 data: new Dictionary<string, object>
                 {
                     ["authController"] = authController.name,
-                    ["networkBootstrap"] = networkBootstrap != null ? networkBootstrap.name : "<missing>"
-                });
+                    ["networkBootstrap"] =
+                        networkBootstrap != null ? networkBootstrap.name : "<missing>",
+                }
+            );
         }
 
         void UnbindAuthEvents()
         {
-            if (authController == null) return;
+            if (authController == null)
+                return;
             authController.events.onLoginSuccess.RemoveListener(HandleAuthSuccess);
             authController.events.onRegisterSuccess.RemoveListener(HandleAuthSuccess);
         }
@@ -154,7 +180,11 @@ namespace NPCSystem
         async void HandleAuthSuccess(string username)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
-            if (string.IsNullOrWhiteSpace(hostAddress) || hostAddress == "127.0.0.1" || hostAddress == "localhost")
+            if (
+                string.IsNullOrWhiteSpace(hostAddress)
+                || hostAddress == "127.0.0.1"
+                || hostAddress == "localhost"
+            )
             {
                 try
                 {
@@ -164,7 +194,7 @@ namespace NPCSystem
                         hostAddress = uri.Host;
                     }
                 }
-                catch {}
+                catch { }
             }
 #endif
 
@@ -175,7 +205,10 @@ namespace NPCSystem
             // Close the auth UI immediately
             CloseAuthUI();
 
-            _logger?.Log(NPCFlowStage.UIInput, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
+            _logger?.Log(
+                NPCFlowStage.UIInput,
+                NPCFlowStatus.Success,
+                NPCFlowLogLevel.Info,
                 $"Auth success for '{_authenticatedPlayerName}'. Starting network (mode: {resolvedMode.ToString().ToLowerInvariant()})...",
                 source: nameof(AuthNetworkBridge),
                 data: new Dictionary<string, object>
@@ -183,13 +216,17 @@ namespace NPCSystem
                     ["playerName"] = _authenticatedPlayerName,
                     ["startAsHost"] = startAsHost,
                     ["autoDetectStartupMode"] = autoDetectStartupMode,
-                    ["resolvedMode"] = resolvedMode.ToString()
-                });
-            lastBridgeStatus = $"Auth success for {_authenticatedPlayerName}; resolved mode {resolvedMode}.";
+                    ["resolvedMode"] = resolvedMode.ToString(),
+                }
+            );
+            lastBridgeStatus =
+                $"Auth success for {_authenticatedPlayerName}; resolved mode {resolvedMode}.";
 
             // Initialize dialogue UI and backend system on demand to be memory smart!
 #if !UNITY_SERVER
-            var uiController = FindAnyObjectByType<NPCDialogueUIController>(FindObjectsInactive.Include);
+            var uiController = FindAnyObjectByType<NPCDialogueUIController>(
+                FindObjectsInactive.Include
+            );
             if (uiController != null)
             {
                 GameObject gameplayCanvas = uiController.GetGameplayCanvas();
@@ -198,21 +235,31 @@ namespace NPCSystem
                     gameplayCanvas.SetActive(true);
                 }
 
-                _logger?.Log(NPCFlowStage.SceneBootstrap, NPCFlowStatus.Start, NPCFlowLogLevel.Info,
+                _logger?.Log(
+                    NPCFlowStage.SceneBootstrap,
+                    NPCFlowStatus.Start,
+                    NPCFlowLogLevel.Info,
                     "Triggering on-demand dialogue UI and backend system initialization.",
-                    source: nameof(AuthNetworkBridge));
+                    source: nameof(AuthNetworkBridge)
+                );
                 await uiController.InitializeOnDemandAsync();
             }
             else
 #endif
             {
                 // Headless fallback
-                var bootstrapper = FindAnyObjectByType<NPCDialogueBootstrapper>(FindObjectsInactive.Include);
+                var bootstrapper = FindAnyObjectByType<NPCDialogueBootstrapper>(
+                    FindObjectsInactive.Include
+                );
                 if (bootstrapper != null)
                 {
-                    _logger?.Log(NPCFlowStage.SceneBootstrap, NPCFlowStatus.Start, NPCFlowLogLevel.Info,
+                    _logger?.Log(
+                        NPCFlowStage.SceneBootstrap,
+                        NPCFlowStatus.Start,
+                        NPCFlowLogLevel.Info,
                         "Triggering on-demand backend dialogue system initialization (headless fallback).",
-                        source: nameof(AuthNetworkBridge));
+                        source: nameof(AuthNetworkBridge)
+                    );
                     await bootstrapper.InitializeOnDemandAsync();
                 }
             }
@@ -232,7 +279,9 @@ namespace NPCSystem
 
             if (NPCPlayModeInstanceResolver.TryGetPlayerIndex(out int playerIndex))
             {
-                return playerIndex <= 1 ? ResolvedNetworkStartupMode.Host : ResolvedNetworkStartupMode.Client;
+                return playerIndex <= 1
+                    ? ResolvedNetworkStartupMode.Host
+                    : ResolvedNetworkStartupMode.Client;
             }
 
             if (autoDetectStartupMode)
@@ -243,13 +292,18 @@ namespace NPCSystem
                     return ResolvedNetworkStartupMode.Client;
                 }
 
-                if (roleMask == MultiplayerRoleFlags.Server || roleMask == MultiplayerRoleFlags.ClientAndServer)
+                if (
+                    roleMask == MultiplayerRoleFlags.Server
+                    || roleMask == MultiplayerRoleFlags.ClientAndServer
+                )
                 {
                     return ResolvedNetworkStartupMode.Host;
                 }
             }
 
-            return startAsHost ? ResolvedNetworkStartupMode.Host : ResolvedNetworkStartupMode.Client;
+            return startAsHost
+                ? ResolvedNetworkStartupMode.Host
+                : ResolvedNetworkStartupMode.Client;
         }
 
         public static bool TryGetCommandLineStartupMode(out ResolvedNetworkStartupMode mode)
@@ -309,9 +363,13 @@ namespace NPCSystem
         {
             if (networkBootstrap == null)
             {
-                _logger?.Log(NPCFlowStage.NetworkHost, NPCFlowStatus.Error, NPCFlowLogLevel.Error,
+                _logger?.Log(
+                    NPCFlowStage.NetworkHost,
+                    NPCFlowStatus.Error,
+                    NPCFlowLogLevel.Error,
                     "Cannot start host: NPCNetworkBootstrap not found.",
-                    source: nameof(AuthNetworkBridge));
+                    source: nameof(AuthNetworkBridge)
+                );
                 lastBridgeStatus = "Cannot start host: NPCNetworkBootstrap not found.";
                 return;
             }
@@ -319,9 +377,13 @@ namespace NPCSystem
             NetworkManager netManager = networkBootstrap.networkManager;
             if (netManager == null)
             {
-                _logger?.Log(NPCFlowStage.NetworkHost, NPCFlowStatus.Error, NPCFlowLogLevel.Error,
+                _logger?.Log(
+                    NPCFlowStage.NetworkHost,
+                    NPCFlowStatus.Error,
+                    NPCFlowLogLevel.Error,
                     "Cannot start host: NetworkManager not found via bootstrap.",
-                    source: nameof(AuthNetworkBridge));
+                    source: nameof(AuthNetworkBridge)
+                );
                 lastBridgeStatus = "Cannot start host: NetworkManager not found.";
                 return;
             }
@@ -339,32 +401,42 @@ namespace NPCSystem
             if (!started)
             {
                 NPCTransportConfig cfg = networkBootstrap.transportConfig;
-                _logger?.Log(NPCFlowStage.NetworkHost, NPCFlowStatus.Error, NPCFlowLogLevel.Error,
+                _logger?.Log(
+                    NPCFlowStage.NetworkHost,
+                    NPCFlowStatus.Error,
+                    NPCFlowLogLevel.Error,
                     $"Failed to start host on port {cfg.port} via bootstrap.",
                     source: nameof(AuthNetworkBridge),
                     data: new Dictionary<string, object>
                     {
                         ["hostAddress"] = cfg.connectAddress ?? "unknown",
                         ["hostPort"] = cfg.port,
-                        ["listenAddress"] = cfg.listenAddress ?? "unknown"
-                    });
+                        ["listenAddress"] = cfg.listenAddress ?? "unknown",
+                    }
+                );
                 lastBridgeStatus = $"Failed to start host on {cfg.connectAddress}:{cfg.port}.";
                 return;
             }
 
-            _logger?.Log(NPCFlowStage.NetworkHost, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
+            _logger?.Log(
+                NPCFlowStage.NetworkHost,
+                NPCFlowStatus.Success,
+                NPCFlowLogLevel.Info,
                 "Host started via bootstrap. Waiting for local player object...",
-                source: nameof(AuthNetworkBridge));
+                source: nameof(AuthNetworkBridge)
+            );
             lastBridgeStatus = "Host started. Waiting for local player object.";
 
             // Wait for player object to spawn
             int attempts = 0;
             while (attempts < 100)
             {
-                if (netManager.IsListening &&
-                    netManager.LocalClient != null &&
-                    netManager.LocalClient.PlayerObject != null &&
-                    netManager.LocalClient.PlayerObject.gameObject != null)
+                if (
+                    netManager.IsListening
+                    && netManager.LocalClient != null
+                    && netManager.LocalClient.PlayerObject != null
+                    && netManager.LocalClient.PlayerObject.gameObject != null
+                )
                 {
                     SetPlayerNameOnLocalAvatar(netManager);
                     onHostStarted?.Invoke(_authenticatedPlayerName);
@@ -374,10 +446,15 @@ namespace NPCSystem
                 attempts++;
             }
 
-            _logger?.Log(NPCFlowStage.PlayerNameRegistration, NPCFlowStatus.Warning, NPCFlowLogLevel.Warning,
+            _logger?.Log(
+                NPCFlowStage.PlayerNameRegistration,
+                NPCFlowStatus.Warning,
+                NPCFlowLogLevel.Warning,
                 "Player object did not spawn within timeout (host). Name set via OnNetworkSpawn.",
-                source: nameof(AuthNetworkBridge));
-            lastBridgeStatus = "Host player object spawn timed out; fallback to OnNetworkSpawn registration.";
+                source: nameof(AuthNetworkBridge)
+            );
+            lastBridgeStatus =
+                "Host player object spawn timed out; fallback to OnNetworkSpawn registration.";
         }
 
         // ── Client mode ───────────────────────────────────────────
@@ -386,9 +463,13 @@ namespace NPCSystem
         {
             if (networkBootstrap == null)
             {
-                _logger?.Log(NPCFlowStage.NetworkHost, NPCFlowStatus.Error, NPCFlowLogLevel.Error,
+                _logger?.Log(
+                    NPCFlowStage.NetworkHost,
+                    NPCFlowStatus.Error,
+                    NPCFlowLogLevel.Error,
                     "Cannot connect as client: NPCNetworkBootstrap not found.",
-                    source: nameof(AuthNetworkBridge));
+                    source: nameof(AuthNetworkBridge)
+                );
                 lastBridgeStatus = "Cannot connect as client: NPCNetworkBootstrap not found.";
                 return;
             }
@@ -396,24 +477,34 @@ namespace NPCSystem
             NetworkManager netManager = networkBootstrap.networkManager;
             if (netManager == null)
             {
-                _logger?.Log(NPCFlowStage.NetworkHost, NPCFlowStatus.Error, NPCFlowLogLevel.Error,
+                _logger?.Log(
+                    NPCFlowStage.NetworkHost,
+                    NPCFlowStatus.Error,
+                    NPCFlowLogLevel.Error,
                     "Cannot connect as client: NetworkManager not found via bootstrap.",
-                    source: nameof(AuthNetworkBridge));
+                    source: nameof(AuthNetworkBridge)
+                );
                 lastBridgeStatus = "Cannot connect as client: NetworkManager not found.";
                 return;
             }
 
             if (netManager.IsListening)
             {
-                _logger?.Log(NPCFlowStage.NetworkHost, NPCFlowStatus.Skipped, NPCFlowLogLevel.Info,
+                _logger?.Log(
+                    NPCFlowStage.NetworkHost,
+                    NPCFlowStatus.Skipped,
+                    NPCFlowLogLevel.Info,
                     "Network already listening. Ignoring client start request.",
-                    source: nameof(AuthNetworkBridge));
+                    source: nameof(AuthNetworkBridge)
+                );
                 lastBridgeStatus = "Network already listening; skipped duplicate client start.";
                 return;
             }
 
             // Override bootstrap's connect address if specified, then delegate to bootstrap
-            networkBootstrap.transportConfig.connectAddress = string.IsNullOrWhiteSpace(hostAddress) ? "127.0.0.1" : hostAddress.Trim();
+            networkBootstrap.transportConfig.connectAddress = string.IsNullOrWhiteSpace(hostAddress)
+                ? "127.0.0.1"
+                : hostAddress.Trim();
             if (hostPort > 0)
                 networkBootstrap.transportConfig.port = hostPort;
 
@@ -421,24 +512,33 @@ namespace NPCSystem
             bool started = networkBootstrap.StartConfiguredMode();
             if (!started)
             {
-                _logger?.Log(NPCFlowStage.NetworkHost, NPCFlowStatus.Error, NPCFlowLogLevel.Error,
+                _logger?.Log(
+                    NPCFlowStage.NetworkHost,
+                    NPCFlowStatus.Error,
+                    NPCFlowLogLevel.Error,
                     "Failed to start client via bootstrap.",
-                    source: nameof(AuthNetworkBridge));
+                    source: nameof(AuthNetworkBridge)
+                );
                 lastBridgeStatus = $"Failed to start client to {hostAddress}:{hostPort}.";
                 return;
             }
 
             string effectiveAddress = networkBootstrap.transportConfig.connectAddress;
             ushort effectivePort = networkBootstrap.transportConfig.port;
-            _logger?.Log(NPCFlowStage.NetworkHost, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
+            _logger?.Log(
+                NPCFlowStage.NetworkHost,
+                NPCFlowStatus.Success,
+                NPCFlowLogLevel.Info,
                 $"Client started via bootstrap, connecting to {effectiveAddress}:{effectivePort}...",
                 source: nameof(AuthNetworkBridge),
                 data: new Dictionary<string, object>
                 {
                     ["hostAddress"] = effectiveAddress,
-                    ["hostPort"] = effectivePort
-                });
-            lastBridgeStatus = $"Client started to {hostAddress}:{(hostPort > 0 ? hostPort : networkBootstrap.transportConfig.port)} as {_authenticatedPlayerName}.";
+                    ["hostPort"] = effectivePort,
+                }
+            );
+            lastBridgeStatus =
+                $"Client started to {hostAddress}:{(hostPort > 0 ? hostPort : networkBootstrap.transportConfig.port)} as {_authenticatedPlayerName}.";
 
             // Name will be registered automatically by NPCPlayerNetworkAvatar.OnNetworkSpawn
             // which reads AuthNetworkBridge.ActivePlayerName and calls RegisterPlayerNameServerRpc.
@@ -450,16 +550,22 @@ namespace NPCSystem
 
         void SetPlayerNameOnLocalAvatar(NetworkManager netManager)
         {
-            if (netManager == null || netManager.LocalClient == null) return;
+            if (netManager == null || netManager.LocalClient == null)
+                return;
 
-            GameObject playerObj = netManager.LocalClient.PlayerObject != null
-                ? netManager.LocalClient.PlayerObject.gameObject
-                : null;
+            GameObject playerObj =
+                netManager.LocalClient.PlayerObject != null
+                    ? netManager.LocalClient.PlayerObject.gameObject
+                    : null;
             if (playerObj == null)
             {
-                _logger?.Log(NPCFlowStage.PlayerNameRegistration, NPCFlowStatus.Warning, NPCFlowLogLevel.Warning,
+                _logger?.Log(
+                    NPCFlowStage.PlayerNameRegistration,
+                    NPCFlowStatus.Warning,
+                    NPCFlowLogLevel.Warning,
                     "Local client has no PlayerObject.",
-                    source: nameof(AuthNetworkBridge));
+                    source: nameof(AuthNetworkBridge)
+                );
                 lastBridgeStatus = "Local client has no PlayerObject.";
                 return;
             }
@@ -468,21 +574,30 @@ namespace NPCSystem
             if (avatar != null)
             {
                 avatar.SetDisplayName(_authenticatedPlayerName);
-                _logger?.Log(NPCFlowStage.PlayerNameRegistration, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
+                _logger?.Log(
+                    NPCFlowStage.PlayerNameRegistration,
+                    NPCFlowStatus.Success,
+                    NPCFlowLogLevel.Info,
                     $"Player name '{_authenticatedPlayerName}' set on {playerObj.name}.",
                     source: nameof(AuthNetworkBridge),
                     data: new Dictionary<string, object>
                     {
                         ["playerName"] = _authenticatedPlayerName,
-                        ["playerObjectName"] = playerObj.name
-                    });
-                lastBridgeStatus = $"Player name {_authenticatedPlayerName} set on {playerObj.name}.";
+                        ["playerObjectName"] = playerObj.name,
+                    }
+                );
+                lastBridgeStatus =
+                    $"Player name {_authenticatedPlayerName} set on {playerObj.name}.";
             }
             else
             {
-                _logger?.Log(NPCFlowStage.PlayerNameRegistration, NPCFlowStatus.Warning, NPCFlowLogLevel.Warning,
+                _logger?.Log(
+                    NPCFlowStage.PlayerNameRegistration,
+                    NPCFlowStatus.Warning,
+                    NPCFlowLogLevel.Warning,
                     $"No NPCPlayerNetworkAvatar found on {playerObj.name}.",
-                    source: nameof(AuthNetworkBridge));
+                    source: nameof(AuthNetworkBridge)
+                );
                 lastBridgeStatus = $"No NPCPlayerNetworkAvatar found on {playerObj.name}.";
             }
         }

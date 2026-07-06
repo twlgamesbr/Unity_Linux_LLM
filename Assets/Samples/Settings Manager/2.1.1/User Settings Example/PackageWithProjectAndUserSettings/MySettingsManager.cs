@@ -31,7 +31,11 @@ namespace UnityEditor.SettingsManagement.Examples
             instance.Save();
         }
 
-        public static T Get<T>(string key, SettingsScope scope = SettingsScope.Project, T fallback = default(T))
+        public static T Get<T>(
+            string key,
+            SettingsScope scope = SettingsScope.Project,
+            T fallback = default(T)
+        )
         {
             return instance.Get<T>(key, scope, fallback);
         }

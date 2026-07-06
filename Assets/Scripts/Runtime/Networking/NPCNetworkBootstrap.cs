@@ -68,7 +68,15 @@ namespace NPCSystem
             // Defer auto-start to Start() so NetworkManager's Awake (execution order 0)
             // has run and initialized its internal state (ConnectionManager, LocalClient, etc.).
             // Calling StartConfiguredMode in Awake at -2500 causes NRE in NetworkManager.StartServer.
-            if ((autoStartInPlayMode || (Application.isBatchMode && transportConfig.autoStartMode != NPCNetworkAutoStartMode.Manual)) && Application.isPlaying)
+            if (
+                (
+                    autoStartInPlayMode
+                    || (
+                        Application.isBatchMode
+                        && transportConfig.autoStartMode != NPCNetworkAutoStartMode.Manual
+                    )
+                ) && Application.isPlaying
+            )
             {
                 StartConfiguredMode();
             }
@@ -134,42 +142,84 @@ namespace NPCSystem
                 if (arg == "-npc-server")
                 {
                     transportConfig.autoStartMode = NPCNetworkAutoStartMode.Server;
-                    NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.ConfigurationValidation, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
-                        "CLI override applied: autoStartMode = Server.", source: nameof(NPCNetworkBootstrap));
+                    NPCFlowLogger
+                        .FindOrCreate()
+                        ?.Log(
+                            NPCFlowStage.ConfigurationValidation,
+                            NPCFlowStatus.Success,
+                            NPCFlowLogLevel.Info,
+                            "CLI override applied: autoStartMode = Server.",
+                            source: nameof(NPCNetworkBootstrap)
+                        );
                 }
                 else if (arg == "-npc-websockets")
                 {
                     transportConfig.useWebSockets = true;
-                    NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.ConfigurationValidation, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
-                        "CLI override applied: useWebSockets = true.", source: nameof(NPCNetworkBootstrap));
+                    NPCFlowLogger
+                        .FindOrCreate()
+                        ?.Log(
+                            NPCFlowStage.ConfigurationValidation,
+                            NPCFlowStatus.Success,
+                            NPCFlowLogLevel.Info,
+                            "CLI override applied: useWebSockets = true.",
+                            source: nameof(NPCNetworkBootstrap)
+                        );
                 }
                 else if (arg == "-npc-host")
                 {
                     transportConfig.autoStartMode = NPCNetworkAutoStartMode.Host;
-                    NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.ConfigurationValidation, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
-                        "CLI override applied: autoStartMode = Host.", source: nameof(NPCNetworkBootstrap));
+                    NPCFlowLogger
+                        .FindOrCreate()
+                        ?.Log(
+                            NPCFlowStage.ConfigurationValidation,
+                            NPCFlowStatus.Success,
+                            NPCFlowLogLevel.Info,
+                            "CLI override applied: autoStartMode = Host.",
+                            source: nameof(NPCNetworkBootstrap)
+                        );
                 }
                 else if (arg == "-npc-client")
                 {
                     transportConfig.autoStartMode = NPCNetworkAutoStartMode.Client;
-                    NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.ConfigurationValidation, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
-                        "CLI override applied: autoStartMode = Client.", source: nameof(NPCNetworkBootstrap));
+                    NPCFlowLogger
+                        .FindOrCreate()
+                        ?.Log(
+                            NPCFlowStage.ConfigurationValidation,
+                            NPCFlowStatus.Success,
+                            NPCFlowLogLevel.Info,
+                            "CLI override applied: autoStartMode = Client.",
+                            source: nameof(NPCNetworkBootstrap)
+                        );
                 }
                 else if (arg == "-port" && i + 1 < args.Length)
                 {
                     if (ushort.TryParse(args[i + 1], out ushort port))
                     {
                         transportConfig.port = port;
-                        NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.ConfigurationValidation, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
-                            $"CLI override applied: port = {port}.", source: nameof(NPCNetworkBootstrap));
+                        NPCFlowLogger
+                            .FindOrCreate()
+                            ?.Log(
+                                NPCFlowStage.ConfigurationValidation,
+                                NPCFlowStatus.Success,
+                                NPCFlowLogLevel.Info,
+                                $"CLI override applied: port = {port}.",
+                                source: nameof(NPCNetworkBootstrap)
+                            );
                         i++;
                     }
                 }
                 else if (arg == "-address" && i + 1 < args.Length)
                 {
                     transportConfig.connectAddress = args[i + 1];
-                    NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.ConfigurationValidation, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
-                        $"CLI override applied: connectAddress = {transportConfig.connectAddress}.", source: nameof(NPCNetworkBootstrap));
+                    NPCFlowLogger
+                        .FindOrCreate()
+                        ?.Log(
+                            NPCFlowStage.ConfigurationValidation,
+                            NPCFlowStatus.Success,
+                            NPCFlowLogLevel.Info,
+                            $"CLI override applied: connectAddress = {transportConfig.connectAddress}.",
+                            source: nameof(NPCNetworkBootstrap)
+                        );
                     i++;
                 }
             }
@@ -212,9 +262,14 @@ namespace NPCSystem
                 serverNpcPrefab = Resources.Load<GameObject>(serverNpcPrefabResourcesPath.Trim());
             }
 
-            if (transferableItemPrefab == null && !string.IsNullOrWhiteSpace(transferableItemPrefabResourcesPath))
+            if (
+                transferableItemPrefab == null
+                && !string.IsNullOrWhiteSpace(transferableItemPrefabResourcesPath)
+            )
             {
-                transferableItemPrefab = Resources.Load<GameObject>(transferableItemPrefabResourcesPath.Trim());
+                transferableItemPrefab = Resources.Load<GameObject>(
+                    transferableItemPrefabResourcesPath.Trim()
+                );
             }
         }
 
@@ -224,8 +279,15 @@ namespace NPCSystem
 
             if (unityTransport == null)
             {
-                NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.ConfigurationValidation, NPCFlowStatus.Error, NPCFlowLogLevel.Error,
-                    "Could not find a UnityTransport component.", source: nameof(NPCNetworkBootstrap));
+                NPCFlowLogger
+                    .FindOrCreate()
+                    ?.Log(
+                        NPCFlowStage.ConfigurationValidation,
+                        NPCFlowStatus.Error,
+                        NPCFlowLogLevel.Error,
+                        "Could not find a UnityTransport component.",
+                        source: nameof(NPCNetworkBootstrap)
+                    );
                 return;
             }
 
@@ -246,8 +308,15 @@ namespace NPCSystem
 #endif
             if (!transportConfig.TryValidate(out string errorMessage))
             {
-                NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.ConfigurationValidation, NPCFlowStatus.Error, NPCFlowLogLevel.Error,
-                    errorMessage, source: nameof(NPCNetworkBootstrap));
+                NPCFlowLogger
+                    .FindOrCreate()
+                    ?.Log(
+                        NPCFlowStage.ConfigurationValidation,
+                        NPCFlowStatus.Error,
+                        NPCFlowLogLevel.Error,
+                        errorMessage,
+                        source: nameof(NPCNetworkBootstrap)
+                    );
                 return;
             }
 
@@ -261,18 +330,28 @@ namespace NPCSystem
             connectionData.ClientBindPort = ResolveClientBindPort();
             unityTransport.ConnectionData = connectionData;
 
-            NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.ConfigurationValidation, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
-                "Transport configured.",
-                source: nameof(NPCNetworkBootstrap),
-                data: new Dictionary<string, object>
-                {
-                    ["connectAddress"] = connectionData.Address,
-                    ["port"] = connectionData.Port,
-                    ["listenAddress"] = connectionData.ServerListenAddress,
-                    ["clientBindPort"] = connectionData.ClientBindPort,
-                    ["autoStartMode"] = transportConfig.autoStartMode.ToString(),
-                    ["player"] = NPCPlayModeInstanceResolver.TryGetPlayerName(out string playerName) ? playerName : "unknown"
-                });
+            NPCFlowLogger
+                .FindOrCreate()
+                ?.Log(
+                    NPCFlowStage.ConfigurationValidation,
+                    NPCFlowStatus.Success,
+                    NPCFlowLogLevel.Info,
+                    "Transport configured.",
+                    source: nameof(NPCNetworkBootstrap),
+                    data: new Dictionary<string, object>
+                    {
+                        ["connectAddress"] = connectionData.Address,
+                        ["port"] = connectionData.Port,
+                        ["listenAddress"] = connectionData.ServerListenAddress,
+                        ["clientBindPort"] = connectionData.ClientBindPort,
+                        ["autoStartMode"] = transportConfig.autoStartMode.ToString(),
+                        ["player"] = NPCPlayModeInstanceResolver.TryGetPlayerName(
+                            out string playerName
+                        )
+                            ? playerName
+                            : "unknown",
+                    }
+                );
         }
 
         public bool StartConfiguredMode()
@@ -281,35 +360,54 @@ namespace NPCSystem
 
             if (networkManager == null)
             {
-                NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.NetworkHost, NPCFlowStatus.Error, NPCFlowLogLevel.Error,
-                    "Could not find a NetworkManager component.", source: nameof(NPCNetworkBootstrap));
+                NPCFlowLogger
+                    .FindOrCreate()
+                    ?.Log(
+                        NPCFlowStage.NetworkHost,
+                        NPCFlowStatus.Error,
+                        NPCFlowLogLevel.Error,
+                        "Could not find a NetworkManager component.",
+                        source: nameof(NPCNetworkBootstrap)
+                    );
                 return false;
             }
 
             if (networkManager.IsListening)
             {
-                NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.NetworkHost, NPCFlowStatus.Skipped, NPCFlowLogLevel.Info,
-                    "StartConfiguredMode skipped because NetworkManager is already listening.",
-                    source: nameof(NPCNetworkBootstrap),
-                    data: new Dictionary<string, object>
-                    {
-                        ["autoStartMode"] = transportConfig.autoStartMode.ToString()
-                    });
+                NPCFlowLogger
+                    .FindOrCreate()
+                    ?.Log(
+                        NPCFlowStage.NetworkHost,
+                        NPCFlowStatus.Skipped,
+                        NPCFlowLogLevel.Info,
+                        "StartConfiguredMode skipped because NetworkManager is already listening.",
+                        source: nameof(NPCNetworkBootstrap),
+                        data: new Dictionary<string, object>
+                        {
+                            ["autoStartMode"] = transportConfig.autoStartMode.ToString(),
+                        }
+                    );
                 return true;
             }
 
             ApplyTransportConfiguration();
 
-            NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.NetworkHost, NPCFlowStatus.Start, NPCFlowLogLevel.Info,
-                "Starting configured network mode.",
-                source: nameof(NPCNetworkBootstrap),
-                data: new Dictionary<string, object>
-                {
-                    ["autoStartMode"] = transportConfig.autoStartMode.ToString(),
-                    ["connectAddress"] = transportConfig.connectAddress ?? string.Empty,
-                    ["port"] = transportConfig.port,
-                    ["listenAddress"] = transportConfig.listenAddress ?? string.Empty
-                });
+            NPCFlowLogger
+                .FindOrCreate()
+                ?.Log(
+                    NPCFlowStage.NetworkHost,
+                    NPCFlowStatus.Start,
+                    NPCFlowLogLevel.Info,
+                    "Starting configured network mode.",
+                    source: nameof(NPCNetworkBootstrap),
+                    data: new Dictionary<string, object>
+                    {
+                        ["autoStartMode"] = transportConfig.autoStartMode.ToString(),
+                        ["connectAddress"] = transportConfig.connectAddress ?? string.Empty,
+                        ["port"] = transportConfig.port,
+                        ["listenAddress"] = transportConfig.listenAddress ?? string.Empty,
+                    }
+                );
 
             switch (transportConfig.autoStartMode)
             {
@@ -332,7 +430,11 @@ namespace NPCSystem
 
         ushort ResolveClientBindPort()
         {
-            if (NPCPlayModeInstanceResolver.TryGetCommandLineClientBindPort(out ushort commandLineBindPort))
+            if (
+                NPCPlayModeInstanceResolver.TryGetCommandLineClientBindPort(
+                    out ushort commandLineBindPort
+                )
+            )
             {
                 return commandLineBindPort;
             }
@@ -350,7 +452,8 @@ namespace NPCSystem
             return NPCPlayModeInstanceResolver.ResolveClientBindPortForPlayerIndex(
                 playerIndex,
                 transportConfig.port,
-                clientBindPortOverride);
+                clientBindPortOverride
+            );
         }
 
         void RegisterRuntimeCallbacks()
@@ -394,41 +497,51 @@ namespace NPCSystem
         void HandleServerStarted()
         {
             _logger = NPCFlowLogger.FindOrCreate();
-            _logger?.Log(NPCFlowStage.NetworkHost, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
-                $"Server started. localClientId={networkManager.LocalClientId}, " +
-                $"listenPort={unityTransport.ConnectionData.Port}, " +
-                $"clientBindPort={unityTransport.ConnectionData.ClientBindPort}",
-                source: nameof(NPCNetworkBootstrap));
+            _logger?.Log(
+                NPCFlowStage.NetworkHost,
+                NPCFlowStatus.Success,
+                NPCFlowLogLevel.Info,
+                $"Server started. localClientId={networkManager.LocalClientId}, "
+                    + $"listenPort={unityTransport.ConnectionData.Port}, "
+                    + $"clientBindPort={unityTransport.ConnectionData.ClientBindPort}",
+                source: nameof(NPCNetworkBootstrap)
+            );
         }
 
         void HandleClientConnected(ulong clientId)
         {
             _logger = NPCFlowLogger.FindOrCreate();
-            _logger?.Log(NPCFlowStage.NetworkHost, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
-                $"Client connected. localClientId={networkManager.LocalClientId}, " +
-                $"connectedClientId={clientId}, " +
-                $"isServer={networkManager.IsServer}, isClient={networkManager.IsClient}",
+            _logger?.Log(
+                NPCFlowStage.NetworkHost,
+                NPCFlowStatus.Success,
+                NPCFlowLogLevel.Info,
+                $"Client connected. localClientId={networkManager.LocalClientId}, "
+                    + $"connectedClientId={clientId}, "
+                    + $"isServer={networkManager.IsServer}, isClient={networkManager.IsClient}",
                 source: nameof(NPCNetworkBootstrap),
-                data: new Dictionary<string, object>
-                {
-                    ["clientId"] = clientId
-                });
+                data: new Dictionary<string, object> { ["clientId"] = clientId }
+            );
         }
 
         void HandleClientDisconnected(ulong clientId)
         {
             _logger = NPCFlowLogger.FindOrCreate();
-            string disconnectReason = networkManager != null ? networkManager.DisconnectReason : string.Empty;
-            _logger?.Log(NPCFlowStage.NetworkHost, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
-                $"Client disconnected. localClientId={networkManager.LocalClientId}, " +
-                $"disconnectedClientId={clientId}, " +
-                $"shutdownInProgress={networkManager.ShutdownInProgress}",
+            string disconnectReason =
+                networkManager != null ? networkManager.DisconnectReason : string.Empty;
+            _logger?.Log(
+                NPCFlowStage.NetworkHost,
+                NPCFlowStatus.Success,
+                NPCFlowLogLevel.Info,
+                $"Client disconnected. localClientId={networkManager.LocalClientId}, "
+                    + $"disconnectedClientId={clientId}, "
+                    + $"shutdownInProgress={networkManager.ShutdownInProgress}",
                 source: nameof(NPCNetworkBootstrap),
                 data: new Dictionary<string, object>
                 {
                     ["clientId"] = clientId,
-                    ["disconnectReason"] = disconnectReason ?? string.Empty
-                });
+                    ["disconnectReason"] = disconnectReason ?? string.Empty,
+                }
+            );
         }
 
         void TryRegisterNetworkPrefab(GameObject prefab, string label)
@@ -441,23 +554,31 @@ namespace NPCSystem
             if (IsPrefabAlreadyRegistered(prefab))
             {
                 _logger = NPCFlowLogger.FindOrCreate();
-                _logger?.Log(NPCFlowStage.ConfigurationValidation, NPCFlowStatus.Skipped, NPCFlowLogLevel.Debug,
+                _logger?.Log(
+                    NPCFlowStage.ConfigurationValidation,
+                    NPCFlowStatus.Skipped,
+                    NPCFlowLogLevel.Debug,
                     $"Skipped runtime registration for '{label}' because prefab '{prefab.name}' is already registered in NetworkConfig.",
                     source: nameof(NPCNetworkBootstrap),
                     data: new Dictionary<string, object>
                     {
                         ["label"] = label,
-                        ["prefab"] = prefab.name
-                    });
+                        ["prefab"] = prefab.name,
+                    }
+                );
                 return;
             }
 
             if (!prefab.TryGetComponent<NetworkObject>(out _))
             {
                 _logger = NPCFlowLogger.FindOrCreate();
-                _logger?.Log(NPCFlowStage.ConfigurationValidation, NPCFlowStatus.Error, NPCFlowLogLevel.Error,
+                _logger?.Log(
+                    NPCFlowStage.ConfigurationValidation,
+                    NPCFlowStatus.Error,
+                    NPCFlowLogLevel.Error,
                     $"Skipped network prefab registration for '{label}' because '{prefab.name}' has no NetworkObject.",
-                    source: nameof(NPCNetworkBootstrap));
+                    source: nameof(NPCNetworkBootstrap)
+                );
                 return;
             }
 
@@ -465,26 +586,34 @@ namespace NPCSystem
             {
                 networkManager.PrefabHandler.AddNetworkPrefab(prefab);
                 _logger = NPCFlowLogger.FindOrCreate();
-                _logger?.Log(NPCFlowStage.ConfigurationValidation, NPCFlowStatus.Success, NPCFlowLogLevel.Debug,
+                _logger?.Log(
+                    NPCFlowStage.ConfigurationValidation,
+                    NPCFlowStatus.Success,
+                    NPCFlowLogLevel.Debug,
                     $"Registered network prefab '{prefab.name}' for '{label}'.",
                     source: nameof(NPCNetworkBootstrap),
                     data: new Dictionary<string, object>
                     {
                         ["label"] = label,
-                        ["prefab"] = prefab.name
-                    });
+                        ["prefab"] = prefab.name,
+                    }
+                );
             }
             catch (Exception ex)
             {
                 _logger = NPCFlowLogger.FindOrCreate();
-                _logger?.Log(NPCFlowStage.ConfigurationValidation, NPCFlowStatus.Error, NPCFlowLogLevel.Error,
+                _logger?.Log(
+                    NPCFlowStage.ConfigurationValidation,
+                    NPCFlowStatus.Error,
+                    NPCFlowLogLevel.Error,
                     $"Failed to register network prefab '{prefab.name}' for '{label}': {ex.Message}",
                     source: nameof(NPCNetworkBootstrap),
                     data: new Dictionary<string, object>
                     {
                         ["label"] = label,
-                        ["prefab"] = prefab.name
-                    });
+                        ["prefab"] = prefab.name,
+                    }
+                );
                 throw;
             }
         }
@@ -523,7 +652,13 @@ namespace NPCSystem
                 for (int prefabIndex = 0; prefabIndex < list.PrefabList.Count; prefabIndex++)
                 {
                     NetworkPrefab networkPrefab = list.PrefabList[prefabIndex];
-                    if (networkPrefab != null && (networkPrefab.Prefab == prefab || networkPrefab.SourcePrefabToOverride == prefab))
+                    if (
+                        networkPrefab != null
+                        && (
+                            networkPrefab.Prefab == prefab
+                            || networkPrefab.SourcePrefabToOverride == prefab
+                        )
+                    )
                     {
                         return true;
                     }

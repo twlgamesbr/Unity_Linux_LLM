@@ -9,9 +9,11 @@ namespace NPCSystem
     [RequireComponent(typeof(NetworkObject))]
     public sealed class NPCPlayerInventory : NetworkBehaviour
     {
-        public readonly NetworkList<FixedString64Bytes> itemIds = new NetworkList<FixedString64Bytes>();
+        public readonly NetworkList<FixedString64Bytes> itemIds =
+            new NetworkList<FixedString64Bytes>();
 
-        [SerializeField] string lastInventoryStatus = "Empty";
+        [SerializeField]
+        string lastInventoryStatus = "Empty";
 
         public IReadOnlyList<string> Items
         {
@@ -69,7 +71,11 @@ namespace NPCSystem
             string normalizedItemId = NormalizeItemId(itemId);
             for (int i = 0; i < itemIds.Count; i++)
             {
-                if (itemIds[i].ToString().Equals(normalizedItemId, System.StringComparison.OrdinalIgnoreCase))
+                if (
+                    itemIds[i]
+                        .ToString()
+                        .Equals(normalizedItemId, System.StringComparison.OrdinalIgnoreCase)
+                )
                 {
                     itemIds.RemoveAt(i);
                     return true;
@@ -84,7 +90,11 @@ namespace NPCSystem
             string normalizedItemId = NormalizeItemId(itemId);
             for (int i = 0; i < itemIds.Count; i++)
             {
-                if (itemIds[i].ToString().Equals(normalizedItemId, System.StringComparison.OrdinalIgnoreCase))
+                if (
+                    itemIds[i]
+                        .ToString()
+                        .Equals(normalizedItemId, System.StringComparison.OrdinalIgnoreCase)
+                )
                 {
                     return true;
                 }
@@ -95,24 +105,33 @@ namespace NPCSystem
 
         void HandleInventoryChanged(NetworkListEvent<FixedString64Bytes> changeEvent)
         {
-            lastInventoryStatus = itemIds.Count == 0
-                ? "Empty"
-                : $"{itemIds.Count} item(s): {string.Join(", ", Items)}";
+            lastInventoryStatus =
+                itemIds.Count == 0
+                    ? "Empty"
+                    : $"{itemIds.Count} item(s): {string.Join(", ", Items)}";
 
-            NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.OwnershipAuthority, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
-                $"Inventory updated for player {OwnerClientId}.",
-                source: nameof(NPCPlayerInventory),
-                data: new Dictionary<string, object>
-                {
-                    ["ownerClientId"] = OwnerClientId,
-                    ["eventType"] = changeEvent.Type.ToString(),
-                    ["itemCount"] = itemIds.Count
-                });
+            NPCFlowLogger
+                .FindOrCreate()
+                ?.Log(
+                    NPCFlowStage.OwnershipAuthority,
+                    NPCFlowStatus.Success,
+                    NPCFlowLogLevel.Info,
+                    $"Inventory updated for player {OwnerClientId}.",
+                    source: nameof(NPCPlayerInventory),
+                    data: new Dictionary<string, object>
+                    {
+                        ["ownerClientId"] = OwnerClientId,
+                        ["eventType"] = changeEvent.Type.ToString(),
+                        ["itemCount"] = itemIds.Count,
+                    }
+                );
         }
 
         static string NormalizeItemId(string itemId)
         {
-            return string.IsNullOrWhiteSpace(itemId) ? string.Empty : itemId.Trim().ToLowerInvariant();
+            return string.IsNullOrWhiteSpace(itemId)
+                ? string.Empty
+                : itemId.Trim().ToLowerInvariant();
         }
     }
 }

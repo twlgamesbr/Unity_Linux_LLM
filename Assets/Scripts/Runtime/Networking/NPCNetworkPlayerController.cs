@@ -97,14 +97,19 @@ namespace NPCSystem
 #else
                     string resolvedMoveAction = "missing";
 #endif
-                    LogAuthorityEvent(NPCFlowStatus.Success,
+                    LogAuthorityEvent(
+                        NPCFlowStatus.Success,
                         "Owner input enabled for spawned player controller.",
                         new Dictionary<string, object>
                         {
-                            ["localClientId"] = NetworkManager.Singleton != null ? NetworkManager.Singleton.LocalClientId : 0ul,
+                            ["localClientId"] =
+                                NetworkManager.Singleton != null
+                                    ? NetworkManager.Singleton.LocalClientId
+                                    : 0ul,
                             ["actionMap"] = actionMapName,
-                            ["moveAction"] = resolvedMoveAction
-                        });
+                            ["moveAction"] = resolvedMoveAction,
+                        }
+                    );
                 }
 
                 if (lockCursorForOwner)
@@ -123,7 +128,10 @@ namespace NPCSystem
 
                 DisableInput();
 #endif
-                LogAuthorityEvent(NPCFlowStatus.Success, "Spawned non-owner controller; local input disabled.");
+                LogAuthorityEvent(
+                    NPCFlowStatus.Success,
+                    "Spawned non-owner controller; local input disabled."
+                );
             }
         }
 
@@ -173,48 +181,57 @@ namespace NPCSystem
         }
 
         public void ResolveReferences()
- {
-     if (characterController == null)
-     {
-         characterController = GetComponent<CharacterController>();
-     }
+        {
+            if (characterController == null)
+            {
+                characterController = GetComponent<CharacterController>();
+            }
 
-     if (animator == null)
-     {
-         animator = GetComponentInChildren<Animator>(true);
-     }
+            if (animator == null)
+            {
+                animator = GetComponentInChildren<Animator>(true);
+            }
 
- #if !UNITY_SERVER
-     if (playerInput == null)
-     {
-         playerInput = GetComponent<PlayerInput>();
-     }
- #endif
+#if !UNITY_SERVER
+            if (playerInput == null)
+            {
+                playerInput = GetComponent<PlayerInput>();
+            }
+#endif
 
-     if (cameraFollowTarget == null)
-     {
-         cameraFollowTarget = transform;
-     }
- }
+            if (cameraFollowTarget == null)
+            {
+                cameraFollowTarget = transform;
+            }
+        }
 
- void LogAuthorityEvent(NPCFlowStatus status, string message, Dictionary<string, object> data = null)
- {
-     data ??= new Dictionary<string, object>();
-     data["ownerClientId"] = OwnerClientId;
-     data["isOwner"] = IsOwner;
-     data["isServer"] = IsServer;
-     data["isSpawned"] = IsSpawned;
-     NPCFlowLogger.FindOrCreate()?.Log(
-         NPCFlowStage.OwnershipAuthority,
-         status,
-         status == NPCFlowStatus.Warning ? NPCFlowLogLevel.Warning : NPCFlowLogLevel.Info,
-         message,
-         source: nameof(NPCNetworkPlayerController),
-         data: data);
- }
+        void LogAuthorityEvent(
+            NPCFlowStatus status,
+            string message,
+            Dictionary<string, object> data = null
+        )
+        {
+            data ??= new Dictionary<string, object>();
+            data["ownerClientId"] = OwnerClientId;
+            data["isOwner"] = IsOwner;
+            data["isServer"] = IsServer;
+            data["isSpawned"] = IsSpawned;
+            NPCFlowLogger
+                .FindOrCreate()
+                ?.Log(
+                    NPCFlowStage.OwnershipAuthority,
+                    status,
+                    status == NPCFlowStatus.Warning
+                        ? NPCFlowLogLevel.Warning
+                        : NPCFlowLogLevel.Info,
+                    message,
+                    source: nameof(NPCNetworkPlayerController),
+                    data: data
+                );
+        }
 
- #if !UNITY_SERVER
- void EnableInput()
+#if !UNITY_SERVER
+        void EnableInput()
         {
             if (usePlayerInputCopy && playerInput != null)
             {
@@ -245,7 +262,8 @@ namespace NPCSystem
 
         void DisableInput()
         {
-            if (!_inputEnabled) return;
+            if (!_inputEnabled)
+                return;
             _moveAction?.Disable();
             _lookAction?.Disable();
             _jumpAction?.Disable();
@@ -255,7 +273,8 @@ namespace NPCSystem
 
         void ResolveInputActions()
         {
-            if (inputActions == null) return;
+            if (inputActions == null)
+                return;
             InputActionMap map = inputActions.FindActionMap(actionMapName, false);
             _moveAction = map?.FindAction(moveActionName, false);
             _lookAction = map?.FindAction(lookActionName, false);
@@ -265,7 +284,10 @@ namespace NPCSystem
 
         void ReadInput()
         {
-            _moveInput = _moveAction != null ? Vector2.ClampMagnitude(_moveAction.ReadValue<Vector2>(), 1f) : Vector2.zero;
+            _moveInput =
+                _moveAction != null
+                    ? Vector2.ClampMagnitude(_moveAction.ReadValue<Vector2>(), 1f)
+                    : Vector2.zero;
             _lookInput = _lookAction != null ? _lookAction.ReadValue<Vector2>() : Vector2.zero;
 
             if (allowKeyboardFallback && _moveInput.sqrMagnitude < 0.0001f)
@@ -274,10 +296,14 @@ namespace NPCSystem
                 Keyboard keyboard = Keyboard.current;
                 if (keyboard != null)
                 {
-                    if (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed) fallbackMove.y += 1f;
-                    if (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed) fallbackMove.y -= 1f;
-                    if (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed) fallbackMove.x += 1f;
-                    if (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed) fallbackMove.x -= 1f;
+                    if (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed)
+                        fallbackMove.y += 1f;
+                    if (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed)
+                        fallbackMove.y -= 1f;
+                    if (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed)
+                        fallbackMove.x += 1f;
+                    if (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed)
+                        fallbackMove.x -= 1f;
                 }
 
                 Gamepad gamepad = Gamepad.current;
@@ -293,7 +319,8 @@ namespace NPCSystem
 
         void MoveCharacter(float deltaTime)
         {
-            if (characterController == null) return;
+            if (characterController == null)
+                return;
 
             bool grounded = IsGrounded();
             if (grounded && _verticalVelocity < 0f)
@@ -311,7 +338,16 @@ namespace NPCSystem
                 }
             }
 
-            bool sprinting = (_sprintAction != null && _sprintAction.IsPressed()) || (allowKeyboardFallback && Keyboard.current != null && (Keyboard.current.leftShiftKey.isPressed || Keyboard.current.rightShiftKey.isPressed));
+            bool sprinting =
+                (_sprintAction != null && _sprintAction.IsPressed())
+                || (
+                    allowKeyboardFallback
+                    && Keyboard.current != null
+                    && (
+                        Keyboard.current.leftShiftKey.isPressed
+                        || Keyboard.current.rightShiftKey.isPressed
+                    )
+                );
 #else
             bool sprinting = false;
 #endif
@@ -323,9 +359,15 @@ namespace NPCSystem
             {
                 Vector3 cameraForward = CameraPlanarForward();
                 Vector3 cameraRight = Vector3.Cross(Vector3.up, cameraForward).normalized;
-                Vector3 worldMove = (cameraForward * planarMove.z + cameraRight * planarMove.x).normalized;
+                Vector3 worldMove = (
+                    cameraForward * planarMove.z + cameraRight * planarMove.x
+                ).normalized;
                 Quaternion targetRotation = Quaternion.LookRotation(worldMove, Vector3.up);
-                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * deltaTime);
+                transform.rotation = Quaternion.RotateTowards(
+                    transform.rotation,
+                    targetRotation,
+                    rotationSpeed * deltaTime
+                );
                 planarMove = worldMove;
             }
 
@@ -345,29 +387,37 @@ namespace NPCSystem
         Vector3 CameraPlanarForward()
         {
             Camera cam = _mainCamera != null ? _mainCamera : Camera.main;
-            if (cam == null) return Vector3.forward;
+            if (cam == null)
+                return Vector3.forward;
             Vector3 forward = Vector3.ProjectOnPlane(cam.transform.forward, Vector3.up);
             return forward.sqrMagnitude > 0.0001f ? forward.normalized : Vector3.forward;
         }
 
         void UpdateOwnerCamera(float deltaTime)
         {
-            if (!driveMainCameraForOwner) return;
+            if (!driveMainCameraForOwner)
+                return;
             _mainCamera ??= Camera.main;
-            if (_mainCamera == null || cameraFollowTarget == null) return;
+            if (_mainCamera == null || cameraFollowTarget == null)
+                return;
 
             _yaw += _lookInput.x * lookYawSensitivity;
             Quaternion cameraYaw = Quaternion.Euler(0f, _yaw, 0f);
             Vector3 targetPosition = cameraFollowTarget.position + cameraYaw * cameraOffset;
             float t = 1f - Mathf.Exp(-cameraFollowSharpness * deltaTime);
-            _mainCamera.transform.position = Vector3.Lerp(_mainCamera.transform.position, targetPosition, t);
+            _mainCamera.transform.position = Vector3.Lerp(
+                _mainCamera.transform.position,
+                targetPosition,
+                t
+            );
             _mainCamera.transform.LookAt(cameraFollowTarget.position + Vector3.up * 1.25f);
         }
 
 #if !UNITY_SERVER
         void UpdateAnimator(Vector2 move, bool sprinting, bool grounded)
         {
-            if (animator == null) return;
+            if (animator == null)
+                return;
             float speed01 = Mathf.Clamp01(move.magnitude) * (sprinting ? 1f : 0.6f);
             animator.SetFloat(MoveXHash, move.x);
             animator.SetFloat(MoveYHash, move.y);

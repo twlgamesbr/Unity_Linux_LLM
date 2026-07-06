@@ -6,16 +6,22 @@ namespace NPCSystem
 {
     public static class NPCNotebookStateFormatter
     {
-        public static NPCNotebookStateMessage Build(NPCEvidenceStateSnapshot snapshot, string npcSlug)
+        public static NPCNotebookStateMessage Build(
+            NPCEvidenceStateSnapshot snapshot,
+            string npcSlug
+        )
         {
-            string normalizedSlug = string.IsNullOrWhiteSpace(npcSlug) ? string.Empty : npcSlug.Trim().ToLowerInvariant();
-            NPCEvidenceStateSnapshot safeSnapshot = snapshot?.Clone() ?? new NPCEvidenceStateSnapshot();
+            string normalizedSlug = string.IsNullOrWhiteSpace(npcSlug)
+                ? string.Empty
+                : npcSlug.Trim().ToLowerInvariant();
+            NPCEvidenceStateSnapshot safeSnapshot =
+                snapshot?.Clone() ?? new NPCEvidenceStateSnapshot();
 
             var message = new NPCNotebookStateMessage
             {
                 npcSlug = normalizedSlug,
                 notesPageLeft = BuildStatusPage(safeSnapshot, normalizedSlug),
-                notesPageRight = BuildInvestigationPage(safeSnapshot)
+                notesPageRight = BuildInvestigationPage(safeSnapshot),
             };
             message.SanitizeInPlace();
             return message;
@@ -59,24 +65,41 @@ namespace NPCSystem
             }
 
             sb.AppendLine();
-            sb.AppendLine(snapshot.obtainedItems.Count == 0
-                ? "Items: none"
-                : $"Items: {string.Join(", ", snapshot.obtainedItems)}");
-            sb.AppendLine(snapshot.visitedLocations.Count == 0
-                ? "Locations: none"
-                : $"Locations: {string.Join(", ", snapshot.visitedLocations)}");
+            sb.AppendLine(
+                snapshot.obtainedItems.Count == 0
+                    ? "Items: none"
+                    : $"Items: {string.Join(", ", snapshot.obtainedItems)}"
+            );
+            sb.AppendLine(
+                snapshot.visitedLocations.Count == 0
+                    ? "Locations: none"
+                    : $"Locations: {string.Join(", ", snapshot.visitedLocations)}"
+            );
             return sb.ToString().Trim();
         }
 
         static string LookupMood(NPCEvidenceStateSnapshot snapshot, string npcSlug)
         {
-            if (string.IsNullOrWhiteSpace(npcSlug)) return "neutral";
+            if (string.IsNullOrWhiteSpace(npcSlug))
+                return "neutral";
 
-            for (int i = 0; i < System.Math.Min(snapshot.npcMoodKeys.Count, snapshot.npcMoodValues.Count); i++)
+            for (
+                int i = 0;
+                i < System.Math.Min(snapshot.npcMoodKeys.Count, snapshot.npcMoodValues.Count);
+                i++
+            )
             {
-                if (string.Equals(snapshot.npcMoodKeys[i], npcSlug, System.StringComparison.OrdinalIgnoreCase))
+                if (
+                    string.Equals(
+                        snapshot.npcMoodKeys[i],
+                        npcSlug,
+                        System.StringComparison.OrdinalIgnoreCase
+                    )
+                )
                 {
-                    return string.IsNullOrWhiteSpace(snapshot.npcMoodValues[i]) ? "neutral" : snapshot.npcMoodValues[i].Trim();
+                    return string.IsNullOrWhiteSpace(snapshot.npcMoodValues[i])
+                        ? "neutral"
+                        : snapshot.npcMoodValues[i].Trim();
                 }
             }
 
@@ -88,9 +111,19 @@ namespace NPCSystem
             int trustValue = 50;
             if (!string.IsNullOrWhiteSpace(npcSlug))
             {
-                for (int i = 0; i < System.Math.Min(snapshot.npcTrustKeys.Count, snapshot.npcTrustValues.Count); i++)
+                for (
+                    int i = 0;
+                    i < System.Math.Min(snapshot.npcTrustKeys.Count, snapshot.npcTrustValues.Count);
+                    i++
+                )
                 {
-                    if (string.Equals(snapshot.npcTrustKeys[i], npcSlug, System.StringComparison.OrdinalIgnoreCase))
+                    if (
+                        string.Equals(
+                            snapshot.npcTrustKeys[i],
+                            npcSlug,
+                            System.StringComparison.OrdinalIgnoreCase
+                        )
+                    )
                     {
                         trustValue = snapshot.npcTrustValues[i];
                         break;
@@ -98,10 +131,14 @@ namespace NPCSystem
                 }
             }
 
-            if (trustValue >= 80) return "trusting";
-            if (trustValue >= 60) return "cooperative";
-            if (trustValue >= 40) return "cautious";
-            if (trustValue >= 20) return "guarded";
+            if (trustValue >= 80)
+                return "trusting";
+            if (trustValue >= 60)
+                return "cooperative";
+            if (trustValue >= 40)
+                return "cautious";
+            if (trustValue >= 20)
+                return "guarded";
             return "hostile";
         }
     }

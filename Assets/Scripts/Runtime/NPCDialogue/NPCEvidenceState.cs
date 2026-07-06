@@ -31,7 +31,12 @@ namespace NPCSystem
         public string value;
         public string npcSlug;
 
-        public DialogueActionResult(string actionType, string description, string value, string npcSlug)
+        public DialogueActionResult(
+            string actionType,
+            string description,
+            string value,
+            string npcSlug
+        )
         {
             this.actionType = actionType;
             this.description = description;
@@ -66,7 +71,7 @@ namespace NPCSystem
                 npcMoodKeys = new List<string>(npcMoodKeys ?? new List<string>()),
                 npcMoodValues = new List<string>(npcMoodValues ?? new List<string>()),
                 npcTrustKeys = new List<string>(npcTrustKeys ?? new List<string>()),
-                npcTrustValues = new List<int>(npcTrustValues ?? new List<int>())
+                npcTrustValues = new List<int>(npcTrustValues ?? new List<int>()),
             };
         }
     }
@@ -112,12 +117,15 @@ namespace NPCSystem
 
         public bool RecordClue(string npcSlug, string clueText, string category)
         {
-            if (string.IsNullOrWhiteSpace(clueText)) return false;
+            if (string.IsNullOrWhiteSpace(clueText))
+                return false;
             string hash = CanonicalHash(clueText);
             if (_clueHashes != null && _clueHashes.Contains(hash))
                 return false;
 
-            discoveredClues.Add(new ClueEntry(npcSlug, clueText.Trim(), category ?? "general", Time.time));
+            discoveredClues.Add(
+                new ClueEntry(npcSlug, clueText.Trim(), category ?? "general", Time.time)
+            );
             _clueHashes?.Add(hash);
 
             Log($"Clue recorded: \"{clueText.Trim()}\" (from {npcSlug}, category: {category})");
@@ -126,7 +134,8 @@ namespace NPCSystem
 
         public bool HasClue(string clueText)
         {
-            if (string.IsNullOrWhiteSpace(clueText)) return false;
+            if (string.IsNullOrWhiteSpace(clueText))
+                return false;
             return _clueHashes?.Contains(CanonicalHash(clueText)) ?? false;
         }
 
@@ -137,7 +146,8 @@ namespace NPCSystem
 
         public void SetNpcMood(string npcSlug, string mood)
         {
-            if (string.IsNullOrWhiteSpace(npcSlug)) return;
+            if (string.IsNullOrWhiteSpace(npcSlug))
+                return;
             _npcMoods[npcSlug] = mood;
             SyncMoodLists();
             Log($"NPC mood set: {npcSlug} = {mood}");
@@ -152,8 +162,10 @@ namespace NPCSystem
 
         public void AdjustNpcTrust(string npcSlug, int delta)
         {
-            if (string.IsNullOrWhiteSpace(npcSlug)) return;
-            if (!_npcTrust.ContainsKey(npcSlug)) _npcTrust[npcSlug] = 50;
+            if (string.IsNullOrWhiteSpace(npcSlug))
+                return;
+            if (!_npcTrust.ContainsKey(npcSlug))
+                _npcTrust[npcSlug] = 50;
             _npcTrust[npcSlug] = Mathf.Clamp(_npcTrust[npcSlug] + delta, 0, 100);
             SyncTrustLists();
         }
@@ -166,10 +178,14 @@ namespace NPCSystem
         public string GetTrustLabel(string npcSlug)
         {
             int t = GetNpcTrust(npcSlug);
-            if (t >= 80) return "trusting";
-            if (t >= 60) return "cooperative";
-            if (t >= 40) return "cautious";
-            if (t >= 20) return "guarded";
+            if (t >= 80)
+                return "trusting";
+            if (t >= 60)
+                return "cooperative";
+            if (t >= 40)
+                return "cautious";
+            if (t >= 20)
+                return "guarded";
             return "hostile";
         }
 
@@ -177,7 +193,8 @@ namespace NPCSystem
 
         public bool AddItem(string itemId)
         {
-            if (string.IsNullOrWhiteSpace(itemId) || obtainedItems.Contains(itemId)) return false;
+            if (string.IsNullOrWhiteSpace(itemId) || obtainedItems.Contains(itemId))
+                return false;
             obtainedItems.Add(itemId);
             Log($"Item obtained: {itemId}");
             return true;
@@ -185,7 +202,8 @@ namespace NPCSystem
 
         public bool AddLocation(string locationName)
         {
-            if (string.IsNullOrWhiteSpace(locationName) || visitedLocations.Contains(locationName)) return false;
+            if (string.IsNullOrWhiteSpace(locationName) || visitedLocations.Contains(locationName))
+                return false;
             visitedLocations.Add(locationName);
             Log($"Location noted: {locationName}");
             return true;
@@ -199,7 +217,9 @@ namespace NPCSystem
                 return string.Empty;
 
             var sb = new StringBuilder();
-            sb.AppendLine("\n[Investigation state — what this NPC has previously shared or experienced:]");
+            sb.AppendLine(
+                "\n[Investigation state — what this NPC has previously shared or experienced:]"
+            );
 
             if (discoveredClues.Count > 0)
             {
@@ -216,7 +236,9 @@ namespace NPCSystem
             }
 
             if (obtainedItems.Count > 0)
-                sb.AppendLine($"Items you have given the player: {string.Join(", ", obtainedItems)}.");
+                sb.AppendLine(
+                    $"Items you have given the player: {string.Join(", ", obtainedItems)}."
+                );
 
             sb.AppendLine("[/Investigation state]");
             return sb.ToString();
@@ -224,7 +246,8 @@ namespace NPCSystem
 
         public string BuildNpcStateLine(string npcSlug)
         {
-            if (string.IsNullOrWhiteSpace(npcSlug)) return string.Empty;
+            if (string.IsNullOrWhiteSpace(npcSlug))
+                return string.Empty;
             string mood = GetNpcMood(npcSlug);
             string trust = GetTrustLabel(npcSlug);
             return $"Current state: mood={mood}, trust={trust}.";
@@ -240,7 +263,7 @@ namespace NPCSystem
                 npcMoodKeys = new List<string>(npcMoodKeys ?? new List<string>()),
                 npcMoodValues = new List<string>(npcMoodValues ?? new List<string>()),
                 npcTrustKeys = new List<string>(npcTrustKeys ?? new List<string>()),
-                npcTrustValues = new List<int>(npcTrustValues ?? new List<int>())
+                npcTrustValues = new List<int>(npcTrustValues ?? new List<int>()),
             };
         }
 
@@ -301,8 +324,15 @@ namespace NPCSystem
 
         static void Log(string message)
         {
-            NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.ActionExecution, NPCFlowStatus.Success,
-                NPCFlowLogLevel.Debug, message, source: nameof(NPCEvidenceState));
+            NPCFlowLogger
+                .FindOrCreate()
+                .Log(
+                    NPCFlowStage.ActionExecution,
+                    NPCFlowStatus.Success,
+                    NPCFlowLogLevel.Debug,
+                    message,
+                    source: nameof(NPCEvidenceState)
+                );
         }
     }
 }

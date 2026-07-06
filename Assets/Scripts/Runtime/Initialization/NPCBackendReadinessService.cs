@@ -34,26 +34,49 @@ namespace NPCSystem
     public sealed class NPCBackendReadinessService : MonoBehaviour
     {
         [Title("NPC Backend Readiness")]
-        [HelpBox("Verifies the auth backend and LocalAI endpoint before multiplayer dialogue traffic starts. The auth route is considered reachable even on expected 401/404 responses, as long as Unity can complete the HTTP exchange.", MessageMode.Log, drawAbove: true)]
+        [HelpBox(
+            "Verifies the auth backend and LocalAI endpoint before multiplayer dialogue traffic starts. The auth route is considered reachable even on expected 401/404 responses, as long as Unity can complete the HTTP exchange.",
+            MessageMode.Log,
+            drawAbove: true
+        )]
         [Header("References")]
         public PlayerAuthService authService;
         public NPCDialogueManager dialogueManager;
 
         [Header("Probe Targets")]
-        [SerializeField] string authProbeRelativePath = "api/auth/session";
-        [SerializeField] string localAiProbeRelativePath = "v1/models";
-        [SerializeField] float requestTimeoutSeconds = 5f;
-        [SerializeField] bool requireAuthBackend = true;
-        [SerializeField] bool requireLocalAiBackend = true;
-        [SerializeField] bool failInitializationOnRequiredBackendFailure = false;
+        [SerializeField]
+        string authProbeRelativePath = "api/auth/session";
+
+        [SerializeField]
+        string localAiProbeRelativePath = "v1/models";
+
+        [SerializeField]
+        float requestTimeoutSeconds = 5f;
+
+        [SerializeField]
+        bool requireAuthBackend = true;
+
+        [SerializeField]
+        bool requireLocalAiBackend = true;
+
+        [SerializeField]
+        bool failInitializationOnRequiredBackendFailure = false;
 
         [Header("Runtime Diagnostics")]
-        [SerializeField, ReadOnly] string lastReadinessStatus = "Not checked.";
-        [SerializeField, ReadOnly] string lastAuthBackendStatus = "Idle";
-        [SerializeField, ReadOnly] string lastLocalAiBackendStatus = "Idle";
-        [SerializeField, ReadOnly] long lastProbeDurationMs;
+        [SerializeField, ReadOnly]
+        string lastReadinessStatus = "Not checked.";
 
-        public NPCBackendReadinessSnapshot LastSnapshot { get; private set; } = new NPCBackendReadinessSnapshot();
+        [SerializeField, ReadOnly]
+        string lastAuthBackendStatus = "Idle";
+
+        [SerializeField, ReadOnly]
+        string lastLocalAiBackendStatus = "Idle";
+
+        [SerializeField, ReadOnly]
+        long lastProbeDurationMs;
+
+        public NPCBackendReadinessSnapshot LastSnapshot { get; private set; } =
+            new NPCBackendReadinessSnapshot();
 
         [ShowInInspector]
         string AuthProbePreview => BuildAuthProbeUrl();
@@ -84,10 +107,13 @@ namespace NPCSystem
 
             if (dialogueManager == null)
             {
-                dialogueManager = FindAnyObjectByType<NPCDialogueManager>(FindObjectsInactive.Include);
+                dialogueManager = FindAnyObjectByType<NPCDialogueManager>(
+                    FindObjectsInactive.Include
+                );
             }
 
-            lastReadinessStatus = $"References assigned. auth={AuthProbePreview} localai={LocalAiProbePreview}";
+            lastReadinessStatus =
+                $"References assigned. auth={AuthProbePreview} localai={LocalAiProbePreview}";
         }
 
         [Button("Probe Backends")]
@@ -109,25 +135,40 @@ namespace NPCSystem
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogWarning($"[NPCBackendReadinessService] Pre-probe authService initialization failed: {ex.Message}");
+                    Debug.LogWarning(
+                        $"[NPCBackendReadinessService] Pre-probe authService initialization failed: {ex.Message}"
+                    );
                 }
             }
 
             NPCFlowLogger logger = NPCFlowLogger.FindOrCreate();
-            using var scope = NPCFlowScope.Start(logger, NPCFlowStage.BackendRequest, nameof(NPCBackendReadinessService), data: new Dictionary<string, object>
-            {
-                ["authProbeUrl"] = AuthProbePreview,
-                ["localAiProbeUrl"] = LocalAiProbePreview,
-                ["requireAuthBackend"] = requireAuthBackend,
-                ["requireLocalAiBackend"] = requireLocalAiBackend && probeLocalAi
-            });
+            using var scope = NPCFlowScope.Start(
+                logger,
+                NPCFlowStage.BackendRequest,
+                nameof(NPCBackendReadinessService),
+                data: new Dictionary<string, object>
+                {
+                    ["authProbeUrl"] = AuthProbePreview,
+                    ["localAiProbeUrl"] = LocalAiProbePreview,
+                    ["requireAuthBackend"] = requireAuthBackend,
+                    ["requireLocalAiBackend"] = requireLocalAiBackend && probeLocalAi,
+                }
+            );
 
-            var authResult = await ProbeEndpointAsync("AuthBackend", AuthProbePreview, allowHttpErrorAsReachable: true);
+            var authResult = await ProbeEndpointAsync(
+                "AuthBackend",
+                AuthProbePreview,
+                allowHttpErrorAsReachable: true
+            );
             NPCBackendProbeResult localAiResult;
 
             if (probeLocalAi)
             {
-                localAiResult = await ProbeEndpointAsync("LocalAI", LocalAiProbePreview, allowHttpErrorAsReachable: false);
+                localAiResult = await ProbeEndpointAsync(
+                    "LocalAI",
+                    LocalAiProbePreview,
+                    allowHttpErrorAsReachable: false
+                );
             }
             else
             {
@@ -138,14 +179,14 @@ namespace NPCSystem
                     reachable = true,
                     responseCode = 0,
                     durationMs = 0,
-                    status = "LocalAI probing deferred until post-login."
+                    status = "LocalAI probing deferred until post-login.",
                 };
             }
 
             var snapshot = new NPCBackendReadinessSnapshot
             {
                 auth = authResult,
-                localAi = localAiResult
+                localAi = localAiResult,
             };
 
             LastSnapshot = snapshot;
@@ -153,7 +194,10 @@ namespace NPCSystem
             lastAuthBackendStatus = snapshot.auth.status;
             lastLocalAiBackendStatus = snapshot.localAi.status;
 
-            bool healthy = snapshot.AllRequiredBackendsReachable(requireAuthBackend, requireLocalAiBackend && probeLocalAi);
+            bool healthy = snapshot.AllRequiredBackendsReachable(
+                requireAuthBackend,
+                requireLocalAiBackend && probeLocalAi
+            );
             lastReadinessStatus = healthy
                 ? "Required multiplayer dialogue backends are reachable."
                 : "One or more required multiplayer dialogue backends are unreachable.";
@@ -163,7 +207,7 @@ namespace NPCSystem
                 ["authReachable"] = snapshot.auth.reachable,
                 ["authStatus"] = snapshot.auth.status,
                 ["localAiReachable"] = snapshot.localAi.reachable,
-                ["localAiStatus"] = snapshot.localAi.status
+                ["localAiStatus"] = snapshot.localAi.status,
             };
 
             if (healthy)
@@ -183,7 +227,11 @@ namespace NPCSystem
             return snapshot;
         }
 
-        async Task<NPCBackendProbeResult> ProbeEndpointAsync(string backendName, string url, bool allowHttpErrorAsReachable)
+        async Task<NPCBackendProbeResult> ProbeEndpointAsync(
+            string backendName,
+            string url,
+            bool allowHttpErrorAsReachable
+        )
         {
             DateTime startedAt = DateTime.UtcNow;
             using UnityWebRequest request = UnityWebRequest.Get(url);
@@ -196,10 +244,14 @@ namespace NPCSystem
             }
 
             long durationMs = (long)(DateTime.UtcNow - startedAt).TotalMilliseconds;
-            bool transportReachable = request.result != UnityWebRequest.Result.ConnectionError
-                                      && request.result != UnityWebRequest.Result.DataProcessingError;
-            bool reachable = transportReachable && (request.result == UnityWebRequest.Result.Success || allowHttpErrorAsReachable);
-            string responseCodeText = request.responseCode <= 0 ? "n/a" : request.responseCode.ToString();
+            bool transportReachable =
+                request.result != UnityWebRequest.Result.ConnectionError
+                && request.result != UnityWebRequest.Result.DataProcessingError;
+            bool reachable =
+                transportReachable
+                && (request.result == UnityWebRequest.Result.Success || allowHttpErrorAsReachable);
+            string responseCodeText =
+                request.responseCode <= 0 ? "n/a" : request.responseCode.ToString();
             string status = reachable
                 ? $"{backendName} reachable via {url} (HTTP {responseCodeText})."
                 : $"{backendName} unreachable via {url}: {request.error}";
@@ -211,13 +263,14 @@ namespace NPCSystem
                 reachable = reachable,
                 responseCode = request.responseCode,
                 durationMs = durationMs,
-                status = status
+                status = status,
             };
         }
 
         string BuildAuthProbeUrl()
         {
-            string baseUrl = authService == null ? "http://localhost:5100" : authService.ServiceBaseUrl;
+            string baseUrl =
+                authService == null ? "http://localhost:5100" : authService.ServiceBaseUrl;
             return CombineUrl(baseUrl, authProbeRelativePath);
         }
 
@@ -228,14 +281,23 @@ namespace NPCSystem
                 return "http://localhost:8080/v1/models";
             }
 
-            return CombineUrl($"http://{dialogueManager.remoteHost}:{dialogueManager.remotePort}", localAiProbeRelativePath);
+            return CombineUrl(
+                $"http://{dialogueManager.remoteHost}:{dialogueManager.remotePort}",
+                localAiProbeRelativePath
+            );
         }
 
         static string CombineUrl(string baseUrl, string relativePath)
         {
-            string normalizedBase = string.IsNullOrWhiteSpace(baseUrl) ? string.Empty : baseUrl.Trim().TrimEnd('/');
-            string normalizedPath = string.IsNullOrWhiteSpace(relativePath) ? string.Empty : relativePath.Trim().TrimStart('/');
-            return string.IsNullOrWhiteSpace(normalizedPath) ? normalizedBase : $"{normalizedBase}/{normalizedPath}";
+            string normalizedBase = string.IsNullOrWhiteSpace(baseUrl)
+                ? string.Empty
+                : baseUrl.Trim().TrimEnd('/');
+            string normalizedPath = string.IsNullOrWhiteSpace(relativePath)
+                ? string.Empty
+                : relativePath.Trim().TrimStart('/');
+            return string.IsNullOrWhiteSpace(normalizedPath)
+                ? normalizedBase
+                : $"{normalizedBase}/{normalizedPath}";
         }
     }
 }

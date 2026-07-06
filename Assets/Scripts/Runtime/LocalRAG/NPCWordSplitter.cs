@@ -25,7 +25,8 @@ namespace NPCSystem
                 {
                     if (i == input.Length - 1 || IsBoundary(input[i]))
                     {
-                        while (i < input.Length - 1 && IsBoundary(input[i + 1])) i++;
+                        while (i < input.Length - 1 && IsBoundary(input[i + 1]))
+                            i++;
                         endIndex = i;
                         wordIndices.Add((startIndex, endIndex));
                         startIndex = i + 1;

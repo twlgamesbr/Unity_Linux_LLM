@@ -15,7 +15,8 @@ namespace NPCSystem
                 : npcSlug.Trim().ToLowerInvariant();
         }
 
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer)
+            where T : IReaderWriter
         {
             serializer.SerializeValue(ref npcSlug);
         }
@@ -41,7 +42,8 @@ namespace NPCSystem
                 : playerMessage.Trim();
         }
 
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer)
+            where T : IReaderWriter
         {
             serializer.SerializeValue(ref requestId);
             serializer.SerializeValue(ref npcSlug);
@@ -60,12 +62,17 @@ namespace NPCSystem
         public void SanitizeInPlace()
         {
             requestId = string.IsNullOrWhiteSpace(requestId) ? string.Empty : requestId.Trim();
-            npcSlug = string.IsNullOrWhiteSpace(npcSlug) ? string.Empty : npcSlug.Trim().ToLowerInvariant();
-            displayName = string.IsNullOrWhiteSpace(displayName) ? string.Empty : displayName.Trim();
+            npcSlug = string.IsNullOrWhiteSpace(npcSlug)
+                ? string.Empty
+                : npcSlug.Trim().ToLowerInvariant();
+            displayName = string.IsNullOrWhiteSpace(displayName)
+                ? string.Empty
+                : displayName.Trim();
             content = string.IsNullOrWhiteSpace(content) ? string.Empty : content.Trim();
         }
 
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer)
+            where T : IReaderWriter
         {
             serializer.SerializeValue(ref requestId);
             serializer.SerializeValue(ref npcSlug);
@@ -83,12 +90,19 @@ namespace NPCSystem
 
         public void SanitizeInPlace()
         {
-            npcSlug = string.IsNullOrWhiteSpace(npcSlug) ? string.Empty : npcSlug.Trim().ToLowerInvariant();
-            notesPageLeft = string.IsNullOrWhiteSpace(notesPageLeft) ? string.Empty : notesPageLeft.Trim();
-            notesPageRight = string.IsNullOrWhiteSpace(notesPageRight) ? string.Empty : notesPageRight.Trim();
+            npcSlug = string.IsNullOrWhiteSpace(npcSlug)
+                ? string.Empty
+                : npcSlug.Trim().ToLowerInvariant();
+            notesPageLeft = string.IsNullOrWhiteSpace(notesPageLeft)
+                ? string.Empty
+                : notesPageLeft.Trim();
+            notesPageRight = string.IsNullOrWhiteSpace(notesPageRight)
+                ? string.Empty
+                : notesPageRight.Trim();
         }
 
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer)
+            where T : IReaderWriter
         {
             serializer.SerializeValue(ref npcSlug);
             serializer.SerializeValue(ref notesPageLeft);

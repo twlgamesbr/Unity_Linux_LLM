@@ -12,7 +12,7 @@ namespace NPCSystem
         public string content;
         public string timestampUtc;
 
-        public DialogueEntry() {}
+        public DialogueEntry() { }
 
         public DialogueEntry(string role, string content)
         {
@@ -35,11 +35,16 @@ namespace NPCSystem
             string fullPath = GetFullPath(relativePath);
             if (!File.Exists(fullPath))
             {
-                NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.HistoryLoad, NPCFlowStatus.Skipped, NPCFlowLogLevel.Info,
-                    "History file does not exist; starting empty history.", source: nameof(NPCHistoryStore), data: new Dictionary<string, object>
-                    {
-                        ["path"] = fullPath
-                    });
+                NPCFlowLogger
+                    .FindOrCreate()
+                    .Log(
+                        NPCFlowStage.HistoryLoad,
+                        NPCFlowStatus.Skipped,
+                        NPCFlowLogLevel.Info,
+                        "History file does not exist; starting empty history.",
+                        source: nameof(NPCHistoryStore),
+                        data: new Dictionary<string, object> { ["path"] = fullPath }
+                    );
                 return new List<DialogueEntry>();
             }
 
@@ -47,43 +52,69 @@ namespace NPCSystem
             {
                 string json = File.ReadAllText(fullPath);
                 DialogueHistoryFile history = JsonUtility.FromJson<DialogueHistoryFile>(json);
-                List<DialogueEntry> entries = history != null && history.entries != null
-                    ? history.entries
-                    : new List<DialogueEntry>();
+                List<DialogueEntry> entries =
+                    history != null && history.entries != null
+                        ? history.entries
+                        : new List<DialogueEntry>();
 
-                List<DialogueEntry> normalized = NormalizeForChatTemplate(entries, out int droppedCount);
+                List<DialogueEntry> normalized = NormalizeForChatTemplate(
+                    entries,
+                    out int droppedCount
+                );
                 if (droppedCount > 0)
                 {
-                    NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.HistoryLoad, NPCFlowStatus.Warning, NPCFlowLogLevel.Warning,
-                        $"Repaired history '{fullPath}' by dropping {droppedCount} malformed entr{(droppedCount == 1 ? "y" : "ies")}.",
-                        source: nameof(NPCHistoryStore), data: new Dictionary<string, object>
-                        {
-                            ["path"] = fullPath,
-                            ["droppedCount"] = droppedCount,
-                            ["entryCount"] = normalized.Count
-                        });
+                    NPCFlowLogger
+                        .FindOrCreate()
+                        .Log(
+                            NPCFlowStage.HistoryLoad,
+                            NPCFlowStatus.Warning,
+                            NPCFlowLogLevel.Warning,
+                            $"Repaired history '{fullPath}' by dropping {droppedCount} malformed entr{(droppedCount == 1 ? "y" : "ies")}.",
+                            source: nameof(NPCHistoryStore),
+                            data: new Dictionary<string, object>
+                            {
+                                ["path"] = fullPath,
+                                ["droppedCount"] = droppedCount,
+                                ["entryCount"] = normalized.Count,
+                            }
+                        );
                     Save(relativePath, normalized);
                 }
 
-                NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.HistoryLoad, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
-                    "History loaded.", source: nameof(NPCHistoryStore), data: new Dictionary<string, object>
-                    {
-                        ["path"] = fullPath,
-                        ["entryCount"] = normalized.Count
-                    });
+                NPCFlowLogger
+                    .FindOrCreate()
+                    .Log(
+                        NPCFlowStage.HistoryLoad,
+                        NPCFlowStatus.Success,
+                        NPCFlowLogLevel.Info,
+                        "History loaded.",
+                        source: nameof(NPCHistoryStore),
+                        data: new Dictionary<string, object>
+                        {
+                            ["path"] = fullPath,
+                            ["entryCount"] = normalized.Count,
+                        }
+                    );
 
                 return normalized;
             }
             catch (Exception ex)
             {
-                NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.HistoryLoad, NPCFlowStatus.Error, NPCFlowLogLevel.Warning,
-                    $"Failed to load history '{fullPath}'.",
-                    source: nameof(NPCHistoryStore), data: new Dictionary<string, object>
-                    {
-                        ["path"] = fullPath,
-                        ["exceptionType"] = ex.GetType().Name,
-                        ["exceptionMessage"] = ex.Message
-                    });
+                NPCFlowLogger
+                    .FindOrCreate()
+                    .Log(
+                        NPCFlowStage.HistoryLoad,
+                        NPCFlowStatus.Error,
+                        NPCFlowLogLevel.Warning,
+                        $"Failed to load history '{fullPath}'.",
+                        source: nameof(NPCHistoryStore),
+                        data: new Dictionary<string, object>
+                        {
+                            ["path"] = fullPath,
+                            ["exceptionType"] = ex.GetType().Name,
+                            ["exceptionMessage"] = ex.Message,
+                        }
+                    );
                 return new List<DialogueEntry>();
             }
         }
@@ -101,27 +132,42 @@ namespace NPCSystem
 
                 DialogueHistoryFile history = new DialogueHistoryFile
                 {
-                    entries = NormalizeForChatTemplate(entries, out _)
+                    entries = NormalizeForChatTemplate(entries, out _),
                 };
 
                 File.WriteAllText(fullPath, JsonUtility.ToJson(history, true));
-                NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.HistoryPersist, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
-                    "History saved.", source: nameof(NPCHistoryStore), data: new Dictionary<string, object>
-                    {
-                        ["path"] = fullPath,
-                        ["entryCount"] = history.entries.Count
-                    });
+                NPCFlowLogger
+                    .FindOrCreate()
+                    .Log(
+                        NPCFlowStage.HistoryPersist,
+                        NPCFlowStatus.Success,
+                        NPCFlowLogLevel.Info,
+                        "History saved.",
+                        source: nameof(NPCHistoryStore),
+                        data: new Dictionary<string, object>
+                        {
+                            ["path"] = fullPath,
+                            ["entryCount"] = history.entries.Count,
+                        }
+                    );
             }
             catch (Exception ex)
             {
-                NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.HistoryPersist, NPCFlowStatus.Error, NPCFlowLogLevel.Warning,
-                    $"Failed to save history '{fullPath}'.",
-                    source: nameof(NPCHistoryStore), data: new Dictionary<string, object>
-                    {
-                        ["path"] = fullPath,
-                        ["exceptionType"] = ex.GetType().Name,
-                        ["exceptionMessage"] = ex.Message
-                    });
+                NPCFlowLogger
+                    .FindOrCreate()
+                    .Log(
+                        NPCFlowStage.HistoryPersist,
+                        NPCFlowStatus.Error,
+                        NPCFlowLogLevel.Warning,
+                        $"Failed to save history '{fullPath}'.",
+                        source: nameof(NPCHistoryStore),
+                        data: new Dictionary<string, object>
+                        {
+                            ["path"] = fullPath,
+                            ["exceptionType"] = ex.GetType().Name,
+                            ["exceptionMessage"] = ex.Message,
+                        }
+                    );
             }
         }
 
@@ -130,33 +176,50 @@ namespace NPCSystem
             string fullPath = GetFullPath(relativePath);
             if (!File.Exists(fullPath))
             {
-                NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.HistoryPersist, NPCFlowStatus.Skipped, NPCFlowLogLevel.Info,
-                    "History delete skipped because file does not exist.", source: nameof(NPCHistoryStore), data: new Dictionary<string, object>
-                    {
-                        ["path"] = fullPath
-                    });
+                NPCFlowLogger
+                    .FindOrCreate()
+                    .Log(
+                        NPCFlowStage.HistoryPersist,
+                        NPCFlowStatus.Skipped,
+                        NPCFlowLogLevel.Info,
+                        "History delete skipped because file does not exist.",
+                        source: nameof(NPCHistoryStore),
+                        data: new Dictionary<string, object> { ["path"] = fullPath }
+                    );
                 return;
             }
 
             try
             {
                 File.Delete(fullPath);
-                NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.HistoryPersist, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
-                    "History deleted.", source: nameof(NPCHistoryStore), data: new Dictionary<string, object>
-                    {
-                        ["path"] = fullPath
-                    });
+                NPCFlowLogger
+                    .FindOrCreate()
+                    .Log(
+                        NPCFlowStage.HistoryPersist,
+                        NPCFlowStatus.Success,
+                        NPCFlowLogLevel.Info,
+                        "History deleted.",
+                        source: nameof(NPCHistoryStore),
+                        data: new Dictionary<string, object> { ["path"] = fullPath }
+                    );
             }
             catch (Exception ex)
             {
-                NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.HistoryPersist, NPCFlowStatus.Error, NPCFlowLogLevel.Warning,
-                    $"Failed to delete history '{fullPath}'.",
-                    source: nameof(NPCHistoryStore), data: new Dictionary<string, object>
-                    {
-                        ["path"] = fullPath,
-                        ["exceptionType"] = ex.GetType().Name,
-                        ["exceptionMessage"] = ex.Message
-                    });
+                NPCFlowLogger
+                    .FindOrCreate()
+                    .Log(
+                        NPCFlowStage.HistoryPersist,
+                        NPCFlowStatus.Error,
+                        NPCFlowLogLevel.Warning,
+                        $"Failed to delete history '{fullPath}'.",
+                        source: nameof(NPCHistoryStore),
+                        data: new Dictionary<string, object>
+                        {
+                            ["path"] = fullPath,
+                            ["exceptionType"] = ex.GetType().Name,
+                            ["exceptionMessage"] = ex.Message,
+                        }
+                    );
             }
         }
 
@@ -165,10 +228,14 @@ namespace NPCSystem
             string safeRelativePath = string.IsNullOrWhiteSpace(relativePath)
                 ? "NPCDialogue/default.json"
                 : relativePath.Trim().Replace('\\', '/');
-            return Path.Combine(Application.persistentDataPath, safeRelativePath).Replace('\\', '/');
+            return Path.Combine(Application.persistentDataPath, safeRelativePath)
+                .Replace('\\', '/');
         }
 
-        public static List<DialogueEntry> NormalizeForChatTemplate(List<DialogueEntry> entries, out int droppedCount)
+        public static List<DialogueEntry> NormalizeForChatTemplate(
+            List<DialogueEntry> entries,
+            out int droppedCount
+        )
         {
             List<DialogueEntry> normalized = new List<DialogueEntry>();
             droppedCount = 0;
@@ -192,7 +259,9 @@ namespace NPCSystem
                 entry.role = role;
                 entry.content = entry.content.Trim();
                 normalized.Add(entry);
-                expectedRole = string.Equals(expectedRole, "user", StringComparison.Ordinal) ? "assistant" : "user";
+                expectedRole = string.Equals(expectedRole, "user", StringComparison.Ordinal)
+                    ? "assistant"
+                    : "user";
             }
 
             if (normalized.Count % 2 != 0)
@@ -206,8 +275,10 @@ namespace NPCSystem
 
         static string NormalizeRole(string role)
         {
-            if (string.Equals(role, "assistant", StringComparison.OrdinalIgnoreCase)) return "assistant";
-            if (string.Equals(role, "user", StringComparison.OrdinalIgnoreCase)) return "user";
+            if (string.Equals(role, "assistant", StringComparison.OrdinalIgnoreCase))
+                return "assistant";
+            if (string.Equals(role, "user", StringComparison.OrdinalIgnoreCase))
+                return "user";
             return null;
         }
     }

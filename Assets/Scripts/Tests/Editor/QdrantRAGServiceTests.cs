@@ -18,7 +18,10 @@ namespace NPCSystem.Tests
             try
             {
                 string endpoint = service.BuildSearchEndpoint();
-                Assert.That(endpoint, Is.EqualTo("http://localhost:6333/collections/npc_knowledge/points/search"));
+                Assert.That(
+                    endpoint,
+                    Is.EqualTo("http://localhost:6333/collections/npc_knowledge/points/search")
+                );
             }
             finally
             {
@@ -75,7 +78,10 @@ namespace NPCSystem.Tests
             try
             {
                 string endpoint = service.BuildSearchEndpoint();
-                Assert.That(endpoint, Is.EqualTo("http://localhost:6333/collections/test/points/search"));
+                Assert.That(
+                    endpoint,
+                    Is.EqualTo("http://localhost:6333/collections/test/points/search")
+                );
                 Assert.That(endpoint, Does.Not.Contain("//collections"));
             }
             finally
@@ -168,13 +174,17 @@ namespace NPCSystem.Tests
             service.qdrantUrl = "http://localhost:6333";
             service.collectionName = "test_collection";
             service.embedder = embedder;
-            service.mockResponse = "{\"result\":[{\"score\":0.95,\"payload\":{\"text\":\"Found knowledge\"}}]}";
+            service.mockResponse =
+                "{\"result\":[{\"score\":0.95,\"payload\":{\"text\":\"Found knowledge\"}}]}";
 
             try
             {
                 string result = service.SearchMemoryAsync("test query").GetAwaiter().GetResult();
                 Assert.That(result, Is.EqualTo("Found knowledge"));
-                Assert.That(service.lastRequestedEndpoint, Does.Contain("test_collection/points/search"));
+                Assert.That(
+                    service.lastRequestedEndpoint,
+                    Does.Contain("test_collection/points/search")
+                );
             }
             finally
             {
@@ -298,7 +308,8 @@ namespace NPCSystem.Tests
             service.qdrantUrl = "http://localhost:6333";
             service.collectionName = "test_collection";
             service.embedder = embedder;
-            service.mockResponse = "{\"result\":[{\"score\":0.95,\"payload\":{\"text\":\"First result\"}},{\"score\":0.80,\"payload\":{\"text\":\"Second result\"}}]}";
+            service.mockResponse =
+                "{\"result\":[{\"score\":0.95,\"payload\":{\"text\":\"First result\"}},{\"score\":0.80,\"payload\":{\"text\":\"Second result\"}}]}";
 
             try
             {

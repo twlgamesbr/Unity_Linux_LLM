@@ -11,13 +11,20 @@ namespace NPCSystem
     public class QdrantRAGService : MonoBehaviour
     {
         [Title("Qdrant Endpoint")]
-        [HelpBox("Qdrant is the primary vector database for NPC knowledge. Uses NPCLocalAIEmbedder for query encoding.", MessageMode.Log, drawAbove: true)]
+        [HelpBox(
+            "Qdrant is the primary vector database for NPC knowledge. Uses NPCLocalAIEmbedder for query encoding.",
+            MessageMode.Log,
+            drawAbove: true
+        )]
         public string qdrantUrl = "http://localhost:6333";
 
         public string collectionName = "npc_knowledge";
 
         [Title("Embedder")]
-        [HelpBox("Assign the NPCLocalAIEmbedder used to encode queries before searching Qdrant.", MessageMode.Log)]
+        [HelpBox(
+            "Assign the NPCLocalAIEmbedder used to encode queries before searching Qdrant.",
+            MessageMode.Log
+        )]
         public NPCLocalAIEmbedder embedder;
 
         [SerializeField, ReadOnly]
@@ -29,36 +36,49 @@ namespace NPCSystem
         [Button("Validate Qdrant Inspector Settings")]
         void ValidateInspectorSettings()
         {
-            inspectorStatus = HasValidQdrantUrl() && HasValidCollectionName()
-                ? $"Qdrant settings look valid: {BuildSearchEndpoint()}"
-                : "Qdrant settings are invalid. Check URL and collection name.";
+            inspectorStatus =
+                HasValidQdrantUrl() && HasValidCollectionName()
+                    ? $"Qdrant settings look valid: {BuildSearchEndpoint()}"
+                    : "Qdrant settings are invalid. Check URL and collection name.";
         }
 
         [Button("Log Qdrant Configuration")]
         void LogQdrantConfiguration()
         {
-            NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.ConfigurationValidation, NPCFlowStatus.Success, NPCFlowLogLevel.Info,
-                "Qdrant inspector configuration logged.",
-                source: nameof(QdrantRAGService),
-                data: new Dictionary<string, object>
-                {
-                    ["qdrantUrl"] = qdrantUrl,
-                    ["collectionName"] = collectionName,
-                    ["searchEndpoint"] = BuildSearchEndpoint()
-                });
+            NPCFlowLogger
+                .FindOrCreate()
+                .Log(
+                    NPCFlowStage.ConfigurationValidation,
+                    NPCFlowStatus.Success,
+                    NPCFlowLogLevel.Info,
+                    "Qdrant inspector configuration logged.",
+                    source: nameof(QdrantRAGService),
+                    data: new Dictionary<string, object>
+                    {
+                        ["qdrantUrl"] = qdrantUrl,
+                        ["collectionName"] = collectionName,
+                        ["searchEndpoint"] = BuildSearchEndpoint(),
+                    }
+                );
             inspectorStatus = $"Logged Qdrant configuration: {BuildSearchEndpoint()}";
         }
 
         void Awake()
         {
-            NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.SceneBootstrap, NPCFlowStatus.Success, NPCFlowLogLevel.Debug,
-                "QdrantRAGService initialized.",
-                source: nameof(QdrantRAGService),
-                data: new Dictionary<string, object>
-                {
-                    ["qdrantUrl"] = qdrantUrl,
-                    ["collectionName"] = collectionName
-                });
+            NPCFlowLogger
+                .FindOrCreate()
+                .Log(
+                    NPCFlowStage.SceneBootstrap,
+                    NPCFlowStatus.Success,
+                    NPCFlowLogLevel.Debug,
+                    "QdrantRAGService initialized.",
+                    source: nameof(QdrantRAGService),
+                    data: new Dictionary<string, object>
+                    {
+                        ["qdrantUrl"] = qdrantUrl,
+                        ["collectionName"] = collectionName,
+                    }
+                );
         }
 
         [System.Serializable]
@@ -88,23 +108,43 @@ namespace NPCSystem
             public string text;
         }
 
-        public async Task<string> SearchMemoryAsync(string query, int limit = 3, string requestId = null, string npcSlug = null)
+        public async Task<string> SearchMemoryAsync(
+            string query,
+            int limit = 3,
+            string requestId = null,
+            string npcSlug = null
+        )
         {
-            using var scope = NPCFlowScope.Start(NPCFlowLogger.Instance, NPCFlowStage.QdrantSearch, source: nameof(QdrantRAGService), requestId: requestId, npcSlug: npcSlug, data: new Dictionary<string, object>
-            {
-                ["endpoint"] = qdrantUrl,
-                ["collection"] = collectionName,
-                ["limit"] = limit
-            });
+            using var scope = NPCFlowScope.Start(
+                NPCFlowLogger.Instance,
+                NPCFlowStage.QdrantSearch,
+                source: nameof(QdrantRAGService),
+                requestId: requestId,
+                npcSlug: npcSlug,
+                data: new Dictionary<string, object>
+                {
+                    ["endpoint"] = qdrantUrl,
+                    ["collection"] = collectionName,
+                    ["limit"] = limit,
+                }
+            );
 
             if (embedder == null)
             {
                 embedder = FindAnyObjectByType<NPCLocalAIEmbedder>(FindObjectsInactive.Include);
                 if (embedder == null)
                 {
-                    NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.QdrantSearch, NPCFlowStatus.Skipped, NPCFlowLogLevel.Warning,
-                        "NPCLocalAIEmbedder not found; Qdrant search skipped.",
-                        source: nameof(QdrantRAGService), requestId: requestId, npcSlug: npcSlug);
+                    NPCFlowLogger
+                        .FindOrCreate()
+                        .Log(
+                            NPCFlowStage.QdrantSearch,
+                            NPCFlowStatus.Skipped,
+                            NPCFlowLogLevel.Warning,
+                            "NPCLocalAIEmbedder not found; Qdrant search skipped.",
+                            source: nameof(QdrantRAGService),
+                            requestId: requestId,
+                            npcSlug: npcSlug
+                        );
                     scope.Skipped("Embedder missing; Qdrant skipped.");
                     return string.Empty;
                 }
@@ -115,10 +155,21 @@ namespace NPCSystem
                 List<float> queryVector = await embedder.Embeddings(query);
                 if (queryVector == null || queryVector.Count == 0)
                 {
-                    NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.QdrantEmbedding, NPCFlowStatus.Fallback, NPCFlowLogLevel.Warning,
-                        "Failed to generate embeddings for query.",
-                        source: nameof(QdrantRAGService), requestId: requestId, npcSlug: npcSlug,
-                        data: new Dictionary<string, object> { ["queryLength"] = query?.Length ?? 0 });
+                    NPCFlowLogger
+                        .FindOrCreate()
+                        .Log(
+                            NPCFlowStage.QdrantEmbedding,
+                            NPCFlowStatus.Fallback,
+                            NPCFlowLogLevel.Warning,
+                            "Failed to generate embeddings for query.",
+                            source: nameof(QdrantRAGService),
+                            requestId: requestId,
+                            npcSlug: npcSlug,
+                            data: new Dictionary<string, object>
+                            {
+                                ["queryLength"] = query?.Length ?? 0,
+                            }
+                        );
                     scope.Fallback("Embeddings generation failed.");
                     return string.Empty;
                 }
@@ -127,7 +178,7 @@ namespace NPCSystem
                 {
                     vector = queryVector,
                     limit = limit,
-                    with_payload = true
+                    with_payload = true,
                 };
 
                 string jsonRequest = JsonUtility.ToJson(requestBody);
@@ -137,23 +188,37 @@ namespace NPCSystem
 
                 if (responseText == null)
                 {
-                    NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.QdrantSearch, NPCFlowStatus.Error, NPCFlowLogLevel.Error,
+                    NPCFlowLogger
+                        .FindOrCreate()
+                        .Log(
+                            NPCFlowStage.QdrantSearch,
+                            NPCFlowStatus.Error,
+                            NPCFlowLogLevel.Error,
+                            "Qdrant request failed.",
+                            source: nameof(QdrantRAGService),
+                            requestId: requestId,
+                            npcSlug: npcSlug,
+                            data: new Dictionary<string, object>
+                            {
+                                ["endpoint"] = searchEndpoint,
+                                ["vectorLength"] = queryVector.Count,
+                            }
+                        );
+                    scope.Error(
+                        null,
                         "Qdrant request failed.",
-                        source: nameof(QdrantRAGService), requestId: requestId, npcSlug: npcSlug,
-                        data: new Dictionary<string, object>
+                        new Dictionary<string, object>
                         {
                             ["endpoint"] = searchEndpoint,
-                            ["vectorLength"] = queryVector.Count
-                        });
-                    scope.Error(null, "Qdrant request failed.", new Dictionary<string, object>
-                    {
-                        ["endpoint"] = searchEndpoint,
-                        ["vectorLength"] = queryVector.Count
-                    });
+                            ["vectorLength"] = queryVector.Count,
+                        }
+                    );
                     return string.Empty;
                 }
 
-                QdrantSearchResponse response = JsonUtility.FromJson<QdrantSearchResponse>(responseText);
+                QdrantSearchResponse response = JsonUtility.FromJson<QdrantSearchResponse>(
+                    responseText
+                );
 
                 if (response != null && response.result != null && response.result.Count > 0)
                 {
@@ -165,30 +230,44 @@ namespace NPCSystem
                             results.Add(point.payload.text);
                         }
                     }
-                    scope.Success("Qdrant results retrieved.", new Dictionary<string, object>
-                    {
-                        ["resultCount"] = results.Count,
-                        ["vectorLength"] = queryVector.Count,
-                        ["endpoint"] = searchEndpoint
-                    });
+                    scope.Success(
+                        "Qdrant results retrieved.",
+                        new Dictionary<string, object>
+                        {
+                            ["resultCount"] = results.Count,
+                            ["vectorLength"] = queryVector.Count,
+                            ["endpoint"] = searchEndpoint,
+                        }
+                    );
                     return string.Join("\n", results);
                 }
-                scope.Skipped("Qdrant returned empty.", new Dictionary<string, object>
-                {
-                    ["vectorLength"] = queryVector.Count,
-                    ["endpoint"] = searchEndpoint
-                });
+                scope.Skipped(
+                    "Qdrant returned empty.",
+                    new Dictionary<string, object>
+                    {
+                        ["vectorLength"] = queryVector.Count,
+                        ["endpoint"] = searchEndpoint,
+                    }
+                );
             }
             catch (Exception e)
             {
-                NPCFlowLogger.FindOrCreate().Log(NPCFlowStage.QdrantSearch, NPCFlowStatus.Error, NPCFlowLogLevel.Error,
-                    $"Exception during Qdrant search: {e.Message}",
-                    source: nameof(QdrantRAGService), requestId: requestId, npcSlug: npcSlug,
-                    data: new Dictionary<string, object>
-                    {
-                        ["exceptionType"] = e.GetType().Name,
-                        ["exceptionMessage"] = e.Message
-                    });
+                NPCFlowLogger
+                    .FindOrCreate()
+                    .Log(
+                        NPCFlowStage.QdrantSearch,
+                        NPCFlowStatus.Error,
+                        NPCFlowLogLevel.Error,
+                        $"Exception during Qdrant search: {e.Message}",
+                        source: nameof(QdrantRAGService),
+                        requestId: requestId,
+                        npcSlug: npcSlug,
+                        data: new Dictionary<string, object>
+                        {
+                            ["exceptionType"] = e.GetType().Name,
+                            ["exceptionMessage"] = e.Message,
+                        }
+                    );
                 scope.Error(e, "Exception during Qdrant search.");
             }
 
@@ -211,7 +290,10 @@ namespace NPCSystem
                     await Task.Yield();
                 }
 
-                if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
+                if (
+                    request.result == UnityWebRequest.Result.ConnectionError
+                    || request.result == UnityWebRequest.Result.ProtocolError
+                )
                 {
                     Debug.LogError($"[QdrantRAGService] Request failed: {request.error}");
                     return null;
@@ -234,8 +316,12 @@ namespace NPCSystem
 
         public string BuildSearchEndpoint()
         {
-            string baseUrl = string.IsNullOrWhiteSpace(qdrantUrl) ? "<missing-qdrant-url>" : qdrantUrl.TrimEnd('/');
-            string collection = string.IsNullOrWhiteSpace(collectionName) ? "<missing-collection>" : collectionName;
+            string baseUrl = string.IsNullOrWhiteSpace(qdrantUrl)
+                ? "<missing-qdrant-url>"
+                : qdrantUrl.TrimEnd('/');
+            string collection = string.IsNullOrWhiteSpace(collectionName)
+                ? "<missing-collection>"
+                : collectionName;
             return $"{baseUrl}/collections/{collection}/points/search";
         }
     }

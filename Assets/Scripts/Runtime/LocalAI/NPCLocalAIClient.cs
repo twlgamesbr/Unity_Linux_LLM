@@ -30,7 +30,10 @@ namespace NPCSystem
         /// Send a chat completion request to LocalAI with message history.
         /// Returns the assistant response text. Strips <think> blocks if present.
         /// </summary>
-        public async Task<string> ChatAsync(NPCOpenAIMessage[] messages, float? temperatureOverride = null)
+        public async Task<string> ChatAsync(
+            NPCOpenAIMessage[] messages,
+            float? temperatureOverride = null
+        )
         {
             string uri = $"http://{host}:{port}/v1/chat/completions";
             string modelName = string.IsNullOrWhiteSpace(model) ? "default-llm" : model.Trim();
@@ -42,7 +45,7 @@ namespace NPCSystem
                 temperature = temperatureOverride ?? temperature,
                 top_p = topP,
                 top_k = topK,
-                max_tokens = maxTokens
+                max_tokens = maxTokens,
             };
 
             for (int attempt = 0; attempt <= numRetries; attempt++)
@@ -64,11 +67,16 @@ namespace NPCSystem
 
                     var response = JsonUtility.FromJson<NPCOpenAIChatResponse>(responseJson);
 
-                    if (response?.choices != null && response.choices.Length > 0 && response.choices[0].message != null)
+                    if (
+                        response?.choices != null
+                        && response.choices.Length > 0
+                        && response.choices[0].message != null
+                    )
                     {
                         string rawContent = response.choices[0].message.content ?? string.Empty;
-                        rawContent = Regex.Replace(rawContent, @"<think>.*?</think>", "",
-                            RegexOptions.Singleline).Trim();
+                        rawContent = Regex
+                            .Replace(rawContent, @"<think>.*?</think>", "", RegexOptions.Singleline)
+                            .Trim();
                         return rawContent;
                     }
 
@@ -77,7 +85,9 @@ namespace NPCSystem
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogError($"[NPCLocalAIClient] Exception (attempt {attempt + 1}/{numRetries + 1}): {ex.Message}");
+                    Debug.LogError(
+                        $"[NPCLocalAIClient] Exception (attempt {attempt + 1}/{numRetries + 1}): {ex.Message}"
+                    );
                     if (attempt < numRetries)
                     {
                         await Task.Delay(500 * (attempt + 1));
@@ -103,10 +113,13 @@ namespace NPCSystem
                     request.SetRequestHeader("Authorization", $"Bearer {apiKey}");
 
                 var operation = request.SendWebRequest();
-                while (!operation.isDone) await Task.Yield();
+                while (!operation.isDone)
+                    await Task.Yield();
 
-                if (request.result == UnityWebRequest.Result.ConnectionError ||
-                    request.result == UnityWebRequest.Result.ProtocolError)
+                if (
+                    request.result == UnityWebRequest.Result.ConnectionError
+                    || request.result == UnityWebRequest.Result.ProtocolError
+                )
                 {
                     Debug.LogError($"[NPCLocalAIClient] Request failed: {request.error}");
                     return null;

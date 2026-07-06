@@ -7,7 +7,7 @@ namespace NPCSystem
         Manual,
         Client,
         Host,
-        Server
+        Server,
     }
 
     [Serializable]
@@ -26,19 +26,25 @@ namespace NPCSystem
             {
                 connectAddress = "127.0.0.1",
                 listenAddress = "0.0.0.0",
-                port = 11474,  // non-standard, avoids common port conflicts
+                port = 11474, // non-standard, avoids common port conflicts
                 useWebSockets = false,
                 webSocketPath = "/npc-dialogue",
-                autoStartMode = NPCNetworkAutoStartMode.Manual
+                autoStartMode = NPCNetworkAutoStartMode.Manual,
             };
         }
 
         public void NormalizeInPlace()
         {
-            connectAddress = string.IsNullOrWhiteSpace(connectAddress) ? string.Empty : connectAddress.Trim();
-            listenAddress = string.IsNullOrWhiteSpace(listenAddress) ? string.Empty : listenAddress.Trim();
+            connectAddress = string.IsNullOrWhiteSpace(connectAddress)
+                ? string.Empty
+                : connectAddress.Trim();
+            listenAddress = string.IsNullOrWhiteSpace(listenAddress)
+                ? string.Empty
+                : listenAddress.Trim();
 
-            string normalizedPath = string.IsNullOrWhiteSpace(webSocketPath) ? "/" : webSocketPath.Trim();
+            string normalizedPath = string.IsNullOrWhiteSpace(webSocketPath)
+                ? "/"
+                : webSocketPath.Trim();
             if (!normalizedPath.StartsWith("/", StringComparison.Ordinal))
             {
                 normalizedPath = "/" + normalizedPath;

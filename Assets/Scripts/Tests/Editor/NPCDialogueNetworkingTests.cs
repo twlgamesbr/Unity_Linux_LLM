@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using NUnit.Framework;
-using UnityEngine;
 using Unity.Netcode;
+using UnityEngine;
 
 namespace NPCSystem.Tests
 {
@@ -14,7 +14,7 @@ namespace NPCSystem.Tests
             {
                 requestId = "   ",
                 npcSlug = "  Butler  ",
-                playerMessage = "  Where were you last night?  "
+                playerMessage = "  Where were you last night?  ",
             };
 
             request.SanitizeInPlace();
@@ -27,10 +27,7 @@ namespace NPCSystem.Tests
         [Test]
         public void DialogueSelectionSanitizeInPlaceTrimsAndLowercasesNpcSlug()
         {
-            var selection = new NPCDialogueSelectionMessage
-            {
-                npcSlug = "  Chef  "
-            };
+            var selection = new NPCDialogueSelectionMessage { npcSlug = "  Chef  " };
 
             selection.SanitizeInPlace();
 
@@ -48,9 +45,15 @@ namespace NPCSystem.Tests
                 sessionManager.SetSelectedNpcSlug(11ul, "Butler");
                 sessionManager.SetSelectedNpcSlug(22ul, "Chef");
 
-                Assert.That(sessionManager.TryGetSelectedNpcSlug(11ul, out string firstNpc), Is.True);
+                Assert.That(
+                    sessionManager.TryGetSelectedNpcSlug(11ul, out string firstNpc),
+                    Is.True
+                );
                 Assert.That(firstNpc, Is.EqualTo("butler"));
-                Assert.That(sessionManager.TryGetSelectedNpcSlug(22ul, out string secondNpc), Is.True);
+                Assert.That(
+                    sessionManager.TryGetSelectedNpcSlug(22ul, out string secondNpc),
+                    Is.True
+                );
                 Assert.That(secondNpc, Is.EqualTo("chef"));
             }
             finally
@@ -86,16 +89,24 @@ namespace NPCSystem.Tests
 
             try
             {
-                sessionManager.SetHistorySnapshot(11ul, "butler", new System.Collections.Generic.List<DialogueEntry>
-                {
-                    new DialogueEntry("user", "Where were you?"),
-                    new DialogueEntry("assistant", "In the study.")
-                });
-                sessionManager.SetHistorySnapshot(22ul, "butler", new System.Collections.Generic.List<DialogueEntry>
-                {
-                    new DialogueEntry("user", "Did you hear a noise?"),
-                    new DialogueEntry("assistant", "Only the clock.")
-                });
+                sessionManager.SetHistorySnapshot(
+                    11ul,
+                    "butler",
+                    new System.Collections.Generic.List<DialogueEntry>
+                    {
+                        new DialogueEntry("user", "Where were you?"),
+                        new DialogueEntry("assistant", "In the study."),
+                    }
+                );
+                sessionManager.SetHistorySnapshot(
+                    22ul,
+                    "butler",
+                    new System.Collections.Generic.List<DialogueEntry>
+                    {
+                        new DialogueEntry("user", "Did you hear a noise?"),
+                        new DialogueEntry("assistant", "Only the clock."),
+                    }
+                );
 
                 var firstHistory = sessionManager.GetHistorySnapshot(11ul, "butler");
                 var secondHistory = sessionManager.GetHistorySnapshot(22ul, "butler");
@@ -120,7 +131,9 @@ namespace NPCSystem.Tests
             try
             {
                 var firstSnapshot = new NPCEvidenceStateSnapshot();
-                firstSnapshot.discoveredClues.Add(new ClueEntry("butler", "The study window was open.", "observation", 1f));
+                firstSnapshot.discoveredClues.Add(
+                    new ClueEntry("butler", "The study window was open.", "observation", 1f)
+                );
                 firstSnapshot.obtainedItems.Add("rusty-key");
 
                 var secondSnapshot = new NPCEvidenceStateSnapshot();
@@ -172,11 +185,17 @@ namespace NPCSystem.Tests
             Assert.That(NPCDialogueNetworkBridge.LooksLikeFallbackPlayerName(null), Is.True);
             Assert.That(NPCDialogueNetworkBridge.LooksLikeFallbackPlayerName(""), Is.True);
             Assert.That(NPCDialogueNetworkBridge.LooksLikeFallbackPlayerName("  "), Is.True);
-            Assert.That(NPCDialogueNetworkBridge.LooksLikeFallbackPlayerName("Player 123"), Is.True);
+            Assert.That(
+                NPCDialogueNetworkBridge.LooksLikeFallbackPlayerName("Player 123"),
+                Is.True
+            );
             Assert.That(NPCDialogueNetworkBridge.LooksLikeFallbackPlayerName("Player 0"), Is.True);
             Assert.That(NPCDialogueNetworkBridge.LooksLikeFallbackPlayerName("Alice"), Is.False);
             Assert.That(NPCDialogueNetworkBridge.LooksLikeFallbackPlayerName("Player"), Is.False);
-            Assert.That(NPCDialogueNetworkBridge.LooksLikeFallbackPlayerName(" Player 42 "), Is.True);
+            Assert.That(
+                NPCDialogueNetworkBridge.LooksLikeFallbackPlayerName(" Player 42 "),
+                Is.True
+            );
         }
 
         [Test]
@@ -187,13 +206,13 @@ namespace NPCSystem.Tests
                 ["butler"] = new List<DialogueEntry>
                 {
                     new DialogueEntry("user", "Hello"),
-                    new DialogueEntry("assistant", "Hi")
+                    new DialogueEntry("assistant", "Hi"),
                 },
                 ["maid"] = new List<DialogueEntry>
                 {
                     new DialogueEntry("user", "Clean the room"),
-                    new DialogueEntry("assistant", "Of course")
-                }
+                    new DialogueEntry("assistant", "Of course"),
+                },
             };
 
             var clone = NPCDialogueNetworkBridge.CloneHistorySnapshot(original);
@@ -203,7 +222,11 @@ namespace NPCSystem.Tests
             Assert.That(clone["maid"][1].content, Is.EqualTo("Of course"));
 
             clone["butler"][0].content = "Modified";
-            Assert.That(original["butler"][0].content, Is.EqualTo("Hello"), "Clone should be a deep copy");
+            Assert.That(
+                original["butler"][0].content,
+                Is.EqualTo("Hello"),
+                "Clone should be a deep copy"
+            );
         }
 
         [Test]
@@ -222,8 +245,8 @@ namespace NPCSystem.Tests
                 {
                     new DialogueEntry("user", "Hello"),
                     null,
-                    new DialogueEntry("assistant", "Hi")
-                }
+                    new DialogueEntry("assistant", "Hi"),
+                },
             };
 
             var clone = NPCDialogueNetworkBridge.CloneHistorySnapshot(original);
@@ -295,22 +318,46 @@ namespace NPCSystem.Tests
             }
 
             var netObjType = typeof(Unity.Netcode.NetworkObject);
-            var fields = netObjType.GetFields(System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            var fields = netObjType.GetFields(
+                System.Reflection.BindingFlags.NonPublic
+                    | System.Reflection.BindingFlags.Public
+                    | System.Reflection.BindingFlags.Instance
+            );
             foreach (var f in fields)
             {
-                if (f.Name.Contains("OwnerClientId") || f.Name.Contains("ownerClientId") || f.Name.Equals("m_OwnerClientId"))
+                if (
+                    f.Name.Contains("OwnerClientId")
+                    || f.Name.Contains("ownerClientId")
+                    || f.Name.Equals("m_OwnerClientId")
+                )
                 {
-                    try { f.SetValue(netObj, clientId); } catch {}
+                    try
+                    {
+                        f.SetValue(netObj, clientId);
+                    }
+                    catch { }
                 }
             }
 
             var netBehType = typeof(Unity.Netcode.NetworkBehaviour);
-            var behFields = netBehType.GetFields(System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            var behFields = netBehType.GetFields(
+                System.Reflection.BindingFlags.NonPublic
+                    | System.Reflection.BindingFlags.Public
+                    | System.Reflection.BindingFlags.Instance
+            );
             foreach (var f in behFields)
             {
-                if (f.Name.Contains("OwnerClientId") || f.Name.Contains("ownerClientId") || f.Name.Equals("m_OwnerClientId"))
+                if (
+                    f.Name.Contains("OwnerClientId")
+                    || f.Name.Contains("ownerClientId")
+                    || f.Name.Equals("m_OwnerClientId")
+                )
                 {
-                    try { f.SetValue(behaviour, clientId); } catch {}
+                    try
+                    {
+                        f.SetValue(behaviour, clientId);
+                    }
+                    catch { }
                 }
             }
         }
@@ -331,16 +378,20 @@ namespace NPCSystem.Tests
             SetOwnerClientId(avatar, 42ul);
 
             var interactor = avatarObject.AddComponent<NPCNetworkItemInteractor>();
-            
+
             var sessionManagerObject = new GameObject("SessionManager");
             var sessionManager = sessionManagerObject.AddComponent<NPCNetworkSessionManager>();
 
             try
             {
-                string response = "Take this ledger! It contains everything you need to solve the mystery!";
+                string response =
+                    "Take this ledger! It contains everything you need to solve the mystery!";
                 bridge.TryVerbalItemTransfer(42ul, response);
 
-                Assert.That(sessionManager.GetEvidenceSnapshot(42ul).obtainedItems, Contains.Item("evidence-ledger"));
+                Assert.That(
+                    sessionManager.GetEvidenceSnapshot(42ul).obtainedItems,
+                    Contains.Item("evidence-ledger")
+                );
             }
             finally
             {
@@ -367,16 +418,20 @@ namespace NPCSystem.Tests
             SetOwnerClientId(avatar, 42ul);
 
             var interactor = avatarObject.AddComponent<NPCNetworkItemInteractor>();
-            
+
             var sessionManagerObject = new GameObject("SessionManager");
             var sessionManager = sessionManagerObject.AddComponent<NPCNetworkSessionManager>();
 
             try
             {
-                string response = "I have a ledger in my cabinet, but I am too busy cooking to show it to you.";
+                string response =
+                    "I have a ledger in my cabinet, but I am too busy cooking to show it to you.";
                 bridge.TryVerbalItemTransfer(42ul, response);
 
-                Assert.That(sessionManager.GetEvidenceSnapshot(42ul).obtainedItems, Is.Not.Contains("evidence-ledger"));
+                Assert.That(
+                    sessionManager.GetEvidenceSnapshot(42ul).obtainedItems,
+                    Is.Not.Contains("evidence-ledger")
+                );
             }
             finally
             {

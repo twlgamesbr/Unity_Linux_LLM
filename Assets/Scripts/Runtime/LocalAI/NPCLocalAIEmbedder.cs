@@ -35,8 +35,10 @@ namespace NPCSystem
                 {
                     var payload = new LocalAIEmbeddingRequest
                     {
-                        model = string.IsNullOrWhiteSpace(model) ? "default-embedding" : model.Trim(),
-                        input = query
+                        model = string.IsNullOrWhiteSpace(model)
+                            ? "default-embedding"
+                            : model.Trim(),
+                        input = query,
                     };
 
                     string json = JsonUtility.ToJson(payload);
@@ -54,7 +56,11 @@ namespace NPCSystem
 
                     var response = JsonUtility.FromJson<LocalAIEmbeddingResponse>(responseText);
 
-                    if (response?.data != null && response.data.Length > 0 && response.data[0].embedding != null)
+                    if (
+                        response?.data != null
+                        && response.data.Length > 0
+                        && response.data[0].embedding != null
+                    )
                     {
                         return new List<float>(response.data[0].embedding);
                     }
@@ -64,7 +70,9 @@ namespace NPCSystem
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogError($"[NPCLocalAIEmbedder] Exception (attempt {attempt + 1}/{numRetries + 1}): {ex.Message}");
+                    Debug.LogError(
+                        $"[NPCLocalAIEmbedder] Exception (attempt {attempt + 1}/{numRetries + 1}): {ex.Message}"
+                    );
                     if (attempt < numRetries)
                     {
                         await Task.Delay(500 * (attempt + 1));
@@ -90,10 +98,13 @@ namespace NPCSystem
                     request.SetRequestHeader("Authorization", $"Bearer {apiKey}");
 
                 var operation = request.SendWebRequest();
-                while (!operation.isDone) await Task.Yield();
+                while (!operation.isDone)
+                    await Task.Yield();
 
-                if (request.result == UnityWebRequest.Result.ConnectionError ||
-                    request.result == UnityWebRequest.Result.ProtocolError)
+                if (
+                    request.result == UnityWebRequest.Result.ConnectionError
+                    || request.result == UnityWebRequest.Result.ProtocolError
+                )
                 {
                     Debug.LogError($"[NPCLocalAIEmbedder] Request failed: {request.error}");
                     return null;

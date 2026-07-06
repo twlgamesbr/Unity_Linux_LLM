@@ -30,22 +30,28 @@ namespace NPCSystem
         {
             int fetchKey = await IncrementalSearch(queryString, group);
             (string[] phrases, float[] distances, bool completed) = IncrementalFetch(fetchKey, k);
-            if (!completed) IncrementalSearchComplete(fetchKey);
+            if (!completed)
+                IncrementalSearchComplete(fetchKey);
             return (phrases, distances);
         }
 
         public abstract void Save(ZipArchive archive);
         public abstract void Load(ZipArchive archive);
+
         public virtual string GetSavePath(string name) => Path.Combine(GetType().Name, name);
+
         public virtual void UpdateGameObjects() { }
 
-        protected T ConstructComponent<T>(Type type, Action<T, T> copyAction = null) where T : Component
+        protected T ConstructComponent<T>(Type type, Action<T, T> copyAction = null)
+            where T : Component
         {
             T Construct(Type t)
             {
-                if (t == null) return null;
+                if (t == null)
+                    return null;
                 T newComponent = (T)gameObject.AddComponent(t);
-                if (newComponent is NPCSearchable searchable) searchable.UpdateGameObjects();
+                if (newComponent is NPCSearchable searchable)
+                    searchable.UpdateGameObjects();
                 return newComponent;
             }
 
@@ -64,7 +70,8 @@ namespace NPCSystem
                 else
                 {
                     newComponent = Construct(type);
-                    if (type != null) copyAction?.Invoke(component, newComponent);
+                    if (type != null)
+                        copyAction?.Invoke(component, newComponent);
 #if UNITY_EDITOR
                     DestroyImmediate(component);
 #else
@@ -80,11 +87,14 @@ namespace NPCSystem
 #if UNITY_EDITOR
         public virtual void Reset()
         {
-            if (!Application.isPlaying) UnityEditor.EditorApplication.update += UpdateGameObjects;
+            if (!Application.isPlaying)
+                UnityEditor.EditorApplication.update += UpdateGameObjects;
         }
+
         public virtual void OnDestroy()
         {
-            if (!Application.isPlaying) UnityEditor.EditorApplication.update -= UpdateGameObjects;
+            if (!Application.isPlaying)
+                UnityEditor.EditorApplication.update -= UpdateGameObjects;
         }
 #endif
 
@@ -97,7 +107,9 @@ namespace NPCSystem
             }
             catch (Exception e)
             {
-                Debug.LogError($"[NPC] File {filePath} could not be saved: {e.GetType()}: {e.Message}");
+                Debug.LogError(
+                    $"[NPC] File {filePath} could not be saved: {e.GetType()}: {e.Message}"
+                );
             }
         }
 
@@ -106,12 +118,15 @@ namespace NPCSystem
             try
             {
                 string path = ResolveAssetPath(filePath);
-                if (!File.Exists(path)) return Task.FromResult(false);
+                if (!File.Exists(path))
+                    return Task.FromResult(false);
                 NPCArchiveSaver.Load(path, Load);
             }
             catch (Exception e)
             {
-                Debug.LogError($"[NPC] File {filePath} could not be loaded: {e.GetType()}: {e.Message}");
+                Debug.LogError(
+                    $"[NPC] File {filePath} could not be loaded: {e.GetType()}: {e.Message}"
+                );
                 return Task.FromResult(false);
             }
             return Task.FromResult(true);
@@ -119,9 +134,11 @@ namespace NPCSystem
 
         public static string ResolveAssetPath(string relativePath)
         {
-            if (string.IsNullOrWhiteSpace(relativePath)) return string.Empty;
+            if (string.IsNullOrWhiteSpace(relativePath))
+                return string.Empty;
             string normalized = relativePath.Trim().Replace('\\', '/');
-            if (Path.IsPathRooted(normalized)) return normalized;
+            if (Path.IsPathRooted(normalized))
+                return normalized;
             return Path.Combine(Application.streamingAssetsPath, normalized).Replace('\\', '/');
         }
     }
@@ -137,7 +154,8 @@ namespace NPCSystem
         protected int nextKey = 0;
         protected int nextIncrementalSearchKey = 0;
         protected SortedDictionary<int, string> data = new SortedDictionary<int, string>();
-        protected SortedDictionary<string, List<int>> dataSplits = new SortedDictionary<string, List<int>>();
+        protected SortedDictionary<string, List<int>> dataSplits =
+            new SortedDictionary<string, List<int>>();
 
         protected abstract void AddInternal(int key, float[] embedding);
         protected abstract void RemoveInternal(int key);
@@ -153,8 +171,10 @@ namespace NPCSystem
                 embeddingsList[i] = await Encode(searchList[i]);
 
             float[] unsortedDistances = InverseDotProduct(embedding, embeddingsList);
-            List<(string, float)> sortedLists = searchList.Zip(unsortedDistances, (first, second) => (first, second))
-                .OrderBy(item => item.Item2).ToList();
+            List<(string, float)> sortedLists = searchList
+                .Zip(unsortedDistances, (first, second) => (first, second))
+                .OrderBy(item => item.Item2)
+                .ToList();
 
             string[] results = new string[sortedLists.Count];
             float[] distances = new float[sortedLists.Count];
@@ -168,14 +188,24 @@ namespace NPCSystem
 
         public static float DotProduct(float[] vector1, float[] vector2)
         {
-            if (vector1 == null || vector2 == null) { Debug.LogError("Vectors cannot be null"); return 0; }
-            if (vector1.Length != vector2.Length) { Debug.LogError("Vector lengths must be equal"); return 0; }
+            if (vector1 == null || vector2 == null)
+            {
+                Debug.LogError("Vectors cannot be null");
+                return 0;
+            }
+            if (vector1.Length != vector2.Length)
+            {
+                Debug.LogError("Vector lengths must be equal");
+                return 0;
+            }
             float result = 0;
-            for (int i = 0; i < vector1.Length; i++) result += vector1[i] * vector2[i];
+            for (int i = 0; i < vector1.Length; i++)
+                result += vector1[i] * vector2[i];
             return result;
         }
 
-        public static float InverseDotProduct(float[] vector1, float[] vector2) => 1 - DotProduct(vector1, vector2);
+        public static float InverseDotProduct(float[] vector1, float[] vector2) =>
+            1 - DotProduct(vector1, vector2);
 
         public static float[] InverseDotProduct(float[] vector1, float[][] vector2)
         {
@@ -199,7 +229,8 @@ namespace NPCSystem
         public virtual async Task<List<int>> Tokenize(string query)
         {
             await Task.Yield();
-            if (string.IsNullOrWhiteSpace(query)) return new List<int>();
+            if (string.IsNullOrWhiteSpace(query))
+                return new List<int>();
             // Simple character-level tokenization as fallback
             var tokens = new List<int>();
             for (int i = 0; i < query.Length; i++)
@@ -211,7 +242,8 @@ namespace NPCSystem
         public virtual async Task<string> Detokenize(List<int> tokens)
         {
             await Task.Yield();
-            if (tokens == null || tokens.Count == 0) return string.Empty;
+            if (tokens == null || tokens.Count == 0)
+                return string.Empty;
             char[] chars = new char[tokens.Count];
             for (int i = 0; i < tokens.Count; i++)
                 chars[i] = (char)(tokens[i] & 0xFFFF);
@@ -220,7 +252,8 @@ namespace NPCSystem
 
         public override string Get(int key)
         {
-            if (data.TryGetValue(key, out string result)) return result;
+            if (data.TryGetValue(key, out string result))
+                return result;
             return null;
         }
 
@@ -229,8 +262,10 @@ namespace NPCSystem
             int key = nextKey++;
             AddInternal(key, await Encode(inputString));
             data[key] = inputString;
-            if (!dataSplits.ContainsKey(group)) dataSplits[group] = new List<int> { key };
-            else dataSplits[group].Add(key);
+            if (!dataSplits.ContainsKey(group))
+                dataSplits[group] = new List<int> { key };
+            else
+                dataSplits[group].Add(key);
             return key;
         }
 
@@ -246,7 +281,8 @@ namespace NPCSystem
         protected bool RemoveEntry(int key)
         {
             bool removed = data.Remove(key);
-            if (removed) RemoveInternal(key);
+            if (removed)
+                RemoveInternal(key);
             return removed;
         }
 
@@ -254,29 +290,35 @@ namespace NPCSystem
         {
             if (RemoveEntry(key))
             {
-                foreach (var dataSplit in dataSplits.Values) dataSplit.Remove(key);
+                foreach (var dataSplit in dataSplits.Values)
+                    dataSplit.Remove(key);
             }
         }
 
         public override int Remove(string inputString, string group = "")
         {
-            if (!dataSplits.TryGetValue(group, out List<int> dataSplit)) return 0;
+            if (!dataSplits.TryGetValue(group, out List<int> dataSplit))
+                return 0;
             List<int> removeIds = new List<int>();
             foreach (int key in dataSplit)
             {
-                if (Get(key) == inputString) removeIds.Add(key);
+                if (Get(key) == inputString)
+                    removeIds.Add(key);
             }
             foreach (int key in removeIds)
             {
-                if (RemoveEntry(key)) dataSplit.Remove(key);
+                if (RemoveEntry(key))
+                    dataSplit.Remove(key);
             }
             return removeIds.Count;
         }
 
         public override int Count() => data.Count;
+
         public override int Count(string group)
         {
-            if (!dataSplits.TryGetValue(group, out List<int> dataSplit)) return 0;
+            if (!dataSplits.TryGetValue(group, out List<int> dataSplit))
+                return 0;
             return dataSplit.Count;
         }
 
@@ -301,24 +343,44 @@ namespace NPCSystem
             NPCArchiveSaver.Save(archive, data, GetSavePath("data"));
             NPCArchiveSaver.Save(archive, dataSplits, GetSavePath("dataSplits"));
             NPCArchiveSaver.Save(archive, nextKey, GetSavePath("nextKey"));
-            NPCArchiveSaver.Save(archive, nextIncrementalSearchKey, GetSavePath("nextIncrementalSearchKey"));
+            NPCArchiveSaver.Save(
+                archive,
+                nextIncrementalSearchKey,
+                GetSavePath("nextIncrementalSearchKey")
+            );
             SaveInternal(archive);
         }
 
         public override void Load(ZipArchive archive)
         {
-            data = NPCArchiveSaver.Load<SortedDictionary<int, string>>(archive, GetSavePath("data"));
-            dataSplits = NPCArchiveSaver.Load<SortedDictionary<string, List<int>>>(archive, GetSavePath("dataSplits"));
+            data = NPCArchiveSaver.Load<SortedDictionary<int, string>>(
+                archive,
+                GetSavePath("data")
+            );
+            dataSplits = NPCArchiveSaver.Load<SortedDictionary<string, List<int>>>(
+                archive,
+                GetSavePath("dataSplits")
+            );
             nextKey = NPCArchiveSaver.Load<int>(archive, GetSavePath("nextKey"));
-            nextIncrementalSearchKey = NPCArchiveSaver.Load<int>(archive, GetSavePath("nextIncrementalSearchKey"));
+            nextIncrementalSearchKey = NPCArchiveSaver.Load<int>(
+                archive,
+                GetSavePath("nextIncrementalSearchKey")
+            );
             LoadInternal(archive);
         }
 
         public override void UpdateGameObjects()
         {
-            if (this == null || llmEmbedder != null) return;
-            llmEmbedder = ConstructComponent<NPCLocalAIEmbedder>(typeof(NPCLocalAIEmbedder),
-                (previous, current) => { /* no LLM ref to copy */ });
+            if (this == null || llmEmbedder != null)
+                return;
+            llmEmbedder = ConstructComponent<NPCLocalAIEmbedder>(
+                typeof(NPCLocalAIEmbedder),
+                (
+                    previous,
+                    current
+                ) => { /* no LLM ref to copy */
+                }
+            );
         }
     }
 
@@ -387,7 +449,8 @@ namespace NPCSystem
         public static T Load<T>(ZipArchive archive, string path)
         {
             ZipArchiveEntry entry = archive.GetEntry(path);
-            if (entry == null) return default;
+            if (entry == null)
+                return default;
             using (Stream stream = entry.Open())
             {
                 BinaryFormatter formatter = new BinaryFormatter();

@@ -8,13 +8,19 @@ namespace NPCSystem.Tests
         [Test]
         public void SupportsPersistentFileLogging_DisablesWebGL()
         {
-            Assert.That(NPCFlowLogger.SupportsPersistentFileLogging(RuntimePlatform.WebGLPlayer), Is.False);
+            Assert.That(
+                NPCFlowLogger.SupportsPersistentFileLogging(RuntimePlatform.WebGLPlayer),
+                Is.False
+            );
         }
 
         [Test]
         public void SupportsPersistentFileLogging_AllowsDesktopEditor()
         {
-            Assert.That(NPCFlowLogger.SupportsPersistentFileLogging(RuntimePlatform.LinuxEditor), Is.True);
+            Assert.That(
+                NPCFlowLogger.SupportsPersistentFileLogging(RuntimePlatform.LinuxEditor),
+                Is.True
+            );
         }
     }
 }

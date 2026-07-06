@@ -1,4 +1,3 @@
-#if !UNITY_SERVER && GLADE_UGUI
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -57,35 +56,47 @@ namespace NPCSystem.Tests
         {
             CreateCanvas();
 
-            Execute(new CreateUiElementTool(), new Dictionary<string, object>
-            {
-                ["elementType"] = "Toggle",
-                ["name"] = "RememberToggle",
-                ["parentPath"] = "Canvas"
-            });
+            Execute(
+                new CreateUiElementTool(),
+                new Dictionary<string, object>
+                {
+                    ["elementType"] = "Toggle",
+                    ["name"] = "RememberToggle",
+                    ["parentPath"] = "Canvas",
+                }
+            );
 
-            Execute(new CreateUiElementTool(), new Dictionary<string, object>
-            {
-                ["elementType"] = "Slider",
-                ["name"] = "VolumeSlider",
-                ["parentPath"] = "Canvas"
-            });
+            Execute(
+                new CreateUiElementTool(),
+                new Dictionary<string, object>
+                {
+                    ["elementType"] = "Slider",
+                    ["name"] = "VolumeSlider",
+                    ["parentPath"] = "Canvas",
+                }
+            );
 
-            Execute(new CreateUiElementTool(), new Dictionary<string, object>
-            {
-                ["elementType"] = "Dropdown",
-                ["name"] = "RoleDropdown",
-                ["parentPath"] = "Canvas",
-                ["options"] = new ArrayList { "Butler", "Maid", "Chef" }
-            });
+            Execute(
+                new CreateUiElementTool(),
+                new Dictionary<string, object>
+                {
+                    ["elementType"] = "Dropdown",
+                    ["name"] = "RoleDropdown",
+                    ["parentPath"] = "Canvas",
+                    ["options"] = new ArrayList { "Butler", "Maid", "Chef" },
+                }
+            );
 
-            Execute(new CreateUiElementTool(), new Dictionary<string, object>
-            {
-                ["elementType"] = "InputField",
-                ["name"] = "LegacyInput",
-                ["parentPath"] = "Canvas",
-                ["placeholder"] = "Say something"
-            });
+            Execute(
+                new CreateUiElementTool(),
+                new Dictionary<string, object>
+                {
+                    ["elementType"] = "InputField",
+                    ["name"] = "LegacyInput",
+                    ["parentPath"] = "Canvas",
+                    ["placeholder"] = "Say something",
+                }
+            );
 
             var toggle = GameObject.Find("RememberToggle").GetComponent<Toggle>();
             var slider = GameObject.Find("VolumeSlider").GetComponent<Slider>();
@@ -109,21 +120,27 @@ namespace NPCSystem.Tests
         {
             CreateCanvas();
 
-            Execute(new CreateUiElementTool(), new Dictionary<string, object>
-            {
-                ["elementType"] = "TMP_InputField",
-                ["name"] = "TmpInput",
-                ["parentPath"] = "Canvas",
-                ["placeholder"] = "Enter NPC prompt"
-            });
+            Execute(
+                new CreateUiElementTool(),
+                new Dictionary<string, object>
+                {
+                    ["elementType"] = "TMP_InputField",
+                    ["name"] = "TmpInput",
+                    ["parentPath"] = "Canvas",
+                    ["placeholder"] = "Enter NPC prompt",
+                }
+            );
 
-            Execute(new CreateUiElementTool(), new Dictionary<string, object>
-            {
-                ["elementType"] = "TMP_Dropdown",
-                ["name"] = "TmpDropdown",
-                ["parentPath"] = "Canvas",
-                ["options"] = new ArrayList { "One", "Two" }
-            });
+            Execute(
+                new CreateUiElementTool(),
+                new Dictionary<string, object>
+                {
+                    ["elementType"] = "TMP_Dropdown",
+                    ["name"] = "TmpDropdown",
+                    ["parentPath"] = "Canvas",
+                    ["options"] = new ArrayList { "One", "Two" },
+                }
+            );
 
             var tmpInputType = ResolveType("TMPro.TMP_InputField, Unity.TextMeshPro");
             var tmpDropdownType = ResolveType("TMPro.TMP_Dropdown, Unity.TextMeshPro");
@@ -144,34 +161,46 @@ namespace NPCSystem.Tests
         {
             CreateCanvas();
 
-            Execute(new CreateUiElementTool(), new Dictionary<string, object>
-            {
-                ["elementType"] = "Dropdown",
-                ["name"] = "RoleDropdown",
-                ["parentPath"] = "Canvas"
-            });
+            Execute(
+                new CreateUiElementTool(),
+                new Dictionary<string, object>
+                {
+                    ["elementType"] = "Dropdown",
+                    ["name"] = "RoleDropdown",
+                    ["parentPath"] = "Canvas",
+                }
+            );
 
-            Execute(new CreateUiElementTool(), new Dictionary<string, object>
-            {
-                ["elementType"] = "TMP_InputField",
-                ["name"] = "TmpInput",
-                ["parentPath"] = "Canvas"
-            });
+            Execute(
+                new CreateUiElementTool(),
+                new Dictionary<string, object>
+                {
+                    ["elementType"] = "TMP_InputField",
+                    ["name"] = "TmpInput",
+                    ["parentPath"] = "Canvas",
+                }
+            );
 
-            Execute(new SetUiPropertiesTool(), new Dictionary<string, object>
-            {
-                ["gameObjectPath"] = "Canvas/RoleDropdown",
-                ["options"] = new ArrayList { "Butler", "Maid", "Chef" },
-                ["value"] = "1"
-            });
+            Execute(
+                new SetUiPropertiesTool(),
+                new Dictionary<string, object>
+                {
+                    ["gameObjectPath"] = "Canvas/RoleDropdown",
+                    ["options"] = new ArrayList { "Butler", "Maid", "Chef" },
+                    ["value"] = "1",
+                }
+            );
 
-            Execute(new SetUiPropertiesTool(), new Dictionary<string, object>
-            {
-                ["gameObjectPath"] = "Canvas/TmpInput",
-                ["placeholder"] = "Ask about evidence",
-                ["text"] = "Hello",
-                ["lineType"] = "MultiLineNewline"
-            });
+            Execute(
+                new SetUiPropertiesTool(),
+                new Dictionary<string, object>
+                {
+                    ["gameObjectPath"] = "Canvas/TmpInput",
+                    ["placeholder"] = "Ask about evidence",
+                    ["text"] = "Hello",
+                    ["lineType"] = "MultiLineNewline",
+                }
+            );
 
             var dropdown = GameObject.Find("RoleDropdown").GetComponent<Dropdown>();
             var tmpInputType = ResolveType("TMPro.TMP_InputField, Unity.TextMeshPro");
@@ -181,7 +210,10 @@ namespace NPCSystem.Tests
             Assert.That(dropdown.options.Count, Is.EqualTo(3));
             Assert.That(dropdown.value, Is.EqualTo(1));
             Assert.That(GetPropertyValue(tmpInput, "text")?.ToString(), Is.EqualTo("Hello"));
-            Assert.That(GetPropertyValue(tmpInput, "lineType")?.ToString(), Is.EqualTo("MultiLineNewline"));
+            Assert.That(
+                GetPropertyValue(tmpInput, "lineType")?.ToString(),
+                Is.EqualTo("MultiLineNewline")
+            );
             Assert.That(ReadTextLike(placeholder), Is.EqualTo("Ask about evidence"));
         }
 
@@ -190,61 +222,74 @@ namespace NPCSystem.Tests
         {
             CreateCanvas();
 
-            Execute(new CreateUiElementTool(), new Dictionary<string, object>
-            {
-                ["elementType"] = "Button",
-                ["name"] = "SubmitButton",
-                ["parentPath"] = "Canvas",
-                ["text"] = "Submit"
-            });
+            Execute(
+                new CreateUiElementTool(),
+                new Dictionary<string, object>
+                {
+                    ["elementType"] = "Button",
+                    ["name"] = "SubmitButton",
+                    ["parentPath"] = "Canvas",
+                    ["text"] = "Submit",
+                }
+            );
 
-            Execute(new CreateUiElementTool(), new Dictionary<string, object>
-            {
-                ["elementType"] = "TMP_Dropdown",
-                ["name"] = "TmpDropdown",
-                ["parentPath"] = "Canvas",
-                ["options"] = new ArrayList { "One", "Two" }
-            });
+            Execute(
+                new CreateUiElementTool(),
+                new Dictionary<string, object>
+                {
+                    ["elementType"] = "TMP_Dropdown",
+                    ["name"] = "TmpDropdown",
+                    ["parentPath"] = "Canvas",
+                    ["options"] = new ArrayList { "One", "Two" },
+                }
+            );
 
             var receiverObject = new GameObject("Receiver");
             receiverObject.AddComponent<UiEventReceiver>();
 
-            Execute(new SetUiEventTool(), new Dictionary<string, object>
-            {
-                ["gameObjectPath"] = "Canvas/SubmitButton",
-                ["eventType"] = "onClick",
-                ["targetGameObjectPath"] = "Receiver",
-                ["methodName"] = nameof(UiEventReceiver.HandleClick)
-            });
+            Execute(
+                new SetUiEventTool(),
+                new Dictionary<string, object>
+                {
+                    ["gameObjectPath"] = "Canvas/SubmitButton",
+                    ["eventType"] = "onClick",
+                    ["targetGameObjectPath"] = "Receiver",
+                    ["methodName"] = nameof(UiEventReceiver.HandleClick),
+                }
+            );
 
-            Execute(new SetUiEventTool(), new Dictionary<string, object>
-            {
-                ["gameObjectPath"] = "Canvas/TmpDropdown",
-                ["eventType"] = "onValueChangedInt",
-                ["targetGameObjectPath"] = "Receiver",
-                ["methodName"] = nameof(UiEventReceiver.HandleIndexChanged)
-            });
+            Execute(
+                new SetUiEventTool(),
+                new Dictionary<string, object>
+                {
+                    ["gameObjectPath"] = "Canvas/TmpDropdown",
+                    ["eventType"] = "onValueChangedInt",
+                    ["targetGameObjectPath"] = "Receiver",
+                    ["methodName"] = nameof(UiEventReceiver.HandleIndexChanged),
+                }
+            );
 
-            var buttonHandlers = new GetUiEventHandlersTool().Execute(new Dictionary<string, object>
-            {
-                ["gameObjectPath"] = "Canvas/SubmitButton"
-            });
+            var buttonHandlers = new GetUiEventHandlersTool().Execute(
+                new Dictionary<string, object> { ["gameObjectPath"] = "Canvas/SubmitButton" }
+            );
             Assert.That(buttonHandlers, Does.Contain("\"count\":1"));
             Assert.That(buttonHandlers, Does.Contain(nameof(UiEventReceiver.HandleClick)));
 
-            var dropdownHandlers = new GetUiEventHandlersTool().Execute(new Dictionary<string, object>
-            {
-                ["gameObjectPath"] = "Canvas/TmpDropdown"
-            });
+            var dropdownHandlers = new GetUiEventHandlersTool().Execute(
+                new Dictionary<string, object> { ["gameObjectPath"] = "Canvas/TmpDropdown" }
+            );
             Assert.That(dropdownHandlers, Does.Contain("\"count\":1"));
             Assert.That(dropdownHandlers, Does.Contain(nameof(UiEventReceiver.HandleIndexChanged)));
 
-            Execute(new RemoveUiEventTool(), new Dictionary<string, object>
-            {
-                ["gameObjectPath"] = "Canvas/SubmitButton",
-                ["eventType"] = "onClick",
-                ["removeAll"] = true
-            });
+            Execute(
+                new RemoveUiEventTool(),
+                new Dictionary<string, object>
+                {
+                    ["gameObjectPath"] = "Canvas/SubmitButton",
+                    ["eventType"] = "onClick",
+                    ["removeAll"] = true,
+                }
+            );
 
             var button = GameObject.Find("SubmitButton").GetComponent<Button>();
             Assert.That(button.onClick.GetPersistentEventCount(), Is.EqualTo(0));
@@ -255,23 +300,24 @@ namespace NPCSystem.Tests
         {
             CreateCanvas();
 
-            Execute(new CreateUiElementTool(), new Dictionary<string, object>
-            {
-                ["elementType"] = "TMP_Dropdown",
-                ["name"] = "TmpDropdown",
-                ["parentPath"] = "Canvas",
-                ["options"] = new ArrayList { "One", "Two" }
-            });
+            Execute(
+                new CreateUiElementTool(),
+                new Dictionary<string, object>
+                {
+                    ["elementType"] = "TMP_Dropdown",
+                    ["name"] = "TmpDropdown",
+                    ["parentPath"] = "Canvas",
+                    ["options"] = new ArrayList { "One", "Two" },
+                }
+            );
 
             var hierarchy = new ListUiHierarchyTool().Execute(new Dictionary<string, object>());
-            var exists = new CheckUiElementExistsTool().Execute(new Dictionary<string, object>
-            {
-                ["elementPath"] = "Canvas/TmpDropdown"
-            });
-            var info = new GetUiElementInfoTool().Execute(new Dictionary<string, object>
-            {
-                ["gameObjectPath"] = "Canvas/TmpDropdown"
-            });
+            var exists = new CheckUiElementExistsTool().Execute(
+                new Dictionary<string, object> { ["elementPath"] = "Canvas/TmpDropdown" }
+            );
+            var info = new GetUiElementInfoTool().Execute(
+                new Dictionary<string, object> { ["gameObjectPath"] = "Canvas/TmpDropdown" }
+            );
 
             Assert.That(hierarchy, Does.Contain("TMP_Dropdown"));
             Assert.That(exists, Does.Contain("\"success\":true"));
@@ -290,11 +336,14 @@ namespace NPCSystem.Tests
 
         static void CreateCanvas()
         {
-            Execute(new CreateCanvasTool(), new Dictionary<string, object>
-            {
-                ["name"] = "Canvas",
-                ["renderMode"] = "ScreenSpaceOverlay"
-            });
+            Execute(
+                new CreateCanvasTool(),
+                new Dictionary<string, object>
+                {
+                    ["name"] = "Canvas",
+                    ["renderMode"] = "ScreenSpaceOverlay",
+                }
+            );
         }
 
         static Type ResolveType(string assemblyQualifiedName)
@@ -321,18 +370,15 @@ namespace NPCSystem.Tests
                 return legacyText.text;
             }
 
-            return component.GetType().GetProperty("text")?.GetValue(component)?.ToString() ?? string.Empty;
+            return component.GetType().GetProperty("text")?.GetValue(component)?.ToString()
+                ?? string.Empty;
         }
 
         public class UiEventReceiver : MonoBehaviour
         {
-            public void HandleClick()
-            {
-            }
+            public void HandleClick() { }
 
-            public void HandleIndexChanged(int index)
-            {
-            }
+            public void HandleIndexChanged(int index) { }
         }
     }
 }

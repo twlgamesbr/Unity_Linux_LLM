@@ -14,7 +14,7 @@ namespace NPCSystem
         BackendReadiness,
         NetworkBridge,
         Validation,
-        Spawning
+        Spawning,
     }
 
     [DefaultExecutionOrder(-2000)]
@@ -30,7 +30,7 @@ namespace NPCSystem
             NPCSceneInitializationPhase.BackendReadiness,
             NPCSceneInitializationPhase.NetworkBridge,
             NPCSceneInitializationPhase.Validation,
-            NPCSceneInitializationPhase.Spawning
+            NPCSceneInitializationPhase.Spawning,
         };
 
         [Header("References")]
@@ -44,7 +44,10 @@ namespace NPCSystem
         [Header("Startup")]
         public bool initializeOnStart = true;
         public bool configureNetworkTransport = false;
-        [Tooltip("If true, initializes the dialogue manager immediately during scene start. Set to false to delay initialization until after player login (recommended for WebGL memory-smart start).")]
+
+        [Tooltip(
+            "If true, initializes the dialogue manager immediately during scene start. Set to false to delay initialization until after player login (recommended for WebGL memory-smart start)."
+        )]
         public bool initializeDialogueManager = false;
         public bool verifyBackendsDuringInitialization = false;
         public bool initializeNetworkBridge = true;
@@ -54,7 +57,8 @@ namespace NPCSystem
         bool _started;
         Task _initializationTask;
 
-        public bool IsInitialized => _initializationTask != null && _initializationTask.IsCompletedSuccessfully;
+        public bool IsInitialized =>
+            _initializationTask != null && _initializationTask.IsCompletedSuccessfully;
         public Task InitializationTask => _initializationTask;
 
         void Reset()
@@ -77,7 +81,8 @@ namespace NPCSystem
 
         async void Start()
         {
-            if (!initializeOnStart) return;
+            if (!initializeOnStart)
+                return;
             if (ShouldDeferInitializationForWebGL())
             {
                 flowLogger = flowLogger != null ? flowLogger : NPCFlowLogger.FindOrCreate();
@@ -86,7 +91,8 @@ namespace NPCSystem
                     NPCFlowStatus.Skipped,
                     NPCFlowLogLevel.Info,
                     "Deferred automatic scene initialization for WebGL startup to avoid browser bootstrap instability. Call InitializeSceneAsync after the page finishes loading and the player is ready.",
-                    source: nameof(NPCSceneInitializationController));
+                    source: nameof(NPCSceneInitializationController)
+                );
                 return;
             }
             await InitializeSceneAsync();
@@ -126,10 +132,12 @@ namespace NPCSystem
         async Task RunPhaseAsync(NPCSceneInitializationPhase phase)
         {
             NPCFlowLogger logger = flowLogger != null ? flowLogger : NPCFlowLogger.FindOrCreate();
-            using var scope = NPCFlowScope.Start(logger, NPCFlowStage.SceneBootstrap, source: nameof(NPCSceneInitializationController), data: new Dictionary<string, object>
-            {
-                ["phase"] = phase.ToString()
-            });
+            using var scope = NPCFlowScope.Start(
+                logger,
+                NPCFlowStage.SceneBootstrap,
+                source: nameof(NPCSceneInitializationController),
+                data: new Dictionary<string, object> { ["phase"] = phase.ToString() }
+            );
 
             try
             {
@@ -156,7 +164,9 @@ namespace NPCSystem
                     case NPCSceneInitializationPhase.BackendReadiness:
                         if (verifyBackendsDuringInitialization && backendReadiness != null)
                         {
-                            bool probeLocalAi = initializeDialogueManager && (dialogueManager != null && dialogueManager.initializeOnStart);
+                            bool probeLocalAi =
+                                initializeDialogueManager
+                                && (dialogueManager != null && dialogueManager.initializeOnStart);
                             await backendReadiness.ProbeAsync(probeLocalAi);
                         }
                         break;
@@ -171,12 +181,17 @@ namespace NPCSystem
                         {
                             if (dialogueManager != null && !dialogueManager.isInitialized)
                             {
-                                logger.Log(NPCFlowStage.SceneBootstrap,
+                                logger.Log(
+                                    NPCFlowStage.SceneBootstrap,
                                     NPCFlowStatus.Skipped,
                                     NPCFlowLogLevel.Info,
                                     "Skipped scene initialization smoke validation because dialogue manager is not initialized yet (deferred loading active).",
                                     source: nameof(NPCSceneInitializationController),
-                                    data: new Dictionary<string, object> { ["phase"] = phase.ToString() });
+                                    data: new Dictionary<string, object>
+                                    {
+                                        ["phase"] = phase.ToString(),
+                                    }
+                                );
                             }
                             else
                             {
@@ -187,12 +202,15 @@ namespace NPCSystem
                     case NPCSceneInitializationPhase.Spawning:
                         if (startNetworkingAfterInitialization && networkBootstrap != null)
                         {
-                            bool skipForBatchmodeBootstrap = Application.isBatchMode &&
-                                networkBootstrap.transportConfig.autoStartMode != NPCNetworkAutoStartMode.Manual;
+                            bool skipForBatchmodeBootstrap =
+                                Application.isBatchMode
+                                && networkBootstrap.transportConfig.autoStartMode
+                                    != NPCNetworkAutoStartMode.Manual;
 
                             if (skipForBatchmodeBootstrap)
                             {
-                                logger.Log(NPCFlowStage.SceneBootstrap,
+                                logger.Log(
+                                    NPCFlowStage.SceneBootstrap,
                                     NPCFlowStatus.Skipped,
                                     NPCFlowLogLevel.Info,
                                     "Skipped scene initialization network start because batchmode bootstrap auto-start is active.",
@@ -200,32 +218,46 @@ namespace NPCSystem
                                     data: new Dictionary<string, object>
                                     {
                                         ["phase"] = phase.ToString(),
-                                        ["autoStartMode"] = networkBootstrap.transportConfig.autoStartMode.ToString()
-                                    });
+                                        ["autoStartMode"] =
+                                            networkBootstrap.transportConfig.autoStartMode.ToString(),
+                                    }
+                                );
                                 break;
                             }
 
                             bool started = networkBootstrap.StartConfiguredMode();
-                            logger.Log(NPCFlowStage.SceneBootstrap,
+                            logger.Log(
+                                NPCFlowStage.SceneBootstrap,
                                 started ? NPCFlowStatus.Success : NPCFlowStatus.Skipped,
                                 started ? NPCFlowLogLevel.Info : NPCFlowLogLevel.Warning,
-                                started ? "NetworkManager started from scene initialization controller." : "NetworkManager start skipped by scene initialization controller.",
+                                started
+                                    ? "NetworkManager started from scene initialization controller."
+                                    : "NetworkManager start skipped by scene initialization controller.",
                                 source: nameof(NPCSceneInitializationController),
-                                data: new Dictionary<string, object> { ["phase"] = phase.ToString() });
+                                data: new Dictionary<string, object>
+                                {
+                                    ["phase"] = phase.ToString(),
+                                }
+                            );
                         }
                         break;
                     default:
-                        throw new ArgumentOutOfRangeException(nameof(phase), phase, "Unknown scene initialization phase.");
+                        throw new ArgumentOutOfRangeException(
+                            nameof(phase),
+                            phase,
+                            "Unknown scene initialization phase."
+                        );
                 }
 
-                scope.Success("Scene initialization phase completed.", new Dictionary<string, object>
-                {
-                    ["phase"] = phase.ToString()
-                });
+                scope.Success(
+                    "Scene initialization phase completed.",
+                    new Dictionary<string, object> { ["phase"] = phase.ToString() }
+                );
             }
             catch (Exception ex)
             {
-                logger.Log(NPCFlowStage.SceneBootstrap,
+                logger.Log(
+                    NPCFlowStage.SceneBootstrap,
                     NPCFlowStatus.Error,
                     NPCFlowLogLevel.Warning,
                     $"Scene initialization phase {phase} failed: {ex.Message}",
@@ -233,12 +265,13 @@ namespace NPCSystem
                     data: new Dictionary<string, object>
                     {
                         ["phase"] = phase.ToString(),
-                        ["exception"] = ex.ToString()
-                    });
-                scope.Warning($"Scene initialization phase {phase} failed: {ex.Message}", new Dictionary<string, object>
-                {
-                    ["phase"] = phase.ToString()
-                });
+                        ["exception"] = ex.ToString(),
+                    }
+                );
+                scope.Warning(
+                    $"Scene initialization phase {phase} failed: {ex.Message}",
+                    new Dictionary<string, object> { ["phase"] = phase.ToString() }
+                );
             }
         }
 
@@ -251,27 +284,37 @@ namespace NPCSystem
 
             if (networkBootstrap == null)
             {
-                networkBootstrap = FindAnyObjectByType<NPCNetworkBootstrap>(FindObjectsInactive.Include);
+                networkBootstrap = FindAnyObjectByType<NPCNetworkBootstrap>(
+                    FindObjectsInactive.Include
+                );
             }
 
             if (dialogueManager == null)
             {
-                dialogueManager = FindAnyObjectByType<NPCDialogueManager>(FindObjectsInactive.Include);
+                dialogueManager = FindAnyObjectByType<NPCDialogueManager>(
+                    FindObjectsInactive.Include
+                );
             }
 
             if (networkBridge == null)
             {
-                networkBridge = FindAnyObjectByType<NPCDialogueNetworkBridge>(FindObjectsInactive.Include);
+                networkBridge = FindAnyObjectByType<NPCDialogueNetworkBridge>(
+                    FindObjectsInactive.Include
+                );
             }
 
             if (backendReadiness == null)
             {
-                backendReadiness = FindAnyObjectByType<NPCBackendReadinessService>(FindObjectsInactive.Include);
+                backendReadiness = FindAnyObjectByType<NPCBackendReadinessService>(
+                    FindObjectsInactive.Include
+                );
             }
 
             if (smokeValidator == null)
             {
-                smokeValidator = FindAnyObjectByType<NPCDialogueSmokeValidator>(FindObjectsInactive.Include);
+                smokeValidator = FindAnyObjectByType<NPCDialogueSmokeValidator>(
+                    FindObjectsInactive.Include
+                );
             }
         }
     }

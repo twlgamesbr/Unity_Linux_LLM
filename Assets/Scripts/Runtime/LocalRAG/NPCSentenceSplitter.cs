@@ -10,6 +10,7 @@ namespace NPCSystem
     public class NPCSentenceSplitter : NPCChunking
     {
         public const string DefaultDelimiters = ".!:;?\n\r";
+
         [Tooltip("delimiters used to split the phrases")]
         public char[] delimiters = DefaultDelimiters.ToCharArray();
 
@@ -25,12 +26,18 @@ namespace NPCSystem
                     bool isDelimiter = delimiters.Contains(input[i]);
                     if (isDelimiter)
                     {
-                        while ((i < input.Length - 1) && (delimiters.Contains(input[i + 1]) || char.IsWhiteSpace(input[i + 1])))
+                        while (
+                            (i < input.Length - 1)
+                            && (
+                                delimiters.Contains(input[i + 1]) || char.IsWhiteSpace(input[i + 1])
+                            )
+                        )
                             i++;
                     }
                     else
                     {
-                        if (!seenChar) seenChar = !char.IsWhiteSpace(input[i]);
+                        if (!seenChar)
+                            seenChar = !char.IsWhiteSpace(input[i]);
                     }
                     if ((i == input.Length - 1) || (isDelimiter && seenChar))
                     {
