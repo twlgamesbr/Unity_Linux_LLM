@@ -4,7 +4,6 @@
     "references": [
         "Unity.InputSystem",
         "Unity.Collections",
-        "Unity.Nuget.Newtonsoft-Json",
         "Unity.Netcode.Runtime",
         "Unity.DedicatedServer.MultiplayerRoles",
         "Unity.TextMeshPro",
@@ -13,8 +12,10 @@
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "Newtonsoft.Json.dll"
+    ],
     "autoReferenced": true,
     "defineConstraints": [],
     "versionDefines": [],

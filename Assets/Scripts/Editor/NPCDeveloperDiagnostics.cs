@@ -5,8 +5,8 @@ using Unity.Profiling.Memory;
 using Unity.ProjectAuditor.Editor;
 using Unity.ProjectAuditor.Editor.Core;
 using UnityEditor;
-using UnityEditor.TestTools.TestRunner.Api;
 using UnityEditor.TestTools.CodeCoverage;
+using UnityEditor.TestTools.TestRunner.Api;
 using UnityEngine;
 
 namespace NPCSystem.Editor
@@ -23,29 +23,39 @@ namespace NPCSystem.Editor
         const string MemoryProfilerWindowMenuItem = "Window/Analysis/Memory Profiler";
         const string EditModeTestResultsRelativePath = "Diagnostics/Logs/EditMode-test-results.xml";
         const string EditModeTestResultsFileName = "EditMode-test-results.xml";
-        static readonly string[] ProjectEditModeTestAssemblies =
-        {
-            "NPCSystem.Tests"
-        };
-        static readonly SerializableEnum<IssueCategory>[] AllIssueCategories =
-            Enum.GetValues(typeof(IssueCategory))
-                .Cast<IssueCategory>()
-                .Select(category => new SerializableEnum<IssueCategory>(category))
-                .ToArray();
+        static readonly string[] ProjectEditModeTestAssemblies = { "NPCSystem.Tests" };
+        static readonly SerializableEnum<IssueCategory>[] AllIssueCategories = Enum.GetValues(
+                typeof(IssueCategory)
+            )
+            .Cast<IssueCategory>()
+            .Select(category => new SerializableEnum<IssueCategory>(category))
+            .ToArray();
 
         static bool s_AuditInProgress;
 
-        public static string ProjectRoot => Directory.GetParent(Application.dataPath)?.FullName ?? Application.dataPath;
-        public static string DiagnosticsRoot => EnsureDirectory(Path.Combine(ProjectRoot, DiagnosticsRootName));
-        public static string CoverageDirectory => EnsureDirectory(Path.Combine(DiagnosticsRoot, CoverageDirectoryName));
-        public static string MemorySnapshotDirectory => EnsureDirectory(Path.Combine(DiagnosticsRoot, MemoryDirectoryName));
-        public static string ProjectAuditorDirectory => EnsureDirectory(Path.Combine(DiagnosticsRoot, AuditorDirectoryName));
-        public static string LogDirectory => EnsureDirectory(Path.Combine(DiagnosticsRoot, LogDirectoryName));
-        public static string EditModeTestResultsPath => Path.Combine(LogDirectory, EditModeTestResultsFileName);
+        public static string ProjectRoot =>
+            Directory.GetParent(Application.dataPath)?.FullName ?? Application.dataPath;
+        public static string DiagnosticsRoot =>
+            EnsureDirectory(Path.Combine(ProjectRoot, DiagnosticsRootName));
+        public static string CoverageDirectory =>
+            EnsureDirectory(Path.Combine(DiagnosticsRoot, CoverageDirectoryName));
+        public static string MemorySnapshotDirectory =>
+            EnsureDirectory(Path.Combine(DiagnosticsRoot, MemoryDirectoryName));
+        public static string ProjectAuditorDirectory =>
+            EnsureDirectory(Path.Combine(DiagnosticsRoot, AuditorDirectoryName));
+        public static string LogDirectory =>
+            EnsureDirectory(Path.Combine(DiagnosticsRoot, LogDirectoryName));
+        public static string EditModeTestResultsPath =>
+            Path.Combine(LogDirectory, EditModeTestResultsFileName);
 
-        public static bool OpenCodeCoverageWindow() => EditorApplication.ExecuteMenuItem(CoverageWindowMenuItem);
-        public static bool OpenProfileAnalyzerWindow() => EditorApplication.ExecuteMenuItem(ProfileAnalyzerWindowMenuItem);
-        public static bool OpenMemoryProfilerWindow() => EditorApplication.ExecuteMenuItem(MemoryProfilerWindowMenuItem);
+        public static bool OpenCodeCoverageWindow() =>
+            EditorApplication.ExecuteMenuItem(CoverageWindowMenuItem);
+
+        public static bool OpenProfileAnalyzerWindow() =>
+            EditorApplication.ExecuteMenuItem(ProfileAnalyzerWindowMenuItem);
+
+        public static bool OpenMemoryProfilerWindow() =>
+            EditorApplication.ExecuteMenuItem(MemoryProfilerWindowMenuItem);
 
         public static void StartCoverageRecording()
         {
@@ -69,7 +79,9 @@ namespace NPCSystem.Editor
         public static void StopCoverageRecording()
         {
             CodeCoverage.StopRecording();
-            Debug.Log("[NPC Diagnostics] Code Coverage recording stopped and report generation requested.");
+            Debug.Log(
+                "[NPC Diagnostics] Code Coverage recording stopped and report generation requested."
+            );
         }
 
         public static string BuildCoverageCommand()
@@ -78,19 +90,18 @@ namespace NPCSystem.Editor
             string testResultsPath = Path.Combine(LogDirectory, "editmode-test-results.xml");
             string editorLogPath = Path.Combine(LogDirectory, "editmode-coverage.log");
             string coverageOptions =
-                "generateHtmlReport;generateAdditionalMetrics;generateBadgeReport;generateAdditionalReports;" +
-                "assemblyFilters:+NPCSystem.Runtime,+NPCSystem.Editor,+NPCSystem.Tests,+Assembly-CSharp,+Assembly-CSharp-Editor;" +
-                "pathFilters:+Assets/Scripts";
+                "generateHtmlReport;generateAdditionalMetrics;generateBadgeReport;generateAdditionalReports;"
+                + "assemblyFilters:+NPCSystem.Runtime,+NPCSystem.Editor,+NPCSystem.Tests,+Assembly-CSharp,+Assembly-CSharp-Editor;"
+                + "pathFilters:+Assets/Scripts";
 
-            return
-                $"{QuoteShell(editorPath)} " +
-                $"-batchmode -quit -projectPath {QuoteShell(ProjectRoot)} " +
-                "-runTests -testPlatform editmode " +
-                $"-testResults {QuoteShell(testResultsPath)} " +
-                $"-logFile {QuoteShell(editorLogPath)} " +
-                "-enableCodeCoverage " +
-                $"-coverageResultsPath {QuoteShell(CoverageDirectory)} " +
-                $"-coverageOptions {QuoteShell(coverageOptions)}";
+            return $"{QuoteShell(editorPath)} "
+                + $"-batchmode -quit -projectPath {QuoteShell(ProjectRoot)} "
+                + "-runTests -testPlatform editmode "
+                + $"-testResults {QuoteShell(testResultsPath)} "
+                + $"-logFile {QuoteShell(editorLogPath)} "
+                + "-enableCodeCoverage "
+                + $"-coverageResultsPath {QuoteShell(CoverageDirectory)} "
+                + $"-coverageOptions {QuoteShell(coverageOptions)}";
         }
 
         public static void RunProjectAuditorInteractive()
@@ -122,13 +133,15 @@ namespace NPCSystem.Editor
             CodeCoverage.VerbosityLevel = LogVerbosityLevel.Info;
             CodeCoverage.StartRecording();
 
-            var executionSettings = new ExecutionSettings(new Filter
+            var executionSettings = new ExecutionSettings(
+                new Filter
+                {
+                    testMode = TestMode.EditMode,
+                    assemblyNames = ProjectEditModeTestAssemblies,
+                }
+            )
             {
-                testMode = TestMode.EditMode,
-                assemblyNames = ProjectEditModeTestAssemblies
-            })
-            {
-                runSynchronously = true
+                runSynchronously = true,
             };
 
             try
@@ -153,24 +166,30 @@ namespace NPCSystem.Editor
         {
             string outputPath = Path.Combine(
                 MemorySnapshotDirectory,
-                $"memory-{DateTime.Now:yyyyMMdd-HHmmss}.snap");
+                $"memory-{DateTime.Now:yyyyMMdd-HHmmss}.snap"
+            );
 
-            CaptureFlags flags = CaptureFlags.ManagedObjects |
-                                 CaptureFlags.NativeObjects |
-                                 CaptureFlags.NativeAllocations |
-                                 CaptureFlags.NativeAllocationSites;
+            CaptureFlags flags =
+                CaptureFlags.ManagedObjects
+                | CaptureFlags.NativeObjects
+                | CaptureFlags.NativeAllocations
+                | CaptureFlags.NativeAllocationSites;
 
-            MemoryProfiler.TakeSnapshot(outputPath, (path, succeeded) =>
-            {
-                if (succeeded)
+            MemoryProfiler.TakeSnapshot(
+                outputPath,
+                (path, succeeded) =>
                 {
-                    Debug.Log($"[NPC Diagnostics] Memory snapshot saved to {path}");
-                    EditorUtility.RevealInFinder(path);
-                    return;
-                }
+                    if (succeeded)
+                    {
+                        Debug.Log($"[NPC Diagnostics] Memory snapshot saved to {path}");
+                        EditorUtility.RevealInFinder(path);
+                        return;
+                    }
 
-                Debug.LogError($"[NPC Diagnostics] Memory snapshot failed for {path}");
-            }, flags);
+                    Debug.LogError($"[NPC Diagnostics] Memory snapshot failed for {path}");
+                },
+                flags
+            );
         }
 
         public static void RevealDiagnosticsRoot()
@@ -189,21 +208,25 @@ namespace NPCSystem.Editor
             s_AuditInProgress = true;
             string reportPath = Path.Combine(
                 ProjectAuditorDirectory,
-                $"project-auditor-{DateTime.Now:yyyyMMdd-HHmmss}.projectauditor");
+                $"project-auditor-{DateTime.Now:yyyyMMdd-HHmmss}.projectauditor"
+            );
 
             int issueCount = 0;
             var analysisParams = new AnalysisParams(false)
             {
                 Categories = AllIssueCategories,
                 CodeOptimization = CodeOptimization.Debug,
-                OnStarted = (_, _, _) => Debug.Log("[NPC Diagnostics] Project Auditor analysis started."),
+                OnStarted = (_, _, _) =>
+                    Debug.Log("[NPC Diagnostics] Project Auditor analysis started."),
                 OnIncomingIssues = issues => issueCount += issues.Count(),
                 OnCompleted = report =>
                 {
                     try
                     {
                         report.Save(reportPath);
-                        Debug.Log($"[NPC Diagnostics] Project Auditor saved {issueCount} issues to {reportPath}");
+                        Debug.Log(
+                            $"[NPC Diagnostics] Project Auditor saved {issueCount} issues to {reportPath}"
+                        );
                         if (revealReport)
                         {
                             EditorUtility.RevealInFinder(reportPath);
@@ -217,7 +240,7 @@ namespace NPCSystem.Editor
                             EditorApplication.Exit(0);
                         }
                     }
-                }
+                },
             };
 
             new ProjectAuditor().AuditAsync(analysisParams, null);
@@ -248,7 +271,11 @@ namespace NPCSystem.Editor
 
         static void ClearCoverageRecordingDirectory()
         {
-            string recordingDirectory = Path.Combine(CoverageDirectory, $"{Application.productName}-opencov", "Recording");
+            string recordingDirectory = Path.Combine(
+                CoverageDirectory,
+                $"{Application.productName}-opencov",
+                "Recording"
+            );
             if (!Directory.Exists(recordingDirectory))
             {
                 return;
@@ -260,7 +287,9 @@ namespace NPCSystem.Editor
             }
             catch (Exception ex)
             {
-                Debug.LogWarning($"[NPC Diagnostics] Failed to clear stale coverage recording directory: {ex.Message}");
+                Debug.LogWarning(
+                    $"[NPC Diagnostics] Failed to clear stale coverage recording directory: {ex.Message}"
+                );
             }
         }
 
@@ -278,7 +307,9 @@ namespace NPCSystem.Editor
                 try
                 {
                     TestRunnerApi.SaveResultToFile(result, EditModeTestResultsRelativePath);
-                    Debug.Log($"[NPC Diagnostics] Saved EditMode test results to {EditModeTestResultsPath}");
+                    Debug.Log(
+                        $"[NPC Diagnostics] Saved EditMode test results to {EditModeTestResultsPath}"
+                    );
                 }
                 catch (Exception ex)
                 {
@@ -288,21 +319,22 @@ namespace NPCSystem.Editor
                 finally
                 {
                     SafeStopCoverage();
-                    int exitCode = _failureCount > 0 || result == null || result.FailCount > 0 ? 1 : 0;
+                    int exitCode =
+                        _failureCount > 0 || result == null || result.FailCount > 0 ? 1 : 0;
                     EditorApplication.Exit(exitCode);
                 }
             }
 
-            public void TestStarted(ITestAdaptor test)
-            {
-            }
+            public void TestStarted(ITestAdaptor test) { }
 
             public void TestFinished(ITestResultAdaptor result)
             {
                 if (result != null && result.TestStatus == TestStatus.Failed)
                 {
                     _failureCount++;
-                    Debug.LogError($"[NPC Diagnostics] Failed test: {result.FullName}\n{result.Message}");
+                    Debug.LogError(
+                        $"[NPC Diagnostics] Failed test: {result.FullName}\n{result.Message}"
+                    );
                 }
             }
         }

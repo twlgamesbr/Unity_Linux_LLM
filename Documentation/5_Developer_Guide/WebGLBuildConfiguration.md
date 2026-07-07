@@ -35,6 +35,26 @@ Each setting below was evaluated during the debugging process. The current produ
 
 - **Maximum Memory Size → 4096 MB** — Sets the initial WebAssembly memory heap to 4 GB (the maximum WebGL supports). The dialogue system loads LLM inference context and NPC knowledge assets at runtime; sufficient headroom prevents out-of-memory crashes during gameplay. The heap is virtual — the browser only commits pages as they are used.
 
+## Build Profiles
+
+The project uses Unity 6 Build Profiles (`UnityEditor.Build.Profile.BuildProfile`) to manage per-target settings, stored under `Assets/Settings/Build Profiles/`:
+
+| Profile | Target | Subtarget | Key Overrides |
+|---|---|---|---|
+| `WebGL - Desktop - Development` | WebGL | Player | Stripping High, CodeGen OptimizeSize, Compression Brotli, CodeOpt DiskSizeLTO, MaxMem 4096 |
+| `Linux` | StandaloneLinux64 | Player | Stripping High, CodeGen OptimizeSize, IL2CPP |
+| `Linux Server` | StandaloneLinux64 | Server | Stripping High, CodeGen OptimizeSize, IL2CPP, DedicatedServerOpt On |
+
+Each profile carries its own PlayerSettings YAML, scene list, and quality/graphics settings. The build script (`NPCDialogueBuild.cs`) loads profiles by path and builds using `BuildPlayerWithProfileOptions`, eliminating the need for manual `PlayerSettings.Set*()` overrides.
+
+To build via CLI with an explicit profile:
+```bash
+/path/to/Unity -quit -batchmode -nographics \
+  -projectPath /path/to/project \
+  -activeBuildProfile "Assets/Settings/Build Profiles/WebGL - Desktop - Development.asset" \
+  -executeMethod NPCDialogueBuild.PerformWebGLBuild
+```
+
 ## Build Artifact Comparison
 
 | Setting | `.wasm.br` | `.data.br` | Total | Status |

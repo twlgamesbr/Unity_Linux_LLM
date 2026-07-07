@@ -3,9 +3,11 @@
     "rootNamespace": "NPCSystem.Editor",
     "references": [
         "NPCSystem.Runtime",
+        "Unity.Settings.Editor",
         "UnityEditor.TestRunner",
         "Unity.TestTools.CodeCoverage.Editor",
-        "Unity.Performance.Profile-Analyzer.Editor"
+        "Unity.Performance.Profile-Analyzer.Editor",
+        "Unity.Physics.Editor.ProjectSettingsBridge"
     ],
     "includePlatforms": [
         "Editor"

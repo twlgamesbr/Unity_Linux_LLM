@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 #endif
@@ -17,9 +19,9 @@ namespace NPCSystem
         public Behaviour legacyKnowledgeBaseController;
 
         [Header("Dialogue UI")]
-        public Dropdown characterSelect;
-        public InputField playerInput;
-        public Text aiText;
+        public TMP_Dropdown characterSelect;
+        public TMP_InputField playerInput;
+        public TMP_Text aiText;
         public Button stopButton;
 
         [Header("Portraits")]
@@ -177,8 +179,14 @@ namespace NPCSystem
 
         void OnDestroy()
         {
+            NPCPlayerCharacterController.LocalInstance?.SetUIActive(false);
             UnbindRuntimeEvents();
             UnbindUiListeners();
+        }
+
+        void OnDisable()
+        {
+            NPCPlayerCharacterController.LocalInstance?.SetUIActive(false);
         }
 
         void ResolveReferences()
@@ -219,10 +227,10 @@ namespace NPCSystem
             characterSelect =
                 characterSelect != null
                     ? characterSelect
-                    : FindComponent<Dropdown>("Canvas/Dropdown");
+                    : FindComponent<TMP_Dropdown>("Canvas/Dropdown");
             playerInput =
-                playerInput != null ? playerInput : FindComponent<InputField>("Canvas/PlayerInput");
-            aiText = aiText != null ? aiText : FindComponent<Text>("Canvas/AIImage/AIText");
+                playerInput != null ? playerInput : FindComponent<TMP_InputField>("Canvas/PlayerInput");
+            aiText = aiText != null ? aiText : FindComponent<TMP_Text>("Canvas/AIImage/AIText");
             stopButton =
                 stopButton != null ? stopButton : FindComponent<Button>("Canvas/StopButton");
 
@@ -431,12 +439,9 @@ namespace NPCSystem
                     )
                 );
             SetAIText(response);
+            SetInputEnabled(true);
             if (playerInput != null)
-            {
-                playerInput.interactable = true;
                 playerInput.text = "";
-                playerInput.Select();
-            }
         }
 
         void HandleError(string error)
@@ -569,6 +574,11 @@ namespace NPCSystem
             if (enabled)
             {
                 playerInput.Select();
+                NPCPlayerCharacterController.LocalInstance?.SetUIActive(true);
+            }
+            else
+            {
+                NPCPlayerCharacterController.LocalInstance?.SetUIActive(false);
             }
         }
 
@@ -588,11 +598,7 @@ namespace NPCSystem
                 networkBridge.CancelActiveRequest();
             else
                 dialogueManager?.CancelRequests();
-            if (playerInput != null)
-            {
-                playerInput.interactable = true;
-                playerInput.Select();
-            }
+            SetInputEnabled(true);
         }
 
         void UpdatePortrait(NPCProfile profile)
@@ -664,14 +670,61 @@ namespace NPCSystem
                 Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
             Vector2 mousePosition =
                 Mouse.current != null ? Mouse.current.position.ReadValue() : Vector2.zero;
+            bool escapePressed =
+                Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame;
 #else
             bool mouseClicked = Input.GetMouseButtonDown(0);
             Vector2 mousePosition = Input.mousePosition;
+            bool escapePressed = Input.GetKeyDown(KeyCode.Escape);
 #endif
+
+            // ESC pressed while in player mode -> enter UI mode (unlock cursor, enable UI map)
+            if (escapePressed)
+            {
+                var cc = NPCPlayerCharacterController.LocalInstance;
+                if (cc != null && !cc.IsInUIMode)
+                {
+                    cc.SetUIActive(true);
+                }
+                return;
+            }
+
+            // Mouse clicked while in UI mode on empty space -> exit UI mode
+            if (mouseClicked)
+            {
+                var cc = NPCPlayerCharacterController.LocalInstance;
+                if (cc != null && cc.IsInUIMode && !IsPointerOverUI())
+                {
+                    cc.SetUIActive(false);
+                    return;
+                }
+            }
+
             if (!mouseClicked)
                 return;
 
             notebookController?.HandleGlobalClick(mousePosition);
+        }
+
+        bool IsPointerOverUI()
+        {
+            var eventSystem = EventSystem.current;
+            if (eventSystem == null)
+                return false;
+
+            var pointerData = new PointerEventData(eventSystem)
+            {
+#if ENABLE_INPUT_SYSTEM
+                position =
+                    Mouse.current != null ? Mouse.current.position.ReadValue() : Vector2.zero
+#else
+                position = Input.mousePosition
+#endif
+            };
+
+            var results = new List<RaycastResult>();
+            eventSystem.RaycastAll(pointerData, results);
+            return results.Count > 0;
         }
 
         static T FindComponent<T>(string path)

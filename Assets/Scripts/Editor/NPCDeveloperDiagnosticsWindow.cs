@@ -21,7 +21,8 @@ namespace NPCSystem.Editor
             EditorGUILayout.LabelField("Developer Diagnostics", EditorStyles.boldLabel);
             EditorGUILayout.HelpBox(
                 "Use this window to keep code intelligence, coverage, memory capture, and static auditing close to the project instead of relying on package menus alone.",
-                MessageType.Info);
+                MessageType.Info
+            );
 
             DrawPathSection();
             EditorGUILayout.Space(8f);
@@ -37,10 +38,26 @@ namespace NPCSystem.Editor
         void DrawPathSection()
         {
             EditorGUILayout.LabelField("Output Paths", EditorStyles.boldLabel);
-            EditorGUILayout.SelectableLabel(NPCDeveloperDiagnostics.DiagnosticsRoot, EditorStyles.textField, GUILayout.Height(18f));
-            EditorGUILayout.SelectableLabel(NPCDeveloperDiagnostics.CoverageDirectory, EditorStyles.textField, GUILayout.Height(18f));
-            EditorGUILayout.SelectableLabel(NPCDeveloperDiagnostics.ProjectAuditorDirectory, EditorStyles.textField, GUILayout.Height(18f));
-            EditorGUILayout.SelectableLabel(NPCDeveloperDiagnostics.MemorySnapshotDirectory, EditorStyles.textField, GUILayout.Height(18f));
+            EditorGUILayout.SelectableLabel(
+                NPCDeveloperDiagnostics.DiagnosticsRoot,
+                EditorStyles.textField,
+                GUILayout.Height(18f)
+            );
+            EditorGUILayout.SelectableLabel(
+                NPCDeveloperDiagnostics.CoverageDirectory,
+                EditorStyles.textField,
+                GUILayout.Height(18f)
+            );
+            EditorGUILayout.SelectableLabel(
+                NPCDeveloperDiagnostics.ProjectAuditorDirectory,
+                EditorStyles.textField,
+                GUILayout.Height(18f)
+            );
+            EditorGUILayout.SelectableLabel(
+                NPCDeveloperDiagnostics.MemorySnapshotDirectory,
+                EditorStyles.textField,
+                GUILayout.Height(18f)
+            );
             if (GUILayout.Button("Open Diagnostics Folder"))
             {
                 NPCDeveloperDiagnostics.RevealDiagnosticsRoot();
@@ -98,8 +115,15 @@ namespace NPCSystem.Editor
             }
 
             EditorGUILayout.LabelField("Batch Command", EditorStyles.miniBoldLabel);
-            _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition, GUILayout.Height(96f));
-            EditorGUILayout.SelectableLabel(NPCDeveloperDiagnostics.BuildCoverageCommand(), EditorStyles.textArea, GUILayout.ExpandHeight(true));
+            _scrollPosition = EditorGUILayout.BeginScrollView(
+                _scrollPosition,
+                GUILayout.Height(96f)
+            );
+            EditorGUILayout.SelectableLabel(
+                NPCDeveloperDiagnostics.BuildCoverageCommand(),
+                EditorStyles.textArea,
+                GUILayout.ExpandHeight(true)
+            );
             EditorGUILayout.EndScrollView();
 
             if (GUILayout.Button("Copy Coverage Command"))

@@ -147,10 +147,16 @@
       "timestamp": "2026-07-03T19:18:20.245Z",
       "fact": "PostgreSQL stack updated: Adminer on :8082 for DB visualization, PostgREST on :3001 for auto-generated REST API with Swagger/OpenAPI docs. PostgREST exposes /players and /player_sessions endpoints with full CRUD, filtering, pagination. Roles created: web_anon (read-only), authenticator (PostgREST connector). Init SQL updated at Backend/PlayerAuthService/db/init.sql. Compose at Backend/PlayerAuthService/docker-compose.yml.",
       "category": "infrastructure"
+    },
+    {
+      "id": 14,
+      "timestamp": "2026-07-07T09:32:54.039Z",
+      "fact": "## Session Summary (July 7, 2026)\n\n### Accomplished\n\n1. **Cursor/ESC support for UI interaction** — Completed in prior session\n   - `NPCPlayerCharacterController.lockCursorForOwner`: default changed to `false` (cursor visible by default, camera-lock on click)\n   - `NPCPlayerCharacterController.IsInUIMode`: added, disables camera rotation when true\n   - `NPCDialogueUIController`: ESC key closes dialogue and restores gameplay; click-outside-dialogue closes panel\n   - `NPCPlayerCharacterController` no longer auto-locks cursor in `OnDisable`\n\n2. **NPCProfile asset location evaluated** — `Assets/Data/NPCProfiles/` is correct outside `StreamingAssets`. StreamingAssets is for raw data files (knowledge.md, profile.json) read by the runtime; ScriptableObject profile assets in `Assets/Data/` are the editor-authored metadata layer. Verified via explore agents — all profile references correctly point to `Assets/Data/NPCProfiles/` with no cross-referencing of StreamingAssets.\n\n3. **NPCTransferableItem \"type not renderable\" fix** — Added `[HideInInspector]` to the two `public readonly NetworkVariable<FixedString64Bytes>` fields (`itemIdValue`, `displayNameValue`). These are runtime-only Netcode sync fields that should never appear in the Inspector. Diagnostics clean.\n\n4. **NPCCharacterMotor \"strange when changing directions\" fix** — Refactored `ApplyMovement()` from world-space velocity-vector smoothing (`Vector3.MoveTowards` on a world-space direction) to speed-scalar + facing-direction approach: `_currentSpeed` is a float smoothed via `Mathf.MoveTowards`, then `_currentVelocity = transform.forward * _currentSpeed`. This eliminates the stop-and-go feel when reversing direction (W→S) and prevents lateral sliding during rotation. Diagnostics clean.\n\n### Current Scene State (NPCDialoguePrototype1.unity)\n- **Dialogue**: LocalAI HTTP (`useRemoteServer=true`, port 8080, llama-3.1-8b-q4-k-m)\n- **RAG**: Local .rag enabled (`NPCDialogues-minilm-chunked.rag`), Qdrant disabled, Cognee disabled\n- **Profiles**: Butler, Maid, Chef — ScriptableObjects in `Assets/Data/NPCProfiles/`, knowledge in `Assets/StreamingAssets/NPCs/<slug>/knowledge.md`\n- **FunctionCalling**: GameObject inactive, Agent points to shared LLM (not separate FunctionCallingLLM)\n- **Logging**: NPCFlowLogger writes JSONL to `persistentDataPath/NPCDialogue/Logs/`",
+      "category": "session"
     }
   ],
-  "session_count": 10,
-  "last_session": "2026-07-03T19:18:20.245Z",
+  "session_count": 11,
+  "last_session": "2026-07-07T09:32:54.039Z",
   "infrastructure_snapshot": {
     "timestamp": "2026-07-03T10:49:34Z",
     "containers": {

@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -21,12 +22,12 @@ namespace NPCSystem
         public GameObject helpPanel;
         public RawImage mapImage;
         public RawImage successImage;
-        public Text failText;
-        public Dropdown answer1;
-        public Dropdown answer2;
-        public Dropdown answer3;
-        public Text notesText1;
-        public Text notesText2;
+        public TMP_Text failText;
+        public TMP_Dropdown answer1;
+        public TMP_Dropdown answer2;
+        public TMP_Dropdown answer3;
+        public TMP_Text notesText1;
+        public TMP_Text notesText2;
 
         [Header("Solve Answers")]
         public string correctAnswer1 = "Professor Pluot";
@@ -69,12 +70,12 @@ namespace NPCSystem
             helpPanel = helpPanel != null ? helpPanel : FindObject("Canvas/NotebookImage/HelpPanel");
             mapImage = mapImage != null ? mapImage : FindComponent<RawImage>("Canvas/MapImage");
             successImage = successImage != null ? successImage : FindComponent<RawImage>("Canvas/SuccessImage");
-            failText = failText != null ? failText : FindComponent<Text>("Canvas/NotebookImage/SolvePanel/FailText");
-            answer1 = answer1 != null ? answer1 : FindComponent<Dropdown>("Canvas/NotebookImage/SolvePanel/Answer1");
-            answer2 = answer2 != null ? answer2 : FindComponent<Dropdown>("Canvas/NotebookImage/SolvePanel/Answer2");
-            answer3 = answer3 != null ? answer3 : FindComponent<Dropdown>("Canvas/NotebookImage/SolvePanel/Answer3");
-            notesText1 = notesText1 != null ? notesText1 : FindComponent<Text>("Canvas/NotebookImage/NotesPanel/NotesText1");
-            notesText2 = notesText2 != null ? notesText2 : FindComponent<Text>("Canvas/NotebookImage/NotesPanel/NotesText2");
+            failText = failText != null ? failText : FindComponent<TMP_Text>("Canvas/NotebookImage/SolvePanel/FailText");
+            answer1 = answer1 != null ? answer1 : FindComponent<TMP_Dropdown>("Canvas/NotebookImage/SolvePanel/Answer1");
+            answer2 = answer2 != null ? answer2 : FindComponent<TMP_Dropdown>("Canvas/NotebookImage/SolvePanel/Answer2");
+            answer3 = answer3 != null ? answer3 : FindComponent<TMP_Dropdown>("Canvas/NotebookImage/SolvePanel/Answer3");
+            notesText1 = notesText1 != null ? notesText1 : FindComponent<TMP_Text>("Canvas/NotebookImage/NotesPanel/NotesText1");
+            notesText2 = notesText2 != null ? notesText2 : FindComponent<TMP_Text>("Canvas/NotebookImage/NotesPanel/NotesText2");
         }
 
         void CacheDefaultNotebookText()
@@ -285,7 +286,7 @@ namespace NPCSystem
             }
         }
 
-        static string SelectedText(Dropdown dropdown)
+        static string SelectedText(TMP_Dropdown dropdown)
         {
             if (dropdown == null || dropdown.options == null || dropdown.options.Count == 0) return string.Empty;
             int value = Mathf.Clamp(dropdown.value, 0, dropdown.options.Count - 1);

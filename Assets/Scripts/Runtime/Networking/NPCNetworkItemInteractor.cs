@@ -1,12 +1,16 @@
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
-#if !UNITY_SERVER
-using UnityEngine.InputSystem;
-#endif
 
 namespace NPCSystem
 {
+    /// <summary>
+    /// Handles item pickup and transfer between players/NPCs on the server side.
+    ///
+    /// Input sources can call the public/internal RPC-trigger methods directly,
+    /// or let the component poll for input autonomously (legacy mode).
+    /// New code should use direct calls via <see cref="NPCPlayerCharacterController"/>.
+    /// </summary>
     [DefaultExecutionOrder(-340)]
     [DisallowMultipleComponent]
     [RequireComponent(typeof(NetworkObject))]
@@ -16,59 +20,26 @@ namespace NPCSystem
         [Header("References")]
         public NPCPlayerInventory inventory;
 
-        [Header("Actions")]
-        public string interactActionName = "Interact";
-        public string giveToPlayerActionName = "Previous";
-        public string giveToNpcActionName = "Next";
-
         [Header("Range")]
         public float pickupRange = 3f;
         public float transferRange = 4f;
 
-#if !UNITY_SERVER
-        InputAction _interactAction;
-        InputAction _giveToPlayerAction;
-        InputAction _giveToNpcAction;
-        NPCNetworkPlayerController _playerController;
-#endif
-
         void Awake()
         {
             inventory = inventory != null ? inventory : GetComponent<NPCPlayerInventory>();
-#if !UNITY_SERVER
-            _playerController = GetComponent<NPCNetworkPlayerController>();
-#endif
         }
 
         void Update()
         {
-            if (!IsOwner)
-            {
-                return;
-            }
-
-#if !UNITY_SERVER
-            ResolveActions();
-
-            if (_interactAction != null && _interactAction.WasPressedThisFrame())
-            {
-                RequestPickupNearestItemServerRpc();
-            }
-
-            if (_giveToPlayerAction != null && _giveToPlayerAction.WasPressedThisFrame())
-            {
-                RequestGiveHeldItemToNearestPlayerServerRpc();
-            }
-
-            if (_giveToNpcAction != null && _giveToNpcAction.WasPressedThisFrame())
-            {
-                RequestGiveHeldItemToNearestNpcServerRpc();
-            }
-#endif
+            // Input is now routed through NPCPlayerCharacterController event handlers.
+            // This Update is intentionally left empty unless legacy polling is restored.
         }
 
+        // \u2500\u2500\u2500 Public RPC-trigger methods (call from orchestrator) \u2500\u2500\u2500
+
+        /// <summary>Pick up the nearest valid item on the server.</summary>
         [Rpc(SendTo.Server)]
-        void RequestPickupNearestItemServerRpc(RpcParams rpcParams = default)
+        public void RequestPickupNearestItemServerRpc(RpcParams rpcParams = default)
         {
             ulong clientId = rpcParams.Receive.SenderClientId;
             NPCTransferableItem item = FindNearestPickupCandidate(clientId);
@@ -85,8 +56,9 @@ namespace NPCSystem
             TransferItemToPlayer(item, clientId);
         }
 
+        /// <summary>Give the held item to the nearest other player on the server.</summary>
         [Rpc(SendTo.Server)]
-        void RequestGiveHeldItemToNearestPlayerServerRpc(RpcParams rpcParams = default)
+        public void RequestGiveHeldItemToNearestPlayerServerRpc(RpcParams rpcParams = default)
         {
             ulong clientId = rpcParams.Receive.SenderClientId;
             NPCTransferableItem item = FindHeldItem(clientId);
@@ -104,8 +76,9 @@ namespace NPCSystem
             TransferItemToPlayer(item, targetPlayer.OwnerClientId);
         }
 
+        /// <summary>Give the held item to the nearest NPC on the server.</summary>
         [Rpc(SendTo.Server)]
-        void RequestGiveHeldItemToNearestNpcServerRpc(RpcParams rpcParams = default)
+        public void RequestGiveHeldItemToNearestNpcServerRpc(RpcParams rpcParams = default)
         {
             ulong clientId = rpcParams.Receive.SenderClientId;
             NPCTransferableItem item = FindHeldItem(clientId);
@@ -123,6 +96,8 @@ namespace NPCSystem
             RemoveItemFromPlayer(item, clientId);
             item.AssignToNpc(npc.Slug);
         }
+
+        // \u2500\u2500\u2500 Transfer Logic \u2500\u2500\u2500
 
         public void TransferItemToPlayer(NPCTransferableItem item, ulong targetClientId)
         {
@@ -182,13 +157,13 @@ namespace NPCSystem
             bridge?.RefreshNotebookStateForClient(clientId);
         }
 
+        // \u2500\u2500\u2500 Find helpers \u2500\u2500\u2500
+
         NPCTransferableItem FindNearestPickupCandidate(ulong clientId)
         {
             NPCPlayerNetworkAvatar avatar = FindPlayerAvatar(clientId);
             if (avatar == null)
-            {
                 return null;
-            }
 
             NPCTransferableItem nearestItem = null;
             float nearestDistance = pickupRange;
@@ -198,9 +173,7 @@ namespace NPCSystem
             foreach (NPCTransferableItem item in items)
             {
                 if (item == null || !item.IsSpawned || item.IsHeldByPlayer)
-                {
                     continue;
-                }
 
                 float distance = Vector3.Distance(
                     avatar.transform.position,
@@ -223,15 +196,8 @@ namespace NPCSystem
             );
             foreach (NPCTransferableItem item in items)
             {
-                if (
-                    item != null
-                    && item.IsSpawned
-                    && item.IsHeldByPlayer
-                    && item.OwnerClientId == clientId
-                )
-                {
+                if (item != null && item.IsSpawned && item.IsHeldByPlayer && item.OwnerClientId == clientId)
                     return item;
-                }
             }
 
             return null;
@@ -241,9 +207,7 @@ namespace NPCSystem
         {
             NPCPlayerNetworkAvatar sourceAvatar = FindPlayerAvatar(clientId);
             if (sourceAvatar == null)
-            {
                 return null;
-            }
 
             NPCPlayerNetworkAvatar nearestPlayer = null;
             float nearestDistance = transferRange;
@@ -253,9 +217,7 @@ namespace NPCSystem
             foreach (NPCPlayerNetworkAvatar avatar in avatars)
             {
                 if (avatar == null || avatar.OwnerClientId == clientId || !avatar.IsSpawned)
-                {
                     continue;
-                }
 
                 float distance = Vector3.Distance(
                     sourceAvatar.transform.position,
@@ -275,9 +237,7 @@ namespace NPCSystem
         {
             NPCPlayerNetworkAvatar sourceAvatar = FindPlayerAvatar(clientId);
             if (sourceAvatar == null)
-            {
                 return null;
-            }
 
             NPCServerCharacter nearestNpc = null;
             float nearestDistance = transferRange;
@@ -287,9 +247,7 @@ namespace NPCSystem
             foreach (NPCServerCharacter npc in npcs)
             {
                 if (npc == null || !npc.IsSpawned)
-                {
                     continue;
-                }
 
                 float distance = Vector3.Distance(
                     sourceAvatar.transform.position,
@@ -319,31 +277,11 @@ namespace NPCSystem
             foreach (NPCPlayerNetworkAvatar avatar in avatars)
             {
                 if (avatar != null && avatar.IsSpawned && avatar.OwnerClientId == clientId)
-                {
                     return avatar;
-                }
             }
 
             return null;
         }
-
-#if !UNITY_SERVER
-        void ResolveActions()
-        {
-            if (_playerController == null || _playerController.inputActions == null)
-            {
-                return;
-            }
-
-            InputActionMap map = _playerController.inputActions.FindActionMap(
-                _playerController.actionMapName,
-                false
-            );
-            _interactAction ??= map?.FindAction(interactActionName, false);
-            _giveToPlayerAction ??= map?.FindAction(giveToPlayerActionName, false);
-            _giveToNpcAction ??= map?.FindAction(giveToNpcActionName, false);
-        }
-#endif
 
         void LogInteractorEvent(ulong clientId, NPCFlowStatus status, string message)
         {

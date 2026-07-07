@@ -1909,7 +1909,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spriteAsset: {fileID: 21300000, guid: bcc7dd75abdc1a74497c9d657e1d6cf5, type: 3}
-  materialAsset: {fileID: 10302, guid: 0000000000000000f000000000000000, type: 0}
+  materialAsset: {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
   meshAsset: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1 &1264061094
 GameObject:

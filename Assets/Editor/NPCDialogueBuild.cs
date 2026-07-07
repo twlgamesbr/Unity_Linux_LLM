@@ -4,37 +4,40 @@ using Process = System.Diagnostics.Process;
 using ProcessStartInfo = System.Diagnostics.ProcessStartInfo;
 using UnityEditor;
 using UnityEditor.Build;
+using UnityEditor.Build.Profile;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
 
 public static class NPCDialogueBuild
 {
+    static readonly string ProfileDir = "Assets/Settings/Build Profiles";
+    static readonly string WebGLProfilePath = $"{ProfileDir}/WebGL - Desktop - Development.asset";
+    static readonly string LinuxProfilePath = $"{ProfileDir}/Linux.asset";
+    static readonly string LinuxServerProfilePath = $"{ProfileDir}/Linux Server.asset";
+
+    static string ResolvePath(string relative) =>
+        Path.GetFullPath(Path.Combine(Application.dataPath, "..", relative));
+
+    static BuildProfile LoadProfile(string path)
+    {
+        var profile = AssetDatabase.LoadAssetAtPath<BuildProfile>(path);
+        if (profile == null)
+            throw new BuildFailedException($"Build profile not found: {path}");
+        return profile;
+    }
+
     // Server build for headless dedicated server
     [MenuItem("Build/Server (Headless)")]
     public static void BuildServer()
     {
-        string outputPath = Path.GetFullPath(Path.Combine(
-            Application.dataPath, "..", "Builds", "Server", "NPCServer.x86_64"));
-
-        var options = new BuildPlayerOptions
+        var options = new BuildPlayerWithProfileOptions
         {
-            scenes = GetEnabledScenes(),
-            locationPathName = outputPath,
-            target = BuildTarget.StandaloneLinux64,
-            subtarget = (int)StandaloneBuildSubtarget.Server,
-            options = BuildOptions.CompressWithLz4HC
-                | BuildOptions.ShowBuiltPlayer
+            buildProfile = LoadProfile(LinuxServerProfilePath),
+            locationPathName = ResolvePath("Builds/Server/NPCServer.x86_64"),
+            options = BuildOptions.CompressWithLz4HC | BuildOptions.ShowBuiltPlayer
         };
 
-        var defines = new BuildPlayerOptions();
-        defines.scenes = GetEnabledScenes();
-        defines.locationPathName = outputPath;
-        defines.target = BuildTarget.StandaloneLinux64;
-        defines.subtarget = (int)StandaloneBuildSubtarget.Server;
-        defines.options = BuildOptions.CompressWithLz4HC
-            | BuildOptions.ShowBuiltPlayer;
-
-        BuildReport report = BuildPipeline.BuildPlayer(defines);
+        BuildReport report = BuildPipeline.BuildPlayer(options);
         HandleBuildReport(report, "Server");
     }
 
@@ -42,17 +45,11 @@ public static class NPCDialogueBuild
     [MenuItem("Build/Client")]
     public static void BuildClient()
     {
-        string outputPath = Path.GetFullPath(Path.Combine(
-            Application.dataPath, "..", "Builds", "Client", "NPCClient.x86_64"));
-
-        var options = new BuildPlayerOptions
+        var options = new BuildPlayerWithProfileOptions
         {
-            scenes = GetEnabledScenes(),
-            locationPathName = outputPath,
-            target = BuildTarget.StandaloneLinux64,
-            subtarget = (int)StandaloneBuildSubtarget.Player,
-            options = BuildOptions.CompressWithLz4HC
-                | BuildOptions.ShowBuiltPlayer
+            buildProfile = LoadProfile(LinuxProfilePath),
+            locationPathName = ResolvePath("Builds/Client/NPCClient.x86_64"),
+            options = BuildOptions.CompressWithLz4HC | BuildOptions.ShowBuiltPlayer
         };
 
         BuildReport report = BuildPipeline.BuildPlayer(options);
@@ -63,16 +60,11 @@ public static class NPCDialogueBuild
     [MenuItem("Build/WebGL")]
     public static void BuildWebGL()
     {
-        ApplyWebGLReleaseSettings();
-
-        string outputPath = Path.GetFullPath(Path.Combine(
-            Application.dataPath, "..", "Builds", "WebGL_client", "LinuxWebGLWS"));
-
-        var options = new BuildPlayerOptions
+        string outputPath = ResolvePath("Builds/WebGL_client/LinuxWebGLWS");
+        var options = new BuildPlayerWithProfileOptions
         {
-            scenes = GetEnabledScenes(),
+            buildProfile = LoadProfile(WebGLProfilePath),
             locationPathName = outputPath,
-            target = BuildTarget.WebGL,
             options = BuildOptions.None
         };
 
@@ -81,7 +73,7 @@ public static class NPCDialogueBuild
         HandleBuildReport(report, "WebGL");
     }
 
-    // Both
+    // Build both Linux targets
     [MenuItem("Build/Both")]
     public static void BuildBoth()
     {
@@ -89,14 +81,34 @@ public static class NPCDialogueBuild
         BuildClient();
     }
 
-    static string[] GetEnabledScenes()
+    // Restart Docker containers serving the latest build
+    [MenuItem("Build/Restart Docker Containers")]
+    public static void RestartDocker()
     {
-        var scenes = new System.Collections.Generic.List<string>();
-        foreach (EditorBuildSettingsScene scene in EditorBuildSettings.scenes)
+        string composeDir = ResolvePath("docker_webgl_client");
+
+        try
         {
-            if (scene.enabled) scenes.Add(scene.path);
+            using var proc = Process.Start(new ProcessStartInfo
+            {
+                FileName = "docker",
+                Arguments = $"compose -f \"{composeDir}/docker-compose.yml\" restart",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            });
+            proc?.WaitForExit(30000);
+            string stdout = proc?.StandardOutput.ReadToEnd() ?? "";
+            string stderr = proc?.StandardError.ReadToEnd() ?? "";
+            Debug.Log($"[NPCBuild] Docker restart: {stdout.Trim()}");
+            if (proc?.ExitCode != 0)
+                Debug.LogWarning($"[NPCBuild] Docker restart stderr: {stderr.Trim()}");
         }
-        return scenes.ToArray();
+        catch (Exception ex)
+        {
+            Debug.LogWarning($"[NPCBuild] Docker restart failed: {ex.Message}");
+        }
     }
 
     static void HandleBuildReport(BuildReport report, string label)
@@ -115,52 +127,14 @@ public static class NPCDialogueBuild
     }
 
     // CLI entry points
-    public static void PerformServerBuild()
-    {
-        BuildServer();
-    }
-
-    public static void PerformClientBuild()
-    {
-        BuildClient();
-    }
-
-    public static void PerformWebGLBuild()
-    {
-        BuildWebGL();
-    }
-
-    static void ApplyWebGLReleaseSettings()
-    {
-        var target = NamedBuildTarget.WebGL;
-
-        EditorUserBuildSettings.development = false;
-        EditorUserBuildSettings.connectProfiler = false;
-        EditorUserBuildSettings.allowDebugging = false;
-
-        PlayerSettings.SetIl2CppCodeGeneration(target, Il2CppCodeGeneration.OptimizeSize);
-        PlayerSettings.SetManagedStrippingLevel(target, ManagedStrippingLevel.High);
-        PlayerSettings.stripUnusedMeshComponents = true;
-
-        PlayerSettings.WebGL.compressionFormat = WebGLCompressionFormat.Disabled;
-        PlayerSettings.WebGL.dataCaching = true;
-        PlayerSettings.WebGL.debugSymbolMode = WebGLDebugSymbolMode.Off;
-        PlayerSettings.WebGL.exceptionSupport = WebGLExceptionSupport.None;
-        PlayerSettings.WebGL.maximumMemorySize = 4096;
-        UnityEditor.WebGL.UserBuildSettings.codeOptimization = UnityEditor.WebGL.WasmCodeOptimization.DiskSizeLTO;
-
-        Debug.Log("[NPCBuild] Applied WebGL release settings: development off, profiler off, compression off, debug symbols off, exception support off, max memory 4096 MB.");
-
-    }
+    public static void PerformServerBuild() => BuildServer();
+    public static void PerformClientBuild() => BuildClient();
+    public static void PerformWebGLBuild() => BuildWebGL();
 
     static void EnsureLinuxDockerReadableArtifacts(string outputPath, bool buildSucceeded)
     {
         if (!buildSucceeded || !Directory.Exists(outputPath)) return;
-
-        if (Application.platform != RuntimePlatform.LinuxEditor)
-        {
-            return;
-        }
+        if (Application.platform != RuntimePlatform.LinuxEditor) return;
 
         try
         {
@@ -177,7 +151,7 @@ public static class NPCDialogueBuild
             chmod?.WaitForExit();
             if (chmod is { ExitCode: 0 })
             {
-                Debug.Log($"[NPCBuild] Normalized WebGL artifact permissions for Docker hosting: {outputPath}");
+                Debug.Log($"[NPCBuild] Normalized WebGL artifact permissions: {outputPath}");
                 return;
             }
 

@@ -28,6 +28,7 @@ namespace NPCSystem
         public Vector3 npcHoldOffset = new Vector3(0.65f, 1.1f, 0f);
         public float followSharpness = 20f;
 
+        [HideInInspector]
         public readonly NetworkVariable<FixedString64Bytes> itemIdValue =
             new NetworkVariable<FixedString64Bytes>(
                 default,
@@ -35,6 +36,7 @@ namespace NPCSystem
                 NetworkVariableWritePermission.Server
             );
 
+        [HideInInspector]
         public readonly NetworkVariable<FixedString64Bytes> displayNameValue =
             new NetworkVariable<FixedString64Bytes>(
                 default,

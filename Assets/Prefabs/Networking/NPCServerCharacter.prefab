@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 5268859136340817088}
   - component: {fileID: 2440310422697163463}
   - component: {fileID: 5968867171957428223}
-  - component: {fileID: 4925179945376579934}
   m_Layer: 0
   m_Name: NPCServerCharacter
   m_TagString: NPC
@@ -189,16 +188,3 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 1
---- !u!114 &4925179945376579934
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6903247061848355748}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 513fc7fba961956e79f3d97f343aa405, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCServerCharacter
-  ShowTopMostFoldoutHeaderGroup: 1
