@@ -40,6 +40,15 @@ Thumbs.db
 ExportedObj/
 .consulo/
 
+# Unity profiler captures, project auditor reports, auto-generated schemas
+ProfilerCaptures/
+Project_Auditor/
+UIElementsSchema/
+Data/Plugins/
+
+# Generated fine-tuning datasets (keep the .py scripts, not the output)
+Tools/FineTuning/datasets/*.jsonl
+
 # Python/tool caches
 __pycache__/
 *.py[cod]
