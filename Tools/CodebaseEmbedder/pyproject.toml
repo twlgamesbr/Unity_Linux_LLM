@@ -3,7 +3,9 @@ name = "unity-codebase-embedder"
 version = "0.1.0"
 description = "Offline-first Unity C# codebase scanner and Qdrant indexer"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "watchdog>=4.0.0",
+]
 
 [project.optional-dependencies]
 test = ["pytest>=8"]

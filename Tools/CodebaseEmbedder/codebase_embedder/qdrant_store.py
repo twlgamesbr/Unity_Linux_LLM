@@ -85,6 +85,11 @@ class QdrantStore:
         for start in range(0, len(points), 64):
             self._request("PUT", f"/collections/{self.collection}/points?wait=true", {"points": points[start:start+64]})
 
+    def delete(self, point_ids: list[str]) -> None:
+        if not point_ids:
+            return
+        self._request("POST", f"/collections/{self.collection}/points/delete?wait=true", {"points": point_ids})
+
     def search(self, vector: list[float], limit: int = 8, query_filter: dict[str, Any] | None = None) -> list[dict[str, Any]]:
         body: dict[str, Any] = {"vector": vector, "limit": limit, "with_payload": True}
         if query_filter:

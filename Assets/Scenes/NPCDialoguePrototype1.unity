@@ -2274,71 +2274,143 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!1001 &457902358
-PrefabInstance:
+--- !u!1 &477901106
+GameObject:
   m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: 2439569497437008205, guid: a38d0f6a35d285b58a8264207005b243, type: 3}
-      propertyPath: GlobalObjectIdHash
-      value: 3085559549
-      objectReference: {fileID: 0}
-    - target: {fileID: 2439569497437008205, guid: a38d0f6a35d285b58a8264207005b243, type: 3}
-      propertyPath: InScenePlacedSourceGlobalObjectIdHash
-      value: 3405826387
-      objectReference: {fileID: 0}
-    - target: {fileID: 5908405929411428223, guid: a38d0f6a35d285b58a8264207005b243, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -1.24
-      objectReference: {fileID: 0}
-    - target: {fileID: 5908405929411428223, guid: a38d0f6a35d285b58a8264207005b243, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5908405929411428223, guid: a38d0f6a35d285b58a8264207005b243, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 2.072
-      objectReference: {fileID: 0}
-    - target: {fileID: 5908405929411428223, guid: a38d0f6a35d285b58a8264207005b243, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5908405929411428223, guid: a38d0f6a35d285b58a8264207005b243, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5908405929411428223, guid: a38d0f6a35d285b58a8264207005b243, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5908405929411428223, guid: a38d0f6a35d285b58a8264207005b243, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5908405929411428223, guid: a38d0f6a35d285b58a8264207005b243, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5908405929411428223, guid: a38d0f6a35d285b58a8264207005b243, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 5908405929411428223, guid: a38d0f6a35d285b58a8264207005b243, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7291902954840310053, guid: a38d0f6a35d285b58a8264207005b243, type: 3}
-      propertyPath: m_Name
-      value: NPCTransferableItem_TEMP
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: a38d0f6a35d285b58a8264207005b243, type: 3}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 477901109}
+  - component: {fileID: 477901108}
+  - component: {fileID: 477901107}
+  m_Layer: 0
+  m_Name: NameLabel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &477901107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 477901106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_text: NPC
+  m_isRightToLeft: 0
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontSharedMaterials: []
+  m_fontMaterial: {fileID: 0}
+  m_fontMaterials: []
+  m_fontColor32:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_enableVertexGradient: 0
+  m_colorMode: 3
+  m_fontColorGradient:
+    topLeft: {r: 1, g: 1, b: 1, a: 1}
+    topRight: {r: 1, g: 1, b: 1, a: 1}
+    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
+    bottomRight: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColorGradientPreset: {fileID: 0}
+  m_spriteAsset: {fileID: 0}
+  m_tintAllSprites: 0
+  m_StyleSheet: {fileID: 0}
+  m_TextStyleHashCode: 0
+  m_overrideHtmlColors: 0
+  m_faceColor:
+    serializedVersion: 2
+    rgba: 4294967295
+  m_fontSize: 4
+  m_fontSizeBase: 4
+  m_fontWeight: 400
+  m_enableAutoSizing: 0
+  m_fontSizeMin: 11
+  m_fontSizeMax: 44
+  m_fontStyle: 0
+  m_HorizontalAlignment: 4
+  m_VerticalAlignment: 0
+  m_textAlignment: 65535
+  m_characterSpacing: 0
+  m_characterHorizontalScale: 1
+  m_wordSpacing: 0
+  m_lineSpacing: 0
+  m_lineSpacingMax: 0
+  m_paragraphSpacing: 0
+  m_charWidthMaxAdj: 0
+  m_TextWrappingMode: 1
+  m_wordWrappingRatios: 0.4
+  m_overflowMode: 0
+  m_linkedTextComponent: {fileID: 0}
+  parentLinkedComponent: {fileID: 0}
+  m_enableKerning: 0
+  m_ActiveFontFeatures: 6e72656b
+  m_enableExtraPadding: 0
+  checkPaddingRequired: 0
+  m_isRichText: 1
+  m_EmojiFallbackSupport: 1
+  m_parseCtrlCharacters: 1
+  m_isOrthographic: 1
+  m_isCullingEnabled: 0
+  m_horizontalMapping: 0
+  m_verticalMapping: 0
+  m_uvLineOffset: 0
+  m_geometrySortingOrder: 0
+  m_IsTextObjectScaleStatic: 0
+  m_VertexBufferAutoSizeReduction: 0
+  m_useMaxVisibleDescender: 1
+  m_pageToDisplay: 1
+  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_isUsingLegacyAnimationComponent: 0
+  m_isVolumetricText: 0
+  m_hasFontAssetChanged: 0
+  m_baseMaterial: {fileID: 0}
+  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!222 &477901108
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 477901106}
+  m_CullTransparentMesh: 1
+--- !u!224 &477901109
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 477901106}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &489627711
 GameObject:
   m_ObjectHideFlags: 0
@@ -3566,7 +3638,7 @@ MonoBehaviour:
   m_fontColor32:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColor: {r: 0.1, g: 0.1, b: 0.1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -4259,7 +4331,7 @@ MonoBehaviour:
   initializeDialogueManager: 0
   verifyBackendsDuringInitialization: 1
   initializeNetworkBridge: 1
-  validateAfterInitialization: 1
+  validateAfterInitialization: 0
   startNetworkingAfterInitialization: 0
 --- !u!4 &774187517
 Transform:
@@ -8874,7 +8946,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d55b672bece5ed5f5b5e3880fc89b88b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.PlayerAuthService
-  serviceBaseUrl: http://localhost:5100
+  serviceBaseUrl: http://127.0.0.1:5100
   requestTimeoutSeconds: 15
   validateStoredSessionOnStart: 1
   lastAuthStatus: 'Auth service settings look valid: http://localhost:5100/api/auth/login
@@ -11144,29 +11216,30 @@ MonoBehaviour:
   localRag: {fileID: 1778380634}
   ragEmbeddingPath: RAG/NPCDialogues-minilm-chunked.rag
   qdrantRag: {fileID: 1778380628}
-  useQdrantRag: 1
+  useQdrantRag: 0
   actionPlanner: {fileID: 1778380629}
   evidenceState: {fileID: 1778380630}
-  remoteHost: localhost
+  remoteHost: 127.0.0.1
   remotePort: 8080
-  remoteModel: llama32-qdrant-safe-20260706-ckpt100-q4_k_m
+  remoteModel: llama32-unity-blended-20260707-q4_k_m
   _cachedModelNames:
-  - embeddinggemma-300m
+  - gemma-4-e2b-it
+  - llama-3.1-8b-q4-k-m-vulkan
+  - llama-3.2-3b-instruct:q4_k_m
+  - nomic-embed-text-v1.5
   - intelligent-router
+  - llama32-unity-blended-20260707-q4_k_m
+  - modal-vllm-qwen
   - npc-codebase-v3
   - npc-codebase-v4
-  - llama-3.2-3b-instruct:q8_0
-  - npc-codebase-v1
-  - gemma-4-e2b-it
-  - llama-3.2-3b-instruct:q4_k_m
-  - llama32-qdrant-safe-20260706-ckpt100-q4_k_m
-  - nomic-embed-text-v1.5
-  - qwen2.5-1.5b-instruct-q4-k-m
   - qwen3-tts-cpp-1.7b-base-q4
-  - llama-3.1-8b-q4-k-m-vulkan
+  - embeddinggemma-300m
+  - llama-3.2-3b-instruct:q8_0
   - llama-3.1-8b-q4-k-m
-  - modal-vllm-qwen
-  remoteEmbeddingHost: localhost
+  - llama32-qdrant-safe-20260706-ckpt100-q4_k_m
+  - npc-codebase-v1
+  - qwen2.5-1.5b-instruct-q4-k-m
+  remoteEmbeddingHost: 127.0.0.1
   remoteEmbeddingPort: 8080
   profiles:
   - {fileID: 11400000, guid: fee9805d1a4aff5de9e2b4c154fda9a7, type: 2}
@@ -11239,7 +11312,7 @@ MonoBehaviour:
   dialogueManager: {fileID: 1778380623}
   chatClient: {fileID: 1778380636}
   localRag: {fileID: 1778380634}
-  validateOnStart: 1
+  validateOnStart: 0
   runFirstQuestionSmokeOnStart: 0
   smokeQuestion: What should I investigate first?
   smokeTimeoutSeconds: 60
@@ -11305,9 +11378,9 @@ MonoBehaviour:
   dialogueManager: {fileID: 1778380623}
   useQdrantDiagnostics: 1
   qdrantRag: {fileID: 1778380628}
-  localAiHost: localhost
+  localAiHost: 127.0.0.1
   localAiPort: 8080
-  localAiModel: llama32-qdrant-safe-20260706-ckpt100-q4_k_m
+  localAiModel: llama32-unity-blended-20260707-q4_k_m
   lastValidationStatus: 'References assigned. LocalAI preview: http://localhost:8080/v1'
 --- !u!1652712579 &1778380632
 MultiplayerRolesData:
@@ -11330,7 +11403,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fc1cc6216f8393fd94c3253333df4f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCLocalAIEmbedder
-  host: localhost
+  host: 127.0.0.1
   port: 8080
   apiKey: 
   model: nomic-embed-text-v1.5
@@ -11376,10 +11449,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a2e4b181559021ddab4f2cbdaf4b400, type: 3}
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCLocalAIClient
-  host: localhost
+  host: 127.0.0.1
   port: 8080
   apiKey: 
-  model: llama32-qdrant-safe-20260706-ckpt100-q4_k_m
+  model: llama32-unity-blended-20260707-q4_k_m
   temperature: 0.2
   topP: 0.9
   topK: 40
@@ -13461,6 +13534,80 @@ MonoBehaviour:
   isAlert: 0
   m_InputValidator: {fileID: 0}
   m_ShouldActivateOnSelect: 1
+--- !u!1 &2106546705
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2106546708}
+  - component: {fileID: 2106546707}
+  - component: {fileID: 2106546706}
+  m_Layer: 0
+  m_Name: NameplateCanvas
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2106546706
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2106546705}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 774e0de963774827091bb3d93e5f00f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCNameplate
+  nameLabel: {fileID: 477901107}
+--- !u!223 &2106546707
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2106546705}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 2
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 0
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_UseReflectionProbes: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+  m_TargetDisplay: 0
+--- !u!224 &2106546708
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2106546705}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &2116735929
 GameObject:
   m_ObjectHideFlags: 0
@@ -13874,4 +14021,5 @@ SceneRoots:
   - {fileID: 1788130159}
   - {fileID: 1597061039}
   - {fileID: 408113103}
-  - {fileID: 457902358}
+  - {fileID: 2106546708}
+  - {fileID: 477901109}

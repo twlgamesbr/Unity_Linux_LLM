@@ -248,6 +248,32 @@ def cmd_audit(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_watch(args: argparse.Namespace) -> int:
+    import time
+    from .watcher import CodebaseWatcher
+    from .indexer import build_index
+
+    cfg = _config(args)
+    art = cfg.artifact_dir
+    if not (art / "chunks.jsonl").exists():
+        print("Local index database not found. Initiating full index scan first...", flush=True)
+        build_index(cfg, write_artifacts=True)
+        print("Full index scan completed.", flush=True)
+
+    watcher = CodebaseWatcher(cfg, debounce_seconds=args.debounce)
+    watcher.start()
+
+    print("Press Ctrl+C to exit.", flush=True)
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print("\nStopping watcher...", flush=True)
+    finally:
+        watcher.stop()
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="codebase-embedder")
     add_common_args(parser)
@@ -286,6 +312,10 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--json", action="store_true")
     p.add_argument("--local", action="store_true", help="Use local artifacts instead of live Qdrant")
     p.set_defaults(func=cmd_audit)
+    p = sub.add_parser("watch")
+    add_common_args(p)
+    p.add_argument("--debounce", type=float, default=1.5, help="Quiet period in seconds to debounce file events")
+    p.set_defaults(func=cmd_watch)
     return parser
 
 

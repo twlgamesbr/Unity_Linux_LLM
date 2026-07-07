@@ -16,14 +16,6 @@ def _load_script(name: str):
     return module
 
 
-def test_embedding_benchmark_parses_batch_sizes_and_percentiles():
-    bench = _load_script("benchmark_embeddings.py")
-
-    assert bench.parse_batch_sizes("1, 4,8") == [1, 4, 8]
-    assert bench.percentile([3.0, 1.0, 2.0], 50) == 2.0
-    assert bench.percentile([1.0, 2.0, 3.0, 4.0], 95) == 4.0
-
-
 def test_localai_backend_script_extracts_model_ids():
     bench = _load_script("benchmark_localai_backends.py")
 

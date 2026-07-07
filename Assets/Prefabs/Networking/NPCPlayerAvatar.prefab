@@ -23,6 +23,7 @@ GameObject:
   - component: {fileID: 2705921267641347282}
   - component: {fileID: 8244578066159571029}
   - component: {fileID: -9195951490691375075}
+  - component: {fileID: 2256178644128380247}
   m_Layer: 0
   m_Name: NPCPlayerAvatar
   m_TagString: Player
@@ -58,7 +59,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 2950224579
+  GlobalObjectIdHash: 2354842929
   InScenePlacedSourceGlobalObjectIdHash: 2354842929
   DeferredDespawnTick: 0
   Ownership: 1
@@ -175,8 +176,8 @@ Animator:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4442102780728157853}
   m_Enabled: 0
-  m_Avatar: {fileID: 9000000, guid: 8a3c35dfb7885f26e9cf390ff740aeb5, type: 3}
-  m_Controller: {fileID: 91000000, guid: a1b2c3d4e5f678901234567890abcdef, type: 2}
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -390,6 +391,28 @@ MonoBehaviour:
       Synchronize: 1
       ParameterType: 9
   AnimatorParametersExpanded: 0
+--- !u!64 &2256178644128380247
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4442102780728157853}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 6796121518194019630, guid: 8a3c35dfb7885f26e9cf390ff740aeb5, type: 3}
 --- !u!1001 &1609983377784481111
 PrefabInstance:
   m_ObjectHideFlags: 0

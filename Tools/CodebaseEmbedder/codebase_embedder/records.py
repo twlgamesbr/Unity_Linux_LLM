@@ -75,7 +75,7 @@ def write_jsonl(path: Path, records: list[IndexRecord | RelationRecord | dict[st
         if hasattr(rec, "to_json"):
             obj = rec.to_json()
         elif isinstance(rec, RelationRecord):
-            obj = rec.__dict__
+            obj = asdict(rec)
         else:
             obj = rec
         lines.append(json.dumps(obj, sort_keys=True))
