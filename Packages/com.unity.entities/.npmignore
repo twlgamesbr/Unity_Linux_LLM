@@ -1,0 +1,4 @@
+.npmignore
+
+Unity.Entities/SourceGenerators/Source~/build.bat
+Unity.Entities/SourceGenerators/Source~/build.sh

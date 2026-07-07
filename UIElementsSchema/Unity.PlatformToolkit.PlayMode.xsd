@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="Unity.PlatformToolkit.PlayMode" elementFormDefault="qualified" targetNamespace="Unity.PlatformToolkit.PlayMode" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="UnityEngine.UIElements.xsd" namespace="UnityEngine.UIElements" />
+  <xs:complexType name="PlayModeControlsSaveDataFieldType">
+    <xs:complexContent mixed="false">
+      <xs:extension xmlns:q1="UnityEngine.UIElements" base="q1:VisualElementType">
+        <xs:choice />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="PlayModeControlsSaveDataField" xmlns:q2="UnityEngine.UIElements" substitutionGroup="q2:VisualElement" type="tns:PlayModeControlsSaveDataFieldType" />
+  <xs:complexType name="ToggleFoldoutType">
+    <xs:complexContent mixed="false">
+      <xs:extension xmlns:q3="UnityEngine.UIElements" base="q3:VisualElementType">
+        <xs:choice />
+        <xs:attribute default="false" name="foldout-value" type="xs:boolean" />
+        <xs:attribute name="text" type="xs:string" />
+        <xs:attribute name="toggle-value-data-source-path" type="xs:string" />
+        <xs:attribute name="viewDataKey" type="xs:string" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="ToggleFoldout" xmlns:q4="UnityEngine.UIElements" substitutionGroup="q4:VisualElement" type="tns:ToggleFoldoutType" />
+  <xs:complexType name="PlayModeControlsInputMappingFieldType">
+    <xs:complexContent mixed="false">
+      <xs:extension xmlns:q5="UnityEngine.UIElements" base="q5:VisualElementType">
+        <xs:choice />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="PlayModeControlsInputMappingField" xmlns:q6="UnityEngine.UIElements" substitutionGroup="q6:VisualElement" type="tns:PlayModeControlsInputMappingFieldType" />
+  <xs:complexType name="TimeOptionType">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element xmlns:q7="UnityEngine.UIElements" ref="q7:VisualElement" />
+    </xs:choice>
+    <xs:attribute default="0" name="milliseconds" type="xs:int" />
+    <xs:attribute name="formatting-suffix" type="xs:string" />
+    <xs:anyAttribute processContents="lax" />
+  </xs:complexType>
+  <xs:element name="TimeOption" type="tns:TimeOptionType" />
+  <xs:complexType name="PlayModeControlsAccountAttributeValueInputCellType">
+    <xs:complexContent mixed="false">
+      <xs:extension xmlns:q8="UnityEngine.UIElements" base="q8:VisualElementType">
+        <xs:choice />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="PlayModeControlsAccountAttributeValueInputCell" xmlns:q9="UnityEngine.UIElements" substitutionGroup="q9:VisualElement" type="tns:PlayModeControlsAccountAttributeValueInputCellType" />
+  <xs:complexType name="TimeDropdownType">
+    <xs:complexContent mixed="false">
+      <xs:extension xmlns:q10="UnityEngine.UIElements" base="q10:BindableElementType">
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element minOccurs="0" maxOccurs="1" form="unqualified" name="value" type="tns:TimeDropdownvalueType" />
+        </xs:choice>
+        <xs:attribute name="label" type="xs:string" />
+        <xs:attribute name="formatting-prefix" type="xs:string" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:complexType name="TimeDropdownvalueType">
+    <xs:complexContent mixed="false">
+      <xs:restriction base="xs:anyType">
+        <xs:choice>
+          <xs:element minOccurs="0" maxOccurs="1" ref="tns:TimeOption" />
+        </xs:choice>
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="TimeDropdown" xmlns:q11="UnityEngine.UIElements" substitutionGroup="q11:BindableElement" type="tns:TimeDropdownType" />
+  <xs:complexType name="PlayModeControlsSystemControlsFieldType">
+    <xs:complexContent mixed="false">
+      <xs:extension xmlns:q12="UnityEngine.UIElements" base="q12:VisualElementType">
+        <xs:choice />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="PlayModeControlsSystemControlsField" xmlns:q13="UnityEngine.UIElements" substitutionGroup="q13:VisualElement" type="tns:PlayModeControlsSystemControlsFieldType" />
+  <xs:complexType name="PlayModeControlsAccountAchievementsListType">
+    <xs:complexContent mixed="false">
+      <xs:extension xmlns:q14="UnityEngine.UIElements" base="q14:VisualElementType">
+        <xs:choice />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="PlayModeControlsAccountAchievementsList" xmlns:q15="UnityEngine.UIElements" substitutionGroup="q15:VisualElement" type="tns:PlayModeControlsAccountAchievementsListType" />
+  <xs:complexType name="PlayModeControlsAccountFieldType">
+    <xs:complexContent mixed="false">
+      <xs:extension xmlns:q16="UnityEngine.UIElements" base="q16:VisualElementType">
+        <xs:choice />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="PlayModeControlsAccountField" xmlns:q17="UnityEngine.UIElements" substitutionGroup="q17:VisualElement" type="tns:PlayModeControlsAccountFieldType" />
+  <xs:complexType name="PlayModeControlsAccountControlsFieldType">
+    <xs:complexContent mixed="false">
+      <xs:extension xmlns:q18="UnityEngine.UIElements" base="q18:VisualElementType">
+        <xs:choice />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="PlayModeControlsAccountControlsField" xmlns:q19="UnityEngine.UIElements" substitutionGroup="q19:VisualElement" type="tns:PlayModeControlsAccountControlsFieldType" />
+  <xs:complexType name="PlayModeControlsAttributeDefinitionValueTypePopupFieldType">
+    <xs:complexContent mixed="false">
+      <xs:extension xmlns:q20="UnityEngine.UIElements" base="q20:BindableElementType">
+        <xs:choice />
+        <xs:attribute name="label" type="xs:string" />
+        <xs:attribute default="System.String, mscorlib" name="value" type="xs:string" />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="PlayModeControlsAttributeDefinitionValueTypePopupField" xmlns:q21="UnityEngine.UIElements" substitutionGroup="q21:BindableElement" type="tns:PlayModeControlsAttributeDefinitionValueTypePopupFieldType" />
+  <xs:complexType name="PlayModeControlsSettingsFieldType">
+    <xs:complexContent mixed="false">
+      <xs:extension xmlns:q22="UnityEngine.UIElements" base="q22:VisualElementType">
+        <xs:choice />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="PlayModeControlsSettingsField" xmlns:q23="UnityEngine.UIElements" substitutionGroup="q23:VisualElement" type="tns:PlayModeControlsSettingsFieldType" />
+  <xs:complexType name="PlayModeControlsAccountAttributeValuesListType">
+    <xs:complexContent mixed="false">
+      <xs:extension xmlns:q24="UnityEngine.UIElements" base="q24:VisualElementType">
+        <xs:choice />
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="PlayModeControlsAccountAttributeValuesList" xmlns:q25="UnityEngine.UIElements" substitutionGroup="q25:VisualElement" type="tns:PlayModeControlsAccountAttributeValuesListType" />
+</xs:schema>

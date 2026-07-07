@@ -1,0 +1,26 @@
+{
+    "name": "Unity.UI.TestFramework.DocCodeSamples.Editor.Tests",
+    "rootNamespace": "",
+    "references": [
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner",
+        "Unity.UI.TestFramework.Runtime",
+        "Unity.UI.TestFramework.Editor",
+        "Unity.UI.TestFramework.DocCodeSamples.Runtime.Tests"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
