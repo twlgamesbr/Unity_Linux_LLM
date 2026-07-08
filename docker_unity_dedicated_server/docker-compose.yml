@@ -1,0 +1,25 @@
+services:
+  npc-server:
+    build:
+      context: ..
+      dockerfile: docker_unity_dedicated_server/Dockerfile
+    container_name: npc-dedicated-server
+    # Host networking: the server sees localhost as the host machine,
+    # so it can reach LocalAI (8080), Qdrant (6333), and
+    # PlayerAuthService (6000) directly, no extra config.
+    network_mode: host
+    environment:
+      - SERVER_PORT=11474
+      - SERVER_ADDRESS=0.0.0.0
+      - USE_WEBSOCKETS=true
+    # Bind-mount the server build so you can iterate without rebuilding.
+    # Read-write: Unity needs to write to _Data/ for logs and config.
+    volumes:
+      - ../Builds/Server:/server:rw
+    restart: unless-stopped
+    stop_grace_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "50m"
+        max-file: "3"

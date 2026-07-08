@@ -45,7 +45,7 @@ namespace NPCSystem
 
         [Header("Probe Targets")]
         [SerializeField]
-        string authProbeRelativePath = "api/auth/session";
+        string authProbeRelativePath = "auth/v1/health";
 
         [SerializeField]
         string localAiProbeRelativePath = "v1/models";
@@ -270,7 +270,7 @@ namespace NPCSystem
         string BuildAuthProbeUrl()
         {
             string baseUrl =
-                authService == null ? "http://localhost:5100" : authService.ServiceBaseUrl;
+                authService == null ? "http://localhost:8091" : authService.SupabaseUrl;
             return CombineUrl(baseUrl, authProbeRelativePath);
         }
 

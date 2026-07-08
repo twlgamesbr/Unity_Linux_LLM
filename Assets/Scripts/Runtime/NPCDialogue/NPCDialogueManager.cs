@@ -35,6 +35,10 @@ namespace NPCSystem
         [Header("Evidence & Game State")]
         public NPCEvidenceState evidenceState;
 
+        [Title("Supabase Persistence")]
+        [Header("Supabase Dialogue Repository")]
+        public SupabaseDialogueRepository supabaseRepo;
+
         [Title("Remote LLM Configuration")]
         [Header("Remote LLM Configuration")]
         public string remoteHost = "localhost";
@@ -167,7 +171,7 @@ namespace NPCSystem
                 AutoAssignReferencesIfNeeded();
                 ValidateReferences();
                 BuildProfileIndex();
-                LoadAllHistories();
+                await LoadAllHistoriesAsync();
                 await LoadOrBuildRagEmbeddingsAsync();
                 scope.Success("Initialization complete.");
             }
@@ -289,15 +293,39 @@ namespace NPCSystem
             }
         }
 
-        void LoadAllHistories()
+        async Task LoadAllHistoriesAsync()
         {
             _historyByNpc.Clear();
 
             foreach (NPCProfile profile in Profiles)
             {
-                _historyByNpc[profile.GetNpcSlug()] = persistHistory
-                    ? NPCHistoryStore.Load(profile.GetHistorySaveFile())
-                    : new List<DialogueEntry>();
+                string slug = profile.GetNpcSlug();
+
+                if (!persistHistory)
+                {
+                    _historyByNpc[slug] = new List<DialogueEntry>();
+                    continue;
+                }
+
+                // Try Supabase first if configured and authenticated
+                if (supabaseRepo != null && supabaseRepo.IsConfigured)
+                {
+                    List<DialogueEntry> supabaseHistory = await supabaseRepo.LoadHistoryAsync(slug);
+                    if (supabaseHistory != null)
+                    {
+                        _historyByNpc[slug] = supabaseHistory;
+                        Logger.Log(NPCFlowStage.HistoryLoad, NPCFlowStatus.Success, NPCFlowLogLevel.Debug,
+                            $"Loaded {supabaseHistory.Count} turns from Supabase for NPC '{slug}'.",
+                            source: nameof(NPCDialogueManager));
+                        continue;
+                    }
+
+                    Logger.Log(NPCFlowStage.HistoryLoad, NPCFlowStatus.Fallback, NPCFlowLogLevel.Debug,
+                        $"Supabase history unavailable for NPC '{slug}', falling back to local file.",
+                        source: nameof(NPCDialogueManager));
+                }
+
+                _historyByNpc[slug] = NPCHistoryStore.Load(profile.GetHistorySaveFile());
             }
         }
 
@@ -653,18 +681,25 @@ namespace NPCSystem
             return basePrompt;
         }
 
-        Task AppendConversationAsync(NPCProfile profile, string playerMessage, string response)
+        async Task AppendConversationAsync(NPCProfile profile, string playerMessage, string response)
         {
-            if (profile == null) return Task.CompletedTask;
+            if (profile == null) return;
 
-            if (!persistHistory) return Task.CompletedTask;
+            if (!persistHistory) return;
 
             List<DialogueEntry> history = GetOrCreateHistory(profile);
             history.Add(new DialogueEntry("user", playerMessage));
             history.Add(new DialogueEntry("assistant", response));
             TrimHistory(history);
             NPCHistoryStore.Save(profile.GetHistorySaveFile(), history);
-            return Task.CompletedTask;
+
+            // Also persist to Supabase if configured
+            if (supabaseRepo != null && supabaseRepo.IsConfigured)
+            {
+                string slug = profile.GetNpcSlug();
+                await supabaseRepo.SaveTurnAsync(slug, "user", playerMessage);
+                await supabaseRepo.SaveTurnAsync(slug, "assistant", response);
+            }
         }
 
         List<DialogueEntry> GetOrCreateHistory(NPCProfile profile)
@@ -929,7 +964,7 @@ namespace NPCSystem
             evidenceState.ApplySnapshot(snapshot);
         }
 
-        public void ClearHistory(string npcName)
+        public async void ClearHistory(string npcName)
         {
             if (string.IsNullOrWhiteSpace(npcName))
             {
@@ -937,6 +972,8 @@ namespace NPCSystem
                 {
                     _historyByNpc[profile.GetNpcSlug()] = new List<DialogueEntry>();
                     NPCHistoryStore.Delete(profile.GetHistorySaveFile());
+                    if (supabaseRepo != null)
+                        await supabaseRepo.DeleteHistoryAsync(profile.GetNpcSlug());
                 }
             }
             else
@@ -945,6 +982,8 @@ namespace NPCSystem
                 if (profile == null) return;
                 _historyByNpc[profile.GetNpcSlug()] = new List<DialogueEntry>();
                 NPCHistoryStore.Delete(profile.GetHistorySaveFile());
+                if (supabaseRepo != null)
+                    await supabaseRepo.DeleteHistoryAsync(profile.GetNpcSlug());
             }
         }
 

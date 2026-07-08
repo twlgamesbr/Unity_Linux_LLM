@@ -160,7 +160,7 @@ MonoBehaviour:
   rotationSpeed: 720
   acceleration: 12
   deceleration: 10
-  jumpHeight: 1.25
+  jumpHeight: 3
   gravity: -24
   groundedStickVelocity: -2
   groundCheckDistance: 0.15
@@ -175,12 +175,12 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4442102780728157853}
-  m_Enabled: 0
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 0}
+  m_Enabled: 1
+  m_Avatar: {fileID: 9000000, guid: 8a3c35dfb7885f26e9cf390ff740aeb5, type: 3}
+  m_Controller: {fileID: 91000000, guid: a1b2c3d4e5f678901234567890abcdef, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
-  m_ApplyRootMotion: 0
+  m_ApplyRootMotion: 1
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_AnimatePhysics: 0
@@ -201,7 +201,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2fee1ad867ca30b78c38c3b18a92b82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCCharacterAnimatorBridge
-  animator: {fileID: 5133359153835677894}
+  animator: {fileID: 5178309420554491902}
   motor: {fileID: 2790446208225623981}
   moveXScale: 1
   moveYScale: 1
@@ -358,7 +358,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkAnimatorExpanded: 0
   AuthorityMode: 1
-  m_Animator: {fileID: 5133359153835677894}
+  m_Animator: {fileID: 5178309420554491902}
   TransitionStateInfoList: []
   AnimatorParameterEntries:
     ParameterEntries:
@@ -469,7 +469,8 @@ PrefabInstance:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 91000000, guid: a1b2c3d4e5f678901234567890abcdef, type: 2}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5866666021909216657, guid: 8a3c35dfb7885f26e9cf390ff740aeb5, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -477,10 +478,5 @@ PrefabInstance:
 --- !u!4 &1287314980011360956 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 8a3c35dfb7885f26e9cf390ff740aeb5, type: 3}
-  m_PrefabInstance: {fileID: 1609983377784481111}
-  m_PrefabAsset: {fileID: 0}
---- !u!95 &5133359153835677894 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 8a3c35dfb7885f26e9cf390ff740aeb5, type: 3}
   m_PrefabInstance: {fileID: 1609983377784481111}
   m_PrefabAsset: {fileID: 0}

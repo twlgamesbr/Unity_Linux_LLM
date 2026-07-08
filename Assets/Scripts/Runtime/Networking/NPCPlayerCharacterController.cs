@@ -58,9 +58,10 @@ namespace NPCSystem
             SubscribeInputEvents();
         }
 
-        void OnDestroy()
+        public override void OnDestroy()
         {
             UnsubscribeInputEvents();
+            base.OnDestroy();
         }
 
         public override void OnNetworkSpawn()

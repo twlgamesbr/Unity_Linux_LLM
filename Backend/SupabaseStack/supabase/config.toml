@@ -1,0 +1,25 @@
+project_id = "local-supabase-unity-backend"
+
+[api]
+enabled = true
+port = 8091
+
+[db]
+port = 55432
+shadow_port = 55430
+
+[auth]
+enabled = true
+site_url = "http://127.0.0.1:3000"
+additional_redirect_urls = ["http://localhost:3000", "http://127.0.0.1:3000"]
+
+[studio]
+enabled = true
+port = 8097
+
+[storage]
+enabled = true
+
+[db.seed]
+enabled = true
+sql_paths = ["./migrations/0001_initial.sql", "./migrations/002_gameplay_schema.sql", "./migrations/003_seed_data.sql"]

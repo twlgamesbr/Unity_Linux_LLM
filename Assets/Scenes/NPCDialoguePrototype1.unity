@@ -1380,14 +1380,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCBackendReadinessService
   authService: {fileID: 1351714796}
   dialogueManager: {fileID: 1778380623}
-  authProbeRelativePath: api/auth/session
+  authProbeRelativePath: auth/v1/health
   localAiProbeRelativePath: v1/models
   requestTimeoutSeconds: 5
   requireAuthBackend: 1
   requireLocalAiBackend: 1
   failInitializationOnRequiredBackendFailure: 1
-  lastReadinessStatus: References assigned. auth=http://localhost:5100/api/auth/session
-    localai=http://localhost:8080/v1/models
+  lastReadinessStatus: References assigned. auth=http://localhost:8091/auth/v1/health
+    localai=http://127.0.0.1:8080/v1/models
   lastAuthBackendStatus: Idle
   lastLocalAiBackendStatus: Idle
   lastProbeDurationMs: 0
@@ -1947,59 +1947,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 396490209}
   m_CullTransparentMesh: 1
---- !u!1 &408113101
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 408113103}
-  - component: {fileID: 408113102}
-  m_Layer: 0
-  m_Name: NetworkProfiler
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &408113102
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 408113101}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 17737e0516da2445b9b0077ae2bd9b4f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Multiplayer.Tools.NetStatsMonitor.Component::Unity.Multiplayer.Tools.NetStatsMonitor.RuntimeNetStatsMonitor
-  m_Visible: 1
-  m_MaxRefreshRate: 30
-  <CustomStyleSheet>k__BackingField: {fileID: 0}
-  <PanelSettingsOverride>k__BackingField: {fileID: 0}
-  <Position>k__BackingField:
-    <OverridePosition>k__BackingField: 1
-    m_PositionLeftToRight: 0
-    m_PositionTopToBottom: 0
-  <Configuration>k__BackingField: {fileID: 11400000, guid: 8f1b4e3792d8446399527749cfb591a2, type: 2}
---- !u!4 &408113103
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 408113101}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 402.97415, y: 247.89464, z: -4.44292}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &419902614
 GameObject:
   m_ObjectHideFlags: 0
@@ -2334,7 +2281,7 @@ MonoBehaviour:
   m_spriteAsset: {fileID: 0}
   m_tintAllSprites: 0
   m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: 0
+  m_TextStyleHashCode: -1183493901
   m_overrideHtmlColors: 0
   m_faceColor:
     serializedVersion: 2
@@ -8946,7 +8893,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d55b672bece5ed5f5b5e3880fc89b88b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.PlayerAuthService
-  serviceBaseUrl: http://127.0.0.1:5100
+  supabaseUrl: http://localhost:8091
+  supabaseAnonKey: dev-local-anon-key
   requestTimeoutSeconds: 15
   validateStoredSessionOnStart: 1
   lastAuthStatus: 'Auth service settings look valid: http://localhost:5100/api/auth/login
@@ -11219,6 +11167,7 @@ MonoBehaviour:
   useQdrantRag: 0
   actionPlanner: {fileID: 1778380629}
   evidenceState: {fileID: 1778380630}
+  supabaseRepo: {fileID: 0}
   remoteHost: 127.0.0.1
   remotePort: 8080
   remoteModel: llama32-unity-blended-20260707-q4_k_m
@@ -14020,6 +13969,5 @@ SceneRoots:
   - {fileID: 1778380624}
   - {fileID: 1788130159}
   - {fileID: 1597061039}
-  - {fileID: 408113103}
   - {fileID: 2106546708}
   - {fileID: 477901109}
