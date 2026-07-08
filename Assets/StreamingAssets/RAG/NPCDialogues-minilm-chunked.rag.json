@@ -1,35 +1,35 @@
 {
     "importerVersion": "npc-rag-importer-v2",
     "ragPath": "RAG/NPCDialogues-minilm-chunked.rag",
-    "embeddingModel": "all-MiniLM-L12-v2.Q4_K_M.gguf",
-    "embeddingLength": 384,
+    "embeddingModel": "localai-embedding",
+    "embeddingLength": 0,
     "chunkCharacters": 1200,
     "sourceCount": 3,
-    "chunkCount": 83,
-    "builtAtUtc": "2026-06-27T12:11:43.0792390Z",
+    "chunkCount": 3,
+    "builtAtUtc": "2026-07-08T00:58:04.9105740Z",
     "sources": [
         {
             "npcSlug": "butler",
             "displayName": "Butler",
             "sourcePath": "NPCs/butler/knowledge.md",
-            "sha256": "c3943dec3efb072b7a9b65f6b419901f75365f8596891402cdcfe211e8655540",
-            "byteLength": 43823,
-            "chunkCount": 39
+            "sha256": "6644b7df71ca3e6de000c51376f00d1d08bee3c8871f0838f6288311434d9293",
+            "byteLength": 43948,
+            "chunkCount": 1
         },
         {
             "npcSlug": "maid",
             "displayName": "Maid",
             "sourcePath": "NPCs/maid/knowledge.md",
-            "sha256": "2245e82c377d73170db93ad53055a5d46742fd0ad9b988486faa67fab662261b",
-            "byteLength": 47442,
-            "chunkCount": 43
+            "sha256": "7c98df6cd9473aeb2b87e5207ce4a4f8a15aebc928d766d0128c18d062962c9e",
+            "byteLength": 47570,
+            "chunkCount": 1
         },
         {
             "npcSlug": "chef",
             "displayName": "Chef",
             "sourcePath": "NPCs/chef/knowledge.md",
-            "sha256": "5ebe8dab61b90e1f69d6edaa8ea7e767528c5a2288b71433085bff1c5e91b373",
-            "byteLength": 739,
+            "sha256": "1ef7aa4470a20a34b0d24993aede52d761e2bb46a7362c0d7a04ce062f78ed0a",
+            "byteLength": 4161,
             "chunkCount": 1
         }
     ]

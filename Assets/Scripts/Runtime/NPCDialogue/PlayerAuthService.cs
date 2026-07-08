@@ -336,21 +336,22 @@ namespace NPCSystem
                 password = rawPassword,
             };
 
-            GotrueUserResponse gotrueUser = await SendGotrueJsonAsync<GotrueUserResponse>(
-                "signup",
-                UnityWebRequest.kHttpVerbPOST,
-                JsonUtility.ToJson(signupBody)
-            );
-            if (gotrueUser == null || string.IsNullOrWhiteSpace(gotrueUser.id))
+            GotrueSessionResponse signupResponse =
+                await SendGotrueJsonAsync<GotrueSessionResponse>(
+                    "signup",
+                    UnityWebRequest.kHttpVerbPOST,
+                    JsonUtility.ToJson(signupBody)
+                );
+            if (
+                signupResponse?.user == null
+                || string.IsNullOrWhiteSpace(signupResponse.user.id)
+            )
                 throw new InvalidOperationException("Supabase signup returned no user.");
-
-            // Step 2: immediately login to get tokens (Gotrue signup response may vary)
-            PlayerAuthSessionResponse session = await LoginInternalAsync(email, rawPassword, true);
 
             return new PlayerAuthRegisterResponse
             {
-                playerId = gotrueUser.id,
-                email = gotrueUser.email ?? email,
+                playerId = signupResponse.user.id,
+                email = signupResponse.user.email ?? email,
                 username = username?.Trim() ?? string.Empty,
                 createdAtUtc = DateTime.UtcNow.ToString("O"),
             };
@@ -666,8 +667,7 @@ namespace NPCSystem
 
         string BuildGotrueUrl(string route)
         {
-            // Gotrue auth endpoints live under /auth/v1/
-            return $"{supabaseUrl.TrimEnd('/')}/auth/v1/{route.TrimStart('/')}";
+            return $"{supabaseUrl.TrimEnd('/')}/{route.TrimStart('/')}";
         }
 
         static string ParseGotrueError(string responseText, string fallback, long statusCode)

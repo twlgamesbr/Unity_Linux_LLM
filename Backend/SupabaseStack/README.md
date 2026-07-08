@@ -43,22 +43,71 @@ The helper scripts just wrap `docker compose` in this folder.
 Self-hosted Studio authenticates via local Gotrue. Create an admin:
 
 ```bash
-# 1. Sign up (autoconfirm enabled — no email needed)
-curl -X POST http://localhost:8091/auth/v1/signup \
-  -H "apikey: dev-local-anon-key" \
-  -H "Content-Type: application/json" \
-  -d '{"email":"admin@npc-game.local","password":"supabase-admin-123"}'
-
-# 2. Promote to service_role via psql
-docker exec -it supabase-stack-db psql -U postgres -c "
-UPDATE auth.users
+# 1. Insert admin user directly into auth schema (signup endpoint may fail
+#    because pop migration runner doesn't handle search_path correctly)
+docker exec -i supabase-stack-db psql -U postgres <<'SQLEOF'
+-- Insert into auth.users
+INSERT INTO auth.users (
+    id, instance_id, email, encrypted_password,
+    email_confirmed_at, phone_confirmed_at,
+    confirmation_sent_at, confirmed_at,
+    raw_app_meta_data, raw_user_meta_data,
+    created_at, updated_at, aud, role
+) VALUES (
+    gen_random_uuid(), '00000000-0000-0000-0000-000000000000',
+    'admin@npc-game.local',
+    '$2a$10$abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQ', -- bcrypt placeholder
+    now(), now(), now(), now(),
+    '{"provider":"email","providers":["email"],"role":"service_role","claims_admin":true}'::jsonb,
+    '{"display_name":"Super Admin"}'::jsonb,
+    now(), now(), 'authenticated', 'authenticated'
+)
+ON CONFLICT (email) DO UPDATE
 SET raw_app_meta_data =
-    COALESCE(raw_app_meta_data, '{}'::jsonb) || '{\"role\": \"service_role\", \"claims_admin\": true}'::jsonb
-WHERE email = 'admin@npc-game.local';
+    COALESCE(auth.users.raw_app_meta_data, '{}'::jsonb) ||
+    '{"role": "service_role", "claims_admin": true}'::jsonb,
+    raw_user_meta_data = '{"display_name":"Super Admin"}'::jsonb;
+SQLEOF
+
+# 2. Set a known bcrypt hash for the admin password
+docker exec -i supabase-stack-db psql -U postgres \
+  -c "UPDATE auth.users SET encrypted_password = '$2a$10$' || encode(gen_random_bytes(52), 'hex') || '=' WHERE email = 'admin@npc-game.local';"
+
+# Run the Python script to set a known password:
+python3 -c "
+import bcrypt
+import subprocess
+pw = b'supabase-admin-123'
+hashed = bcrypt.hashpw(pw, bcrypt.gensalt(rounds=10))
+hashed_str = hashed.decode()
+cmd = ['docker', 'exec', '-i', 'supabase-stack-db', 'psql', '-U', 'postgres',
+       '-c', f\"UPDATE auth.users SET encrypted_password = '{hashed_str}' WHERE email = 'admin@npc-game.local';\"]
+subprocess.run(cmd, check=True)
+print('Password set successfully')
 "
 
-# 3. Log in at http://localhost:8097 (use the email/password from step 1)
+# 3. Create corresponding identity record
+docker exec -i supabase-stack-db psql -U postgres <<'SQLEOF'
+INSERT INTO auth.identities (
+    id, user_id, identity_data, provider, provider_id,
+    last_sign_in_at, created_at, updated_at
+)
+SELECT
+    gen_random_uuid(), id,
+    jsonb_build_object('sub', id::text, 'email', email),
+    'email', email,
+    now(), now(), now()
+FROM auth.users WHERE email = 'admin@npc-game.local'
+ON CONFLICT DO NOTHING;
+SQLEOF
+
+# 4. Log in at http://localhost:8097
+#    email: admin@npc-game.local
+#    password: supabase-admin-123
 ```
+
+> **Note:** The Gotrue (auth) container connects using `?search_path=public,auth` so that
+> unqualified table references (`users`, `identities`) resolve correctly at runtime.
 
 ## Edge Functions
 
