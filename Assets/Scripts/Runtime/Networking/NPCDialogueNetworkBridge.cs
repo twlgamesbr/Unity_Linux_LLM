@@ -8,6 +8,13 @@ using UnityEngine.Serialization;
 
 namespace NPCSystem
 {
+    /// <summary>
+    /// Network bridge for NPC dialogue over NGO (Netcode for GameObjects).
+    /// Owns the RPC surface for dialogue requests, responses, notebook sync,
+    /// item transfers, and NPC profile management across the multiplayer session.
+    /// Implemented as partial classes: RequestHandling, ResponseHandling,
+    /// ProfileProvider, NotebookSync, ItemTransfer.
+    /// </summary>
     [DefaultExecutionOrder(-900)]
     [DisallowMultipleComponent]
     [RequireComponent(typeof(NetworkObject))]

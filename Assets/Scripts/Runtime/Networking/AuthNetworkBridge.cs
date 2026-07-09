@@ -211,7 +211,7 @@ namespace NPCSystem
                 try
                 {
                     Uri uri = new Uri(Application.absoluteURL);
-                    if (uri.Host != "localhost" && uri.Host != "127.0.0.1")
+                    if (!NPCFlowLogger.IsLocalHost(uri.Host))
                     {
                         _hostAddress = uri.Host;
                     }
@@ -224,7 +224,6 @@ namespace NPCSystem
             ActivePlayerName = _authenticatedPlayerName;
             ResolvedNetworkStartupMode resolvedMode = ResolveStartupMode();
 
-            // Close the auth UI immediately
             CloseAuthUI();
 
             _logger?.Log(
@@ -416,8 +415,7 @@ namespace NPCSystem
                 return;
             }
 
-            // Bootstrap already configured transport in Awake.
-            // Set host mode and let bootstrap's StartConfiguredMode handle the rest.
+            // Bootstrap already configured transport in Awake; just set host mode
             _networkBootstrap.TransportConfig.autoStartMode = NPCNetworkAutoStartMode.Host;
             bool started = _networkBootstrap.StartConfiguredMode();
             if (!started)

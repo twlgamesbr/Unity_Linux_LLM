@@ -1378,8 +1378,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f93984e4eeefb8606a0d057955a52a5b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCBackendReadinessService
-  authService: {fileID: 1351714796}
-  DialogueManager: {fileID: 1778380623}
+  _authService: {fileID: 1351714796}
+  _dialogueManager: {fileID: 1778380623}
   authProbeRelativePath: auth/v1/health
   localAiProbeRelativePath: v1/models
   requestTimeoutSeconds: 5
@@ -4134,19 +4134,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10b832a864aecc5daa16dc86f55484c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCSceneInitializationController
-  FlowLogger: {fileID: 1788130158}
-  NetworkBootstrap: {fileID: 774187519}
-  DialogueManager: {fileID: 1778380623}
-  BackendReadiness: {fileID: 276694094}
-  NetworkBridge: {fileID: 1471440990}
-  SmokeValidator: {fileID: 1778380626}
-  InitializeOnStart: 1
-  ConfigureNetworkTransport: 0
-  InitializeDialogueManager: 0
-  VerifyBackendsDuringInitialization: 0
-  InitializeNetworkBridge: 1
-  ValidateAfterInitialization: 1
-  StartNetworkingAfterInitialization: 0
+  _flowLogger: {fileID: 1788130158}
+  _networkBootstrap: {fileID: 774187519}
+  _dialogueManager: {fileID: 1778380623}
+  _backendReadiness: {fileID: 276694094}
+  _networkBridge: {fileID: 1471440990}
+  _smokeValidator: {fileID: 1778380626}
+  _initializeOnStart: 1
+  _configureNetworkTransport: 0
+  _initializeDialogueManager: 0
+  _verifyBackendsDuringInitialization: 0
+  _initializeNetworkBridge: 1
+  _validateAfterInitialization: 1
+  _startNetworkingAfterInitialization: 0
 --- !u!4 &774187517
 Transform:
   m_ObjectHideFlags: 0
@@ -5997,8 +5997,8 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 874883149}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -8794,13 +8794,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d1d8a84f9442d78b96081df1aba7422, type: 3}
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.AuthNetworkBridge
-  AuthController: {fileID: 1351714794}
-  NetworkBootstrap: {fileID: 774187519}
-  AutoDetectStartupMode: 0
-  StartAsHost: 0
-  HostAddress: 127.0.0.1
-  HostPort: 0
-  onHostStarted:
+  _authController: {fileID: 1351714794}
+  _networkBootstrap: {fileID: 774187519}
+  _autoDetectStartupMode: 0
+  _startAsHost: 0
+  _hostAddress: 127.0.0.1
+  _hostPort: 0
+  _onHostStarted:
     m_PersistentCalls:
       m_Calls: []
   lastBridgeStatus: Idle
@@ -9541,8 +9541,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCDialogueNetworkBridge
   ShowTopMostFoldoutHeaderGroup: 1
-  DialogueManager: {fileID: 0}
-  SessionManager: {fileID: 0}
+  _dialogueManager: {fileID: 0}
+  _sessionManager: {fileID: 0}
   OnNpcChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -11192,9 +11192,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f5592773f5323e9f39464924204b262e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCRelationshipUIController
-  trustSlider: {fileID: 1894030783}
-  moodLabel: {fileID: 1472984109}
-  dialogueCountLabel: {fileID: 2054559954}
+  _trustSlider: {fileID: 1894030783}
+  _moodLabel: {fileID: 1472984109}
+  _dialogueCountLabel: {fileID: 2054559954}
   autoHideWhenNoNpc: 1
 --- !u!114 &1771715624
 MonoBehaviour:
@@ -11291,15 +11291,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::NPCSystem.NPCDialogueManager
   ChatClient: {fileID: 1778380636}
   LocalRag: {fileID: 1778380634}
-  RagEmbeddingPath: RAG/NPCDialogues.rag
-  UseQdrantRag: 1
+  _ragEmbeddingPath: RAG/NPCDialogues.rag
+  _useQdrantRag: 1
   QdrantRag: {fileID: 1778380628}
   ActionPlanner: {fileID: 1778380629}
   EvidenceState: {fileID: 1778380630}
   SupabaseRepo: {fileID: 1778380637}
-  RemoteHost: 127.0.0.1
-  RemotePort: 8080
-  RemoteModel: llama-3.2-3b-instruct:q8_0
+  _remoteHost: 127.0.0.1
+  _remotePort: 8080
+  _remoteModel: llama-3.2-3b-instruct:q8_0
   _cachedModelNames:
   - llama32-qdrant-safe-20260706-ckpt100-q4_k_m
   - qwen2.5-1.5b-instruct-q4-k-m
@@ -11317,17 +11317,17 @@ MonoBehaviour:
   - nomic-embed-text-v1.5
   - gemma-4-e2b-it
   - llama-3.1-8b-q4-k-m-vulkan
-  RemoteEmbeddingHost: 127.0.0.1
-  RemoteEmbeddingPort: 8080
+  _remoteEmbeddingHost: 127.0.0.1
+  _remoteEmbeddingPort: 8080
   _profiles:
   - {fileID: 11400000, guid: fee9805d1a4aff5de9e2b4c154fda9a7, type: 2}
   - {fileID: 11400000, guid: a2b00eea2a038c8d890b04ea76369e61, type: 2}
   - {fileID: 11400000, guid: aa3445a7aac99dbb2b3803972a0b9de1, type: 2}
-  PersistHistory: 1
-  EnableRAG: 1
-  RebuildRagFromKnowledgeIfMissing: 1
-  MaxHistoryPerNPC: 20
-  InitializeOnStart: 0
+  _persistHistory: 1
+  _enableRAG: 1
+  _rebuildRagFromKnowledgeIfMissing: 1
+  _maxHistoryPerNPC: 20
+  _initializeOnStart: 0
   lastBackendStatus: LocalAI response received for player 'deco'.
   OnNpcChanged:
     m_PersistentCalls:
@@ -11406,9 +11406,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 307aa1d34162b1b759aeeac4d0b0ba14, type: 3}
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.QdrantRAGService
-  qdrantUrl: http://localhost:6333
-  collectionName: unity_linux_llm_codebase_v1
-  embedder: {fileID: 1778380633}
+  _qdrantUrl: http://localhost:6333
+  _collectionName: unity_linux_llm_codebase_v1
+  _embedder: {fileID: 1778380633}
   inspectorStatus: 'Logged Qdrant configuration: http://localhost:6333/collections/unity_linux_llm_codebase_v1/points/search'
 --- !u!114 &1778380629
 MonoBehaviour:
@@ -11480,10 +11480,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd7076bb6525c3ae6b9afa6d8d9ec1ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCLocalRAG
-  searchType: 1
-  search: {fileID: 1778380635}
-  chunkingType: 0
-  chunking: {fileID: 0}
+  _searchType: 1
+  _search: {fileID: 1778380635}
+  _chunkingType: 0
+  _chunking: {fileID: 0}
 --- !u!114 &1778380635
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11496,7 +11496,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e05154708e1da8a285c8ce8968bc646, type: 3}
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCSimpleSearch
-  llmEmbedder: {fileID: 1778380633}
+  _llmEmbedder: {fileID: 1778380633}
 --- !u!114 &1778380636
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11533,7 +11533,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 73162eddfe7ece41e8f7b4bb33778b79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.SupabaseDialogueRepository
-  authService: {fileID: 1351714796}
+  _authService: {fileID: 1351714796}
   requestTimeoutSeconds: 10
   lastStatus: Repository settings look valid.
   lastOperation: ValidateRepositorySettings
@@ -14076,8 +14076,8 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1992122317}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}

@@ -7,6 +7,10 @@ using UnityEngine.Serialization;
 namespace NPCSystem
 {
     /// <content>Network prefab reference resolution and registration extracted from NPCNetworkBootstrap.</content>
+    /// <summary>
+    /// Partial class providing the <see cref="PrefabRegistration"/> nested type,
+    /// which allocates and tracks NetworkObject prefab slots for dynamic spawning.
+    /// </summary>
     public partial class NPCNetworkBootstrap
     {
         public void ResolveReferences()

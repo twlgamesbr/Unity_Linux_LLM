@@ -282,13 +282,13 @@ namespace NPCSystem
 #if UNITY_WEBGL && !UNITY_EDITOR
             if (
                 !string.IsNullOrWhiteSpace(RemoteHost)
-                && (RemoteHost == "localhost" || RemoteHost == "127.0.0.1")
+                && NPCFlowLogger.IsLocalHost(RemoteHost)
             )
             {
                 try
                 {
                     Uri pageUri = new Uri(Application.absoluteURL);
-                    if (pageUri.Host != "localhost" && pageUri.Host != "127.0.0.1")
+                    if (!NPCFlowLogger.IsLocalHost(pageUri.Host))
                     {
                         RemoteHost = pageUri.Host;
                     }
@@ -302,13 +302,13 @@ namespace NPCSystem
             }
             if (
                 !string.IsNullOrWhiteSpace(RemoteEmbeddingHost)
-                && (RemoteEmbeddingHost == "localhost" || RemoteEmbeddingHost == "127.0.0.1")
+                && NPCFlowLogger.IsLocalHost(RemoteEmbeddingHost)
             )
             {
                 try
                 {
                     Uri pageUri = new Uri(Application.absoluteURL);
-                    if (pageUri.Host != "localhost" && pageUri.Host != "127.0.0.1")
+                    if (!NPCFlowLogger.IsLocalHost(pageUri.Host))
                     {
                         RemoteEmbeddingHost = pageUri.Host;
                     }

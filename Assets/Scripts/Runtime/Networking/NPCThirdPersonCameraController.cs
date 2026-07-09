@@ -78,7 +78,6 @@ namespace NPCSystem
             if (inputSource == null)
                 inputSource = GetComponent<NPCMultiplayerInputActions>();
 
-            // Initialize yaw from current facing
             _yaw = followTarget != null ? followTarget.eulerAngles.y : transform.eulerAngles.y;
         }
 
@@ -92,7 +91,6 @@ namespace NPCSystem
             if (inputSource != null)
                 lookInput = inputSource.LookInput;
 
-            // Update yaw and pitch
             _yaw += lookInput.x * yawSensitivity;
             _pitch += lookInput.y * pitchSensitivity * (invertY ? 1f : -1f);
             _pitch = Mathf.Clamp(_pitch, minPitch, maxPitch);

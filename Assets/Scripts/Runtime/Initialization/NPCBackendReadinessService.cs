@@ -162,6 +162,7 @@ namespace NPCSystem
             await ProbeAsync();
         }
 
+        /// <summary>Probe configured backends and return a readiness snapshot.</summary>
         public async Task<NPCBackendReadinessSnapshot> ProbeAsync(bool probeLocalAi = true)
         {
             AutoAssignReferences();

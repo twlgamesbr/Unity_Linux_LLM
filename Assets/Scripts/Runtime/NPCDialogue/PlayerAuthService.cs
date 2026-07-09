@@ -44,7 +44,7 @@ namespace NPCSystem
             {
                 Uri pageUri = new Uri(Application.absoluteURL);
                 string host = pageUri.Host;
-                if (host == "localhost" || host == "127.0.0.1")
+                if (NPCFlowLogger.IsLocalHost(host))
                     return;
 
                 supabaseUrl = ReplaceHost(supabaseUrl, host);

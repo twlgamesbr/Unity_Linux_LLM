@@ -353,6 +353,17 @@ namespace NPCSystem
             return platform != RuntimePlatform.WebGLPlayer;
         }
 
+        /// <summary>
+        /// Returns true when <paramref name="host"/> is a loopback address
+        /// (localhost or 127.0.0.1). Used by WebGL URL-resolution logic across
+        /// multiple auth and dialogue components.
+        /// </summary>
+        public static bool IsLocalHost(string host)
+        {
+            return string.Equals(host, "localhost", StringComparison.OrdinalIgnoreCase)
+                   || string.Equals(host, "127.0.0.1", StringComparison.Ordinal);
+        }
+
         void PrepareEvent(NPCFlowEvent flowEvent)
         {
             flowEvent.schemaVersion = flowEvent.schemaVersion <= 0 ? 1 : flowEvent.schemaVersion;
