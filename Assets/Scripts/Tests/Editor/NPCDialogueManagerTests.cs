@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace NPCSystem.Tests
 {
@@ -21,7 +20,7 @@ namespace NPCSystem.Tests
             manager.initializeOnStart = false;
 
             string changedName = null;
-            manager.onNPCChanged.AddListener(name => changedName = name);
+            manager.OnNpcChanged.AddListener(name => changedName = name);
 
             try
             {
@@ -32,8 +31,8 @@ namespace NPCSystem.Tests
             }
             finally
             {
-                Object.DestroyImmediate(managerObject);
-                Object.DestroyImmediate(profile);
+                UnityEngine.Object.Destroy(managerObject);
+                UnityEngine.Object.Destroy(profile);
             }
         }
 
@@ -51,8 +50,8 @@ namespace NPCSystem.Tests
 
             string errorMessage = null;
             string responseStart = null;
-            manager.onError.AddListener(message => errorMessage = message);
-            manager.onResponseStart.AddListener(message => responseStart = message);
+            manager.OnError.AddListener(message => errorMessage = message);
+            manager.OnResponseStart.AddListener(message => responseStart = message);
 
             try
             {
@@ -61,12 +60,12 @@ namespace NPCSystem.Tests
 
                 Assert.That(errorMessage, Is.Null);
                 Assert.That(responseStart, Is.Null);
-                Assert.That(manager.isResponding, Is.False);
+                Assert.That(manager.IsResponding, Is.False);
             }
             finally
             {
-                Object.DestroyImmediate(managerObject);
-                Object.DestroyImmediate(profile);
+                UnityEngine.Object.DestroyImmediate(managerObject);
+                UnityEngine.Object.DestroyImmediate(profile);
             }
         }
 
@@ -82,7 +81,7 @@ namespace NPCSystem.Tests
             manager.initializeOnStart = false;
 
             string errorMessage = null;
-            manager.onError.AddListener(message => errorMessage = message);
+            manager.OnError.AddListener(message => errorMessage = message);
 
             try
             {
@@ -91,7 +90,7 @@ namespace NPCSystem.Tests
             }
             finally
             {
-                Object.DestroyImmediate(managerObject);
+                UnityEngine.Object.DestroyImmediate(managerObject);
             }
         }
 
@@ -106,7 +105,7 @@ namespace NPCSystem.Tests
             manager.initializeOnStart = false;
 
             string errorMessage = null;
-            manager.onError.AddListener(message => errorMessage = message);
+            manager.OnError.AddListener(message => errorMessage = message);
 
             try
             {
@@ -115,7 +114,7 @@ namespace NPCSystem.Tests
             }
             finally
             {
-                Object.DestroyImmediate(managerObject);
+                UnityEngine.Object.DestroyImmediate(managerObject);
             }
         }
 
@@ -134,7 +133,7 @@ namespace NPCSystem.Tests
             }
             finally
             {
-                Object.DestroyImmediate(managerObject);
+                UnityEngine.Object.DestroyImmediate(managerObject);
             }
         }
 
@@ -155,9 +154,9 @@ namespace NPCSystem.Tests
             }
             finally
             {
-                Object.DestroyImmediate(managerObject);
-                Object.DestroyImmediate(butler);
-                Object.DestroyImmediate(maid);
+                UnityEngine.Object.DestroyImmediate(managerObject);
+                UnityEngine.Object.DestroyImmediate(butler);
+                UnityEngine.Object.DestroyImmediate(maid);
             }
         }
 
@@ -178,9 +177,9 @@ namespace NPCSystem.Tests
             }
             finally
             {
-                Object.DestroyImmediate(managerObject);
-                Object.DestroyImmediate(butler);
-                Object.DestroyImmediate(maid);
+                UnityEngine.Object.DestroyImmediate(managerObject);
+                UnityEngine.Object.DestroyImmediate(butler);
+                UnityEngine.Object.DestroyImmediate(maid);
             }
         }
 
@@ -194,7 +193,9 @@ namespace NPCSystem.Tests
                 Is.True
             );
             Assert.That(
-                NPCDialogueSessionService.IsTechnicalCodebaseQuestion("How does the RAG collection work?"),
+                NPCDialogueSessionService.IsTechnicalCodebaseQuestion(
+                    "How does the RAG collection work?"
+                ),
                 Is.True
             );
             Assert.That(
@@ -225,11 +226,11 @@ namespace NPCSystem.Tests
                 Assert.DoesNotThrow(() => manager.CancelRequests());
 
                 manager.SendMessage("Hello");
-                Assert.That(manager.isResponding, Is.False);
+                Assert.That(manager.IsResponding, Is.False);
             }
             finally
             {
-                Object.DestroyImmediate(managerObject);
+                UnityEngine.Object.DestroyImmediate(managerObject);
             }
         }
 
@@ -248,7 +249,7 @@ namespace NPCSystem.Tests
             }
             finally
             {
-                Object.DestroyImmediate(managerObject);
+                UnityEngine.Object.DestroyImmediate(managerObject);
             }
         }
 
@@ -277,8 +278,8 @@ namespace NPCSystem.Tests
             }
             finally
             {
-                Object.DestroyImmediate(managerObject);
-                Object.DestroyImmediate(profile);
+                UnityEngine.Object.DestroyImmediate(managerObject);
+                UnityEngine.Object.DestroyImmediate(profile);
             }
         }
 
@@ -317,8 +318,8 @@ namespace NPCSystem.Tests
             }
             finally
             {
-                Object.DestroyImmediate(managerObject);
-                Object.DestroyImmediate(profile);
+                UnityEngine.Object.DestroyImmediate(managerObject);
+                UnityEngine.Object.DestroyImmediate(profile);
             }
         }
 
@@ -341,7 +342,7 @@ namespace NPCSystem.Tests
             }
             finally
             {
-                Object.DestroyImmediate(managerObject);
+                UnityEngine.Object.DestroyImmediate(managerObject);
             }
         }
 
@@ -364,8 +365,8 @@ namespace NPCSystem.Tests
             }
             finally
             {
-                Object.DestroyImmediate(managerObject);
-                Object.DestroyImmediate(profile);
+                UnityEngine.Object.DestroyImmediate(managerObject);
+                UnityEngine.Object.DestroyImmediate(profile);
             }
         }
 

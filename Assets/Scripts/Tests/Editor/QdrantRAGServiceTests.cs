@@ -12,14 +12,14 @@ namespace NPCSystem.Tests
             var serviceObject = new GameObject(nameof(QdrantRAGServiceTests));
             var service = serviceObject.AddComponent<QdrantRAGService>();
             service.qdrantUrl = "http://localhost:6333";
-            service.collectionName = "npc_knowledge";
+            service.collectionName = "unity_linux_llm_codebase_v1";
 
             try
             {
                 string endpoint = service.BuildSearchEndpoint();
                 Assert.That(
                     endpoint,
-                    Is.EqualTo("http://localhost:6333/collections/npc_knowledge/points/search")
+                    Is.EqualTo("http://localhost:6333/collections/unity_linux_llm_codebase_v1/points/search")
                 );
             }
             finally
@@ -34,7 +34,7 @@ namespace NPCSystem.Tests
             var serviceObject = new GameObject(nameof(QdrantRAGServiceTests));
             var service = serviceObject.AddComponent<QdrantRAGService>();
             service.qdrantUrl = null;
-            service.collectionName = "test";
+            service.collectionName = "unity_linux_llm_codebase_v1";
 
             try
             {
@@ -72,14 +72,14 @@ namespace NPCSystem.Tests
             var serviceObject = new GameObject(nameof(QdrantRAGServiceTests));
             var service = serviceObject.AddComponent<QdrantRAGService>();
             service.qdrantUrl = "http://localhost:6333/";
-            service.collectionName = "test";
+            service.collectionName = "unity_linux_llm_codebase_v1";
 
             try
             {
                 string endpoint = service.BuildSearchEndpoint();
                 Assert.That(
                     endpoint,
-                    Is.EqualTo("http://localhost:6333/collections/test/points/search")
+                    Is.EqualTo("http://localhost:6333/collections/unity_linux_llm_codebase_v1/points/search")
                 );
                 Assert.That(endpoint, Does.Not.Contain("//collections"));
             }
@@ -126,7 +126,7 @@ namespace NPCSystem.Tests
 
             try
             {
-                service.collectionName = "npc_knowledge";
+                service.collectionName = "unity_linux_llm_codebase_v1";
                 Assert.That(service.HasValidCollectionName(), Is.True);
 
                 service.collectionName = "my collection";
@@ -153,7 +153,7 @@ namespace NPCSystem.Tests
             try
             {
                 Assert.That(service.qdrantUrl, Is.EqualTo("http://localhost:6333"));
-                Assert.That(service.collectionName, Is.EqualTo("npc_knowledge"));
+                Assert.That(service.collectionName, Is.EqualTo("unity_linux_llm_codebase_v1"));
             }
             finally
             {
@@ -171,7 +171,7 @@ namespace NPCSystem.Tests
 
             var service = serviceObject.AddComponent<TestableQdrantRAGService>();
             service.qdrantUrl = "http://localhost:6333";
-            service.collectionName = "test_collection";
+            service.collectionName = "unity_linux_llm_codebase_v1";
             service.embedder = embedder;
             service.mockResponse =
                 "{\"result\":[{\"score\":0.95,\"payload\":{\"text\":\"Found knowledge\"}}]}";
@@ -182,7 +182,7 @@ namespace NPCSystem.Tests
                 Assert.That(result, Is.EqualTo("Found knowledge"));
                 Assert.That(
                     service.lastRequestedEndpoint,
-                    Does.Contain("test_collection/points/search")
+                    Does.Contain("unity_linux_llm_codebase_v1/points/search")
                 );
             }
             finally
@@ -202,7 +202,7 @@ namespace NPCSystem.Tests
 
             var service = serviceObject.AddComponent<TestableQdrantRAGService>();
             service.qdrantUrl = "http://localhost:6333";
-            service.collectionName = "test_collection";
+            service.collectionName = "unity_linux_llm_codebase_v1";
             service.embedder = embedder;
             service.mockResponse = null;
 
@@ -228,7 +228,7 @@ namespace NPCSystem.Tests
 
             var service = serviceObject.AddComponent<TestableQdrantRAGService>();
             service.qdrantUrl = "http://localhost:6333";
-            service.collectionName = "test_collection";
+            service.collectionName = "unity_linux_llm_codebase_v1";
             service.embedder = embedder;
             service.mockResponse = "{\"result\":[]}";
 
@@ -254,7 +254,7 @@ namespace NPCSystem.Tests
 
             var service = serviceObject.AddComponent<TestableQdrantRAGService>();
             service.qdrantUrl = "http://localhost:6333";
-            service.collectionName = "test_collection";
+            service.collectionName = "unity_linux_llm_codebase_v1";
             service.embedder = embedder;
 
             try
@@ -279,7 +279,7 @@ namespace NPCSystem.Tests
 
             var service = serviceObject.AddComponent<TestableQdrantRAGService>();
             service.qdrantUrl = "http://localhost:6333";
-            service.collectionName = "test_collection";
+            service.collectionName = "unity_linux_llm_codebase_v1";
             service.embedder = null;
             service.mockResponse = "{\"result\":[]}";
 
@@ -305,7 +305,7 @@ namespace NPCSystem.Tests
 
             var service = serviceObject.AddComponent<TestableQdrantRAGService>();
             service.qdrantUrl = "http://localhost:6333";
-            service.collectionName = "test_collection";
+            service.collectionName = "unity_linux_llm_codebase_v1";
             service.embedder = embedder;
             service.mockResponse =
                 "{\"result\":[{\"score\":0.95,\"payload\":{\"text\":\"First result\"}},{\"score\":0.80,\"payload\":{\"text\":\"Second result\"}}]}";

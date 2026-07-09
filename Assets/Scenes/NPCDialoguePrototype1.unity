@@ -10994,7 +10994,7 @@ MonoBehaviour:
   localRag: {fileID: 1778380634}
   validateOnStart: 0
   runFirstQuestionSmokeOnStart: 0
-  smokeQuestion: What should I investigate first?
+  smokeQuestion: How many namespaces are there in this unity project?
   smokeTimeoutSeconds: 60
 --- !u!114 &1778380628
 MonoBehaviour:

@@ -300,13 +300,13 @@ namespace NPCSystem
 
             if (networkBridge != null)
             {
-                networkBridge.onNotebookStateChanged.AddListener(ApplyNotebookState);
+                networkBridge.OnNotebookStateChanged.AddListener(ApplyNotebookState);
                 _runtimeEventsBound = true;
             }
             else if (dialogueManager != null)
             {
-                dialogueManager.onNPCChanged.AddListener(HandleNpcChanged);
-                dialogueManager.onResponseComplete.AddListener(HandleResponseComplete);
+                dialogueManager.OnNpcChanged.AddListener(HandleNpcChanged);
+                dialogueManager.OnResponseComplete.AddListener(HandleResponseComplete);
                 _runtimeEventsBound = true;
             }
         }
@@ -318,13 +318,13 @@ namespace NPCSystem
 
             if (networkBridge != null)
             {
-                networkBridge.onNotebookStateChanged.RemoveListener(ApplyNotebookState);
+                networkBridge.OnNotebookStateChanged.RemoveListener(ApplyNotebookState);
             }
 
             if (dialogueManager != null)
             {
-                dialogueManager.onNPCChanged.RemoveListener(HandleNpcChanged);
-                dialogueManager.onResponseComplete.RemoveListener(HandleResponseComplete);
+                dialogueManager.OnNpcChanged.RemoveListener(HandleNpcChanged);
+                dialogueManager.OnResponseComplete.RemoveListener(HandleResponseComplete);
             }
 
             _runtimeEventsBound = false;

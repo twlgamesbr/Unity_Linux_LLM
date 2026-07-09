@@ -179,7 +179,7 @@ namespace NPCSystem
                     case NPCSceneInitializationPhase.Validation:
                         if (validateAfterInitialization && smokeValidator != null)
                         {
-                            if (dialogueManager != null && !dialogueManager.isInitialized)
+                            if (dialogueManager != null && !dialogueManager.IsInitialized)
                             {
                                 logger.Log(
                                     NPCFlowStage.SceneBootstrap,

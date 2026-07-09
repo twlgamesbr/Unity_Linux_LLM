@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using EditorAttributes;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace NPCSystem
 {
@@ -136,11 +137,11 @@ namespace NPCSystem
         [FoldoutGroup(
             "Events",
             true,
-            nameof(onNPCChanged),
-            nameof(onResponseStart),
-            nameof(onResponseUpdated),
-            nameof(onResponseComplete),
-            nameof(onError)
+            nameof(OnNpcChanged),
+            nameof(OnResponseStart),
+            nameof(OnResponseUpdated),
+            nameof(OnResponseComplete),
+            nameof(OnError)
         )]
         [HelpBox(
             "Subscribe to these UnityEvents to react to dialogue lifecycle changes. Events fire on the NPC switch, response start, streaming update, completion, and error paths.",
@@ -169,20 +170,25 @@ namespace NPCSystem
 
         bool enableRemoteServer => true;
 
+        [FormerlySerializedAs("onNPCChanged")]
         [HideProperty]
-        public UnityEvent<string> onNPCChanged = new UnityEvent<string>();
+        public UnityEvent<string> OnNpcChanged = new UnityEvent<string>();
 
+        [FormerlySerializedAs("onResponseStart")]
         [HideProperty]
-        public UnityEvent<string> onResponseStart = new UnityEvent<string>();
+        public UnityEvent<string> OnResponseStart = new UnityEvent<string>();
 
+        [FormerlySerializedAs("onResponseUpdated")]
         [HideProperty]
-        public UnityEvent<string> onResponseUpdated = new UnityEvent<string>();
+        public UnityEvent<string> OnResponseUpdated = new UnityEvent<string>();
 
+        [FormerlySerializedAs("onResponseComplete")]
         [HideProperty]
-        public UnityEvent<string, string> onResponseComplete = new UnityEvent<string, string>();
+        public UnityEvent<string, string> OnResponseComplete = new UnityEvent<string, string>();
 
+        [FormerlySerializedAs("onError")]
         [HideProperty]
-        public UnityEvent<string> onError = new UnityEvent<string>();
+        public UnityEvent<string> OnError = new UnityEvent<string>();
 
         readonly Dictionary<string, NPCProfile> _profilesBySlug = new Dictionary<
             string,
@@ -198,10 +204,10 @@ namespace NPCSystem
         static NPCFlowLogger Logger => NPCFlowLogger.FindOrCreate();
 
         public NPCProfile currentProfile => _currentNPC;
-        public bool isResponding => _sessionService != null && _sessionService.isResponding;
-        public bool isInitialized =>
+        public bool IsResponding => _sessionService != null && _sessionService.IsResponding;
+        public bool IsInitialized =>
             _initializationTask != null && _initializationTask.IsCompletedSuccessfully;
-        public bool isRagAvailable => _retrievalService != null && _retrievalService.IsRagAvailable;
+        public bool IsRagAvailable => _retrievalService != null && _retrievalService.IsRagAvailable;
         public NPCProfile[] Profiles =>
             profiles == null
                 ? Array.Empty<NPCProfile>()
@@ -303,14 +309,15 @@ namespace NPCSystem
                     evidenceState,
                     remoteHost,
                     remotePort,
+                    remoteModel,
                     Profiles
                 );
 
                 if (_sessionService != null)
                 {
-                    _sessionService.onResponseStart += OnSessionResponseStart;
-                    _sessionService.onResponseComplete += OnSessionResponseComplete;
-                    _sessionService.onError += OnSessionError;
+                    _sessionService.OnResponseStart += OnSessionResponseStart;
+                    _sessionService.OnResponseComplete += OnSessionResponseComplete;
+                    _sessionService.OnError += OnSessionError;
                 }
 
                 scope.Success("Initialization complete.");
@@ -395,6 +402,9 @@ namespace NPCSystem
                 chatClient.host = remoteHost;
                 chatClient.port = remotePort;
                 chatClient.model = remoteModel;
+                Debug.Log(
+                    $"[NPCDialogueManager] Synced chatClient — host={chatClient.host} port={chatClient.port} model='{chatClient.model}'"
+                );
             }
         }
 
@@ -420,12 +430,12 @@ namespace NPCSystem
         }
 
         // ── SessionService event bridge ──
-        void OnSessionResponseStart(string msg) => onResponseStart?.Invoke(msg);
+        void OnSessionResponseStart(string msg) => OnResponseStart?.Invoke(msg);
 
         void OnSessionResponseComplete(string npc, string response) =>
-            onResponseComplete?.Invoke(npc, response);
+            OnResponseComplete?.Invoke(npc, response);
 
-        void OnSessionError(string err) => onError?.Invoke(err);
+        void OnSessionError(string err) => OnError?.Invoke(err);
 
         [Button("Fetch Models from LocalAI")]
         void FetchAvailableModelsFromLocalAI()
@@ -543,7 +553,7 @@ namespace NPCSystem
                     error + "!",
                     source: nameof(NPCDialogueManager)
                 );
-                onError?.Invoke(error);
+                OnError?.Invoke(error);
                 scope.Skipped(error);
                 return;
             }
@@ -556,7 +566,7 @@ namespace NPCSystem
                 new Dictionary<string, object> { ["npcSlug"] = profile.GetNpcSlug() }
             );
 
-            onNPCChanged?.Invoke(profile.GetDisplayName());
+            OnNpcChanged?.Invoke(profile.GetDisplayName());
         }
 
         public new void SendMessage(string playerMessage)
@@ -570,7 +580,7 @@ namespace NPCSystem
                     "No NPC selected! Call SwitchToNPC() first.",
                     source: nameof(NPCDialogueManager)
                 );
-                onError?.Invoke("No NPC selected");
+                OnError?.Invoke("No NPC selected");
                 return;
             }
 
@@ -666,9 +676,9 @@ namespace NPCSystem
         {
             if (_sessionService != null)
             {
-                _sessionService.onResponseStart -= OnSessionResponseStart;
-                _sessionService.onResponseComplete -= OnSessionResponseComplete;
-                _sessionService.onError -= OnSessionError;
+                _sessionService.OnResponseStart -= OnSessionResponseStart;
+                _sessionService.OnResponseComplete -= OnSessionResponseComplete;
+                _sessionService.OnError -= OnSessionError;
                 _sessionService.CancelRequests();
             }
         }

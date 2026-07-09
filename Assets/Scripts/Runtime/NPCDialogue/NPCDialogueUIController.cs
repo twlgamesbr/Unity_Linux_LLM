@@ -417,19 +417,19 @@ namespace NPCSystem
 
             if (networkBridge != null)
             {
-                networkBridge.onResponseStart.AddListener(HandleResponseStart);
-                networkBridge.onResponseUpdated.AddListener(SetAIText);
-                networkBridge.onResponseComplete.AddListener(HandleResponseComplete);
-                networkBridge.onNPCChanged.AddListener(HandleNpcChanged);
-                networkBridge.onError.AddListener(HandleError);
+                networkBridge.OnResponseStart.AddListener(HandleResponseStart);
+                networkBridge.OnResponseUpdated.AddListener(SetAIText);
+                networkBridge.OnResponseComplete.AddListener(HandleResponseComplete);
+                networkBridge.OnNpcChanged.AddListener(HandleNpcChanged);
+                networkBridge.OnError.AddListener(HandleError);
             }
             else if (dialogueManager != null)
             {
-                dialogueManager.onResponseStart.AddListener(HandleResponseStart);
-                dialogueManager.onResponseUpdated.AddListener(SetAIText);
-                dialogueManager.onResponseComplete.AddListener(HandleResponseComplete);
-                dialogueManager.onNPCChanged.AddListener(HandleNpcChanged);
-                dialogueManager.onError.AddListener(HandleError);
+                dialogueManager.OnResponseStart.AddListener(HandleResponseStart);
+                dialogueManager.OnResponseUpdated.AddListener(SetAIText);
+                dialogueManager.OnResponseComplete.AddListener(HandleResponseComplete);
+                dialogueManager.OnNpcChanged.AddListener(HandleNpcChanged);
+                dialogueManager.OnError.AddListener(HandleError);
             }
             else
             {
@@ -446,20 +446,20 @@ namespace NPCSystem
 
             if (networkBridge != null)
             {
-                networkBridge.onResponseStart.RemoveListener(HandleResponseStart);
-                networkBridge.onResponseUpdated.RemoveListener(SetAIText);
-                networkBridge.onResponseComplete.RemoveListener(HandleResponseComplete);
-                networkBridge.onNPCChanged.RemoveListener(HandleNpcChanged);
-                networkBridge.onError.RemoveListener(HandleError);
+                networkBridge.OnResponseStart.RemoveListener(HandleResponseStart);
+                networkBridge.OnResponseUpdated.RemoveListener(SetAIText);
+                networkBridge.OnResponseComplete.RemoveListener(HandleResponseComplete);
+                networkBridge.OnNpcChanged.RemoveListener(HandleNpcChanged);
+                networkBridge.OnError.RemoveListener(HandleError);
             }
 
             if (dialogueManager != null)
             {
-                dialogueManager.onResponseStart.RemoveListener(HandleResponseStart);
-                dialogueManager.onResponseUpdated.RemoveListener(SetAIText);
-                dialogueManager.onResponseComplete.RemoveListener(HandleResponseComplete);
-                dialogueManager.onNPCChanged.RemoveListener(HandleNpcChanged);
-                dialogueManager.onError.RemoveListener(HandleError);
+                dialogueManager.OnResponseStart.RemoveListener(HandleResponseStart);
+                dialogueManager.OnResponseUpdated.RemoveListener(SetAIText);
+                dialogueManager.OnResponseComplete.RemoveListener(HandleResponseComplete);
+                dialogueManager.OnNpcChanged.RemoveListener(HandleNpcChanged);
+                dialogueManager.OnError.RemoveListener(HandleError);
             }
 
             _managerBound = false;

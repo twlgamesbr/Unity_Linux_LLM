@@ -50,21 +50,31 @@ namespace NPCSystem
         /// </summary>
         public async Task<string> ChatAsync(
             NPCOpenAIMessage[] messages,
-            float? temperatureOverride = null
+            float? temperatureOverride = null,
+            string modelOverride = null
         )
         {
             string uri = $"http://{host}:{port}/v1/chat/completions";
 
-            // Validate model is explicitly set — Manager syncs this during init.
-            string modelName = string.IsNullOrWhiteSpace(model) ? "" : model.Trim();
+            // Use modelOverride if provided; fall back to this.model (for standalone use).
+            // modelOverride is the primary path — callers like NPCDialogueSessionService pass
+            // the model string directly, eliminating sync dependencies.
+            string modelName =
+                !string.IsNullOrWhiteSpace(modelOverride) ? modelOverride.Trim()
+                : !string.IsNullOrWhiteSpace(model) ? model.Trim()
+                : "";
             if (string.IsNullOrWhiteSpace(modelName))
             {
-                Debug.LogError("[NPCLocalAIClient] ChatAsync: model is not set. " +
-                    "NPCDialogueManager must sync its remoteModel to chatClient.model during initialization.");
+                Debug.LogError(
+                    "[NPCLocalAIClient] ChatAsync: no model specified. "
+                        + "Pass modelOverride or set the model field."
+                );
                 return string.Empty;
             }
 
-            Debug.Log($"[NPCLocalAIClient] Sending chat request — model='{modelName}' uri={uri} messages={messages?.Length ?? 0}");
+            Debug.Log(
+                $"[NPCLocalAIClient] Sending chat request — model='{modelName}' uri={uri} messages={messages?.Length ?? 0}"
+            );
 
             var payload = new NPCOpenAIChatRequest
             {

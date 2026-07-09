@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
 
@@ -31,14 +30,19 @@ namespace NPCSystem
         int _remotePort;
         NPCProfile[] _profiles;
 
+        /// Model string sourced from NPCDialogueManager.remoteModel during Initialize.
+        /// Passed to NPCLocalAIClient.ChatAsync as modelOverride at request time —
+        /// the AIClient never reads its own model field for dialogue requests.
+        string _chatModel;
+
         // ────────────────────────────────────────────── Events ────
-        public event Action<string> onResponseStart;
-        public event Action<string, string> onResponseComplete;
-        public event Action<string> onError;
+        public event Action<string> OnResponseStart;
+        public event Action<string, string> OnResponseComplete;
+        public event Action<string> OnError;
 
         // ────────────────────────────────────────── Properties ────
-        public bool isResponding => _isResponding;
-        public string activePlayerName => ResolveActivePlayerName();
+        public bool IsResponding => _isResponding;
+        public string ActivePlayerName => ResolveActivePlayerName();
 
         // ────────────────────────────────────────── Initialize ────
 
@@ -54,6 +58,7 @@ namespace NPCSystem
             NPCEvidenceState evidenceState,
             string remoteHost,
             int remotePort,
+            string chatModel,
             NPCProfile[] profiles
         )
         {
@@ -64,6 +69,7 @@ namespace NPCSystem
             _evidenceState = evidenceState;
             _remoteHost = remoteHost ?? "localhost";
             _remotePort = remotePort;
+            _chatModel = chatModel ?? "";
             _profiles = profiles;
         }
 
@@ -81,7 +87,7 @@ namespace NPCSystem
             string trimmedMessage = playerMessage.Trim();
             _isResponding = true;
             _responseNPC = currentNpc;
-            onResponseStart?.Invoke(trimmedMessage);
+            OnResponseStart?.Invoke(trimmedMessage);
 
             _ = SendToLLMAsync(_responseNPC, trimmedMessage);
         }
@@ -206,7 +212,7 @@ namespace NPCSystem
                     }
                 }
 
-                onResponseComplete?.Invoke(respondingProfile.GetDisplayName(), dialogueMessage);
+                OnResponseComplete?.Invoke(respondingProfile.GetDisplayName(), dialogueMessage);
 
                 var logData = new Dictionary<string, object>
                 {
@@ -233,7 +239,7 @@ namespace NPCSystem
                         ["exceptionMessage"] = ex.Message,
                     }
                 );
-                onError?.Invoke(ex.Message);
+                OnError?.Invoke(ex.Message);
                 scope.Error(ex, "Dialogue generation failed.");
             }
             finally
@@ -249,10 +255,14 @@ namespace NPCSystem
         string DirectLocalAiEndpointPreview =>
             $"http://{_remoteHost}:{_remotePort}/v1/chat/completions";
 
-        /// <summary>Model name is owned by NPCDialogueManager and synced to chatClient.</summary>
+        /// <summary>
+        /// Model string from NPCDialogueManager.remoteModel, set during Initialize.
+        /// Never reads from NPCLocalAIClient.model — the AIClient's field is only a
+        /// fallback for standalone use (not the dialogue path).
+        /// </summary>
         string ResolvedModelName =>
-            _chatClient != null && !string.IsNullOrWhiteSpace(_chatClient.model)
-                ? _chatClient.model.Trim()
+            !string.IsNullOrWhiteSpace(_chatModel)
+                ? _chatModel.Trim()
                 : "llama-3.2-3b-instruct:q8_0";
 
         async Task<string> SendToLocalAIAsync(
@@ -318,9 +328,13 @@ namespace NPCSystem
 
             if (_chatClient != null)
             {
+                Debug.Log(
+                    $"[NPCDialogueSessionService] Calling LocalAI — model='{ResolvedModelName}' profile='{profile?.GetNpcSlug()}' endpoint={DirectLocalAiEndpointPreview}"
+                );
                 dialogueMessage = await _chatClient.ChatAsync(
                     messages.ToArray(),
-                    profile != null ? profile.temperature : (float?)null
+                    profile != null ? profile.temperature : (float?)null,
+                    modelOverride: ResolvedModelName
                 );
             }
 

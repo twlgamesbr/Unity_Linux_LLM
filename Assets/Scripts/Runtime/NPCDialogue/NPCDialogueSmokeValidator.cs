@@ -52,7 +52,7 @@ namespace NPCSystem
 
             if (validateOnStart)
             {
-                if (dialogueManager != null && !dialogueManager.isInitialized)
+                if (dialogueManager != null && !dialogueManager.IsInitialized)
                 {
                     NPCFlowLogger
                         .FindOrCreate()
@@ -175,7 +175,7 @@ namespace NPCSystem
 
             _responseCompleted = false;
             _lastResponse = string.Empty;
-            dialogueManager.onResponseComplete.AddListener(HandleSmokeResponseComplete);
+            dialogueManager.OnResponseComplete.AddListener(HandleSmokeResponseComplete);
 
             try
             {
@@ -272,7 +272,7 @@ namespace NPCSystem
             }
             finally
             {
-                dialogueManager.onResponseComplete.RemoveListener(HandleSmokeResponseComplete);
+                dialogueManager.OnResponseComplete.RemoveListener(HandleSmokeResponseComplete);
             }
         }
 

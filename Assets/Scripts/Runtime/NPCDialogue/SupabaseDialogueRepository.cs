@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using EditorAttributes;
-using Void = EditorAttributes.Void;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -20,7 +19,7 @@ namespace NPCSystem
             MessageMode.Log
         )]
         [SerializeField]
-        Void restGroup;
+        EditorAttributes.Void restGroup;
 
         [SerializeField, HideProperty]
         [OnValueChanged(nameof(ValidateRepositorySettings))]
@@ -33,29 +32,35 @@ namespace NPCSystem
 
         [FoldoutGroup("References", true, nameof(authService))]
         [SerializeField]
-        Void referencesGroup;
+        EditorAttributes.Void referencesGroup;
 
         [SerializeField, HideProperty]
         public PlayerAuthService authService;
 
         [FoldoutGroup("Behaviour", true, nameof(requestTimeoutSeconds))]
         [SerializeField]
-        Void behaviourGroup;
+        EditorAttributes.Void behaviourGroup;
 
         [SerializeField, HideProperty, Suffix("s")]
         float requestTimeoutSeconds = 10f;
 
-        [FoldoutGroup("Debug", true, nameof(lastStatus), nameof(lastOperation), nameof(lastOperationDurationMs))]
+        [FoldoutGroup(
+            "Debug",
+            true,
+            nameof(lastStatus),
+            nameof(lastOperation),
+            nameof(lastOperationDurationMs)
+        )]
         [SerializeField]
-        Void debugGroup;
+        EditorAttributes.Void debugGroup;
 
-        [SerializeField, HideProperty, ReadOnly]
+        [SerializeField, HideProperty, EditorAttributes.ReadOnly]
         string lastStatus = "Idle";
 
-        [SerializeField, HideProperty, ReadOnly]
+        [SerializeField, HideProperty, EditorAttributes.ReadOnly]
         string lastOperation = string.Empty;
 
-        [SerializeField, HideProperty, ReadOnly]
+        [SerializeField, HideProperty, EditorAttributes.ReadOnly]
         long lastOperationDurationMs;
 
         [ShowInInspector]
@@ -64,21 +69,25 @@ namespace NPCSystem
         [Button("Validate Repository Settings")]
         void ValidateRepositorySettings()
         {
-            bool validUrl = !string.IsNullOrWhiteSpace(restUrl)
+            bool validUrl =
+                !string.IsNullOrWhiteSpace(restUrl)
                 && (restUrl.StartsWith("http://") || restUrl.StartsWith("https://"));
             bool validKey = !string.IsNullOrWhiteSpace(anonKey);
             bool validAuth = authService != null;
 
-            lastStatus = validUrl && validKey && validAuth
-                ? "Repository settings look valid."
-                : "Repository settings are incomplete. Check REST URL, anon key, and AuthService reference.";
+            lastStatus =
+                validUrl && validKey && validAuth
+                    ? "Repository settings look valid."
+                    : "Repository settings are incomplete. Check REST URL, anon key, and AuthService reference.";
             lastOperation = "ValidateRepositorySettings";
 
             NPCFlowLogger
                 .FindOrCreate()
                 ?.Log(
                     NPCFlowStage.ConfigurationValidation,
-                    validUrl && validKey && validAuth ? NPCFlowStatus.Success : NPCFlowStatus.Warning,
+                    validUrl && validKey && validAuth
+                        ? NPCFlowStatus.Success
+                        : NPCFlowStatus.Warning,
                     NPCFlowLogLevel.Info,
                     lastStatus,
                     source: nameof(SupabaseDialogueRepository),

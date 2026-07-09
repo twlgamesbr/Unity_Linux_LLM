@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace NPCSystem
 {
@@ -16,17 +17,23 @@ namespace NPCSystem
 
         public NPCNetworkSessionManager sessionManager;
 
-        public UnityEvent<string> onNPCChanged = new UnityEvent<string>();
+        [FormerlySerializedAs("onNPCChanged")]
+        public UnityEvent<string> OnNpcChanged = new UnityEvent<string>();
 
-        public UnityEvent<string> onResponseStart = new UnityEvent<string>();
+        [FormerlySerializedAs("onResponseStart")]
+        public UnityEvent<string> OnResponseStart = new UnityEvent<string>();
 
-        public UnityEvent<string> onResponseUpdated = new UnityEvent<string>();
+        [FormerlySerializedAs("onResponseUpdated")]
+        public UnityEvent<string> OnResponseUpdated = new UnityEvent<string>();
 
-        public UnityEvent<string, string> onResponseComplete = new UnityEvent<string, string>();
+        [FormerlySerializedAs("onResponseComplete")]
+        public UnityEvent<string, string> OnResponseComplete = new UnityEvent<string, string>();
 
-        public UnityEvent<string> onError = new UnityEvent<string>();
+        [FormerlySerializedAs("onError")]
+        public UnityEvent<string> OnError = new UnityEvent<string>();
 
-        public UnityEvent<NPCNotebookStateMessage> onNotebookStateChanged =
+        [FormerlySerializedAs("onNotebookStateChanged")]
+        public UnityEvent<NPCNotebookStateMessage> OnNotebookStateChanged =
             new UnityEvent<NPCNotebookStateMessage>();
 
         ulong? _activeClientId;
@@ -75,7 +82,7 @@ namespace NPCSystem
             }
         }
 
-        public bool isResponding => dialogueManager != null && dialogueManager.isResponding;
+        public bool IsResponding => dialogueManager != null && dialogueManager.IsResponding;
         public NPCNotebookStateMessage CurrentNotebookState => _currentNotebookState;
 
         string ActiveClientPreview =>
@@ -113,7 +120,7 @@ namespace NPCSystem
             ResolveReferences();
             if (dialogueManager != null)
             {
-                if (dialogueManager.isInitialized)
+                if (dialogueManager.IsInitialized)
                 {
                     CaptureBaselineState();
                     UpdateNotebookStateLocal();
@@ -252,11 +259,11 @@ namespace NPCSystem
             if (_eventsBound || dialogueManager == null)
                 return;
 
-            dialogueManager.onNPCChanged.AddListener(HandleManagerNpcChanged);
-            dialogueManager.onResponseStart.AddListener(HandleManagerResponseStart);
-            dialogueManager.onResponseUpdated.AddListener(HandleManagerResponseUpdated);
-            dialogueManager.onResponseComplete.AddListener(HandleManagerResponseComplete);
-            dialogueManager.onError.AddListener(HandleManagerError);
+            dialogueManager.OnNpcChanged.AddListener(HandleManagerNpcChanged);
+            dialogueManager.OnResponseStart.AddListener(HandleManagerResponseStart);
+            dialogueManager.OnResponseUpdated.AddListener(HandleManagerResponseUpdated);
+            dialogueManager.OnResponseComplete.AddListener(HandleManagerResponseComplete);
+            dialogueManager.OnError.AddListener(HandleManagerError);
             _eventsBound = true;
         }
 
@@ -265,11 +272,11 @@ namespace NPCSystem
             if (!_eventsBound || dialogueManager == null)
                 return;
 
-            dialogueManager.onNPCChanged.RemoveListener(HandleManagerNpcChanged);
-            dialogueManager.onResponseStart.RemoveListener(HandleManagerResponseStart);
-            dialogueManager.onResponseUpdated.RemoveListener(HandleManagerResponseUpdated);
-            dialogueManager.onResponseComplete.RemoveListener(HandleManagerResponseComplete);
-            dialogueManager.onError.RemoveListener(HandleManagerError);
+            dialogueManager.OnNpcChanged.RemoveListener(HandleManagerNpcChanged);
+            dialogueManager.OnResponseStart.RemoveListener(HandleManagerResponseStart);
+            dialogueManager.OnResponseUpdated.RemoveListener(HandleManagerResponseUpdated);
+            dialogueManager.OnResponseComplete.RemoveListener(HandleManagerResponseComplete);
+            dialogueManager.OnError.RemoveListener(HandleManagerError);
             _eventsBound = false;
         }
 
@@ -311,7 +318,7 @@ namespace NPCSystem
         {
             if (ShouldRelayLocally())
             {
-                onNPCChanged?.Invoke(displayName);
+                OnNpcChanged?.Invoke(displayName);
                 UpdateNotebookStateLocal();
             }
         }
@@ -338,7 +345,7 @@ namespace NPCSystem
 
             if (ShouldRelayLocally())
             {
-                onResponseStart?.Invoke(playerMessage);
+                OnResponseStart?.Invoke(playerMessage);
             }
         }
 
@@ -364,7 +371,7 @@ namespace NPCSystem
 
             if (ShouldRelayLocally())
             {
-                onResponseUpdated?.Invoke(partialResponse);
+                OnResponseUpdated?.Invoke(partialResponse);
             }
         }
 
@@ -401,7 +408,7 @@ namespace NPCSystem
 
             if (ShouldRelayLocally())
             {
-                onResponseComplete?.Invoke(npcDisplayName, response);
+                OnResponseComplete?.Invoke(npcDisplayName, response);
                 UpdateNotebookStateLocal();
             }
         }
@@ -570,7 +577,7 @@ namespace NPCSystem
 
             if (ShouldRelayLocally())
             {
-                onError?.Invoke(error);
+                OnError?.Invoke(error);
             }
         }
 
@@ -586,7 +593,7 @@ namespace NPCSystem
         {
             if (!string.IsNullOrWhiteSpace(error))
             {
-                onError?.Invoke(error);
+                OnError?.Invoke(error);
             }
         }
 
@@ -701,7 +708,7 @@ namespace NPCSystem
                 }
             );
 
-            if (_activeClientId.HasValue || dialogueManager.isResponding)
+            if (_activeClientId.HasValue || dialogueManager.IsResponding)
             {
                 EnqueueDialogueRequest(senderClientId, request);
                 return;
@@ -798,7 +805,7 @@ namespace NPCSystem
         )
         {
             _localSelectedNpcSlug = payload.npcSlug;
-            onNPCChanged?.Invoke(payload.displayName);
+            OnNpcChanged?.Invoke(payload.displayName);
         }
 
         [Rpc(SendTo.SpecifiedInParams)]
@@ -807,7 +814,7 @@ namespace NPCSystem
             RpcParams rpcParams = default
         )
         {
-            onResponseStart?.Invoke(payload.content);
+            OnResponseStart?.Invoke(payload.content);
         }
 
         [Rpc(SendTo.SpecifiedInParams)]
@@ -816,7 +823,7 @@ namespace NPCSystem
             RpcParams rpcParams = default
         )
         {
-            onResponseUpdated?.Invoke(payload.content);
+            OnResponseUpdated?.Invoke(payload.content);
         }
 
         [Rpc(SendTo.SpecifiedInParams)]
@@ -826,13 +833,13 @@ namespace NPCSystem
         )
         {
             _localSelectedNpcSlug = payload.npcSlug;
-            onResponseComplete?.Invoke(payload.displayName, payload.content);
+            OnResponseComplete?.Invoke(payload.displayName, payload.content);
         }
 
         [Rpc(SendTo.SpecifiedInParams)]
         void ReceiveErrorClientRpc(string error, RpcParams rpcParams = default)
         {
-            onError?.Invoke(error);
+            OnError?.Invoke(error);
         }
 
         [Rpc(SendTo.SpecifiedInParams)]
@@ -845,7 +852,7 @@ namespace NPCSystem
             _localSelectedNpcSlug = string.IsNullOrWhiteSpace(payload.npcSlug)
                 ? _localSelectedNpcSlug
                 : payload.npcSlug;
-            onNotebookStateChanged?.Invoke(payload);
+            OnNotebookStateChanged?.Invoke(payload);
         }
 
         NPCDialogueResponseMessage BuildResponsePayload(string content)
@@ -883,7 +890,7 @@ namespace NPCSystem
             if (!ShouldRelayLocally())
                 return;
             _currentNotebookState = BuildNotebookStateMessage();
-            onNotebookStateChanged?.Invoke(_currentNotebookState);
+            OnNotebookStateChanged?.Invoke(_currentNotebookState);
         }
 
         NPCNotebookStateMessage BuildNotebookStateMessageForClient(ulong clientId)
