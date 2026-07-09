@@ -229,6 +229,35 @@ namespace NPCSystem
 
         // ── Internal helpers ───────────────────────────────────────────
 
+        void BindRuntimeEvents()
+        {
+            if (_listenersBound)
+                return;
+            if (DialogueManager != null)
+            {
+                DialogueManager.OnNpcChanged.AddListener(HandleNpcChanged);
+                DialogueManager.OnResponseStart.AddListener(HandleResponseStart);
+                DialogueManager.OnResponseUpdated.AddListener(HandleResponseUpdated);
+                DialogueManager.OnResponseComplete.AddListener(HandleResponseComplete);
+                DialogueManager.OnError.AddListener(HandleError);
+            }
+            _listenersBound = true;
+        }
+
+        public GameObject GetGameplayCanvas()
+        {
+            // Find the top-level gameplay canvas; may be inactive initially
+            var canvas = GetComponentInChildren<Canvas>(includeInactive: true);
+            if (canvas != null)
+                return canvas.gameObject;
+            return GameObject.Find("GameplayCanvas");
+        }
+
+        public async System.Threading.Tasks.Task InitializeOnDemandAsync()
+        {
+            await InitializeOnDemandInternalAsync();
+        }
+
         void ClearTemporaryProfiles()
         {
             _profiles.Clear();

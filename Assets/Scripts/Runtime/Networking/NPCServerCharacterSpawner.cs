@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using EditorAttributes;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace NPCSystem
 {
@@ -15,11 +16,16 @@ namespace NPCSystem
             drawAbove: true
         )]
         [Header("References")]
-        public NetworkManager networkManager;
-        public NPCNetworkBootstrap networkBootstrap;
-        public NPCDialogueManager dialogueManager;
-        public GameObject npcPrefab;
-        public string npcPrefabResourcesPath = "Networking/NPCServerCharacter";
+        [FormerlySerializedAs("NetworkManager")]
+        public NetworkManager NetworkManager;
+        [FormerlySerializedAs("NetworkBootstrap")]
+        public NPCNetworkBootstrap NetworkBootstrap;
+        [FormerlySerializedAs("DialogueManager")]
+        public NPCDialogueManager DialogueManager;
+        [FormerlySerializedAs("NpcPrefab")]
+        public GameObject NpcPrefab;
+        [FormerlySerializedAs("NpcPrefabResourcesPath")]
+        public string NpcPrefabResourcesPath = "Networking/NPCServerCharacter";
 
         [Header("Spawn Layout")]
         public Vector3 spawnOrigin = new Vector3(-4f, 1f, 6f);
@@ -37,7 +43,7 @@ namespace NPCSystem
         bool _callbacksRegistered;
 
         [ShowInInspector]
-        string PrefabPreview => npcPrefab != null ? npcPrefab.name : npcPrefabResourcesPath;
+        string PrefabPreview => NpcPrefab != null ? NpcPrefab.name : NpcPrefabResourcesPath;
 
         void Reset()
         {
@@ -68,7 +74,7 @@ namespace NPCSystem
         {
             ResolveReferences();
 
-            if (networkManager == null || !networkManager.IsServer)
+            if (NetworkManager == null || !NetworkManager.IsServer)
             {
                 lastSpawnStatus = "Spawn skipped because this instance is not the server.";
                 NPCFlowLogger
@@ -83,10 +89,10 @@ namespace NPCSystem
                 return;
             }
 
-            if (npcPrefab == null)
+            if (NpcPrefab == null)
             {
                 lastSpawnStatus =
-                    $"NPC prefab could not be loaded from Resources/{npcPrefabResourcesPath}.";
+                    $"NPC prefab could not be loaded from Resources/{NpcPrefabResourcesPath}.";
                 NPCFlowLogger
                     .FindOrCreate()
                     ?.Log(
@@ -100,9 +106,9 @@ namespace NPCSystem
             }
 
             NPCProfile[] profiles =
-                dialogueManager == null
+                DialogueManager == null
                     ? System.Array.Empty<NPCProfile>()
-                    : dialogueManager.Profiles;
+                    : DialogueManager.Profiles;
             if (profiles.Length == 0)
             {
                 lastSpawnStatus = "No NPC profiles are configured on the dialogue manager.";
@@ -133,7 +139,7 @@ namespace NPCSystem
                 }
 
                 GameObject instance = Instantiate(
-                    npcPrefab,
+                    NpcPrefab,
                     GetSpawnPosition(i),
                     Quaternion.identity
                 );
@@ -141,7 +147,7 @@ namespace NPCSystem
                 {
                     Destroy(instance);
                     lastSpawnStatus =
-                        $"Spawned prefab '{npcPrefab.name}' is missing a NetworkObject.";
+                        $"Spawned prefab '{NpcPrefab.name}' is missing a NetworkObject.";
                     NPCFlowLogger
                         .FindOrCreate()
                         ?.Log(
@@ -179,50 +185,50 @@ namespace NPCSystem
 
         void ResolveReferences()
         {
-            if (networkManager == null)
+            if (NetworkManager == null)
             {
-                networkManager = FindAnyObjectByType<NetworkManager>(FindObjectsInactive.Include);
+                NetworkManager = FindAnyObjectByType<NetworkManager>(FindObjectsInactive.Include);
             }
 
-            if (networkBootstrap == null)
+            if (NetworkBootstrap == null)
             {
-                networkBootstrap = FindAnyObjectByType<NPCNetworkBootstrap>(
+                NetworkBootstrap = FindAnyObjectByType<NPCNetworkBootstrap>(
                     FindObjectsInactive.Include
                 );
             }
 
-            if (dialogueManager == null)
+            if (DialogueManager == null)
             {
-                dialogueManager = FindAnyObjectByType<NPCDialogueManager>(
+                DialogueManager = FindAnyObjectByType<NPCDialogueManager>(
                     FindObjectsInactive.Include
                 );
             }
 
-            if (npcPrefab == null && !string.IsNullOrWhiteSpace(npcPrefabResourcesPath))
+            if (NpcPrefab == null && !string.IsNullOrWhiteSpace(NpcPrefabResourcesPath))
             {
-                npcPrefab = Resources.Load<GameObject>(npcPrefabResourcesPath.Trim());
+                NpcPrefab = Resources.Load<GameObject>(NpcPrefabResourcesPath.Trim());
             }
         }
 
         void RegisterCallbacks()
         {
-            if (_callbacksRegistered || networkManager == null)
+            if (_callbacksRegistered || NetworkManager == null)
             {
                 return;
             }
 
-            networkManager.OnServerStarted += HandleServerStarted;
+            NetworkManager.OnServerStarted += HandleServerStarted;
             _callbacksRegistered = true;
         }
 
         void UnregisterCallbacks()
         {
-            if (!_callbacksRegistered || networkManager == null)
+            if (!_callbacksRegistered || NetworkManager == null)
             {
                 return;
             }
 
-            networkManager.OnServerStarted -= HandleServerStarted;
+            NetworkManager.OnServerStarted -= HandleServerStarted;
             _callbacksRegistered = false;
         }
 

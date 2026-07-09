@@ -10,13 +10,13 @@ namespace NPCSystem
     public partial class NPCDialogueNetworkBridge
     {
         public NPCProfile[] Profiles =>
-            dialogueManager == null ? Array.Empty<NPCProfile>() : dialogueManager.Profiles;
+            DialogueManager == null ? Array.Empty<NPCProfile>() : DialogueManager.Profiles;
         public NPCProfile currentProfile
         {
             get
             {
                 if (
-                    dialogueManager != null
+                    DialogueManager != null
                     && (
                         !Application.isPlaying
                         || NetworkManager == null
@@ -25,7 +25,7 @@ namespace NPCSystem
                     )
                 )
                 {
-                    return dialogueManager.currentProfile;
+                    return DialogueManager.currentProfile;
                 }
 
                 return FindProfileBySlug(_localSelectedNpcSlug);
@@ -34,10 +34,10 @@ namespace NPCSystem
 
         public NPCProfile FindProfileBySlug(string npcSlug)
         {
-            if (dialogueManager == null || string.IsNullOrWhiteSpace(npcSlug))
+            if (DialogueManager == null || string.IsNullOrWhiteSpace(npcSlug))
                 return null;
 
-            foreach (NPCProfile profile in dialogueManager.Profiles)
+            foreach (NPCProfile profile in DialogueManager.Profiles)
             {
                 if (
                     profile != null

@@ -1,5 +1,6 @@
 #if !UNITY_SERVER
 using EditorAttributes;
+using UnityEngine.Serialization;
 using Void = EditorAttributes.Void;
 using UnityEngine;
 
@@ -17,15 +18,17 @@ namespace NPCSystem.EditorUX
             MessageMode.Log,
             drawAbove: true
         )]
-        [FoldoutGroup("Scene References", true, nameof(dialogueManager), nameof(qdrantRag))]
+        [FoldoutGroup("Scene References", true, nameof(DialogueManager), nameof(QdrantRag))]
         [SerializeField]
         private Void referencesGroup;
 
+        [FormerlySerializedAs("dialogueManager")]
         [SerializeField, HideProperty, Required]
-        NPCDialogueManager dialogueManager;
+        NPCDialogueManager DialogueManager;
 
+        [FormerlySerializedAs("qdrantRag")]
         [SerializeField, HideProperty, ShowField(nameof(useQdrantDiagnostics))]
-        QdrantRAGService qdrantRag;
+        QdrantRAGService QdrantRag;
 
         [SerializeField, HideProperty]
         bool useQdrantDiagnostics = true;
@@ -54,7 +57,7 @@ namespace NPCSystem.EditorUX
         string LocalAiBaseUrl => $"http://{localAiHost}:{localAiPort}/v1";
 
         [ShowInInspector]
-        string QdrantCollection => qdrantRag == null ? "<none>" : qdrantRag.collectionName;
+        string QdrantCollection => QdrantRag == null ? "<none>" : QdrantRag.collectionName;
 
         void Reset()
         {
@@ -67,7 +70,7 @@ namespace NPCSystem.EditorUX
             if (Application.isPlaying)
                 return;
 
-            if (dialogueManager == null || qdrantRag == null)
+            if (DialogueManager == null || QdrantRag == null)
             {
                 AutoAssignSceneReferences();
             }
@@ -77,20 +80,20 @@ namespace NPCSystem.EditorUX
         [Button("Auto Assign Scene References")]
         void AutoAssignSceneReferences()
         {
-            if (dialogueManager == null)
+            if (DialogueManager == null)
             {
-                dialogueManager = FindAnyObjectByType<NPCDialogueManager>(
+                DialogueManager = FindAnyObjectByType<NPCDialogueManager>(
                     FindObjectsInactive.Include
                 );
             }
 
-            if (qdrantRag == null)
+            if (QdrantRag == null)
             {
-                qdrantRag = FindAnyObjectByType<QdrantRAGService>(FindObjectsInactive.Include);
+                QdrantRag = FindAnyObjectByType<QdrantRAGService>(FindObjectsInactive.Include);
             }
 
             lastValidationStatus =
-                dialogueManager == null
+                DialogueManager == null
                     ? "Dialogue manager not found."
                     : $"References assigned. LocalAI preview: {LocalAiBaseUrl}";
         }
@@ -117,7 +120,7 @@ namespace NPCSystem.EditorUX
                 return;
             }
 
-            if (qdrantRag == null)
+            if (QdrantRag == null)
             {
                 lastValidationStatus =
                     "Qdrant diagnostics enabled but no QdrantRAGService is assigned.";
@@ -125,15 +128,15 @@ namespace NPCSystem.EditorUX
             }
 
             bool hasUrl =
-                !string.IsNullOrWhiteSpace(qdrantRag.qdrantUrl)
+                !string.IsNullOrWhiteSpace(QdrantRag.qdrantUrl)
                 && (
-                    qdrantRag.qdrantUrl.StartsWith("http://")
-                    || qdrantRag.qdrantUrl.StartsWith("https://")
+                    QdrantRag.qdrantUrl.StartsWith("http://")
+                    || QdrantRag.qdrantUrl.StartsWith("https://")
                 );
-            bool hasCollection = !string.IsNullOrWhiteSpace(qdrantRag.collectionName);
+            bool hasCollection = !string.IsNullOrWhiteSpace(QdrantRag.collectionName);
             lastValidationStatus =
                 hasUrl && hasCollection
-                    ? $"Qdrant settings look valid: {qdrantRag.qdrantUrl} collection={qdrantRag.collectionName}"
+                    ? $"Qdrant settings look valid: {QdrantRag.qdrantUrl} collection={QdrantRag.collectionName}"
                     : "Qdrant settings are incomplete. Check URL and collection name.";
         }
 

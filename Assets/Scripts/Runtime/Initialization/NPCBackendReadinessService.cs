@@ -5,6 +5,7 @@ using EditorAttributes;
 using UnityEngine;
 using UnityEngine.Networking;
 using Void = EditorAttributes.Void;
+using UnityEngine.Serialization;
 
 namespace NPCSystem
 {
@@ -40,7 +41,7 @@ namespace NPCSystem
             MessageMode.Log,
             drawAbove: true
         )]
-        [FoldoutGroup("References", true, nameof(authService), nameof(dialogueManager))]
+        [FoldoutGroup("References", true, nameof(authService), nameof(DialogueManager))]
         [SerializeField]
         private Void referencesGroup;
 
@@ -48,7 +49,8 @@ namespace NPCSystem
         public PlayerAuthService authService;
 
         [SerializeField, HideProperty]
-        public NPCDialogueManager dialogueManager;
+        [FormerlySerializedAs("DialogueManager")]
+        public NPCDialogueManager DialogueManager;
 
         [FoldoutGroup(
             "Probe Targets",
@@ -140,9 +142,9 @@ namespace NPCSystem
                 authService = FindAnyObjectByType<PlayerAuthService>(FindObjectsInactive.Include);
             }
 
-            if (dialogueManager == null)
+            if (DialogueManager == null)
             {
-                dialogueManager = FindAnyObjectByType<NPCDialogueManager>(
+                DialogueManager = FindAnyObjectByType<NPCDialogueManager>(
                     FindObjectsInactive.Include
                 );
             }
@@ -311,13 +313,13 @@ namespace NPCSystem
 
         string BuildLocalAiProbeUrl()
         {
-            if (dialogueManager == null)
+            if (DialogueManager == null)
             {
                 return "http://localhost:8080/v1/models";
             }
 
             return CombineUrl(
-                $"http://{dialogueManager.remoteHost}:{dialogueManager.remotePort}",
+                $"http://{DialogueManager.remoteHost}:{DialogueManager.remotePort}",
                 localAiProbeRelativePath
             );
         }

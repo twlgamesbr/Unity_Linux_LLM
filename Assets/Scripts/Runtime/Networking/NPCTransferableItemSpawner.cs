@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using EditorAttributes;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace NPCSystem
 {
@@ -14,9 +15,12 @@ namespace NPCSystem
             MessageMode.Log,
             drawAbove: true
         )]
-        public NetworkManager networkManager;
-        public GameObject itemPrefab;
-        public string itemPrefabResourcesPath = "Networking/NPCTransferableItem";
+        [FormerlySerializedAs("NetworkManager")]
+        public NetworkManager NetworkManager;
+        [FormerlySerializedAs("ItemPrefab")]
+        public GameObject ItemPrefab;
+        [FormerlySerializedAs("ItemPrefabResourcesPath")]
+        public string ItemPrefabResourcesPath = "Networking/NPCTransferableItem";
         public string initialNpcSlug = "butler";
         public Vector3 fallbackWorldPosition = new Vector3(0f, 1f, 4f);
 
@@ -51,14 +55,14 @@ namespace NPCSystem
 
         void ResolveReferences()
         {
-            if (networkManager == null)
+            if (NetworkManager == null)
             {
-                networkManager = FindAnyObjectByType<NetworkManager>(FindObjectsInactive.Include);
+                NetworkManager = FindAnyObjectByType<NetworkManager>(FindObjectsInactive.Include);
             }
 
-            if (itemPrefab == null && !string.IsNullOrWhiteSpace(itemPrefabResourcesPath))
+            if (ItemPrefab == null && !string.IsNullOrWhiteSpace(ItemPrefabResourcesPath))
             {
-                itemPrefab = Resources.Load<GameObject>(itemPrefabResourcesPath.Trim());
+                ItemPrefab = Resources.Load<GameObject>(ItemPrefabResourcesPath.Trim());
             }
 
             initialNpcSlug = string.IsNullOrWhiteSpace(initialNpcSlug)
@@ -68,23 +72,23 @@ namespace NPCSystem
 
         void RegisterCallbacks()
         {
-            if (_callbacksRegistered || networkManager == null)
+            if (_callbacksRegistered || NetworkManager == null)
             {
                 return;
             }
 
-            networkManager.OnServerStarted += HandleServerStarted;
+            NetworkManager.OnServerStarted += HandleServerStarted;
             _callbacksRegistered = true;
         }
 
         void UnregisterCallbacks()
         {
-            if (!_callbacksRegistered || networkManager == null)
+            if (!_callbacksRegistered || NetworkManager == null)
             {
                 return;
             }
 
-            networkManager.OnServerStarted -= HandleServerStarted;
+            NetworkManager.OnServerStarted -= HandleServerStarted;
             _callbacksRegistered = false;
         }
 
@@ -98,17 +102,17 @@ namespace NPCSystem
         {
             ResolveReferences();
 
-            if (networkManager == null || !networkManager.IsServer)
+            if (NetworkManager == null || !NetworkManager.IsServer)
             {
                 lastSpawnStatus =
                     "Transferable item spawn skipped because this instance is not the server.";
                 return;
             }
 
-            if (itemPrefab == null)
+            if (ItemPrefab == null)
             {
                 lastSpawnStatus =
-                    $"Transferable item prefab could not be loaded from Resources/{itemPrefabResourcesPath}.";
+                    $"Transferable item prefab could not be loaded from Resources/{ItemPrefabResourcesPath}.";
                 return;
             }
 
@@ -134,7 +138,7 @@ namespace NPCSystem
             }
 
             GameObject instance = Instantiate(
-                itemPrefab,
+                ItemPrefab,
                 fallbackWorldPosition,
                 Quaternion.identity
             );

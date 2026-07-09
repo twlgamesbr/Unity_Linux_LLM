@@ -87,6 +87,12 @@ namespace NPCSystem
             }
         }
 
+        void HandleResponseUpdated(string partialResponse)
+        {
+            if (AiText != null)
+                AiText.text = partialResponse;
+        }
+
         void OnCharacterSelectionChanged(int selection)
         {
             _ = SelectProfileAsync(selection);

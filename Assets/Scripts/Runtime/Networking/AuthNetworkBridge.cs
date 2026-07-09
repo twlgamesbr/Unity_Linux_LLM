@@ -4,6 +4,7 @@ using EditorAttributes;
 using Unity.Multiplayer;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace NPCSystem
 {
@@ -32,8 +33,10 @@ namespace NPCSystem
             drawAbove: true
         )]
         [Header("References")]
-        public AuthUIController authController;
-        public NPCNetworkBootstrap networkBootstrap;
+        [FormerlySerializedAs("AuthController")]
+        public AuthUIController AuthController;
+        [FormerlySerializedAs("NetworkBootstrap")]
+        public NPCNetworkBootstrap NetworkBootstrap;
 
         [Header("Mode")]
         [Tooltip(
@@ -114,14 +117,14 @@ namespace NPCSystem
         void ResolveReferences()
         {
 #if !UNITY_SERVER
-            if (authController == null)
-                authController = GetComponent<AuthUIController>();
+            if (AuthController == null)
+                AuthController = GetComponent<AuthUIController>();
 
-            if (authController == null)
-                authController = FindAnyObjectByType<AuthUIController>(FindObjectsInactive.Include);
+            if (AuthController == null)
+                AuthController = FindAnyObjectByType<AuthUIController>(FindObjectsInactive.Include);
 #endif
-            if (networkBootstrap == null)
-                networkBootstrap = FindAnyObjectByType<NPCNetworkBootstrap>(
+            if (NetworkBootstrap == null)
+                NetworkBootstrap = FindAnyObjectByType<NPCNetworkBootstrap>(
                     FindObjectsInactive.Include
                 );
         }
@@ -131,7 +134,7 @@ namespace NPCSystem
         {
             ResolveReferences();
 
-            if (authController == null)
+            if (AuthController == null)
             {
                 _logger?.Log(
                     NPCFlowStage.ConfigurationValidation,
@@ -150,8 +153,8 @@ namespace NPCSystem
                 return;
             }
 
-            authController.events.onLoginSuccess.AddListener(HandleAuthSuccess);
-            authController.events.onRegisterSuccess.AddListener(HandleAuthSuccess);
+            AuthController.events.onLoginSuccess.AddListener(HandleAuthSuccess);
+            AuthController.events.onRegisterSuccess.AddListener(HandleAuthSuccess);
 
             _logger?.Log(
                 NPCFlowStage.ConfigurationValidation,
@@ -161,19 +164,19 @@ namespace NPCSystem
                 source: nameof(AuthNetworkBridge),
                 data: new Dictionary<string, object>
                 {
-                    ["authController"] = authController.name,
-                    ["networkBootstrap"] =
-                        networkBootstrap != null ? networkBootstrap.name : "<missing>",
+                    ["AuthController"] = AuthController.name,
+                    ["NetworkBootstrap"] =
+                        NetworkBootstrap != null ? NetworkBootstrap.name : "<missing>",
                 }
             );
         }
 
         void UnbindAuthEvents()
         {
-            if (authController == null)
+            if (AuthController == null)
                 return;
-            authController.events.onLoginSuccess.RemoveListener(HandleAuthSuccess);
-            authController.events.onRegisterSuccess.RemoveListener(HandleAuthSuccess);
+            AuthController.events.onLoginSuccess.RemoveListener(HandleAuthSuccess);
+            AuthController.events.onRegisterSuccess.RemoveListener(HandleAuthSuccess);
         }
 #endif
 
@@ -331,9 +334,9 @@ namespace NPCSystem
         void CloseAuthUI()
         {
 #if !UNITY_SERVER
-            if (authController != null)
+            if (AuthController != null)
             {
-                authController.ClosePanel();
+                AuthController.ClosePanel();
                 return;
             }
 #endif
@@ -361,7 +364,7 @@ namespace NPCSystem
 
         async void StartHostAndRegisterPlayerName()
         {
-            if (networkBootstrap == null)
+            if (NetworkBootstrap == null)
             {
                 _logger?.Log(
                     NPCFlowStage.NetworkHost,
@@ -374,7 +377,7 @@ namespace NPCSystem
                 return;
             }
 
-            NetworkManager netManager = networkBootstrap.networkManager;
+            NetworkManager netManager = NetworkBootstrap.NetworkManager;
             if (netManager == null)
             {
                 _logger?.Log(
@@ -396,11 +399,11 @@ namespace NPCSystem
 
             // Bootstrap already configured transport in Awake.
             // Set host mode and let bootstrap's StartConfiguredMode handle the rest.
-            networkBootstrap.transportConfig.autoStartMode = NPCNetworkAutoStartMode.Host;
-            bool started = networkBootstrap.StartConfiguredMode();
+            NetworkBootstrap.TransportConfig.autoStartMode = NPCNetworkAutoStartMode.Host;
+            bool started = NetworkBootstrap.StartConfiguredMode();
             if (!started)
             {
-                NPCTransportConfig cfg = networkBootstrap.transportConfig;
+                NPCTransportConfig cfg = NetworkBootstrap.TransportConfig;
                 _logger?.Log(
                     NPCFlowStage.NetworkHost,
                     NPCFlowStatus.Error,
@@ -461,7 +464,7 @@ namespace NPCSystem
 
         void StartClientAndRegisterPlayerName()
         {
-            if (networkBootstrap == null)
+            if (NetworkBootstrap == null)
             {
                 _logger?.Log(
                     NPCFlowStage.NetworkHost,
@@ -474,7 +477,7 @@ namespace NPCSystem
                 return;
             }
 
-            NetworkManager netManager = networkBootstrap.networkManager;
+            NetworkManager netManager = NetworkBootstrap.NetworkManager;
             if (netManager == null)
             {
                 _logger?.Log(
@@ -502,14 +505,14 @@ namespace NPCSystem
             }
 
             // Override bootstrap's connect address if specified, then delegate to bootstrap
-            networkBootstrap.transportConfig.connectAddress = string.IsNullOrWhiteSpace(hostAddress)
+            NetworkBootstrap.TransportConfig.connectAddress = string.IsNullOrWhiteSpace(hostAddress)
                 ? "127.0.0.1"
                 : hostAddress.Trim();
             if (hostPort > 0)
-                networkBootstrap.transportConfig.port = hostPort;
+                NetworkBootstrap.TransportConfig.port = hostPort;
 
-            networkBootstrap.transportConfig.autoStartMode = NPCNetworkAutoStartMode.Client;
-            bool started = networkBootstrap.StartConfiguredMode();
+            NetworkBootstrap.TransportConfig.autoStartMode = NPCNetworkAutoStartMode.Client;
+            bool started = NetworkBootstrap.StartConfiguredMode();
             if (!started)
             {
                 _logger?.Log(
@@ -523,8 +526,8 @@ namespace NPCSystem
                 return;
             }
 
-            string effectiveAddress = networkBootstrap.transportConfig.connectAddress;
-            ushort effectivePort = networkBootstrap.transportConfig.port;
+            string effectiveAddress = NetworkBootstrap.TransportConfig.connectAddress;
+            ushort effectivePort = NetworkBootstrap.TransportConfig.port;
             _logger?.Log(
                 NPCFlowStage.NetworkHost,
                 NPCFlowStatus.Success,
@@ -538,7 +541,7 @@ namespace NPCSystem
                 }
             );
             lastBridgeStatus =
-                $"Client started to {hostAddress}:{(hostPort > 0 ? hostPort : networkBootstrap.transportConfig.port)} as {_authenticatedPlayerName}.";
+                $"Client started to {hostAddress}:{(hostPort > 0 ? hostPort : NetworkBootstrap.TransportConfig.port)} as {_authenticatedPlayerName}.";
 
             // Name will be registered automatically by NPCPlayerNetworkAvatar.OnNetworkSpawn
             // which reads AuthNetworkBridge.ActivePlayerName and calls RegisterPlayerNameServerRpc.
@@ -604,8 +607,8 @@ namespace NPCSystem
 
         NetworkManager GetNetworkManager()
         {
-            if (networkBootstrap != null && networkBootstrap.networkManager != null)
-                return networkBootstrap.networkManager;
+            if (NetworkBootstrap != null && NetworkBootstrap.NetworkManager != null)
+                return NetworkBootstrap.NetworkManager;
             return FindAnyObjectByType<NetworkManager>(FindObjectsInactive.Include);
         }
     }

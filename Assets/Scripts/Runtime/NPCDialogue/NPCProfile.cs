@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using EditorAttributes;
+using UnityEngine.Serialization;
 using UnityEngine;
 
 namespace NPCSystem
@@ -19,7 +20,8 @@ namespace NPCSystem
         public string npcSlug = "npc";
 
         public string displayName = "NPC";
-        public Texture2D portraitTexture;
+        [FormerlySerializedAs("portraitTexture")]
+        public Texture2D PortraitTexture;
 
         [Title("Personality")]
         [Header("Personality")]

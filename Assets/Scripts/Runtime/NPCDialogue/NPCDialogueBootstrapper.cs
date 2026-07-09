@@ -1,18 +1,20 @@
 using System.Threading.Tasks;
 using EditorAttributes;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace NPCSystem
 {
     [DefaultExecutionOrder(-1000)]
     public class NPCDialogueBootstrapper : MonoBehaviour
     {
-        [FoldoutGroup("References", true, nameof(dialogueManager))]
+        [FoldoutGroup("References", true, nameof(DialogueManager))]
         [SerializeField]
         EditorAttributes.Void referencesGroup;
 
         [SerializeField, HideProperty, Required]
-        public NPCDialogueManager dialogueManager;
+        [FormerlySerializedAs("DialogueManager")]
+        public NPCDialogueManager DialogueManager;
 
         [FoldoutGroup(
             "Startup Behaviour",
@@ -44,8 +46,8 @@ namespace NPCSystem
             {
                 if (!string.IsNullOrWhiteSpace(defaultNpcSlug))
                     return defaultNpcSlug.Trim();
-                return dialogueManager != null
-                    ? dialogueManager.GetDefaultProfileSlug()
+                return DialogueManager != null
+                    ? DialogueManager.GetDefaultProfileSlug()
                     : "<no dialogue manager>";
             }
         }
@@ -53,12 +55,12 @@ namespace NPCSystem
         void Awake()
         {
             NPCFlowLogger logger = NPCFlowLogger.FindOrCreate();
-            if (dialogueManager == null)
+            if (DialogueManager == null)
             {
-                dialogueManager = GetComponent<NPCDialogueManager>();
-                if (dialogueManager == null)
+                DialogueManager = GetComponent<NPCDialogueManager>();
+                if (DialogueManager == null)
                 {
-                    dialogueManager = FindAnyObjectByType<NPCDialogueManager>(
+                    DialogueManager = FindAnyObjectByType<NPCDialogueManager>(
                         FindObjectsInactive.Include
                     );
                 }
@@ -66,9 +68,9 @@ namespace NPCSystem
 
             logger.Log(
                 NPCFlowStage.SceneBootstrap,
-                dialogueManager != null ? NPCFlowStatus.Success : NPCFlowStatus.Warning,
-                dialogueManager != null ? NPCFlowLogLevel.Info : NPCFlowLogLevel.Warning,
-                dialogueManager != null
+                DialogueManager != null ? NPCFlowStatus.Success : NPCFlowStatus.Warning,
+                DialogueManager != null ? NPCFlowLogLevel.Info : NPCFlowLogLevel.Warning,
+                DialogueManager != null
                     ? "Bootstrapper resolved dialogue manager."
                     : "Bootstrapper could not resolve dialogue manager.",
                 source: nameof(NPCDialogueBootstrapper)
@@ -95,7 +97,7 @@ namespace NPCSystem
         async Task InitializeOnDemandInternalAsync()
         {
             NPCFlowLogger logger = NPCFlowLogger.FindOrCreate();
-            if (dialogueManager == null)
+            if (DialogueManager == null)
             {
                 logger.Log(
                     NPCFlowStage.SceneBootstrap,
@@ -116,7 +118,7 @@ namespace NPCSystem
                 await backendReadiness.ProbeAsync(probeLocalAi: true);
             }
 
-            await dialogueManager.InitializeAsync();
+            await DialogueManager.InitializeAsync();
             logger.Log(
                 NPCFlowStage.SceneBootstrap,
                 NPCFlowStatus.Success,
@@ -141,7 +143,7 @@ namespace NPCSystem
                 validator.ValidateConfiguration();
             }
 
-            if (!autoSelectDefaultNPC || dialogueManager.currentProfile != null)
+            if (!autoSelectDefaultNPC || DialogueManager.currentProfile != null)
             {
                 logger.Log(
                     NPCFlowStage.NPCSwitch,
@@ -154,7 +156,7 @@ namespace NPCSystem
             }
 
             string npcKey = string.IsNullOrWhiteSpace(defaultNpcSlug)
-                ? dialogueManager.GetDefaultProfileSlug()
+                ? DialogueManager.GetDefaultProfileSlug()
                 : defaultNpcSlug.Trim();
 
             if (string.IsNullOrWhiteSpace(npcKey))
@@ -169,7 +171,7 @@ namespace NPCSystem
                 return;
             }
 
-            await dialogueManager.SwitchToNPCAsync(npcKey);
+            await DialogueManager.SwitchToNPCAsync(npcKey);
             logger.Log(
                 NPCFlowStage.NPCSwitch,
                 NPCFlowStatus.Success,

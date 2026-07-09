@@ -2,6 +2,7 @@ using System;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace NPCSystem
 {
@@ -10,67 +11,67 @@ namespace NPCSystem
     {
         public void ResolveReferences()
         {
-            if (networkManager == null)
+            if (NetworkManager == null)
             {
-                networkManager = GetComponent<NetworkManager>();
+                NetworkManager = GetComponent<NetworkManager>();
             }
 
-            if (networkManager == null)
+            if (NetworkManager == null)
             {
-                networkManager = FindAnyObjectByType<NetworkManager>(FindObjectsInactive.Include);
+                NetworkManager = FindAnyObjectByType<NetworkManager>(FindObjectsInactive.Include);
             }
 
-            if (unityTransport == null)
+            if (UnityTransport == null)
             {
-                unityTransport = GetComponent<UnityTransport>();
+                UnityTransport = GetComponent<UnityTransport>();
             }
 
-            if (unityTransport == null && networkManager != null)
+            if (UnityTransport == null && NetworkManager != null)
             {
-                unityTransport = networkManager.GetComponent<UnityTransport>();
+                UnityTransport = NetworkManager.GetComponent<UnityTransport>();
             }
 
-            if (unityTransport == null)
+            if (UnityTransport == null)
             {
-                unityTransport = FindAnyObjectByType<UnityTransport>(FindObjectsInactive.Include);
+                UnityTransport = FindAnyObjectByType<UnityTransport>(FindObjectsInactive.Include);
             }
 
-            if (playerPrefab == null && !string.IsNullOrWhiteSpace(playerPrefabResourcesPath))
+            if (PlayerPrefab == null && !string.IsNullOrWhiteSpace(PlayerPrefabResourcesPath))
             {
-                playerPrefab = Resources.Load<GameObject>(playerPrefabResourcesPath.Trim());
+                PlayerPrefab = Resources.Load<GameObject>(PlayerPrefabResourcesPath.Trim());
             }
 
-            if (serverNpcPrefab == null && !string.IsNullOrWhiteSpace(serverNpcPrefabResourcesPath))
+            if (ServerNpcPrefab == null && !string.IsNullOrWhiteSpace(ServerNpcPrefabResourcesPath))
             {
-                serverNpcPrefab = Resources.Load<GameObject>(serverNpcPrefabResourcesPath.Trim());
+                ServerNpcPrefab = Resources.Load<GameObject>(ServerNpcPrefabResourcesPath.Trim());
             }
 
             if (
-                transferableItemPrefab == null
-                && !string.IsNullOrWhiteSpace(transferableItemPrefabResourcesPath)
+                TransferableItemPrefab == null
+                && !string.IsNullOrWhiteSpace(TransferableItemPrefabResourcesPath)
             )
             {
-                transferableItemPrefab = Resources.Load<GameObject>(
-                    transferableItemPrefabResourcesPath.Trim()
+                TransferableItemPrefab = Resources.Load<GameObject>(
+                    TransferableItemPrefabResourcesPath.Trim()
                 );
             }
         }
 
         public void RegisterNetworkPrefabs()
         {
-            if (networkManager == null)
+            if (NetworkManager == null)
             {
                 return;
             }
 
-            TryRegisterNetworkPrefab(playerPrefab, "player");
-            TryRegisterNetworkPrefab(serverNpcPrefab, "serverNpc");
-            TryRegisterNetworkPrefab(transferableItemPrefab, "transferableItem");
+            TryRegisterNetworkPrefab(PlayerPrefab, "player");
+            TryRegisterNetworkPrefab(ServerNpcPrefab, "serverNpc");
+            TryRegisterNetworkPrefab(TransferableItemPrefab, "transferableItem");
         }
 
         void TryRegisterNetworkPrefab(GameObject prefab, string label)
         {
-            if (prefab == null || networkManager == null)
+            if (prefab == null || NetworkManager == null)
             {
                 return;
             }
@@ -110,7 +111,7 @@ namespace NPCSystem
 
             try
             {
-                networkManager.PrefabHandler.AddNetworkPrefab(prefab);
+                NetworkManager.PrefabHandler.AddNetworkPrefab(prefab);
                 NPCFlowLogger
                     .FindOrCreate()
                     ?.Log(
@@ -148,12 +149,12 @@ namespace NPCSystem
 
         bool IsPrefabAlreadyRegistered(GameObject prefab)
         {
-            if (prefab == null || networkManager == null)
+            if (prefab == null || NetworkManager == null)
             {
                 return false;
             }
 
-            NetworkPrefabs prefabs = networkManager.NetworkConfig?.Prefabs;
+            NetworkPrefabs prefabs = NetworkManager.NetworkConfig?.Prefabs;
             if (prefabs == null)
             {
                 return false;
@@ -164,7 +165,7 @@ namespace NPCSystem
                 return true;
             }
 
-            if (networkManager.NetworkConfig.PlayerPrefab == prefab)
+            if (NetworkManager.NetworkConfig.PlayerPrefab == prefab)
             {
                 return true;
             }

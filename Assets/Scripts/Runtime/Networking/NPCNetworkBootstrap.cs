@@ -5,6 +5,7 @@ using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
 using Void = EditorAttributes.Void;
+using UnityEngine.Serialization;
 
 namespace NPCSystem
 {
@@ -15,95 +16,109 @@ namespace NPCSystem
         [FoldoutGroup(
             "References",
             true,
-            nameof(networkManager),
-            nameof(unityTransport),
-            nameof(playerPrefab),
-            nameof(playerPrefabResourcesPath),
-            nameof(serverNpcPrefab),
-            nameof(serverNpcPrefabResourcesPath),
-            nameof(transferableItemPrefab),
-            nameof(transferableItemPrefabResourcesPath)
+            nameof(NetworkManager),
+            nameof(UnityTransport),
+            nameof(PlayerPrefab),
+            nameof(PlayerPrefabResourcesPath),
+            nameof(ServerNpcPrefab),
+            nameof(ServerNpcPrefabResourcesPath),
+            nameof(TransferableItemPrefab),
+            nameof(TransferableItemPrefabResourcesPath)
         )]
         [SerializeField]
         Void referencesGroup;
 
+        [FormerlySerializedAs("networkManager")]
         [HideProperty]
-        public NetworkManager networkManager;
+        public NetworkManager NetworkManager;
 
+        [FormerlySerializedAs("unityTransport")]
         [HideProperty]
-        public UnityTransport unityTransport;
+        public UnityTransport UnityTransport;
 
+        [FormerlySerializedAs("playerPrefab")]
         [HideProperty]
-        public GameObject playerPrefab;
+        public GameObject PlayerPrefab;
 
+        [FormerlySerializedAs("playerPrefabResourcesPath")]
         [HideProperty]
-        public string playerPrefabResourcesPath = "Networking/NPCPlayerAvatar";
+        public string PlayerPrefabResourcesPath = "Networking/NPCPlayerAvatar";
 
+        [FormerlySerializedAs("serverNpcPrefab")]
         [HideProperty]
-        public GameObject serverNpcPrefab;
+        public GameObject ServerNpcPrefab;
 
+        [FormerlySerializedAs("serverNpcPrefabResourcesPath")]
         [HideProperty]
-        public string serverNpcPrefabResourcesPath = "Networking/NPCServerCharacter";
+        public string ServerNpcPrefabResourcesPath = "Networking/NPCServerCharacter";
 
+        [FormerlySerializedAs("transferableItemPrefab")]
         [HideProperty]
-        public GameObject transferableItemPrefab;
+        public GameObject TransferableItemPrefab;
 
+        [FormerlySerializedAs("transferableItemPrefabResourcesPath")]
         [HideProperty]
-        public string transferableItemPrefabResourcesPath = "Networking/NPCTransferableItem";
+        public string TransferableItemPrefabResourcesPath = "Networking/NPCTransferableItem";
 
         [FoldoutGroup(
             "Transport Settings",
             true,
-            nameof(transportConfig),
-            nameof(configureOnAwake),
-            nameof(autoStartInPlayMode),
-            nameof(autoAssignClientBindPort),
-            nameof(clientBindPortOverride)
+            nameof(TransportConfig),
+            nameof(ConfigureOnAwake),
+            nameof(AutoStartInPlayMode),
+            nameof(AutoAssignClientBindPort),
+            nameof(ClientBindPortOverride)
         )]
         [SerializeField]
         Void transportSettingsGroup;
 
+        [FormerlySerializedAs("transportConfig")]
         [HideProperty]
-        public NPCTransportConfig transportConfig = default;
+        public NPCTransportConfig TransportConfig = default;
 
+        [FormerlySerializedAs("configureOnAwake")]
         [HideProperty]
-        public bool configureOnAwake = true;
+        public bool ConfigureOnAwake = true;
 
+        [FormerlySerializedAs("autoStartInPlayMode")]
         [HideProperty]
-        public bool autoStartInPlayMode = false;
+        public bool AutoStartInPlayMode = false;
 
+        [FormerlySerializedAs("autoAssignClientBindPort")]
         [HideProperty]
-        public bool autoAssignClientBindPort = true;
+        public bool AutoAssignClientBindPort = true;
 
+        [FormerlySerializedAs("clientBindPortOverride")]
         [HideProperty]
-        [HideField(nameof(autoAssignClientBindPort))]
-        public ushort clientBindPortOverride = 0;
+        [HideField(nameof(AutoAssignClientBindPort))]
+        public ushort ClientBindPortOverride = 0;
 
-        [FoldoutGroup("Runtime Settings", true, nameof(forceRunInBackground))]
+        [FoldoutGroup("Runtime Settings", true, nameof(ForceRunInBackground))]
         [SerializeField]
         Void runtimeSettingsGroup;
 
+        [FormerlySerializedAs("forceRunInBackground")]
         [HideProperty]
         [Tooltip("Keeps network updates running when this instance is not the focused window.")]
-        public bool forceRunInBackground = true;
+        public bool ForceRunInBackground = true;
 
         bool _callbacksRegistered;
         NPCFlowLogger _logger;
 
         void Reset()
         {
-            transportConfig = NPCTransportConfig.CreateDefault();
-            playerPrefabResourcesPath = "Networking/NPCPlayerAvatar";
-            serverNpcPrefabResourcesPath = "Networking/NPCServerCharacter";
-            transferableItemPrefabResourcesPath = "Networking/NPCTransferableItem";
+            TransportConfig = NPCTransportConfig.CreateDefault();
+            PlayerPrefabResourcesPath = "Networking/NPCPlayerAvatar";
+            ServerNpcPrefabResourcesPath = "Networking/NPCServerCharacter";
+            TransferableItemPrefabResourcesPath = "Networking/NPCTransferableItem";
             ResolveReferences();
         }
 
         void Awake()
         {
-            if (transportConfig.port == 0)
+            if (TransportConfig.port == 0)
             {
-                transportConfig = NPCTransportConfig.CreateDefault();
+                TransportConfig = NPCTransportConfig.CreateDefault();
             }
 
             ApplyCommandLineOverrides();
@@ -111,7 +126,7 @@ namespace NPCSystem
             ResolveReferences();
             RegisterRuntimeCallbacks();
 
-            if (configureOnAwake)
+            if (ConfigureOnAwake)
             {
                 ApplyTransportConfiguration();
             }
@@ -121,10 +136,10 @@ namespace NPCSystem
         {
             if (
                 (
-                    autoStartInPlayMode
+                    AutoStartInPlayMode
                     || (
                         Application.isBatchMode
-                        && transportConfig.autoStartMode != NPCNetworkAutoStartMode.Manual
+                        && TransportConfig.autoStartMode != NPCNetworkAutoStartMode.Manual
                     )
                 ) && Application.isPlaying
             )
@@ -135,40 +150,40 @@ namespace NPCSystem
 
         void OnDestroy()
         {
-            if (!_callbacksRegistered || networkManager == null)
+            if (!_callbacksRegistered || NetworkManager == null)
             {
                 return;
             }
 
-            networkManager.OnServerStarted -= HandleServerStarted;
-            networkManager.OnClientConnectedCallback -= HandleClientConnected;
-            networkManager.OnClientDisconnectCallback -= HandleClientDisconnected;
+            NetworkManager.OnServerStarted -= HandleServerStarted;
+            NetworkManager.OnClientConnectedCallback -= HandleClientConnected;
+            NetworkManager.OnClientDisconnectCallback -= HandleClientDisconnected;
             _callbacksRegistered = false;
         }
 
         void OnValidate()
         {
-            if (transportConfig.port == 0)
+            if (TransportConfig.port == 0)
             {
-                transportConfig = NPCTransportConfig.CreateDefault();
+                TransportConfig = NPCTransportConfig.CreateDefault();
             }
 
-            if (string.IsNullOrWhiteSpace(playerPrefabResourcesPath))
+            if (string.IsNullOrWhiteSpace(PlayerPrefabResourcesPath))
             {
-                playerPrefabResourcesPath = "Networking/NPCPlayerAvatar";
+                PlayerPrefabResourcesPath = "Networking/NPCPlayerAvatar";
             }
 
-            if (string.IsNullOrWhiteSpace(serverNpcPrefabResourcesPath))
+            if (string.IsNullOrWhiteSpace(ServerNpcPrefabResourcesPath))
             {
-                serverNpcPrefabResourcesPath = "Networking/NPCServerCharacter";
+                ServerNpcPrefabResourcesPath = "Networking/NPCServerCharacter";
             }
 
-            if (string.IsNullOrWhiteSpace(transferableItemPrefabResourcesPath))
+            if (string.IsNullOrWhiteSpace(TransferableItemPrefabResourcesPath))
             {
-                transferableItemPrefabResourcesPath = "Networking/NPCTransferableItem";
+                TransferableItemPrefabResourcesPath = "Networking/NPCTransferableItem";
             }
 
-            transportConfig.NormalizeInPlace();
+            TransportConfig.NormalizeInPlace();
 
             if (!Application.isPlaying)
             {
@@ -178,7 +193,7 @@ namespace NPCSystem
 
         void ApplyRuntimeSettings()
         {
-            if (!forceRunInBackground)
+            if (!ForceRunInBackground)
             {
                 return;
             }
@@ -191,14 +206,14 @@ namespace NPCSystem
 
         void RegisterRuntimeCallbacks()
         {
-            if (_callbacksRegistered || networkManager == null)
+            if (_callbacksRegistered || NetworkManager == null)
             {
                 return;
             }
 
-            networkManager.OnServerStarted += HandleServerStarted;
-            networkManager.OnClientConnectedCallback += HandleClientConnected;
-            networkManager.OnClientDisconnectCallback += HandleClientDisconnected;
+            NetworkManager.OnServerStarted += HandleServerStarted;
+            NetworkManager.OnClientConnectedCallback += HandleClientConnected;
+            NetworkManager.OnClientDisconnectCallback += HandleClientDisconnected;
             _callbacksRegistered = true;
         }
 
@@ -209,9 +224,9 @@ namespace NPCSystem
                 NPCFlowStage.NetworkHost,
                 NPCFlowStatus.Success,
                 NPCFlowLogLevel.Info,
-                $"Server started. localClientId={networkManager.LocalClientId}, "
-                    + $"listenPort={unityTransport.ConnectionData.Port}, "
-                    + $"clientBindPort={unityTransport.ConnectionData.ClientBindPort}",
+                $"Server started. localClientId={NetworkManager.LocalClientId}, "
+                    + $"listenPort={UnityTransport.ConnectionData.Port}, "
+                    + $"clientBindPort={UnityTransport.ConnectionData.ClientBindPort}",
                 source: nameof(NPCNetworkBootstrap)
             );
         }
@@ -223,9 +238,9 @@ namespace NPCSystem
                 NPCFlowStage.NetworkHost,
                 NPCFlowStatus.Success,
                 NPCFlowLogLevel.Info,
-                $"Client connected. localClientId={networkManager.LocalClientId}, "
+                $"Client connected. localClientId={NetworkManager.LocalClientId}, "
                     + $"connectedClientId={clientId}, "
-                    + $"isServer={networkManager.IsServer}, isClient={networkManager.IsClient}",
+                    + $"isServer={NetworkManager.IsServer}, isClient={NetworkManager.IsClient}",
                 source: nameof(NPCNetworkBootstrap),
                 data: new Dictionary<string, object> { ["clientId"] = clientId }
             );
@@ -235,14 +250,14 @@ namespace NPCSystem
         {
             _logger = NPCFlowLogger.FindOrCreate();
             string disconnectReason =
-                networkManager != null ? networkManager.DisconnectReason : string.Empty;
+                NetworkManager != null ? NetworkManager.DisconnectReason : string.Empty;
             _logger?.Log(
                 NPCFlowStage.NetworkHost,
                 NPCFlowStatus.Success,
                 NPCFlowLogLevel.Info,
-                $"Client disconnected. localClientId={networkManager.LocalClientId}, "
+                $"Client disconnected. localClientId={NetworkManager.LocalClientId}, "
                     + $"disconnectedClientId={clientId}, "
-                    + $"shutdownInProgress={networkManager.ShutdownInProgress}",
+                    + $"shutdownInProgress={NetworkManager.ShutdownInProgress}",
                 source: nameof(NPCNetworkBootstrap),
                 data: new Dictionary<string, object>
                 {
@@ -256,7 +271,7 @@ namespace NPCSystem
         {
             ResolveReferences();
 
-            if (networkManager == null)
+            if (NetworkManager == null)
             {
                 NPCFlowLogger
                     .FindOrCreate()
@@ -270,7 +285,7 @@ namespace NPCSystem
                 return false;
             }
 
-            if (networkManager.IsListening)
+            if (NetworkManager.IsListening)
             {
                 NPCFlowLogger
                     .FindOrCreate()
@@ -282,7 +297,7 @@ namespace NPCSystem
                         source: nameof(NPCNetworkBootstrap),
                         data: new Dictionary<string, object>
                         {
-                            ["autoStartMode"] = transportConfig.autoStartMode.ToString(),
+                            ["autoStartMode"] = TransportConfig.autoStartMode.ToString(),
                         }
                     );
                 return true;
@@ -300,21 +315,21 @@ namespace NPCSystem
                     source: nameof(NPCNetworkBootstrap),
                     data: new Dictionary<string, object>
                     {
-                        ["autoStartMode"] = transportConfig.autoStartMode.ToString(),
-                        ["connectAddress"] = transportConfig.connectAddress ?? string.Empty,
-                        ["port"] = transportConfig.port,
-                        ["listenAddress"] = transportConfig.listenAddress ?? string.Empty,
+                        ["autoStartMode"] = TransportConfig.autoStartMode.ToString(),
+                        ["connectAddress"] = TransportConfig.connectAddress ?? string.Empty,
+                        ["port"] = TransportConfig.port,
+                        ["listenAddress"] = TransportConfig.listenAddress ?? string.Empty,
                     }
                 );
 
-            switch (transportConfig.autoStartMode)
+            switch (TransportConfig.autoStartMode)
             {
                 case NPCNetworkAutoStartMode.Client:
-                    return networkManager.StartClient();
+                    return NetworkManager.StartClient();
                 case NPCNetworkAutoStartMode.Host:
-                    return networkManager.StartHost();
+                    return NetworkManager.StartHost();
                 case NPCNetworkAutoStartMode.Server:
-                    return networkManager.StartServer();
+                    return NetworkManager.StartServer();
                 default:
                     return false;
             }

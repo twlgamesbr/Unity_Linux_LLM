@@ -1,6 +1,7 @@
 using EditorAttributes;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace NPCSystem
@@ -15,124 +16,146 @@ namespace NPCSystem
         [SerializeField]
         EditorAttributes.Void _docsGroup;
 
-        [FoldoutGroup("References", true, nameof(dialogueManager), nameof(networkBridge))]
+        [FoldoutGroup("References", true, nameof(DialogueManager), nameof(NetworkBridge))]
         [SerializeField]
         EditorAttributes.Void referencesGroup;
 
+        [FormerlySerializedAs("dialogueManager")]
         [SerializeField, HideProperty, Required]
-        public NPCDialogueManager dialogueManager;
+        public NPCDialogueManager DialogueManager;
 
+        [FormerlySerializedAs("networkBridge")]
         [SerializeField, HideProperty]
-        public NPCDialogueNetworkBridge networkBridge;
+        public NPCDialogueNetworkBridge NetworkBridge;
 
         [FoldoutGroup(
             "Notebook Buttons",
             true,
-            nameof(notesButton),
-            nameof(mapButton),
-            nameof(solveButton),
-            nameof(helpButton),
-            nameof(submitButton)
+            nameof(NotesButton),
+            nameof(MapButton),
+            nameof(SolveButton),
+            nameof(HelpButton),
+            nameof(SubmitButton)
         )]
         [SerializeField]
         EditorAttributes.Void notebookButtonsGroup;
 
+        [FormerlySerializedAs("notesButton")]
         [SerializeField, HideProperty, Required]
-        public Button notesButton;
+        public Button NotesButton;
 
+        [FormerlySerializedAs("mapButton")]
         [SerializeField, HideProperty]
-        public Button mapButton;
+        public Button MapButton;
 
+        [FormerlySerializedAs("solveButton")]
         [SerializeField, HideProperty]
-        public Button solveButton;
+        public Button SolveButton;
 
+        [FormerlySerializedAs("helpButton")]
         [SerializeField, HideProperty]
-        public Button helpButton;
+        public Button HelpButton;
 
+        [FormerlySerializedAs("submitButton")]
         [SerializeField, HideProperty]
-        public Button submitButton;
+        public Button SubmitButton;
 
         [FoldoutGroup(
             "Notebook UI Panels",
             true,
-            nameof(notebookImage),
-            nameof(notesPanel),
-            nameof(solvePanel),
-            nameof(helpPanel),
-            nameof(mapImage),
-            nameof(successImage),
-            nameof(failText)
+            nameof(NotebookImage),
+            nameof(NotesPanel),
+            nameof(SolvePanel),
+            nameof(HelpPanel),
+            nameof(MapImage),
+            nameof(SuccessImage),
+            nameof(FailText)
         )]
         [SerializeField]
         EditorAttributes.Void notebookPanelsGroup;
 
+        [FormerlySerializedAs("notebookImage")]
         [SerializeField, HideProperty, Required]
-        public RawImage notebookImage;
+        public RawImage NotebookImage;
 
+        [FormerlySerializedAs("notesPanel")]
         [SerializeField, HideProperty]
-        public GameObject notesPanel;
+        public GameObject NotesPanel;
 
+        [FormerlySerializedAs("solvePanel")]
         [SerializeField, HideProperty]
-        public GameObject solvePanel;
+        public GameObject SolvePanel;
 
+        [FormerlySerializedAs("helpPanel")]
         [SerializeField, HideProperty]
-        public GameObject helpPanel;
+        public GameObject HelpPanel;
 
+        [FormerlySerializedAs("mapImage")]
         [SerializeField, HideProperty]
-        public RawImage mapImage;
+        public RawImage MapImage;
 
+        [FormerlySerializedAs("successImage")]
         [SerializeField, HideProperty]
-        public RawImage successImage;
+        public RawImage SuccessImage;
 
+        [FormerlySerializedAs("failText")]
         [SerializeField, HideProperty]
-        public TMP_Text failText;
+        public TMP_Text FailText;
 
-        [FoldoutGroup("Dropdown Answers", true, nameof(answer1), nameof(answer2), nameof(answer3))]
+        [FoldoutGroup("Dropdown Answers", true, nameof(Answer1), nameof(Answer2), nameof(Answer3))]
         [SerializeField]
         EditorAttributes.Void dropdownAnswersGroup;
 
+        [FormerlySerializedAs("answer1")]
         [SerializeField, HideProperty]
-        public TMP_Dropdown answer1;
+        public TMP_Dropdown Answer1;
 
+        [FormerlySerializedAs("answer2")]
         [SerializeField, HideProperty]
-        public TMP_Dropdown answer2;
+        public TMP_Dropdown Answer2;
 
+        [FormerlySerializedAs("answer3")]
         [SerializeField, HideProperty]
-        public TMP_Dropdown answer3;
+        public TMP_Dropdown Answer3;
 
-        [FoldoutGroup("Notes Text", true, nameof(notesText1), nameof(notesText2))]
+        [FoldoutGroup("Notes Text", true, nameof(NotesText1), nameof(NotesText2))]
         [SerializeField]
         EditorAttributes.Void notesTextGroup;
 
+        [FormerlySerializedAs("notesText1")]
         [SerializeField, HideProperty, Required]
-        public TMP_Text notesText1;
+        public TMP_Text NotesText1;
 
+        [FormerlySerializedAs("notesText2")]
         [SerializeField, HideProperty, Required]
-        public TMP_Text notesText2;
+        public TMP_Text NotesText2;
 
         [Title("Correct Solve Answers")]
+        [FormerlySerializedAs("correctAnswer1")]
         [SerializeField]
-        public string correctAnswer1 = "Professor Pluot";
+        public string CorrectAnswer1 = "Professor Pluot";
 
+        [FormerlySerializedAs("correctAnswer2")]
         [SerializeField]
-        public string correctAnswer2 = "Living Room";
+        public string CorrectAnswer2 = "Living Room";
 
+        [FormerlySerializedAs("correctAnswer3")]
         [SerializeField]
-        public string correctAnswer3 = "A Hollow Bible";
+        public string CorrectAnswer3 = "A Hollow Bible";
 
         [Title("Runtime Status")]
         [ShowInInspector, ReadOnly]
         string CurrentNpcSlug =>
-            networkBridge?.currentProfile?.GetNpcSlug()
-            ?? dialogueManager?.currentProfile?.GetNpcSlug()
+            NetworkBridge?.currentProfile?.GetNpcSlug()
+            ?? DialogueManager?.currentProfile?.GetNpcSlug()
             ?? "<none>";
 
         [ShowInInspector, ReadOnly]
         bool HasEvidence =>
-            (dialogueManager?.CaptureEvidenceSnapshot() ?? new NPCEvidenceStateSnapshot())
+            (DialogueManager?.CaptureEvidenceSnapshot() ?? new NPCEvidenceStateSnapshot())
                 .discoveredClues
                 .Count > 0
-            || (dialogueManager?.CaptureEvidenceSnapshot() ?? new NPCEvidenceStateSnapshot())
+            || (DialogueManager?.CaptureEvidenceSnapshot() ?? new NPCEvidenceStateSnapshot())
                 .obtainedItems
                 .Count > 0;
 
@@ -177,70 +200,70 @@ namespace NPCSystem
 
         void ResolveReferences()
         {
-            dialogueManager =
-                dialogueManager != null
-                    ? dialogueManager
+            DialogueManager =
+                DialogueManager != null
+                    ? DialogueManager
                     : FindAnyObjectByType<NPCDialogueManager>(FindObjectsInactive.Include);
-            networkBridge =
-                networkBridge != null
-                    ? networkBridge
+            NetworkBridge =
+                NetworkBridge != null
+                    ? NetworkBridge
                     : FindAnyObjectByType<NPCDialogueNetworkBridge>(FindObjectsInactive.Include);
-            notesButton =
-                notesButton != null ? notesButton : FindComponent<Button>("Canvas/NotesButton");
-            mapButton = mapButton != null ? mapButton : FindComponent<Button>("Canvas/MapButton");
-            solveButton =
-                solveButton != null ? solveButton : FindComponent<Button>("Canvas/SolveButton");
-            helpButton =
-                helpButton != null ? helpButton : FindComponent<Button>("Canvas/HelpButton");
-            submitButton =
-                submitButton != null
-                    ? submitButton
+            NotesButton =
+                NotesButton != null ? NotesButton : FindComponent<Button>("Canvas/NotesButton");
+            MapButton = MapButton != null ? MapButton : FindComponent<Button>("Canvas/MapButton");
+            SolveButton =
+                SolveButton != null ? SolveButton : FindComponent<Button>("Canvas/SolveButton");
+            HelpButton =
+                HelpButton != null ? HelpButton : FindComponent<Button>("Canvas/HelpButton");
+            SubmitButton =
+                SubmitButton != null
+                    ? SubmitButton
                     : FindComponent<Button>("Canvas/NotebookImage/SolvePanel/SubmitButton");
-            notebookImage =
-                notebookImage != null
-                    ? notebookImage
+            NotebookImage =
+                NotebookImage != null
+                    ? NotebookImage
                     : FindComponent<RawImage>("Canvas/NotebookImage");
-            notesPanel =
-                notesPanel != null ? notesPanel : FindObject("Canvas/NotebookImage/NotesPanel");
-            solvePanel =
-                solvePanel != null ? solvePanel : FindObject("Canvas/NotebookImage/SolvePanel");
-            helpPanel =
-                helpPanel != null ? helpPanel : FindObject("Canvas/NotebookImage/HelpPanel");
-            mapImage = mapImage != null ? mapImage : FindComponent<RawImage>("Canvas/MapImage");
-            successImage =
-                successImage != null
-                    ? successImage
+            NotesPanel =
+                NotesPanel != null ? NotesPanel : FindObject("Canvas/NotebookImage/NotesPanel");
+            SolvePanel =
+                SolvePanel != null ? SolvePanel : FindObject("Canvas/NotebookImage/SolvePanel");
+            HelpPanel =
+                HelpPanel != null ? HelpPanel : FindObject("Canvas/NotebookImage/HelpPanel");
+            MapImage = MapImage != null ? MapImage : FindComponent<RawImage>("Canvas/MapImage");
+            SuccessImage =
+                SuccessImage != null
+                    ? SuccessImage
                     : FindComponent<RawImage>("Canvas/SuccessImage");
-            failText =
-                failText != null
-                    ? failText
+            FailText =
+                FailText != null
+                    ? FailText
                     : FindComponent<TMP_Text>("Canvas/NotebookImage/SolvePanel/FailText");
-            answer1 =
-                answer1 != null
-                    ? answer1
+            Answer1 =
+                Answer1 != null
+                    ? Answer1
                     : FindComponent<TMP_Dropdown>("Canvas/NotebookImage/SolvePanel/Answer1");
-            answer2 =
-                answer2 != null
-                    ? answer2
+            Answer2 =
+                Answer2 != null
+                    ? Answer2
                     : FindComponent<TMP_Dropdown>("Canvas/NotebookImage/SolvePanel/Answer2");
-            answer3 =
-                answer3 != null
-                    ? answer3
+            Answer3 =
+                Answer3 != null
+                    ? Answer3
                     : FindComponent<TMP_Dropdown>("Canvas/NotebookImage/SolvePanel/Answer3");
-            notesText1 =
-                notesText1 != null
-                    ? notesText1
+            NotesText1 =
+                NotesText1 != null
+                    ? NotesText1
                     : FindComponent<TMP_Text>("Canvas/NotebookImage/NotesPanel/NotesText1");
-            notesText2 =
-                notesText2 != null
-                    ? notesText2
+            NotesText2 =
+                NotesText2 != null
+                    ? NotesText2
                     : FindComponent<TMP_Text>("Canvas/NotebookImage/NotesPanel/NotesText2");
         }
 
         void CacheDefaultNotebookText()
         {
-            _defaultNotesPageLeft = notesText1 != null ? notesText1.text : string.Empty;
-            _defaultNotesPageRight = notesText2 != null ? notesText2.text : string.Empty;
+            _defaultNotesPageLeft = NotesText1 != null ? NotesText1.text : string.Empty;
+            _defaultNotesPageRight = NotesText2 != null ? NotesText2.text : string.Empty;
         }
 
         void BindListeners()
@@ -248,22 +271,22 @@ namespace NPCSystem
             if (_listenersBound)
                 return;
 
-            if (notesButton != null)
-                notesButton.onClick.AddListener(ShowNotes);
-            if (mapButton != null)
-                mapButton.onClick.AddListener(ShowMap);
-            if (solveButton != null)
-                solveButton.onClick.AddListener(ShowSolve);
-            if (helpButton != null)
-                helpButton.onClick.AddListener(ShowHelp);
-            if (submitButton != null)
-                submitButton.onClick.AddListener(SubmitAnswer);
-            if (answer1 != null)
-                answer1.onValueChanged.AddListener(HideFail);
-            if (answer2 != null)
-                answer2.onValueChanged.AddListener(HideFail);
-            if (answer3 != null)
-                answer3.onValueChanged.AddListener(HideFail);
+            if (NotesButton != null)
+                NotesButton.onClick.AddListener(ShowNotes);
+            if (MapButton != null)
+                MapButton.onClick.AddListener(ShowMap);
+            if (SolveButton != null)
+                SolveButton.onClick.AddListener(ShowSolve);
+            if (HelpButton != null)
+                HelpButton.onClick.AddListener(ShowHelp);
+            if (SubmitButton != null)
+                SubmitButton.onClick.AddListener(SubmitAnswer);
+            if (Answer1 != null)
+                Answer1.onValueChanged.AddListener(HideFail);
+            if (Answer2 != null)
+                Answer2.onValueChanged.AddListener(HideFail);
+            if (Answer3 != null)
+                Answer3.onValueChanged.AddListener(HideFail);
 
             _listenersBound = true;
         }
@@ -273,22 +296,22 @@ namespace NPCSystem
             if (!_listenersBound)
                 return;
 
-            if (notesButton != null)
-                notesButton.onClick.RemoveListener(ShowNotes);
-            if (mapButton != null)
-                mapButton.onClick.RemoveListener(ShowMap);
-            if (solveButton != null)
-                solveButton.onClick.RemoveListener(ShowSolve);
-            if (helpButton != null)
-                helpButton.onClick.RemoveListener(ShowHelp);
-            if (submitButton != null)
-                submitButton.onClick.RemoveListener(SubmitAnswer);
-            if (answer1 != null)
-                answer1.onValueChanged.RemoveListener(HideFail);
-            if (answer2 != null)
-                answer2.onValueChanged.RemoveListener(HideFail);
-            if (answer3 != null)
-                answer3.onValueChanged.RemoveListener(HideFail);
+            if (NotesButton != null)
+                NotesButton.onClick.RemoveListener(ShowNotes);
+            if (MapButton != null)
+                MapButton.onClick.RemoveListener(ShowMap);
+            if (SolveButton != null)
+                SolveButton.onClick.RemoveListener(ShowSolve);
+            if (HelpButton != null)
+                HelpButton.onClick.RemoveListener(ShowHelp);
+            if (SubmitButton != null)
+                SubmitButton.onClick.RemoveListener(SubmitAnswer);
+            if (Answer1 != null)
+                Answer1.onValueChanged.RemoveListener(HideFail);
+            if (Answer2 != null)
+                Answer2.onValueChanged.RemoveListener(HideFail);
+            if (Answer3 != null)
+                Answer3.onValueChanged.RemoveListener(HideFail);
 
             _listenersBound = false;
         }
@@ -298,15 +321,15 @@ namespace NPCSystem
             if (_runtimeEventsBound)
                 return;
 
-            if (networkBridge != null)
+            if (NetworkBridge != null)
             {
-                networkBridge.OnNotebookStateChanged.AddListener(ApplyNotebookState);
+                NetworkBridge.OnNotebookStateChanged.AddListener(ApplyNotebookState);
                 _runtimeEventsBound = true;
             }
-            else if (dialogueManager != null)
+            else if (DialogueManager != null)
             {
-                dialogueManager.OnNpcChanged.AddListener(HandleNpcChanged);
-                dialogueManager.OnResponseComplete.AddListener(HandleResponseComplete);
+                DialogueManager.OnNpcChanged.AddListener(HandleNpcChanged);
+                DialogueManager.OnResponseComplete.AddListener(HandleResponseComplete);
                 _runtimeEventsBound = true;
             }
         }
@@ -316,15 +339,15 @@ namespace NPCSystem
             if (!_runtimeEventsBound)
                 return;
 
-            if (networkBridge != null)
+            if (NetworkBridge != null)
             {
-                networkBridge.OnNotebookStateChanged.RemoveListener(ApplyNotebookState);
+                NetworkBridge.OnNotebookStateChanged.RemoveListener(ApplyNotebookState);
             }
 
-            if (dialogueManager != null)
+            if (DialogueManager != null)
             {
-                dialogueManager.OnNpcChanged.RemoveListener(HandleNpcChanged);
-                dialogueManager.OnResponseComplete.RemoveListener(HandleResponseComplete);
+                DialogueManager.OnNpcChanged.RemoveListener(HandleNpcChanged);
+                DialogueManager.OnResponseComplete.RemoveListener(HandleResponseComplete);
             }
 
             _runtimeEventsBound = false;
@@ -334,65 +357,65 @@ namespace NPCSystem
         {
             MarkOverlayOpenedThisFrame();
             RefreshNotebookState();
-            if (notesPanel != null)
-                notesPanel.SetActive(true);
-            if (helpPanel != null)
-                helpPanel.SetActive(false);
-            if (solvePanel != null)
-                solvePanel.SetActive(false);
-            if (notebookImage != null)
-                notebookImage.gameObject.SetActive(true);
+            if (NotesPanel != null)
+                NotesPanel.SetActive(true);
+            if (HelpPanel != null)
+                HelpPanel.SetActive(false);
+            if (SolvePanel != null)
+                SolvePanel.SetActive(false);
+            if (NotebookImage != null)
+                NotebookImage.gameObject.SetActive(true);
         }
 
         public void ShowMap()
         {
             MarkOverlayOpenedThisFrame();
-            if (mapImage != null)
-                mapImage.gameObject.SetActive(true);
+            if (MapImage != null)
+                MapImage.gameObject.SetActive(true);
         }
 
         public void ShowSolve()
         {
             MarkOverlayOpenedThisFrame();
             HideFail(0);
-            if (notesPanel != null)
-                notesPanel.SetActive(false);
-            if (helpPanel != null)
-                helpPanel.SetActive(false);
-            if (solvePanel != null)
-                solvePanel.SetActive(true);
-            if (notebookImage != null)
-                notebookImage.gameObject.SetActive(true);
+            if (NotesPanel != null)
+                NotesPanel.SetActive(false);
+            if (HelpPanel != null)
+                HelpPanel.SetActive(false);
+            if (SolvePanel != null)
+                SolvePanel.SetActive(true);
+            if (NotebookImage != null)
+                NotebookImage.gameObject.SetActive(true);
         }
 
         public void ShowHelp()
         {
             MarkOverlayOpenedThisFrame();
-            if (notesPanel != null)
-                notesPanel.SetActive(false);
-            if (helpPanel != null)
-                helpPanel.SetActive(true);
-            if (solvePanel != null)
-                solvePanel.SetActive(false);
-            if (notebookImage != null)
-                notebookImage.gameObject.SetActive(true);
+            if (NotesPanel != null)
+                NotesPanel.SetActive(false);
+            if (HelpPanel != null)
+                HelpPanel.SetActive(true);
+            if (SolvePanel != null)
+                SolvePanel.SetActive(false);
+            if (NotebookImage != null)
+                NotebookImage.gameObject.SetActive(true);
         }
 
         public void HideFail(int selection)
         {
-            if (failText != null)
-                failText.gameObject.SetActive(false);
+            if (FailText != null)
+                FailText.gameObject.SetActive(false);
         }
 
         public void SubmitAnswer()
         {
-            if (answer1 == null || answer2 == null || answer3 == null || successImage == null)
+            if (Answer1 == null || Answer2 == null || Answer3 == null || SuccessImage == null)
                 return;
 
             if (
-                SelectedText(answer1) == correctAnswer1
-                && SelectedText(answer2) == correctAnswer2
-                && SelectedText(answer3) == correctAnswer3
+                SelectedText(Answer1) == CorrectAnswer1
+                && SelectedText(Answer2) == CorrectAnswer2
+                && SelectedText(Answer3) == CorrectAnswer3
             )
             {
                 MarkOverlayOpenedThisFrame();
@@ -405,11 +428,11 @@ namespace NPCSystem
                         "Mystery solve answer accepted.",
                         source: nameof(NotebookUIController)
                     );
-                if (notebookImage != null)
-                    notebookImage.gameObject.SetActive(false);
-                successImage.gameObject.SetActive(true);
+                if (NotebookImage != null)
+                    NotebookImage.gameObject.SetActive(false);
+                SuccessImage.gameObject.SetActive(true);
             }
-            else if (failText != null)
+            else if (FailText != null)
             {
                 NPCFlowLogger
                     .FindOrCreate()
@@ -420,7 +443,7 @@ namespace NPCSystem
                         "Mystery solve answer rejected.",
                         source: nameof(NotebookUIController)
                     );
-                failText.gameObject.SetActive(true);
+                FailText.gameObject.SetActive(true);
             }
         }
 
@@ -432,7 +455,7 @@ namespace NPCSystem
             if (_overlayOpenedFrame == Time.frameCount)
                 return;
 
-            foreach (RawImage image in new[] { notebookImage, mapImage, successImage })
+            foreach (RawImage image in new[] { NotebookImage, MapImage, SuccessImage })
             {
                 if (
                     image != null
@@ -465,13 +488,13 @@ namespace NPCSystem
 
         void RefreshNotebookState()
         {
-            if (networkBridge != null)
+            if (NetworkBridge != null)
             {
-                ApplyNotebookState(networkBridge.CurrentNotebookState);
+                ApplyNotebookState(NetworkBridge.CurrentNotebookState);
                 return;
             }
 
-            if (dialogueManager == null)
+            if (DialogueManager == null)
             {
                 ApplyNotebookState(
                     new NPCNotebookStateMessage
@@ -484,9 +507,9 @@ namespace NPCSystem
             }
 
             NPCNotebookStateMessage message = NPCNotebookStateFormatter.Build(
-                dialogueManager.CaptureEvidenceSnapshot(),
-                dialogueManager.currentProfile != null
-                    ? dialogueManager.currentProfile.GetNpcSlug()
+                DialogueManager.CaptureEvidenceSnapshot(),
+                DialogueManager.currentProfile != null
+                    ? DialogueManager.currentProfile.GetNpcSlug()
                     : string.Empty
             );
             ApplyNotebookState(message);
@@ -494,16 +517,16 @@ namespace NPCSystem
 
         void ApplyNotebookState(NPCNotebookStateMessage message)
         {
-            if (notesText1 != null)
+            if (NotesText1 != null)
             {
-                notesText1.text = string.IsNullOrWhiteSpace(message.notesPageLeft)
+                NotesText1.text = string.IsNullOrWhiteSpace(message.notesPageLeft)
                     ? _defaultNotesPageLeft
                     : message.notesPageLeft;
             }
 
-            if (notesText2 != null)
+            if (NotesText2 != null)
             {
-                notesText2.text = string.IsNullOrWhiteSpace(message.notesPageRight)
+                NotesText2.text = string.IsNullOrWhiteSpace(message.notesPageRight)
                     ? _defaultNotesPageRight
                     : message.notesPageRight;
             }
@@ -527,6 +550,28 @@ namespace NPCSystem
         static GameObject FindObject(string path)
         {
             return GameObject.Find(path);
+        }
+
+        public bool IsOpen =>
+            (NotebookImage != null && NotebookImage.IsActive())
+            || (MapImage != null && MapImage.IsActive())
+            || (SuccessImage != null && SuccessImage.IsActive());
+
+        public void ToggleNotebook()
+        {
+            if (IsOpen)
+            {
+                if (NotebookImage != null)
+                    NotebookImage.gameObject.SetActive(false);
+                if (MapImage != null)
+                    MapImage.gameObject.SetActive(false);
+                if (SuccessImage != null)
+                    SuccessImage.gameObject.SetActive(false);
+            }
+            else
+            {
+                ShowNotes();
+            }
         }
     }
 }
