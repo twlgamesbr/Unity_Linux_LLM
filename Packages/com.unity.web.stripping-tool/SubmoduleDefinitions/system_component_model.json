@@ -1,0 +1,95 @@
+{
+    "submodules": [
+        {
+            "name": "System.ComponentModel",
+            "description": "Provides functionality for the .NET Component Model (https://learn.microsoft.com/en-us/dotnet/api/system.componentmodel).",
+            "version": "1.0.0",
+            "submodules": [
+                "System.ComponentModel Core",
+                "System.ComponentModel Extra"
+            ]
+        },
+        {
+            "name": "System.ComponentModel Core",
+            "description": "Provides the core functionality for the .NET Component Model (https://learn.microsoft.com/en-us/dotnet/api/system.componentmodel). This submodule contains the specific classes required by the Newtonsoft.Json library.",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "System"
+                        ],
+                        "methods": [
+                            "* System.ComponentModel.TypeDescriptor/TypeDescriptionNode::*",
+                            "* System.ComponentModel.ReflectTypeDescriptionProvider*",
+                            "* System.ComponentModel.WeakHashtable*",
+                            "void System.ComponentModel.TypeDescriptor::.cctor()",
+                            "System.ComponentModel.AttributeCollection System.ComponentModel.TypeDescriptor::GetAttributes(System.Type)",
+                            "System.ComponentModel.TypeConverter System.ComponentModel.TypeDescriptor::GetConverter(System.Type)",
+                            "System.ComponentModel.ICustomTypeDescriptor System.ComponentModel.TypeDescriptor::GetDescriptor(System.Type,System.String)",
+                            "System.Type System.ComponentModel.TypeDescriptor::GetReflectionType(System.Type)",
+                            "System.ComponentModel.TypeDescriptor/TypeDescriptionNode System.ComponentModel.TypeDescriptor::NodeFor(System.Type,System.Boolean)",
+                            "void System.ComponentModel.TypeDescriptor::CheckDefaultProvider(System.Type)",
+                            "System.Type System.ComponentModel.TypeDescriptor::GetNodeForBaseType(System.Type)",
+                            "System.ComponentModel.AttributeCollection System.ComponentModel.TypeDescriptor/TypeDescriptionNode/DefaultTypeDescriptor::System.ComponentModel.ICustomTypeDescriptor.GetAttributes()",
+                            "System.ComponentModel.TypeConverter System.ComponentModel.TypeDescriptor/TypeDescriptionNode/DefaultTypeDescriptor::System.ComponentModel.ICustomTypeDescriptor.GetConverter()",
+                            "void System.ComponentModel.AttributeCollection::.cctor()",
+                            "void System.ComponentModel.AttributeCollection::.ctor(System.Attribute[])",
+                            "System.Attribute System.ComponentModel.AttributeCollection::get_Item(System.Type)",
+                            "System.Attribute System.ComponentModel.AttributeCollection::GetDefaultAttribute(System.Type)",
+                            "void System.ComponentModel.TypeDescriptionProvider::.ctor()",
+                            "void System.ComponentModel.TypeConverter::.ctor()",
+                            "void System.ComponentModel.TypeConverterAttribute::.cctor()"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "System.ComponentModel Extra",
+            "description": "Provides all remaining functionality from the .NET Component Model (https://learn.microsoft.com/en-us/dotnet/api/system.componentmodel) not included in System.ComponentModel Core. This submodule can be safely stripped if your project's dependencies only require the Core components.",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "System"
+                        ],
+                        "methods": [
+                            "* System.ComponentModel.*"
+                        ]
+                    }
+                ],
+                "exclude": [
+                    {
+                        "assemblies": [
+                            "System"
+                        ],
+                        "methods": [
+                            "* System.ComponentModel.TypeDescriptor/TypeDescriptionNode::*",
+                            "* System.ComponentModel.ReflectTypeDescriptionProvider*",
+                            "* System.ComponentModel.WeakHashtable*",
+                            "void System.ComponentModel.TypeDescriptor::.cctor()",
+                            "System.ComponentModel.AttributeCollection System.ComponentModel.TypeDescriptor::GetAttributes(System.Type)",
+                            "System.ComponentModel.TypeConverter System.ComponentModel.TypeDescriptor::GetConverter(System.Type)",
+                            "System.ComponentModel.ICustomTypeDescriptor System.ComponentModel.TypeDescriptor::GetDescriptor(System.Type,System.String)",
+                            "System.Type System.ComponentModel.TypeDescriptor::GetReflectionType(System.Type)",
+                            "System.ComponentModel.TypeDescriptor/TypeDescriptionNode System.ComponentModel.TypeDescriptor::NodeFor(System.Type,System.Boolean)",
+                            "void System.ComponentModel.TypeDescriptor::CheckDefaultProvider(System.Type)",
+                            "System.Type System.ComponentModel.TypeDescriptor::GetNodeForBaseType(System.Type)",
+                            "System.ComponentModel.AttributeCollection System.ComponentModel.TypeDescriptor/TypeDescriptionNode/DefaultTypeDescriptor::System.ComponentModel.ICustomTypeDescriptor.GetAttributes()",
+                            "System.ComponentModel.TypeConverter System.ComponentModel.TypeDescriptor/TypeDescriptionNode/DefaultTypeDescriptor::System.ComponentModel.ICustomTypeDescriptor.GetConverter()",
+                            "void System.ComponentModel.AttributeCollection::.cctor()",
+                            "void System.ComponentModel.AttributeCollection::.ctor(System.Attribute[])",
+                            "System.Attribute System.ComponentModel.AttributeCollection::get_Item(System.Type)",
+                            "System.Attribute System.ComponentModel.AttributeCollection::GetDefaultAttribute(System.Type)",
+                            "void System.ComponentModel.TypeDescriptionProvider::.ctor()",
+                            "void System.ComponentModel.TypeConverter::.ctor()",
+                            "void System.ComponentModel.TypeConverterAttribute::.cctor()"
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}

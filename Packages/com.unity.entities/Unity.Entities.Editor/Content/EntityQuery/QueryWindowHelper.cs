@@ -1,8 +1,6 @@
-using System;
 using Unity.Editor.Bridge;
 using Unity.Entities.UI;
 using UnityEditor;
-using UnityEngine;
 
 namespace Unity.Entities.Editor
 {

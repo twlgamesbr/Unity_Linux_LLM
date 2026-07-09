@@ -1,10 +1,7 @@
-using System.Collections;
 using NUnit.Framework;
-using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.Scripting;
-using UnityEngine.TestTools;
 #if UNITY_EDITOR
 using UnityEngine.InputSystem.Editor;
 

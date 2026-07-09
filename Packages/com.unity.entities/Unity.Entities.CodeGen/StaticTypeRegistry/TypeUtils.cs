@@ -6,8 +6,6 @@ using Unity.Cecil.Awesome;
 using Unity.Cecil.Awesome.Comparers;
 using Unity.Entities.BuildUtils;
 using static Unity.Entities.BuildUtils.MonoExtensions;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
 
 namespace Unity.Entities.CodeGen
 {

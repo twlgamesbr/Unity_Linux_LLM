@@ -1,8 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Reflection;
-using UnityEngine;
-
 namespace UnityEngine.UI.Tests
 {
     // Hook into the graphic callback so we can do our check.

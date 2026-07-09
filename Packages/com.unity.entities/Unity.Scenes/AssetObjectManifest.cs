@@ -1,9 +1,7 @@
-using System;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
-using Hash128 = Unity.Entities.Hash128;
 using Unity.Entities.Serialization;
 
 namespace Unity.Scenes

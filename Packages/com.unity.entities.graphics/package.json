@@ -1,0 +1,19 @@
+{
+  "name": "com.unity.entities.graphics",
+  "displayName": "Entities Graphics",
+  "version": "6.5.0",
+  "unity": "6000.5",
+  "description": "The Entities Graphics package provides systems and components for drawing meshes using DOTS, including support for instanced mesh rendering and LOD.",
+  "dependencies": {
+    "com.unity.entities": "6.5.0",
+    "com.unity.modules.particlesystem": "1.0.0",
+    "com.unity.render-pipelines.core": "14.0.10"
+  },
+  "keywords": [
+    "dots",
+    "hybrid",
+    "rendering",
+    "unity"
+  ],
+  "_fingerprint": "f7c94163ba9a348f33641e4b5432d4de8dfa39f1"
+}

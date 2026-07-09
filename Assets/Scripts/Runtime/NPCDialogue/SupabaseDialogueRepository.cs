@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using EditorAttributes;
+using Void = EditorAttributes.Void;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -13,36 +14,81 @@ namespace NPCSystem
     public class SupabaseDialogueRepository : MonoBehaviour
     {
         [Title("Supabase Dialogue Repository")]
+        [FoldoutGroup("Supabase REST", true, nameof(restUrl), nameof(anonKey))]
         [HelpBox(
-            "Persists NPC dialogue history to Supabase via PostgREST instead of local file-based NPCHistoryStore. "
-                + "Uses the player's access_token from PlayerAuthService for RLS-scoped access. "
-                + "When the Supabase backend is unreachable, falls back to the local file store.",
-            MessageMode.Log,
-            drawAbove: true
+            "Anon key is required for PostgREST. The REST URL is typically <supabase-url>/rest/v1/. For development, default localhost:8000 is used.",
+            MessageMode.Log
         )]
-        [Header("Supabase REST")]
         [SerializeField]
+        Void restGroup;
+
+        [SerializeField, HideProperty]
+        [OnValueChanged(nameof(ValidateRepositorySettings))]
         string restUrl = "http://localhost:8000";
 
-        [SerializeField]
+        [SerializeField, HideProperty]
+        [Required]
+        [OnValueChanged(nameof(ValidateRepositorySettings))]
         string anonKey = "dev-local-anon-key";
 
-        [Header("References")]
+        [FoldoutGroup("References", true, nameof(authService))]
+        [SerializeField]
+        Void referencesGroup;
+
+        [SerializeField, HideProperty]
         public PlayerAuthService authService;
 
-        [Header("Behaviour")]
+        [FoldoutGroup("Behaviour", true, nameof(requestTimeoutSeconds))]
         [SerializeField]
+        Void behaviourGroup;
+
+        [SerializeField, HideProperty, Suffix("s")]
         float requestTimeoutSeconds = 10f;
 
-        [Header("Debug")]
-        [SerializeField, ReadOnly]
+        [FoldoutGroup("Debug", true, nameof(lastStatus), nameof(lastOperation), nameof(lastOperationDurationMs))]
+        [SerializeField]
+        Void debugGroup;
+
+        [SerializeField, HideProperty, ReadOnly]
         string lastStatus = "Idle";
 
-        [SerializeField, ReadOnly]
+        [SerializeField, HideProperty, ReadOnly]
         string lastOperation = string.Empty;
 
-        [SerializeField, ReadOnly]
+        [SerializeField, HideProperty, ReadOnly]
         long lastOperationDurationMs;
+
+        [ShowInInspector]
+        string IsConfiguredPreview => IsConfigured ? "Yes" : "No (check auth + REST URL)";
+
+        [Button("Validate Repository Settings")]
+        void ValidateRepositorySettings()
+        {
+            bool validUrl = !string.IsNullOrWhiteSpace(restUrl)
+                && (restUrl.StartsWith("http://") || restUrl.StartsWith("https://"));
+            bool validKey = !string.IsNullOrWhiteSpace(anonKey);
+            bool validAuth = authService != null;
+
+            lastStatus = validUrl && validKey && validAuth
+                ? "Repository settings look valid."
+                : "Repository settings are incomplete. Check REST URL, anon key, and AuthService reference.";
+            lastOperation = "ValidateRepositorySettings";
+
+            NPCFlowLogger
+                .FindOrCreate()
+                ?.Log(
+                    NPCFlowStage.ConfigurationValidation,
+                    validUrl && validKey && validAuth ? NPCFlowStatus.Success : NPCFlowStatus.Warning,
+                    NPCFlowLogLevel.Info,
+                    lastStatus,
+                    source: nameof(SupabaseDialogueRepository),
+                    data: new Dictionary<string, object>
+                    {
+                        ["restUrl"] = restUrl ?? string.Empty,
+                        ["authAssigned"] = validAuth,
+                    }
+                );
+        }
 
         string _lastSessionId;
         NPCFlowLogger _logger;
@@ -58,8 +104,7 @@ namespace NPCSystem
             && !string.IsNullOrWhiteSpace(restUrl)
             && !string.IsNullOrWhiteSpace(anonKey);
 
-        string BearerToken =>
-            IsConfigured ? authService.CurrentSession.sessionToken : null;
+        string BearerToken => IsConfigured ? authService.CurrentSession.sessionToken : null;
 
         static string ToJson(Dictionary<string, object> dict)
         {
@@ -89,7 +134,8 @@ namespace NPCSystem
             try
             {
                 // 1. Find the most recent active session for this player+NPC
-                string sessionUrl = $"{restUrl.TrimEnd('/')}/rest/v1/rpc/find_or_create_dialogue_session";
+                string sessionUrl =
+                    $"{restUrl.TrimEnd('/')}/rest/v1/rpc/find_or_create_dialogue_session";
                 var sessionBody = new Dictionary<string, object>
                 {
                     ["p_player_id"] = authService.CurrentSession.playerId,
@@ -97,10 +143,7 @@ namespace NPCSystem
                 };
                 string sessionJson = ToJson(sessionBody);
 
-                string sessionId = await PostRpcAndGetStringAsync(
-                    sessionUrl,
-                    sessionJson
-                );
+                string sessionId = await PostRpcAndGetStringAsync(sessionUrl, sessionJson);
 
                 if (string.IsNullOrWhiteSpace(sessionId))
                     return null;
@@ -108,7 +151,8 @@ namespace NPCSystem
                 _lastSessionId = sessionId;
 
                 // 2. Load turns for this session
-                string turnsUrl = $"{restUrl.TrimEnd('/')}/rest/v1/dialogue_turns"
+                string turnsUrl =
+                    $"{restUrl.TrimEnd('/')}/rest/v1/dialogue_turns"
                     + $"?session_id=eq.{sessionId}"
                     + "&order=created_at.asc"
                     + "&select=role,content,created_at";
@@ -124,7 +168,8 @@ namespace NPCSystem
                 foreach (JToken turn in turns)
                 {
                     JObject obj = turn as JObject;
-                    if (obj == null) continue;
+                    if (obj == null)
+                        continue;
 
                     string role = obj.Value<string>("role");
                     string content = obj.Value<string>("content");
@@ -134,7 +179,8 @@ namespace NPCSystem
                     entries.Add(new DialogueEntry(role, content));
                 }
 
-                lastStatus = $"Loaded {entries.Count} turns from session {sessionId} for NPC '{npcSlug}'.";
+                lastStatus =
+                    $"Loaded {entries.Count} turns from session {sessionId} for NPC '{npcSlug}'.";
                 Log(NPCFlowStage.HistoryLoad, NPCFlowStatus.Success, lastStatus);
 
                 return entries;
@@ -142,22 +188,24 @@ namespace NPCSystem
             catch (Exception ex)
             {
                 lastStatus = $"Load failed for NPC '{npcSlug}': {ex.Message}";
-                Log(NPCFlowStage.HistoryLoad, NPCFlowStatus.Error, lastStatus + $" ({ex.GetType().Name})");
+                Log(
+                    NPCFlowStage.HistoryLoad,
+                    NPCFlowStatus.Error,
+                    lastStatus + $" ({ex.GetType().Name})"
+                );
                 return null;
             }
             finally
             {
-                lastOperationDurationMs = (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds - startedAt;
+                lastOperationDurationMs =
+                    (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds
+                    - startedAt;
             }
         }
 
         // \u2500\u2500 Save \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
 
-        public async Task<bool> SaveTurnAsync(
-            string npcSlug,
-            string role,
-            string content
-        )
+        public async Task<bool> SaveTurnAsync(string npcSlug, string role, string content)
         {
             if (!IsConfigured || string.IsNullOrWhiteSpace(npcSlug))
                 return false;
@@ -170,7 +218,8 @@ namespace NPCSystem
                 // Ensure session exists
                 if (string.IsNullOrWhiteSpace(_lastSessionId))
                 {
-                    string sessionUrl = $"{restUrl.TrimEnd('/')}/rest/v1/rpc/find_or_create_dialogue_session";
+                    string sessionUrl =
+                        $"{restUrl.TrimEnd('/')}/rest/v1/rpc/find_or_create_dialogue_session";
                     var sessionBody = new Dictionary<string, object>
                     {
                         ["p_player_id"] = authService.CurrentSession.playerId,
@@ -209,7 +258,9 @@ namespace NPCSystem
             }
             finally
             {
-                lastOperationDurationMs = (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds - startedAt;
+                lastOperationDurationMs =
+                    (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds
+                    - startedAt;
             }
         }
 
@@ -246,7 +297,9 @@ namespace NPCSystem
             }
             finally
             {
-                lastOperationDurationMs = (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds - startedAt;
+                lastOperationDurationMs =
+                    (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds
+                    - startedAt;
             }
         }
 
@@ -294,7 +347,9 @@ namespace NPCSystem
                 string errorText = !string.IsNullOrWhiteSpace(request.downloadHandler.text)
                     ? request.downloadHandler.text
                     : request.error;
-                throw new InvalidOperationException($"POST {url} returned HTTP {request.responseCode}: {errorText}");
+                throw new InvalidOperationException(
+                    $"POST {url} returned HTTP {request.responseCode}: {errorText}"
+                );
             }
         }
 
@@ -321,7 +376,9 @@ namespace NPCSystem
                 string errorText = !string.IsNullOrWhiteSpace(request.downloadHandler.text)
                     ? request.downloadHandler.text
                     : request.error;
-                throw new InvalidOperationException($"RPC {url} returned HTTP {request.responseCode}: {errorText}");
+                throw new InvalidOperationException(
+                    $"RPC {url} returned HTTP {request.responseCode}: {errorText}"
+                );
             }
 
             string text = request.downloadHandler.text?.Trim();
@@ -360,13 +417,18 @@ namespace NPCSystem
 
         void Log(NPCFlowStage stage, NPCFlowStatus status, string message)
         {
-            _logger?.Log(stage, status, NPCFlowLogLevel.Debug, message,
+            _logger?.Log(
+                stage,
+                status,
+                NPCFlowLogLevel.Debug,
+                message,
                 source: nameof(SupabaseDialogueRepository),
                 data: new Dictionary<string, object>
                 {
                     ["sessionId"] = _lastSessionId ?? string.Empty,
                     ["authPlayerId"] = authService?.CurrentSession?.playerId ?? string.Empty,
-                });
+                }
+            );
         }
     }
 }

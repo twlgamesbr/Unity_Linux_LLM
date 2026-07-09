@@ -1,10 +1,6 @@
-using System;
 using Unity.Entities.Tests;
 using Unity.PerformanceTesting;
-using Unity.Collections;
 using NUnit.Framework;
-using Unity.Burst;
-using Unity.Jobs;
 
 namespace Unity.Entities.PerformanceTests
 {

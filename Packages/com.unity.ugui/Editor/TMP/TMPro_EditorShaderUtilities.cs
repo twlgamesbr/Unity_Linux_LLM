@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
 using UnityEditor;
-using System.Linq;
-using System.Collections;
 
 
 namespace TMPro.EditorUtilities

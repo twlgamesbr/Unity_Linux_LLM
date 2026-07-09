@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using EditorAttributes;
+using Void = EditorAttributes.Void;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -10,21 +11,30 @@ namespace NPCSystem
 {
     public class QdrantRAGService : MonoBehaviour
     {
-        [Title("Qdrant Endpoint")]
+        [FoldoutGroup("Qdrant Endpoint", true, nameof(qdrantUrl), nameof(collectionName))]
+        [SerializeField]
+        private Void qdrantEndpointGroup;
+
         [HelpBox(
             "Qdrant is the primary vector database for NPC knowledge. Uses NPCLocalAIEmbedder for query encoding.",
             MessageMode.Log,
             drawAbove: true
         )]
+        [SerializeField, HideProperty]
         public string qdrantUrl = "http://localhost:6333";
 
+        [SerializeField, HideProperty]
         public string collectionName = "npc_knowledge";
 
-        [Title("Embedder")]
+        [FoldoutGroup("Embedder", true, nameof(embedder))]
+        [SerializeField]
+        private Void embedderGroup;
+
         [HelpBox(
             "Assign the NPCLocalAIEmbedder used to encode queries before searching Qdrant.",
             MessageMode.Log
         )]
+        [SerializeField, HideProperty]
         public NPCLocalAIEmbedder embedder;
 
         [SerializeField, ReadOnly]

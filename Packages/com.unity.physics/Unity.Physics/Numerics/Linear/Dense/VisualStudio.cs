@@ -1,7 +1,5 @@
 using System.Diagnostics;
 using System.Globalization;
-using System.Text;
-using Unity.Mathematics;
 
 namespace Unity.Numerics.Linear.Dense.Primitives
 {

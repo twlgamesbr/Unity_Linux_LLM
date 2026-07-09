@@ -1,4 +1,3 @@
-using System;
 using Unity.Assertions;
 using Unity.Burst;
 using Unity.Burst.Intrinsics;
@@ -7,7 +6,6 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Profiling;
 using Unity.Transforms;
-using UnityEngine;
 
 [RequireMatchingQueriesForUpdate]
 [UpdateInGroup(typeof(TransformBakingSystemGroup))]

@@ -3,21 +3,16 @@ using NUnit.Framework;
 using Unity.Entities.Content;
 using Unity.Entities.Serialization;
 using UnityEngine;
-using UnityEngine.TestTools;
-using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using Unity.Collections;
 using System.Threading;
 using Unity.Entities.Build;
 using Unity.Entities.Tests;
-using Unity.Jobs;
 
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEditor.Experimental;
-using UnityEditor.SceneManagement;
 using Unity.Scenes.Editor;
 using Unity.Scenes.Editor.Tests;
 #endif

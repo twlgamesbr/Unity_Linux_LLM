@@ -1,4 +1,3 @@
-using Unity.Burst;
 using Unity.Collections;
 
 namespace Unity.Entities

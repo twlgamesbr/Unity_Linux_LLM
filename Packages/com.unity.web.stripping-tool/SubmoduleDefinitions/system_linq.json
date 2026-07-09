@@ -1,0 +1,57 @@
+{
+    "submodules": [
+        {
+            "name": "System.Linq",
+            "description": "Provides support for Language-Integrated Query(LINQ) (https://learn.microsoft.com/en-us/dotnet/api/system.linq).",
+            "version": "1.0.0",
+            "submodules": [
+                "System.Linq Core",
+                "System.Linq Expressions"
+            ]
+        },
+        {
+            "name": "System.Linq Core",
+            "description": "Provides core functionality for Language-Integrated Query(LINQ) (https://learn.microsoft.com/en-us/dotnet/api/system.linq).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "System.Core"
+                        ],
+                        "methods": [
+                            "* System.Linq.*"
+                        ]
+                    }
+                ],
+                "exclude": [
+                    {
+                        "assemblies": [
+                            "System.Core"
+                        ],
+                        "methods": [
+                            "* System.Linq.Expressions*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "System.Linq Expressions",
+            "description": "Provides support for representing language-level code expressions as expression trees (https://learn.microsoft.com/en-us/dotnet/api/system.linq.expressions).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "System.Core"
+                        ],
+                        "methods": [
+                            "* System.Linq.Expressions*"
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}

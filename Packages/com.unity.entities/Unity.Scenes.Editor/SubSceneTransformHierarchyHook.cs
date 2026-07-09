@@ -1,10 +1,8 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEditor.UI;
-using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Unity.Scenes.Editor

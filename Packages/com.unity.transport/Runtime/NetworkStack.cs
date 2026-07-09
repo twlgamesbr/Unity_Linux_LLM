@@ -3,7 +3,6 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using Unity.Networking.Transport.Relay;
-using Unity.Networking.Transport.TLS;
 using UnityEngine;
 using BurstRuntime = Unity.Burst.BurstRuntime;
 

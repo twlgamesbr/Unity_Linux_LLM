@@ -8,7 +8,6 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.TestTools;
-using System.Runtime.CompilerServices;
 
 internal class ScrollRectTests : IPrebuildSetup
 {

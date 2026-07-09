@@ -1,6 +1,3 @@
-using System;
-using System.IO;
-using Unity.Collections;
 using Unity.Entities;
 using UnityEngine.Scripting.APIUpdating;
 

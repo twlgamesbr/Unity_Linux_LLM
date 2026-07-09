@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using UnityEditor;
-using UnityEngine;
-using GladeAgenticAI.Core.Tools;
-
 #if ENABLE_LEGACY_INPUT_MANAGER
 namespace GladeAgenticAI.Core.Tools.Implementations.InputLegacy
 {
@@ -14,19 +8,30 @@ namespace GladeAgenticAI.Core.Tools.Implementations.InputLegacy
         public string Execute(Dictionary<string, object> args)
         {
             if (!args.ContainsKey("axes"))
-                return ToolUtils.CreateErrorResponse("axes (array of axis objects with at least 'name') is required.");
+                return ToolUtils.CreateErrorResponse(
+                    "axes (array of axis objects with at least 'name') is required."
+                );
 
             // Re-hydrate JSON-array strings so axes works whether it arrives
             // already-typed or string-encoded (e.g. via batch_execute).
             var axesObj = args["axes"];
-            if (axesObj is string axesJson && ToolUtils.TryParseJsonArrayToList(axesJson, out var parsedAxes))
+            if (
+                axesObj is string axesJson
+                && ToolUtils.TryParseJsonArrayToList(axesJson, out var parsedAxes)
+            )
                 axesObj = parsedAxes;
             if (!(axesObj is List<object> axesList))
-                return ToolUtils.CreateErrorResponse("axes must be an array of axis objects with at least 'name'.");
+                return ToolUtils.CreateErrorResponse(
+                    "axes must be an array of axis objects with at least 'name'."
+                );
 
-            UnityEngine.Object[] assets = AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/InputManager.asset");
+            UnityEngine.Object[] assets = AssetDatabase.LoadAllAssetsAtPath(
+                "ProjectSettings/InputManager.asset"
+            );
             if (assets == null || assets.Length == 0)
-                return ToolUtils.CreateErrorResponse("ProjectSettings/InputManager.asset not found.");
+                return ToolUtils.CreateErrorResponse(
+                    "ProjectSettings/InputManager.asset not found."
+                );
 
             SerializedObject so = new SerializedObject(assets[0]);
             SerializedProperty axesProp = so.FindProperty("m_Axes");
@@ -67,9 +72,12 @@ namespace GladeAgenticAI.Core.Tools.Implementations.InputLegacy
 
             var extras = new Dictionary<string, object>
             {
-                { "createdOrUpdated", createdOrUpdated }
+                { "createdOrUpdated", createdOrUpdated },
             };
-            return ToolUtils.CreateSuccessResponse($"Ensured {createdOrUpdated.Count} legacy input axis/axes.", extras);
+            return ToolUtils.CreateSuccessResponse(
+                $"Ensured {createdOrUpdated.Count} legacy input axis/axes.",
+                extras
+            );
         }
 
         private static int FindAxisIndex(SerializedProperty axesProp, string name)
@@ -101,26 +109,40 @@ namespace GladeAgenticAI.Core.Tools.Implementations.InputLegacy
             axisProp.FindPropertyRelative("joyNum").intValue = 0;
         }
 
-        private static void ApplyAxisProperties(SerializedProperty axisProp, Dictionary<string, object> axisDict)
+        private static void ApplyAxisProperties(
+            SerializedProperty axisProp,
+            Dictionary<string, object> axisDict
+        )
         {
             if (axisDict.ContainsKey("positiveButton"))
-                axisProp.FindPropertyRelative("positiveButton").stringValue = axisDict["positiveButton"]?.ToString() ?? "";
+                axisProp.FindPropertyRelative("positiveButton").stringValue =
+                    axisDict["positiveButton"]?.ToString() ?? "";
             if (axisDict.ContainsKey("negativeButton"))
-                axisProp.FindPropertyRelative("negativeButton").stringValue = axisDict["negativeButton"]?.ToString() ?? "";
+                axisProp.FindPropertyRelative("negativeButton").stringValue =
+                    axisDict["negativeButton"]?.ToString() ?? "";
             if (axisDict.ContainsKey("altPositiveButton"))
-                axisProp.FindPropertyRelative("altPositiveButton").stringValue = axisDict["altPositiveButton"]?.ToString() ?? "";
+                axisProp.FindPropertyRelative("altPositiveButton").stringValue =
+                    axisDict["altPositiveButton"]?.ToString() ?? "";
             if (axisDict.ContainsKey("altNegativeButton"))
-                axisProp.FindPropertyRelative("altNegativeButton").stringValue = axisDict["altNegativeButton"]?.ToString() ?? "";
+                axisProp.FindPropertyRelative("altNegativeButton").stringValue =
+                    axisDict["altNegativeButton"]?.ToString() ?? "";
             if (axisDict.ContainsKey("gravity") && ParseFloat(axisDict["gravity"], out float g))
                 axisProp.FindPropertyRelative("gravity").floatValue = g;
             if (axisDict.ContainsKey("dead") && ParseFloat(axisDict["dead"], out float d))
                 axisProp.FindPropertyRelative("dead").floatValue = d;
-            if (axisDict.ContainsKey("sensitivity") && ParseFloat(axisDict["sensitivity"], out float sens))
+            if (
+                axisDict.ContainsKey("sensitivity")
+                && ParseFloat(axisDict["sensitivity"], out float sens)
+            )
                 axisProp.FindPropertyRelative("sensitivity").floatValue = sens;
             if (axisDict.ContainsKey("snap"))
-                axisProp.FindPropertyRelative("snap").intValue = ParseBool(axisDict["snap"]) ? 1 : 0;
+                axisProp.FindPropertyRelative("snap").intValue = ParseBool(axisDict["snap"])
+                    ? 1
+                    : 0;
             if (axisDict.ContainsKey("invert"))
-                axisProp.FindPropertyRelative("invert").intValue = ParseBool(axisDict["invert"]) ? 1 : 0;
+                axisProp.FindPropertyRelative("invert").intValue = ParseBool(axisDict["invert"])
+                    ? 1
+                    : 0;
             if (axisDict.ContainsKey("type") && ParseInt(axisDict["type"], out int t))
                 axisProp.FindPropertyRelative("type").intValue = t;
             if (axisDict.ContainsKey("axis") && ParseInt(axisDict["axis"], out int a))
@@ -132,28 +154,67 @@ namespace GladeAgenticAI.Core.Tools.Implementations.InputLegacy
         private static bool ParseFloat(object o, out float v)
         {
             v = 0f;
-            if (o == null) return false;
-            if (o is float f) { v = f; return true; }
-            if (o is double d) { v = (float)d; return true; }
-            if (o is int i) { v = i; return true; }
-            return float.TryParse(o.ToString(), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out v);
+            if (o == null)
+                return false;
+            if (o is float f)
+            {
+                v = f;
+                return true;
+            }
+            if (o is double d)
+            {
+                v = (float)d;
+                return true;
+            }
+            if (o is int i)
+            {
+                v = i;
+                return true;
+            }
+            return float.TryParse(
+                o.ToString(),
+                System.Globalization.NumberStyles.Float,
+                System.Globalization.CultureInfo.InvariantCulture,
+                out v
+            );
         }
 
         private static bool ParseInt(object o, out int v)
         {
             v = 0;
-            if (o == null) return false;
-            if (o is int i) { v = i; return true; }
-            if (o is long l) { v = (int)l; return true; }
-            if (o is float f) { v = (int)f; return true; }
-            return int.TryParse(o.ToString(), System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out v);
+            if (o == null)
+                return false;
+            if (o is int i)
+            {
+                v = i;
+                return true;
+            }
+            if (o is long l)
+            {
+                v = (int)l;
+                return true;
+            }
+            if (o is float f)
+            {
+                v = (int)f;
+                return true;
+            }
+            return int.TryParse(
+                o.ToString(),
+                System.Globalization.NumberStyles.Integer,
+                System.Globalization.CultureInfo.InvariantCulture,
+                out v
+            );
         }
 
         private static bool ParseBool(object o)
         {
-            if (o == null) return false;
-            if (o is bool b) return b;
-            if (o is string s) return bool.TryParse(s, out var b2) && b2;
+            if (o == null)
+                return false;
+            if (o is bool b)
+                return b;
+            if (o is string s)
+                return bool.TryParse(s, out var b2) && b2;
             return false;
         }
     }

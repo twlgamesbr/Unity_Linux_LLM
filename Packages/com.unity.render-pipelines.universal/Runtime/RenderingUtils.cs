@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine.Experimental.Rendering;
-using UnityEngine.Rendering;
 using UnityEngine.Rendering.RenderGraphModule;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;

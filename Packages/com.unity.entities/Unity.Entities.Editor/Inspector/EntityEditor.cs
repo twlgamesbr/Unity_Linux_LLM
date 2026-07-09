@@ -1,6 +1,4 @@
 using JetBrains.Annotations;
-using System;
-using System.Linq;
 using Unity.Mathematics;
 using Unity.Properties;
 using Unity.Entities.UI;

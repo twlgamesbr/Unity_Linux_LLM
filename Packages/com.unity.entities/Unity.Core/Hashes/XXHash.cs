@@ -4,7 +4,6 @@
 // </copyright>
 //
 // Modified to work under DOTS Runtime
-using System;
 using System.Runtime.CompilerServices;
 using Unity.Burst;
 

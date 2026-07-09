@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using UnityEngine.Assertions;
 using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
 
 namespace Unity.Entities
 {

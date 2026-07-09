@@ -1,5 +1,3 @@
-using UnityEngine.Scripting;
-
 ////TODO: move clamping settings into struct and add process function; then embed both here and in AxisControl
 
 namespace UnityEngine.InputSystem.Processors

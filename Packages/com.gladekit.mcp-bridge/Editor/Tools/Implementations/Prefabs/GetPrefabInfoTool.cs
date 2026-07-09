@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using GladeAgenticAI.Core.Tools;
 
 namespace GladeAgenticAI.Core.Tools.Implementations.Prefabs
 {
@@ -25,11 +23,14 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Prefabs
                 prefabPath = "Assets/" + prefabPath;
 
             // Load prefab asset
-            UnityEngine.GameObject prefabAsset = AssetDatabase.LoadAssetAtPath<UnityEngine.GameObject>(prefabPath);
+            UnityEngine.GameObject prefabAsset =
+                AssetDatabase.LoadAssetAtPath<UnityEngine.GameObject>(prefabPath);
             if (prefabAsset == null)
             {
                 // Try case-insensitive search
-                prefabAsset = ToolUtils.LoadAssetAtPathCaseInsensitive<UnityEngine.GameObject>(prefabPath);
+                prefabAsset = ToolUtils.LoadAssetAtPathCaseInsensitive<UnityEngine.GameObject>(
+                    prefabPath
+                );
                 if (prefabAsset == null)
                     return ToolUtils.CreateErrorResponse($"Prefab not found at '{prefabPath}'");
             }
@@ -45,9 +46,12 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Prefabs
             UnityEngine.Transform rootTransform = prefabAsset.transform;
             info["transform"] = new Dictionary<string, object>
             {
-                ["position"] = $"{rootTransform.localPosition.x},{rootTransform.localPosition.y},{rootTransform.localPosition.z}",
-                ["rotation"] = $"{rootTransform.localRotation.eulerAngles.x},{rootTransform.localRotation.eulerAngles.y},{rootTransform.localRotation.eulerAngles.z}",
-                ["scale"] = $"{rootTransform.localScale.x},{rootTransform.localScale.y},{rootTransform.localScale.z}"
+                ["position"] =
+                    $"{rootTransform.localPosition.x},{rootTransform.localPosition.y},{rootTransform.localPosition.z}",
+                ["rotation"] =
+                    $"{rootTransform.localRotation.eulerAngles.x},{rootTransform.localRotation.eulerAngles.y},{rootTransform.localRotation.eulerAngles.z}",
+                ["scale"] =
+                    $"{rootTransform.localScale.x},{rootTransform.localScale.y},{rootTransform.localScale.z}",
             };
 
             // Components
@@ -68,15 +72,16 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Prefabs
             // Child count
             info["childCount"] = rootTransform.childCount;
 
-            var extras = new Dictionary<string, object>
-            {
-                ["info"] = info
-            };
+            var extras = new Dictionary<string, object> { ["info"] = info };
 
             return ToolUtils.CreateSuccessResponse($"Prefab info for '{prefabPath}'", extras);
         }
 
-        private void CollectHierarchy(UnityEngine.Transform transform, List<string> hierarchy, string prefix)
+        private void CollectHierarchy(
+            UnityEngine.Transform transform,
+            List<string> hierarchy,
+            string prefix
+        )
         {
             string name = prefix + transform.name;
             hierarchy.Add(name);

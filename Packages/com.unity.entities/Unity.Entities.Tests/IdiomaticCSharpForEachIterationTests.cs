@@ -1,11 +1,8 @@
 ﻿using System;
 using NUnit.Framework;
-using Unity.Burst;
 using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Mathematics;
-using Unity.Transforms;
-using UnityEngine;
 using static Unity.Entities.SystemAPI;
 
 namespace Unity.Entities.Tests

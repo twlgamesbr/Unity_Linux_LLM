@@ -1,7 +1,4 @@
-using System.Collections;
 using NUnit.Framework;
-using UnityEngine;
-using UnityEngine.TestTools;
 
 /// <summary>
 /// Dummy test class. Tests are not shipped with the package.

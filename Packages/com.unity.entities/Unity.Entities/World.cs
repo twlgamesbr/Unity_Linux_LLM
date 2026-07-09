@@ -2,10 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using Unity.Assertions;
 using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.Core;
 using Unity.Profiling;
 

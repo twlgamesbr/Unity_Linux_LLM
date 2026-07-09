@@ -1,14 +1,11 @@
 using System;
 using System.Diagnostics;
 using Unity.Collections;
-using Unity.Collections.NotBurstCompatible;
 using Unity.Jobs;
-using UnityEngine;
 
 #if UNITY_EDITOR
 using System.Text;
 using UnityEditor;
-using UnityObject = UnityEngine.Object;
 #endif
 
 namespace Unity.Entities

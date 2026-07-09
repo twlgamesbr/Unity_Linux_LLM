@@ -14,8 +14,6 @@ using System.Text.RegularExpressions;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
-using UnityEngine.TestTools;
-using UnityEngine;
 using static Unity.Entities.EntitiesJournaling;
 
 namespace Unity.Entities.Tests

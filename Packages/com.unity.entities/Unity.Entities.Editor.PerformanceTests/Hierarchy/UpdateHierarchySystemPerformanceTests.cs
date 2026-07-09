@@ -1,9 +1,7 @@
-using System;
 using NUnit.Framework;
 using Unity.Collections;
 using Unity.PerformanceTesting;
 using Unity.Transforms;
-using UnityEditor;
 
 namespace Unity.Entities.Editor.PerformanceTests
 {

@@ -1,8 +1,6 @@
 #define SOME_DEFINE
 using System;
 using NUnit.Framework;
-using Unity.Collections;
-using Unity.Jobs;
 #pragma warning disable 649
 
 namespace Unity.Entities.Tests

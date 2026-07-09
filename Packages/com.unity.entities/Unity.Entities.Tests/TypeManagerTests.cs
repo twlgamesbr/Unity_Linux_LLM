@@ -1,16 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using NUnit.Framework;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
-using Unity.Entities.Serialization;
 using Unity.Entities.Tests;
 using Unity.Mathematics;
-using Unity.Transforms;
 using UnityEngine;
 
 #pragma warning disable 649

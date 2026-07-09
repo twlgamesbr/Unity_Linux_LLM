@@ -5,7 +5,6 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Collections.LowLevel.Unsafe.NotBurstCompatible;
 using Unity.Entities;
-using UnityEngine;
 using Hash128 = Unity.Entities.Hash128;
 
 namespace Unity.Scenes

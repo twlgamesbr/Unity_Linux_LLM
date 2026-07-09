@@ -2,7 +2,6 @@ using System;
 using System.ComponentModel;
 using System.Reflection;
 using UnityEngine.InputSystem.Utilities;
-using UnityEngine.Scripting;
 
 // [GESTURES]
 // Idea for v2 of the input system:

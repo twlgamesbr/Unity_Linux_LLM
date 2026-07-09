@@ -1,11 +1,9 @@
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
-using System.Text;
 using Unity.Assertions;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Profiling;
-using UnityEngine.Profiling;
 
 namespace Unity.Entities
 {

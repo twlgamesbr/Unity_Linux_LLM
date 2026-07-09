@@ -1,6 +1,4 @@
-using System;
 using Unity.Entities;
-using Unity.Scenes.Hybrid.Tests;
 using UnityEngine;
 
 namespace Unity.Scenes.Hybrid.Tests

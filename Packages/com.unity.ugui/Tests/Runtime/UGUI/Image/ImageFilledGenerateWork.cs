@@ -1,7 +1,5 @@
 using UnityEngine.UI;
-using UnityEngine.TestTools;
 using NUnit.Framework;
-using System.Collections;
 using UnityEngine;
 
 [TestFixture]

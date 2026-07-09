@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using UnityEditor.UIElements;
 using UnityEngine.UIElements;
 
 namespace Unity.Entities.UI

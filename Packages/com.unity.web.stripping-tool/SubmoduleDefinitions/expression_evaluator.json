@@ -1,0 +1,24 @@
+{
+    "submodules": [
+        {
+            "name": "Expression Evaluator",
+            "description": "Provides support for evaluating simple math expressions. (https://docs.unity3d.com/ScriptReference/ExpressionEvaluator.html)",
+            "version": "1.0.0",
+            "functions": [
+            ],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* UnityEngine.ExpressionEvaluator::*",
+                            "* UnityEngine.ExpressionEvaluator/*"
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}

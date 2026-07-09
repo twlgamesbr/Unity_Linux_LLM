@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEditor.RenderPipelines.Core;
 using UnityEditor.ShaderGraph;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
 namespace UnityEditor.Rendering.Universal

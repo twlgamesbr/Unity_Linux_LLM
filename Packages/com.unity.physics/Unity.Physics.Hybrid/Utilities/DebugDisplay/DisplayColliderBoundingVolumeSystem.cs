@@ -4,7 +4,6 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
 using Unity.Burst;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.Transforms;
 
 namespace Unity.Physics.Authoring

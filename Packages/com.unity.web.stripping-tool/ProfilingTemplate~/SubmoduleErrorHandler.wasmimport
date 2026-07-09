@@ -1,0 +1,67 @@
+const errorMessageTemplate = "Stripped function $1 (used in submodule '$2') was called.\nThis could be caused by a submodule being stripped from the build even though it is needed.\nTry disabling the submodule '$2' in Submodule Stripping Settings.";
+const throwOnExecution = {{{ THROW_ON_EXECUTION }}};
+const functionsFilePath = !Module['ENVIRONMENT_IS_PTHREAD'] ? "Build/functions.json" : "functions.json";
+const labelsFilePath = !Module['ENVIRONMENT_IS_PTHREAD'] ? "Build/labels.json" : "labels.json";
+var _labelMap = null;
+var _functionMap = null;
+
+async function _getFunctionMap() {
+  if (_functionMap != null)
+    return _functionMap;
+
+  let response = await fetch(functionsFilePath);
+  _functionMap = await response.json();
+
+  return _functionMap;
+}
+
+async function _getLabelMap() {
+  if (_labelMap != null)
+    return _labelMap;
+
+  let response = await fetch(labelsFilePath)
+  _labelMap = await response.json();
+
+  return _labelMap;
+}
+
+// Emscripten 4 might not make warnOnce available
+if (typeof(warnOnce)==="undefined") {
+  window.warnOnce = function (text) {
+    warnOnce.shown ||= {};
+    if (!warnOnce.shown[text]) {
+      warnOnce.shown[text] = 1;
+      console.error(text);
+    }
+  };
+}
+
+function logErrorSync(funcId, labelId) {
+  const errorMessage = errorMessageTemplate.replace("$1", _functionMap[funcId]).replace(/\$2/g, _labelMap[labelId]);
+  if (throwOnExecution)
+    throw new Error(errorMessage);
+  else
+    warnOnce(errorMessage);
+}
+
+function _log_execution(funcId, labelId) {
+  if (_functionMap && _labelMap)
+    return logErrorSync(funcId, labelId);
+
+  return Promise.all([
+    _getFunctionMap(),
+    _getLabelMap()
+  ]).then(() => logErrorSync(funcId, labelId));
+}
+
+// Cick of loading of function and label map immediatly
+Promise.all([
+  _getFunctionMap(),
+  _getLabelMap()
+]).then(() => {
+  console.log("[Submodule Stripping] Loaded submodule meta data.");
+});
+// This could be caused by a submodule being stripped from the build even though it is needed. Try disabling the submodule 'Strip Engine Code' in Submodule Stripping Settings.
+
+var wasmImports = {
+  "log_execution": _log_execution,

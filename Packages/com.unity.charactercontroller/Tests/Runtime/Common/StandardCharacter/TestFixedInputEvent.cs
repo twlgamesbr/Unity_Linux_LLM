@@ -1,5 +1,3 @@
-using UnityEngine;
-
 namespace Unity.CharacterController.RuntimeTests
 {
     public struct TestFixedInputEvent

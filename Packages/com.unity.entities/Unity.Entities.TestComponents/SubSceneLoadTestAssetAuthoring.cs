@@ -1,4 +1,3 @@
-using System;
 using Unity.Entities;
 using UnityEngine;
 using Object = UnityEngine.Object;

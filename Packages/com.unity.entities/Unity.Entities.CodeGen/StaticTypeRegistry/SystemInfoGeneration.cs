@@ -9,7 +9,6 @@ using System.Text;
 using MethodAttributes = Mono.Cecil.MethodAttributes;
 using ParameterAttributes = Mono.Cecil.ParameterAttributes;
 using Unity.Cecil.Awesome;
-using static Unity.Entities.BuildUtils.MonoExtensions;
 using static Unity.Entities.TypeRegistry;
 
 

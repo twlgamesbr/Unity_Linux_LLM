@@ -1,8 +1,6 @@
 using System;
-using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
-using Unity.Jobs;
 
 internal interface IFirstKeyJobCallback<TKey, TValue>
     where TKey : unmanaged, IEquatable<TKey>

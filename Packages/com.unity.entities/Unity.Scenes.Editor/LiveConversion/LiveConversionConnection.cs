@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Reflection;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Entities.Build;
@@ -9,9 +7,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Assert = Unity.Assertions.Assert;
 using Hash128 = Unity.Entities.Hash128;
-using Object = UnityEngine.Object;
 
 namespace Unity.Scenes.Editor
 {

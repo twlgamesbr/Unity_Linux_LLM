@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using EditorAttributes;
+using Void = EditorAttributes.Void;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -27,7 +28,7 @@ namespace NPCSystem
         public string sessionId;
         public string playerId;
         public string username;
-        public string sessionToken;    // Supabase access_token
+        public string sessionToken; // Supabase access_token
         public string refreshToken;
         public string createdAtUtc;
         public string expiresAtUtc;
@@ -181,35 +182,79 @@ namespace NPCSystem
     public class PlayerAuthService : MonoBehaviour
     {
         [Title("Player Auth Service — Supabase Gotrue")]
+        [FoldoutGroup("Supabase Auth", true, nameof(supabaseUrl), nameof(supabaseAnonKey), nameof(restApiUrl))]
         [HelpBox(
-            "Client-side gateway for login/register/session restore against the self-hosted Supabase Gotrue endpoint. "
-                + "Usernames are mapped to email@npc-game.local for Gotrue email/password auth. "
-                + "Access tokens are stored as the session token; refresh tokens enable silent re-auth.",
-            MessageMode.Log,
-            drawAbove: true
+            "Anon key is required for PostgREST access. The URL should point to your self-hosted Gotrue instance. For development, the default localhost:8091 is used. restApiUrl points to PostgREST for player profile creation.",
+            MessageMode.Log
         )]
-        [Header("Supabase Auth")]
         [SerializeField]
+        Void supabaseAuthGroup;
+
+        [SerializeField, HideProperty]
         string supabaseUrl = "http://localhost:8091";
 
-        [SerializeField]
+        [SerializeField, HideProperty]
         string supabaseAnonKey = "dev-local-anon-key";
 
-        [Header("Behaviour")]
+        [SerializeField, HideProperty]
+        string restApiUrl = "http://localhost:8092";
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+        void ResolveWebGLUrls()
+        {
+            try
+            {
+                Uri pageUri = new Uri(Application.absoluteURL);
+                string host = pageUri.Host;
+                if (host == "localhost" || host == "127.0.0.1")
+                    return;
+
+                supabaseUrl = ReplaceHost(supabaseUrl, host);
+                restApiUrl = ReplaceHost(restApiUrl, host);
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning(
+                    $"[PlayerAuthService] Failed to dynamically resolve WebGL URLs: {ex.Message}"
+                );
+            }
+        }
+
+        static string ReplaceHost(string url, string newHost)
+        {
+            try
+            {
+                var uri = new Uri(url);
+                return $"{uri.Scheme}://{newHost}:{uri.Port}{uri.AbsolutePath}";
+            }
+            catch
+            {
+                return url;
+            }
+        }
+#endif
+
+        [FoldoutGroup("Behaviour", true, nameof(requestTimeoutSeconds), nameof(validateStoredSessionOnStart))]
         [SerializeField]
+        Void behaviourGroup;
+
+        [SerializeField, HideProperty, Suffix("s")]
         float requestTimeoutSeconds = 15f;
 
-        [SerializeField]
+        [SerializeField, HideProperty]
         bool validateStoredSessionOnStart = true;
 
-        [Header("Debug")]
-        [SerializeField, ReadOnly]
+        [FoldoutGroup("Debug", true, nameof(lastAuthStatus), nameof(lastAuthRoute), nameof(lastAuthDurationMs))]
+        [SerializeField]
+        Void debugGroup;
+
+        [SerializeField, HideProperty, ReadOnly]
         string lastAuthStatus = "Idle";
 
-        [SerializeField, ReadOnly]
+        [SerializeField, HideProperty, ReadOnly]
         string lastAuthRoute = string.Empty;
 
-        [SerializeField, ReadOnly]
+        [SerializeField, HideProperty, ReadOnly]
         long lastAuthDurationMs;
 
         bool _initialized;
@@ -275,6 +320,10 @@ namespace NPCSystem
             if (_initialized)
                 return IsAuthenticated ? CurrentSession : null;
 
+#if UNITY_WEBGL && !UNITY_EDITOR
+            ResolveWebGLUrls();
+#endif
+
             using var scope = NPCFlowScope.Start(
                 NPCFlowLogger.FindOrCreate(),
                 NPCFlowStage.AuthSession,
@@ -330,23 +379,32 @@ namespace NPCSystem
             string rawPassword = password ?? string.Empty;
 
             // Step 1: signup via Gotrue
-            var signupBody = new GotrueSignupRequest
-            {
-                email = email,
-                password = rawPassword,
-            };
+            var signupBody = new GotrueSignupRequest { email = email, password = rawPassword };
 
-            GotrueSessionResponse signupResponse =
-                await SendGotrueJsonAsync<GotrueSessionResponse>(
-                    "signup",
-                    UnityWebRequest.kHttpVerbPOST,
-                    JsonUtility.ToJson(signupBody)
-                );
-            if (
-                signupResponse?.user == null
-                || string.IsNullOrWhiteSpace(signupResponse.user.id)
-            )
+            GotrueSessionResponse signupResponse = await SendGotrueJsonAsync<GotrueSessionResponse>(
+                "signup",
+                UnityWebRequest.kHttpVerbPOST,
+                JsonUtility.ToJson(signupBody)
+            );
+            if (signupResponse?.user == null || string.IsNullOrWhiteSpace(signupResponse.user.id))
                 throw new InvalidOperationException("Supabase signup returned no user.");
+
+            // Create player profile immediately using the signup session token,
+            // so a player_profiles row exists from the moment the user registers
+            if (!string.IsNullOrWhiteSpace(signupResponse.access_token))
+            {
+                string previousSessionToken = CurrentSession?.sessionToken;
+                CurrentSession = new PlayerAuthSessionResponse
+                {
+                    playerId = signupResponse.user.id,
+                    sessionToken = signupResponse.access_token,
+                    username = username?.Trim() ?? string.Empty,
+                };
+                await TryCreatePlayerProfileAsync(username?.Trim() ?? string.Empty);
+                CurrentSession = previousSessionToken != null
+                    ? new PlayerAuthSessionResponse { sessionToken = previousSessionToken }
+                    : null;
+            }
 
             return new PlayerAuthRegisterResponse
             {
@@ -355,6 +413,67 @@ namespace NPCSystem
                 username = username?.Trim() ?? string.Empty,
                 createdAtUtc = DateTime.UtcNow.ToString("O"),
             };
+        }
+
+        async Task TryCreatePlayerProfileAsync(string displayName)
+        {
+            if (string.IsNullOrWhiteSpace(restApiUrl) || string.IsNullOrWhiteSpace(supabaseAnonKey))
+                return;
+
+            string url = $"{restApiUrl.TrimEnd('/')}/rpc/create_or_update_player_profile";
+            var body = new System.Collections.Generic.Dictionary<string, object>
+            {
+                ["p_display_name"] = displayName?.Trim() ?? string.Empty,
+            };
+            string jsonBody = Newtonsoft.Json.JsonConvert.SerializeObject(body);
+
+            try
+            {
+                using var request = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST);
+                request.downloadHandler = new DownloadHandlerBuffer();
+                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonBody));
+                request.SetRequestHeader("apikey", supabaseAnonKey);
+                request.SetRequestHeader("Content-Type", "application/json");
+                request.SetRequestHeader("Accept", "application/json");
+                if (!string.IsNullOrWhiteSpace(CurrentSession?.sessionToken))
+                    request.SetRequestHeader("Authorization", $"Bearer {CurrentSession.sessionToken}");
+                request.timeout = Mathf.Max(1, Mathf.CeilToInt(requestTimeoutSeconds));
+
+                var operation = request.SendWebRequest();
+                while (!operation.isDone)
+                    await Task.Yield();
+
+                if (request.responseCode >= 200 && request.responseCode < 300)
+                {
+                    NPCFlowLogger.FindOrCreate()?.Log(
+                        NPCFlowStage.ConfigurationValidation,
+                        NPCFlowStatus.Success,
+                        NPCFlowLogLevel.Debug,
+                        $"Player profile created/updated for '{displayName}'.",
+                        source: nameof(PlayerAuthService)
+                    );
+                }
+                else
+                {
+                    NPCFlowLogger.FindOrCreate()?.Log(
+                        NPCFlowStage.ConfigurationValidation,
+                        NPCFlowStatus.Warning,
+                        NPCFlowLogLevel.Warning,
+                        $"Player profile RPC returned HTTP {request.responseCode}: {request.downloadHandler?.text ?? request.error}",
+                        source: nameof(PlayerAuthService)
+                    );
+                }
+            }
+            catch (System.Exception ex)
+            {
+                NPCFlowLogger.FindOrCreate()?.Log(
+                    NPCFlowStage.ConfigurationValidation,
+                    NPCFlowStatus.Warning,
+                    NPCFlowLogLevel.Warning,
+                    $"Player profile creation failed: {ex.Message}",
+                    source: nameof(PlayerAuthService)
+                );
+            }
         }
 
         public async Task<PlayerAuthSessionResponse> LoginAsync(
@@ -407,6 +526,9 @@ namespace NPCSystem
                 // Session is valid — update playerId if needed
                 CurrentSession.playerId = user.id;
                 PlayerSessionStore.Save(CurrentSession);
+
+                // Update profile on session restore (last_login_at, is_online)
+                await TryCreatePlayerProfileAsync(CurrentSession.username);
                 return CurrentSession;
             }
             catch
@@ -418,6 +540,9 @@ namespace NPCSystem
                     ClearLocalSession();
                     return null;
                 }
+
+                // Update profile on token refresh
+                await TryCreatePlayerProfileAsync(CurrentSession.username);
                 return CurrentSession;
             }
         }
@@ -465,11 +590,7 @@ namespace NPCSystem
             bool rememberMe
         )
         {
-            var body = new GotruePasswordGrantRequest
-            {
-                email = email,
-                password = password,
-            };
+            var body = new GotruePasswordGrantRequest { email = email, password = password };
 
             GotrueSessionResponse gotrueSession = await SendGotrueJsonAsync<GotrueSessionResponse>(
                 "token?grant_type=password",
@@ -504,15 +625,16 @@ namespace NPCSystem
             else
                 PlayerSessionStore.Clear();
 
+            // Create/update player profile via PostgREST RPC
+            await TryCreatePlayerProfileAsync(username);
+
+            lastAuthStatus = $"Login successful for '{username}'. Session expires at {session.expiresAtUtc}.";
             return session;
         }
 
         async Task<bool> TryRefreshTokenAsync()
         {
-            if (
-                CurrentSession == null
-                || string.IsNullOrWhiteSpace(CurrentSession.refreshToken)
-            )
+            if (CurrentSession == null || string.IsNullOrWhiteSpace(CurrentSession.refreshToken))
                 return false;
 
             try
@@ -522,12 +644,11 @@ namespace NPCSystem
                     refresh_token = CurrentSession.refreshToken,
                 };
 
-                GotrueSessionResponse refreshed =
-                    await SendGotrueJsonAsync<GotrueSessionResponse>(
-                        "token?grant_type=refresh_token",
-                        UnityWebRequest.kHttpVerbPOST,
-                        JsonUtility.ToJson(body)
-                    );
+                GotrueSessionResponse refreshed = await SendGotrueJsonAsync<GotrueSessionResponse>(
+                    "token?grant_type=refresh_token",
+                    UnityWebRequest.kHttpVerbPOST,
+                    JsonUtility.ToJson(body)
+                );
                 if (
                     refreshed == null
                     || string.IsNullOrWhiteSpace(refreshed.access_token)
@@ -541,10 +662,9 @@ namespace NPCSystem
                 CurrentSession.playerId = refreshed.user.id;
                 CurrentSession.username = username;
                 CurrentSession.sessionToken = refreshed.access_token;
-                CurrentSession.refreshToken = refreshed.refresh_token ?? CurrentSession.refreshToken;
-                CurrentSession.expiresAtUtc = DateTime.UtcNow
-                    .AddSeconds(expiresIn)
-                    .ToString("O");
+                CurrentSession.refreshToken =
+                    refreshed.refresh_token ?? CurrentSession.refreshToken;
+                CurrentSession.expiresAtUtc = DateTime.UtcNow.AddSeconds(expiresIn).ToString("O");
                 CurrentSession.lastSeenAtUtc = DateTime.UtcNow.ToString("O");
                 PlayerSessionStore.Save(CurrentSession);
 
@@ -619,7 +739,8 @@ namespace NPCSystem
                     request.responseCode
                 );
                 lastAuthDurationMs = scope.ElapsedMilliseconds;
-                lastAuthStatus = $"Auth request failed: {route} -> HTTP {request.responseCode} {error}";
+                lastAuthStatus =
+                    $"Auth request failed: {route} -> HTTP {request.responseCode} {error}";
                 scope.Error(
                     new InvalidOperationException(error),
                     lastAuthStatus,
@@ -633,7 +754,10 @@ namespace NPCSystem
             }
 
             // 204 No Content (e.g. logout) — return default
-            if (request.responseCode == 204 || string.IsNullOrWhiteSpace(request.downloadHandler.text))
+            if (
+                request.responseCode == 204
+                || string.IsNullOrWhiteSpace(request.downloadHandler.text)
+            )
             {
                 lastAuthDurationMs = scope.ElapsedMilliseconds;
                 lastAuthStatus = $"Auth request succeeded (HTTP {request.responseCode}): {route}";
@@ -716,8 +840,9 @@ namespace NPCSystem
                 ["playerId"] = session?.playerId ?? string.Empty,
                 ["username"] = session?.username ?? string.Empty,
                 ["expiresAtUtc"] = session?.expiresAtUtc ?? string.Empty,
-                ["hasRefreshToken"] =
-                    !string.IsNullOrWhiteSpace(session?.refreshToken) ? "yes" : "no",
+                ["hasRefreshToken"] = !string.IsNullOrWhiteSpace(session?.refreshToken)
+                    ? "yes"
+                    : "no",
             };
         }
     }

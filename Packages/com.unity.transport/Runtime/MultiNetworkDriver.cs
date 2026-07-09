@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics;
 using Unity.Collections;
 using Unity.Jobs;
-using UnityEngine;
 
 namespace Unity.Networking.Transport
 {

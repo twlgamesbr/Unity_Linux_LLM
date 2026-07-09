@@ -1,12 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Text;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEditor;
-using GladeAgenticAI.Core.Tools;
-
 #if GLADE_UGUI
 namespace GladeAgenticAI.Core.Tools.Implementations.UI
 {

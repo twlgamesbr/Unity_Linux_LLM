@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 using Hash128 = Unity.Entities.Hash128;
 

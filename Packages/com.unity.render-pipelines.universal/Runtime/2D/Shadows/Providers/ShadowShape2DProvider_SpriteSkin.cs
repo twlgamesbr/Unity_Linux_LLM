@@ -1,11 +1,5 @@
 #if USING_2DANIMATION
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
-using UnityEngine;
-using UnityEngine.U2D;
 using UnityEngine.U2D.Animation;
 
 namespace UnityEngine.Rendering.Universal

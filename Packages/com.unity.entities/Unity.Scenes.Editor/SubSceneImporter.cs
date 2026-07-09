@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Entities.Serialization;
-using Unity.Core.Compression;
 using Unity.Entities.Build;
 using UnityEditor;
 using UnityEditor.Build.Content;

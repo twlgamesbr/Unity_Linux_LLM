@@ -3,10 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
 using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.Core;
 using Unity.Jobs;
-using System.Reflection;
 using System.Linq;
 
 namespace Unity.Entities.Tests

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Unity.Serialization.Binary;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Unity.Assertions;
 using Unity.Burst;

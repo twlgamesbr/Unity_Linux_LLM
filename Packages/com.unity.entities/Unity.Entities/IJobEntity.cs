@@ -4,7 +4,6 @@ using System;
 using Unity.Burst.Intrinsics;
 using Unity.Entities.Internal;
 using Unity.Jobs;
-using UnityEngine;
 
 namespace Unity.Entities
 {

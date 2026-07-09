@@ -1,6 +1,6 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using System;
 
 namespace NPCSystem
 {
@@ -144,7 +144,9 @@ namespace NPCSystem
 
             if (_playerMap == null)
             {
-                Debug.LogError($"[{nameof(NPCMultiplayerInputActions)}] Action map '{actionMapName}' not found in {inputActions.name}.");
+                Debug.LogError(
+                    $"[{nameof(NPCMultiplayerInputActions)}] Action map '{actionMapName}' not found in {inputActions.name}."
+                );
                 return;
             }
 
@@ -159,8 +161,14 @@ namespace NPCSystem
             _attackAction = _playerMap.FindAction("Attack", false);
 
             // Optional: log missing non-critical actions
-            if (_moveAction == null) Debug.LogWarning($"[{nameof(NPCMultiplayerInputActions)}] 'Move' action not found.");
-            if (_jumpAction == null) Debug.LogWarning($"[{nameof(NPCMultiplayerInputActions)}] 'Jump' action not found.");
+            if (_moveAction == null)
+                Debug.LogWarning(
+                    $"[{nameof(NPCMultiplayerInputActions)}] 'Move' action not found."
+                );
+            if (_jumpAction == null)
+                Debug.LogWarning(
+                    $"[{nameof(NPCMultiplayerInputActions)}] 'Jump' action not found."
+                );
         }
 
         public void SetActionMap(string mapName)

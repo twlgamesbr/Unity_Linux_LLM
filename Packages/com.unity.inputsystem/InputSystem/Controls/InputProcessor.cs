@@ -2,7 +2,6 @@ using System;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine.InputSystem.Layouts;
 using UnityEngine.InputSystem.Utilities;
-using UnityEngine.Scripting;
 
 ////TODO: come up with a mechanism to allow (certain) processors to be stateful
 

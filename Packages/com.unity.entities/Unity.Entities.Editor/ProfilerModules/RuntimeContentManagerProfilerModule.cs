@@ -9,7 +9,6 @@ using UnityEditor;
 using UnityEditor.Profiling;
 using UnityEditorInternal;
 using UnityEngine.UIElements;
-using Hash128 = Unity.Entities.Hash128;
 
 [System.Serializable]
 [ProfilerModuleMetadata("Runtime Content Manager")]

@@ -1,0 +1,32 @@
+{
+    "name": "Unity.DedicatedServer.MultiplayerRoles.Editor",
+    "rootNamespace": "",
+    "references": [
+        "Unity.DedicatedServer.MultiplayerRoles",
+        "Unity.DedicatedServer.Editor",
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.DedicatedServer.Editor.Bridge"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.render-pipelines.core",
+            "expression": "",
+            "define": "UNITY_RENDER_PIPELINE_PRESENT"
+        },
+        {
+            "name": "com.unity.cinemachine",
+            "expression": "",
+            "define": "UNITY_CINEMACHINE_PRESENT"
+        }
+    ],
+    "noEngineReferences": false
+}

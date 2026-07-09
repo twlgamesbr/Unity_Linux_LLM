@@ -1,5 +1,6 @@
 #if !UNITY_SERVER
 using EditorAttributes;
+using Void = EditorAttributes.Void;
 using UnityEngine;
 
 namespace NPCSystem.EditorUX
@@ -16,25 +17,37 @@ namespace NPCSystem.EditorUX
             MessageMode.Log,
             drawAbove: true
         )]
-        [SerializeField, Required]
+        [FoldoutGroup("Scene References", true, nameof(dialogueManager), nameof(qdrantRag))]
+        [SerializeField]
+        private Void referencesGroup;
+
+        [SerializeField, HideProperty, Required]
         NPCDialogueManager dialogueManager;
 
-        [SerializeField]
-        bool useQdrantDiagnostics = true;
-
-        [SerializeField, ShowField(nameof(useQdrantDiagnostics))]
+        [SerializeField, HideProperty, ShowField(nameof(useQdrantDiagnostics))]
         QdrantRAGService qdrantRag;
 
+        [SerializeField, HideProperty]
+        bool useQdrantDiagnostics = true;
+
+        [FoldoutGroup("LocalAI Settings", true, nameof(localAiHost), nameof(localAiPort), nameof(localAiModel))]
         [SerializeField]
+        private Void localAiGroup;
+
+        [SerializeField, HideProperty]
         string localAiHost = "localhost";
 
-        [SerializeField]
+        [SerializeField, HideProperty]
         int localAiPort = 8080;
 
-        [SerializeField]
-        string localAiModel = "llama-3.1-8b-q4-k-m";
+        [SerializeField, HideProperty]
+        string localAiModel = "llama32-unity-blended-20260707-q4_k_m";
 
-        [SerializeField, ReadOnly]
+        [FoldoutGroup("Diagnostics Status", true, nameof(lastValidationStatus))]
+        [SerializeField]
+        private Void diagnosticsStatusGroup;
+
+        [SerializeField, HideProperty, ReadOnly]
         string lastValidationStatus = "Not validated yet.";
 
         [ShowInInspector]

@@ -1,44 +1,98 @@
 using System.Collections.Generic;
 using System.Linq;
+using EditorAttributes;
+using Void = EditorAttributes.Void;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
-#if ENABLE_INPUT_SYSTEM
-using UnityEngine.InputSystem;
-#endif
 
 namespace NPCSystem
 {
     [DefaultExecutionOrder(-400)]
     public class NPCDialogueUIController : MonoBehaviour
     {
-        [Header("Runtime")]
+        [HelpBox(
+            "Binds UI elements (dropdown, input, text, buttons) to the NPCDialogueManager or NPCDialogueNetworkBridge. Routes runtime events and handles portrait updates.",
+            MessageMode.Log,
+            drawAbove: true
+        )]
+        [SerializeField]
+        Void _docsGroup;
+
+        [FoldoutGroup("References", true, nameof(dialogueManager), nameof(networkBridge), nameof(legacyKnowledgeBaseController))]
+        [SerializeField]
+        Void referencesGroup;
+
+        [SerializeField, HideProperty, Required]
         public NPCDialogueManager dialogueManager;
+
+        [SerializeField, HideProperty]
         public NPCDialogueNetworkBridge networkBridge;
+
+        [SerializeField, HideProperty]
         public Behaviour legacyKnowledgeBaseController;
 
-        [Header("Dialogue UI")]
+        [FoldoutGroup("Dialogue UI", true, nameof(characterSelect), nameof(playerInput), nameof(aiText), nameof(stopButton))]
+        [SerializeField]
+        Void dialogueUiGroup;
+
+        [SerializeField, HideProperty, Required]
         public TMP_Dropdown characterSelect;
+
+        [SerializeField, HideProperty, Required]
         public TMP_InputField playerInput;
+
+        [SerializeField, HideProperty, Required]
         public TMP_Text aiText;
+
+        [SerializeField, HideProperty]
         public Button stopButton;
 
-        [Header("Portraits")]
+        [FoldoutGroup("Portraits", true, nameof(butlerImage), nameof(maidImage), nameof(chefImage))]
+        [SerializeField]
+        Void portraitsGroup;
+
+        [SerializeField, HideProperty]
         public RawImage butlerImage;
+
+        [SerializeField, HideProperty]
         public RawImage maidImage;
+
+        [SerializeField, HideProperty]
         public RawImage chefImage;
 
-        [Header("Notebook / Panels")]
+        [FoldoutGroup("Notebook / Panels", true, nameof(notebookController))]
+        [SerializeField]
+        Void notebookGroup;
+
+        [SerializeField, HideProperty]
         public NotebookUIController notebookController;
 
-        [Header("Exit and Startup")]
+        [FoldoutGroup("Exit and Startup", true, nameof(exitButton), nameof(initializeOnStart))]
+        [SerializeField]
+        Void exitStartupGroup;
+
+        [SerializeField, HideProperty]
         public Button exitButton;
 
         [Tooltip(
             "If true, UI and dialogue systems initialize on Start. If false, they initialize deferred post-login."
         )]
+        [SerializeField, HideProperty]
         public bool initializeOnStart = false;
+
+        [Title("Runtime Status")]
+        [ShowInInspector, ReadOnly]
+        string ActiveProfilePreview => GetActiveProfile()?.GetDisplayName() ?? "<none>";
+
+        [ShowInInspector, ReadOnly]
+        string ActiveSlugPreview => GetActiveProfile()?.GetNpcSlug() ?? "<none>";
+
+        [ShowInInspector, ReadOnly]
+        bool HasDialogueManager => dialogueManager != null;
+
+        [ShowInInspector, ReadOnly]
+        bool IsInitialized => _onDemandInitTask != null && (_onDemandInitTask.IsCompletedSuccessfully || _managerBound);
 
         private System.Threading.Tasks.Task _onDemandInitTask;
         bool _listenersBound;
@@ -67,6 +121,28 @@ namespace NPCSystem
             }
         }
 
+        [Button("Auto-Assign References")]
+        void AutoAssignReferences()
+        {
+            ResolveReferences();
+        }
+
+        [Button("Validate UI References")]
+        void ValidateUiReferences()
+        {
+            NPCFlowLogger
+                .FindOrCreate()
+                .Log(
+                    NPCFlowStage.ConfigurationValidation,
+                    dialogueManager != null ? NPCFlowStatus.Success : NPCFlowStatus.Warning,
+                    dialogueManager != null ? NPCFlowLogLevel.Info : NPCFlowLogLevel.Warning,
+                    dialogueManager != null
+                        ? "NPCDialogueManager is assigned."
+                        : "NPCDialogueManager is NOT assigned — runtime will not function.",
+                    source: nameof(NPCDialogueUIController)
+                );
+        }
+
         public System.Threading.Tasks.Task InitializeOnDemandAsync()
         {
             _onDemandInitTask ??= InitializeOnDemandInternalAsync();
@@ -90,39 +166,60 @@ namespace NPCSystem
             SetInputEnabled(false);
             BindUiListeners();
 
-            // Enforce that the bootstrapper completes its initialization first
-            var bootstrapper = FindAnyObjectByType<NPCDialogueBootstrapper>(
-                FindObjectsInactive.Include
-            );
-            if (bootstrapper != null)
+            try
             {
-                await bootstrapper.InitializeOnDemandAsync();
-            }
-            else
-            {
-                if (networkBridge == null && dialogueManager == null)
+                // Enforce that the bootstrapper completes its initialization first
+                var bootstrapper = FindAnyObjectByType<NPCDialogueBootstrapper>(
+                    FindObjectsInactive.Include
+                );
+                if (bootstrapper != null)
                 {
-                    NPCFlowLogger
-                        .FindOrCreate()
-                        .Log(
-                            NPCFlowStage.SceneBootstrap,
-                            NPCFlowStatus.Error,
-                            NPCFlowLogLevel.Error,
-                            "Neither NPCDialogueManager nor NPCDialogueNetworkBridge is available.",
-                            source: nameof(NPCDialogueUIController)
-                        );
-                    return;
+                    await bootstrapper.InitializeOnDemandAsync();
+                }
+                else
+                {
+                    if (networkBridge == null && dialogueManager == null)
+                    {
+                        NPCFlowLogger
+                            .FindOrCreate()
+                            .Log(
+                                NPCFlowStage.SceneBootstrap,
+                                NPCFlowStatus.Error,
+                                NPCFlowLogLevel.Error,
+                                "Neither NPCDialogueManager nor NPCDialogueNetworkBridge is available.",
+                                source: nameof(NPCDialogueUIController)
+                            );
+                        return;
+                    }
+
+                    if (networkBridge != null)
+                        await networkBridge.InitializeAsync();
+                    else
+                        await dialogueManager.InitializeAsync();
                 }
 
-                if (networkBridge != null)
-                    await networkBridge.InitializeAsync();
-                else
-                    await dialogueManager.InitializeAsync();
+                BindRuntimeEvents();
+                PopulateDropdown();
+                await SyncDropdownToCurrentProfileAsync();
             }
-
-            BindRuntimeEvents();
-            PopulateDropdown();
-            await SyncDropdownToCurrentProfileAsync();
+            catch (System.Exception ex)
+            {
+                NPCFlowLogger
+                    .FindOrCreate()
+                    .Log(
+                        NPCFlowStage.SceneBootstrap,
+                        NPCFlowStatus.Fallback,
+                        NPCFlowLogLevel.Warning,
+                        $"Dialogue bootstrap init failed: {ex.Message}. Input still enabled.",
+                        source: nameof(NPCDialogueUIController)
+                    );
+            }
+            finally
+            {
+                _readyForInput = true;
+                SetInputEnabled(true);
+                NPCPlayerCharacterController.RequestUIActive();
+            }
 
             NPCFlowLogger
                 .FindOrCreate()
@@ -229,7 +326,9 @@ namespace NPCSystem
                     ? characterSelect
                     : FindComponent<TMP_Dropdown>("Canvas/Dropdown");
             playerInput =
-                playerInput != null ? playerInput : FindComponent<TMP_InputField>("Canvas/PlayerInput");
+                playerInput != null
+                    ? playerInput
+                    : FindComponent<TMP_InputField>("Canvas/PlayerInput");
             aiText = aiText != null ? aiText : FindComponent<TMP_Text>("Canvas/AIImage/AIText");
             stopButton =
                 stopButton != null ? stopButton : FindComponent<Button>("Canvas/StopButton");
@@ -498,252 +597,105 @@ namespace NPCSystem
                     );
                 return;
             }
-            NPCProfile profile = _profiles[selection];
-            NPCFlowLogger
-                .FindOrCreate()
-                .Log(
-                    NPCFlowStage.NPCSwitch,
-                    NPCFlowStatus.Start,
-                    NPCFlowLogLevel.Info,
-                    "UI requested NPC switch.",
-                    source: nameof(NPCDialogueUIController),
-                    npcSlug: profile.GetNpcSlug(),
-                    data: new Dictionary<string, object> { ["selection"] = selection }
-                );
-            _readyForInput = false;
-            SetInputEnabled(false);
-            UpdatePortrait(profile);
+
+            string npcSlug = _profiles[selection].GetNpcSlug();
             if (networkBridge != null)
-                await networkBridge.RequestNpcSelectionAsync(profile.GetNpcSlug());
+                await networkBridge.RequestNpcSelectionAsync(npcSlug);
             else
-                await dialogueManager.SwitchToNPCAsync(profile.GetNpcSlug());
+                await dialogueManager.SwitchToNPCAsync(npcSlug);
         }
 
-        void OnInputFieldSubmit(string question)
+        NPCProfile GetActiveProfile()
         {
-            NPCProfile activeProfile = GetActiveProfile();
-            if (!_readyForInput || string.IsNullOrWhiteSpace(question) || activeProfile == null)
-            {
-                NPCFlowLogger
-                    .FindOrCreate()
-                    .Log(
-                        NPCFlowStage.UIInput,
-                        NPCFlowStatus.Skipped,
-                        NPCFlowLogLevel.Info,
-                        "UI input submit ignored.",
-                        source: nameof(NPCDialogueUIController),
-                        data: new Dictionary<string, object>
-                        {
-                            ["readyForInput"] = _readyForInput,
-                            ["hasText"] = !string.IsNullOrWhiteSpace(question),
-                            ["hasManager"] = dialogueManager != null || networkBridge != null,
-                            ["hasCurrentProfile"] = activeProfile != null,
-                        }
-                    );
-                return;
-            }
-            NPCFlowLogger
-                .FindOrCreate()
-                .Log(
-                    NPCFlowStage.UIInput,
-                    NPCFlowStatus.Success,
-                    NPCFlowLogLevel.Info,
-                    "UI submitted player input.",
-                    source: nameof(NPCDialogueUIController),
-                    npcSlug: activeProfile.GetNpcSlug(),
-                    data: NPCFlowTextSanitizer.MergeSummary(
-                        new Dictionary<string, object>(),
-                        "player",
-                        question,
-                        false,
-                        0
-                    )
-                );
             if (networkBridge != null)
-                networkBridge.SubmitPlayerMessage(question.Trim());
-            else
-                dialogueManager.SendMessage(question.Trim());
-        }
-
-        void SetInputEnabled(bool enabled)
-        {
-            if (playerInput == null)
-                return;
-
-            playerInput.interactable = enabled;
-            if (enabled)
-            {
-                playerInput.Select();
-                NPCPlayerCharacterController.LocalInstance?.SetUIActive(true);
-            }
-            else
-            {
-                NPCPlayerCharacterController.LocalInstance?.SetUIActive(false);
-            }
-        }
-
-        void OnStopPressed()
-        {
-            NPCFlowLogger
-                .FindOrCreate()
-                .Log(
-                    NPCFlowStage.UIInput,
-                    NPCFlowStatus.Success,
-                    NPCFlowLogLevel.Info,
-                    "UI stop/cancel pressed.",
-                    source: nameof(NPCDialogueUIController),
-                    npcSlug: GetActiveProfile() != null ? GetActiveProfile().GetNpcSlug() : null
-                );
-            if (networkBridge != null)
-                networkBridge.CancelActiveRequest();
-            else
-                dialogueManager?.CancelRequests();
-            SetInputEnabled(true);
+                return networkBridge.currentProfile;
+            if (dialogueManager != null)
+                return dialogueManager.currentProfile;
+            return null;
         }
 
         void UpdatePortrait(NPCProfile profile)
         {
             RawImage[] portraits = new[] { butlerImage, maidImage, chefImage };
-            foreach (RawImage portrait in portraits)
-            {
-                if (portrait != null)
-                    portrait.gameObject.SetActive(false);
-            }
-
             if (profile == null)
-                return;
-
-            RawImage target = ResolvePortraitTarget(profile);
-            if (target == null)
-                return;
-
-            if (profile.portraitTexture != null)
             {
-                target.texture = profile.portraitTexture;
+                foreach (RawImage img in portraits)
+                {
+                    if (img != null)
+                        img.CrossFadeAlpha(0f, 0.15f, true);
+                }
+                return;
             }
-            target.gameObject.SetActive(true);
-        }
 
-        RawImage ResolvePortraitTarget(NPCProfile profile)
-        {
             string slug = profile.GetNpcSlug();
-            if (slug.Contains("butler"))
-                return butlerImage != null ? butlerImage
-                    : maidImage != null ? maidImage
-                    : chefImage;
-            if (slug.Contains("maid"))
-                return maidImage != null ? maidImage
-                    : butlerImage != null ? butlerImage
-                    : chefImage;
-            if (slug.Contains("chef"))
-                return chefImage != null ? chefImage
-                    : butlerImage != null ? butlerImage
-                    : maidImage;
-            return butlerImage != null ? butlerImage
-                : maidImage != null ? maidImage
-                : chefImage;
-        }
-
-        void OnValueChanged(string newText)
-        {
-            if (!IsSubmitPressed())
-                return;
-            if (playerInput != null && string.IsNullOrWhiteSpace(playerInput.text))
+            for (int i = 0; i < portraits.Length; i++)
             {
-                playerInput.text = string.Empty;
-            }
-        }
+                if (portraits[i] == null)
+                    continue;
 
-        bool IsSubmitPressed()
-        {
-#if ENABLE_INPUT_SYSTEM
-            return Keyboard.current != null && Keyboard.current.enterKey.wasPressedThisFrame;
-#else
-            return Input.GetKey(KeyCode.Return);
-#endif
-        }
-
-        void Update()
-        {
-#if ENABLE_INPUT_SYSTEM
-            bool mouseClicked =
-                Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame;
-            Vector2 mousePosition =
-                Mouse.current != null ? Mouse.current.position.ReadValue() : Vector2.zero;
-            bool escapePressed =
-                Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame;
-#else
-            bool mouseClicked = Input.GetMouseButtonDown(0);
-            Vector2 mousePosition = Input.mousePosition;
-            bool escapePressed = Input.GetKeyDown(KeyCode.Escape);
-#endif
-
-            // ESC pressed while in player mode -> enter UI mode (unlock cursor, enable UI map)
-            if (escapePressed)
-            {
-                var cc = NPCPlayerCharacterController.LocalInstance;
-                if (cc != null && !cc.IsInUIMode)
+                if (
+                    (slug == "butler" && i == 0)
+                    || (slug == "maid" && i == 1)
+                    || (slug == "chef" && i == 2)
+                )
                 {
-                    cc.SetUIActive(true);
+                    if (profile.portraitTexture != null)
+                        portraits[i].texture = profile.portraitTexture;
+                    portraits[i].CrossFadeAlpha(1f, 0.15f, true);
                 }
-                return;
-            }
-
-            // Mouse clicked while in UI mode on empty space -> exit UI mode
-            if (mouseClicked)
-            {
-                var cc = NPCPlayerCharacterController.LocalInstance;
-                if (cc != null && cc.IsInUIMode && !IsPointerOverUI())
+                else
                 {
-                    cc.SetUIActive(false);
-                    return;
+                    portraits[i].CrossFadeAlpha(0f, 0.15f, true);
                 }
             }
-
-            if (!mouseClicked)
-                return;
-
-            notebookController?.HandleGlobalClick(mousePosition);
         }
 
-        bool IsPointerOverUI()
+        void SetInputEnabled(bool enabled)
         {
-            var eventSystem = EventSystem.current;
-            if (eventSystem == null)
-                return false;
-
-            var pointerData = new PointerEventData(eventSystem)
+            if (playerInput != null)
             {
-#if ENABLE_INPUT_SYSTEM
-                position =
-                    Mouse.current != null ? Mouse.current.position.ReadValue() : Vector2.zero
-#else
-                position = Input.mousePosition
-#endif
-            };
+                playerInput.interactable = enabled && _readyForInput;
+            }
+        }
 
-            var results = new List<RaycastResult>();
-            eventSystem.RaycastAll(pointerData, results);
-            return results.Count > 0;
+        void OnInputFieldSubmit(string text)
+        {
+            if (!_readyForInput)
+                return;
+
+            string message = (text ?? string.Empty).Trim();
+            if (message.Length == 0)
+                return;
+
+            if (playerInput != null)
+                playerInput.interactable = false;
+
+            if (networkBridge != null)
+                networkBridge.SubmitPlayerMessage(message);
+            else
+                dialogueManager.SendMessage(message);
+        }
+
+        void OnStopPressed()
+        {
+            if (networkBridge != null)
+                networkBridge.CancelActiveRequest();
+            else
+                dialogueManager.CancelRequests();
+            SetAIText(string.Empty);
+            SetInputEnabled(true);
+        }
+
+        void OnValueChanged(string text)
+        {
+            // NOP — callback required by InputSystem wiring, intentionally empty
         }
 
         static T FindComponent<T>(string path)
             where T : Component
         {
-            GameObject gameObject = FindObject(path);
-            return gameObject != null ? gameObject.GetComponent<T>() : null;
-        }
-
-        NPCProfile GetActiveProfile()
-        {
-            if (networkBridge != null && networkBridge.currentProfile != null)
-                return networkBridge.currentProfile;
-            return dialogueManager != null ? dialogueManager.currentProfile : null;
-        }
-
-        static GameObject FindObject(string path)
-        {
-            return GameObject.Find(path);
+            GameObject go = GameObject.Find(path);
+            return go != null ? go.GetComponent<T>() : null;
         }
     }
 }

@@ -3,7 +3,6 @@ using UnityEngine;
 using Unity.Multiplayer.Tools.NetVis.Configuration;
 using Unity.Multiplayer.Tools.Common.Visualization;
 using Unity.Multiplayer.Tools.Adapters;
-using System;
 using System.Collections.Generic;
 
 namespace Unity.Multiplayer.Tools.NetVis.Tests.Editor

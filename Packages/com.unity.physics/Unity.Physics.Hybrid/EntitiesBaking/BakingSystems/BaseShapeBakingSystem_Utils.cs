@@ -1,7 +1,6 @@
 #if UNITY_EDITOR
 
 using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Mathematics;
 using Hash128 = Unity.Entities.Hash128;

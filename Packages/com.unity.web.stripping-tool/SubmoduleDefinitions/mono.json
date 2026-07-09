@@ -1,0 +1,129 @@
+{
+    "submodules": [
+        {
+            "name": "Mono",
+            "description": "Provides access to Mono runtime internals and platform-specific implementations (https://www.mono-project.com/docs/).",
+            "version": "1.0.0",
+            "submodules": [
+                "Mono Security",
+                "Mono Globalization",
+                "Mono Net",
+                "Mono Unity",
+                "Mono Runtime"
+            ]
+        },
+        {
+            "name": "Mono Security",
+            "description": "Provides security-related classes and cryptographic implementations from the Mono runtime, including X.509 certificate handling and system security providers (https://www.mono-project.com/archived/cryptography/#assembly-monosecurity).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "mscorlib",
+                            "System",
+                            "Mono.Security"
+                        ],
+                        "methods": [
+                            "* Mono.Math.*",
+                            "* Mono.Security.*",
+                            "* Mono.SystemCertificateProvider::*",
+                            "* Mono.SystemDependencyProvider::*",
+                            "* Mono.X509Pal::*",
+                            "* Mono.X509PalImpl::*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Mono Globalization",
+            "description": "Provides globalization and locale-specific collation support for the Mono runtime.",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "mscorlib"
+                        ],
+                        "methods": [
+                            "* Mono.Globalization.*"
+                        ]
+                    }
+                ],
+                "exclude": [
+                    {
+                        "assemblies": [
+                            "mscorlib"
+                        ],
+                        "methods": [
+                            "System.Void Mono.Globalization.Unicode.MSCompatUnicodeTable::.cctor()",
+                            "System.IntPtr Mono.Globalization.Unicode.MSCompatUnicodeTable::GetResource(System.String)"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Mono Net",
+            "description": "Provides Mono-specific networking utilities and HTTP helpers.",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "mscorlib",
+                            "System"
+                        ],
+                        "methods": [
+                            "* Mono.Net.*",
+                            "* Mono.Http.*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Mono Unity",
+            "description": "Provides Unity-specific extensions and integrations for the Mono runtime.",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "mscorlib",
+                            "System"
+                        ],
+                        "methods": [
+                            "* Mono.Unity.*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Mono Runtime",
+            "description": "Provides Mono runtime internal types including runtime handles, interop marshalling helpers, and dependency injection.",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "mscorlib"
+                        ],
+                        "methods": [
+                            "* Mono.Runtime::*",
+                            "* Mono.RuntimeClassHandle::*",
+                            "* Mono.RuntimeEventHandle::*",
+                            "* Mono.RuntimeGenericParamInfoHandle::*",
+                            "* Mono.RuntimePropertyHandle::*",
+                            "* Mono.DependencyInjector::*",
+                            "* Mono.Interop.*",
+                            "* Mono.Util.*"
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}

@@ -3,14 +3,12 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
-using Unity.Entities.Conversion;
 using Unity.Scenes.Editor;
 using Unity.Scenes.Editor.Tests;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.TestTools;
 
 namespace Unity.Entities.Tests
 {

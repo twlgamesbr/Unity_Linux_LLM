@@ -7,8 +7,6 @@
         "Unity.Mathematics",
         "Unity.Mathematics.Extensions",
         "Unity.Collections",
-        "Unity.Properties",
-        "Unity.Properties.Reflection",
         "Unity.Transforms",
         "Unity.Entities.Build"
     ],

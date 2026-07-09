@@ -6,7 +6,6 @@ using System.Linq;
 using Unity.Collections;
 using Unity.Collections.NotBurstCompatible;
 using Unity.Entities;
-using Unity.Entities.Conversion;
 using Unity.Entities.Serialization;
 using UnityEditor;
 using UnityEditor.Build.Content;
@@ -16,19 +15,14 @@ using UnityEditor.Build.Pipeline.Tasks;
 using UnityEditor.Build.Pipeline.Utilities;
 using UnityEditor.Build.Pipeline.Injector;
 using UnityEditor.Build.Utilities;
-using BuildCompression = UnityEngine.BuildCompression;
 using BuildPipeline = UnityEditor.BuildPipeline;
 using Hash128 = Unity.Entities.Hash128;
 using UnityEditor.Experimental;
 using Unity.Entities.Content;
-using UnityEditor.Build.Player;
-using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
-using UnityEngine.Analytics;
 using Object = UnityEngine.Object;
 using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
-using Unity.Entities.Build;
 using Unity.Loading;
 
 namespace Unity.Scenes.Editor

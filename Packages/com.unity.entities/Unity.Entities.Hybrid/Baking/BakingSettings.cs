@@ -1,14 +1,10 @@
 using System;
 using System.Collections.Generic;
-using Unity.Entities.Conversion;
-using Unity.Entities.Hybrid;
 using UnityEngine;
 #if UNITY_EDITOR
-using UnityEditor;
 using Unity.Entities.Build;
 using UnityEditor.AssetImporters;
 #endif
-using UnityObject = UnityEngine.Object;
 
 namespace Unity.Entities
 {

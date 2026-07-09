@@ -5,7 +5,6 @@
         "Unity.Entities.Tests",
         "Unity.Entities",
         "Unity.Burst",
-        "Unity.Properties",
         "Unity.Scenes",
         "Unity.Collections",
         "Unity.Scenes.Editor",
@@ -34,6 +33,6 @@
     "defineConstraints": [
         "UNITY_INCLUDE_TESTS"
     ],
-  "versionDefines": [],
+    "versionDefines": [],
     "noEngineReferences": false
 }

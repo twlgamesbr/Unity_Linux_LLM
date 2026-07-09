@@ -1,5 +1,4 @@
 #if !UNITY_DISABLE_MANAGED_COMPONENTS
-using Unity.Entities;
 using Unity.Entities.Content;
 using UnityEngine;
 

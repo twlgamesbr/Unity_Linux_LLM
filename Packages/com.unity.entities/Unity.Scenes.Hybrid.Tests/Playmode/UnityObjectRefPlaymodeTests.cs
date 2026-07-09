@@ -1,8 +1,6 @@
 ﻿using NUnit.Framework;
 using System.Collections;
-using Unity.Collections;
 using Unity.Entities;
-using UnityEngine;
 using UnityEngine.TestTools;
 
 namespace Unity.Scenes.Hybrid.Tests

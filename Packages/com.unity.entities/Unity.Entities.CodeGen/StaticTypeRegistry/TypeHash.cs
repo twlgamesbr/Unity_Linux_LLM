@@ -1,11 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using Mono.Cecil;
 using Unity.Cecil.Awesome;
-using static Unity.Entities.BuildUtils.MonoExtensions;
 
 namespace Unity.Entities.CodeGen
 {

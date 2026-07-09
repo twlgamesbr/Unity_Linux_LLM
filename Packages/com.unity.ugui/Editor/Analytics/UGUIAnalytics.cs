@@ -1,6 +1,4 @@
-using UnityEngine;
 using UnityEngine.Analytics;
-using UnityEngine.UI;
 
 namespace UnityEditor.UI.Analytics
 {

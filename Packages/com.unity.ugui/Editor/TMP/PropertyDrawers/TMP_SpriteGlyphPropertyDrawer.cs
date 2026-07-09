@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.TextCore;
 using UnityEditor;
-using System.Collections.Generic;
 
 
 namespace TMPro.EditorUtilities

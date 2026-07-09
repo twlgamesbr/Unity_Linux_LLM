@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using EditorAttributes;
+using Void = EditorAttributes.Void;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
@@ -10,24 +12,78 @@ namespace NPCSystem
     [DisallowMultipleComponent]
     public class NPCNetworkBootstrap : MonoBehaviour
     {
-        [Header("References")]
+        [FoldoutGroup(
+            "References",
+            true,
+            nameof(networkManager),
+            nameof(unityTransport),
+            nameof(playerPrefab),
+            nameof(playerPrefabResourcesPath),
+            nameof(serverNpcPrefab),
+            nameof(serverNpcPrefabResourcesPath),
+            nameof(transferableItemPrefab),
+            nameof(transferableItemPrefabResourcesPath)
+        )]
+        [SerializeField]
+        Void referencesGroup;
+
+        [HideProperty]
         public NetworkManager networkManager;
+
+        [HideProperty]
         public UnityTransport unityTransport;
+
+        [HideProperty]
         public GameObject playerPrefab;
+
+        [HideProperty]
         public string playerPrefabResourcesPath = "Networking/NPCPlayerAvatar";
+
+        [HideProperty]
         public GameObject serverNpcPrefab;
+
+        [HideProperty]
         public string serverNpcPrefabResourcesPath = "Networking/NPCServerCharacter";
+
+        [HideProperty]
         public GameObject transferableItemPrefab;
+
+        [HideProperty]
         public string transferableItemPrefabResourcesPath = "Networking/NPCTransferableItem";
 
-        [Header("Transport")]
+        [FoldoutGroup(
+            "Transport Settings",
+            true,
+            nameof(transportConfig),
+            nameof(configureOnAwake),
+            nameof(autoStartInPlayMode),
+            nameof(autoAssignClientBindPort),
+            nameof(clientBindPortOverride)
+        )]
+        [SerializeField]
+        Void transportSettingsGroup;
+
+        [HideProperty]
         public NPCTransportConfig transportConfig = default;
+
+        [HideProperty]
         public bool configureOnAwake = true;
+
+        [HideProperty]
         public bool autoStartInPlayMode = false;
+
+        [HideProperty]
         public bool autoAssignClientBindPort = true;
+
+        [HideProperty]
+        [HideField(nameof(autoAssignClientBindPort))]
         public ushort clientBindPortOverride = 0;
 
-        [Header("Runtime")]
+        [FoldoutGroup("Runtime Settings", true, nameof(forceRunInBackground))]
+        [SerializeField]
+        Void runtimeSettingsGroup;
+
+        [HideProperty]
         [Tooltip("Keeps network updates running when this instance is not the focused window.")]
         public bool forceRunInBackground = true;
 

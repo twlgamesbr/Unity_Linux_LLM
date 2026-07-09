@@ -6,6 +6,6 @@ namespace NPCSystem
         Debug,
         Info,
         Warning,
-        Error
+        Error,
     }
 }

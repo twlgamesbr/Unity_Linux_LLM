@@ -11,11 +11,9 @@
  * Going the other way around, from the Companion GameObject to the Entity, isn't possible nor advised.
  */
 
-using System;
 using Unity.Burst;
 using Unity.Collections;
 using UnityEngine;
-using UnityObject = UnityEngine.Object;
 
 namespace Unity.Entities
 {

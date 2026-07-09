@@ -1,0 +1,48 @@
+{
+    "submodules": [
+        {
+            "name": "System.Numerics Core",
+            "description": "Contains types such as BigInterger and Complex.",
+            "version": "1.0.0",
+            "functions": [
+            ],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "System.Numerics"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "System.Numerics.Vector<T>",
+            "description": "Provides Vector<T> that represents a single vector of a specified numeric type that is suitable for low-level optimization of parallel algorithms.",
+            "version": "1.0.0",
+            "functions": [
+            ],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "mscorlib"
+                        ],
+                        "methods": [
+                            "*System.Numerics.Vector`1<*>*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "System.Numerics",
+            "description": "Provides types in the the System.Numerics (https://learn.microsoft.com/en-us/dotnet/api/system.numerics) namespace, such as BigInterger and Vector<T>.",
+            "version": "1.0.0",
+            "submodules": [
+                "System.Numerics Core",
+                "System.Numerics.Vector<T>"
+            ]
+        }
+    ]
+}

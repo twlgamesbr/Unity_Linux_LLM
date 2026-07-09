@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using GladeAgenticAI.Core.Tools;
 
 namespace GladeAgenticAI.Core.Tools.Implementations.Hierarchy
 {
@@ -10,7 +9,9 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Hierarchy
 
         public string Execute(Dictionary<string, object> args)
         {
-            string gameObjectPath = args.ContainsKey("gameObjectPath") ? args["gameObjectPath"].ToString() : "";
+            string gameObjectPath = args.ContainsKey("gameObjectPath")
+                ? args["gameObjectPath"].ToString()
+                : "";
             if (string.IsNullOrEmpty(gameObjectPath))
             {
                 return ToolUtils.CreateErrorResponse("gameObjectPath is required");
@@ -44,7 +45,7 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Hierarchy
                 ["gameObjectPath"] = ToolUtils.EscapeJsonString(ToolUtils.GetGameObjectPath(obj)),
                 ["componentCount"] = names.Count,
                 ["missingCount"] = missingCount,
-                ["components"] = names
+                ["components"] = names,
             };
 
             return ToolUtils.SerializeDictToJson(result);

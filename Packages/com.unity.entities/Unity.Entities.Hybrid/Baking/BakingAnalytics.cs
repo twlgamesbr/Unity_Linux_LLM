@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using Unity.Collections;
 using UnityEditor;
-using UnityEngine;
 using UnityEngine.Analytics;
 
 namespace Unity.Entities

@@ -1,0 +1,554 @@
+{
+    "submodules": [
+        {
+            "name": "Newtonsoft.Json",
+            "description": "The Newtonsoft.Json namespace provides classes that are used to implement the core services of the framework.",
+            "version": "1.0.0",
+            "submodules": [
+                "Newtonsoft.Json.DefaultJsonNameTable",
+                "Newtonsoft.Json.JsonArrayAttribute",
+                "Newtonsoft.Json.JsonConstructorAttribute",
+                "Newtonsoft.Json.JsonContainerAttribute",
+                "Newtonsoft.Json.JsonConvert",
+                "Newtonsoft.Json.JsonConverter",
+                "Newtonsoft.Json.JsonConverter<T>",
+                "Newtonsoft.Json.JsonConverterAttribute",
+                "Newtonsoft.Json.JsonConverterCollection",
+                "Newtonsoft.Json.JsonDictionaryAttribute",
+                "Newtonsoft.Json.JsonException",
+                "Newtonsoft.Json.JsonExtensionDataAttribute",
+                "Newtonsoft.Json.JsonIgnoreAttribute",
+                "Newtonsoft.Json.JsonNameTable",
+                "Newtonsoft.Json.JsonObjectAttribute",
+                "Newtonsoft.Json.JsonPropertyAttribute",
+                "Newtonsoft.Json.JsonReader",
+                "Newtonsoft.Json.JsonReaderException",
+                "Newtonsoft.Json.JsonRequiredAttribute",
+                "Newtonsoft.Json.JsonSerializationException",
+                "Newtonsoft.Json.JsonSerializer",
+                "Newtonsoft.Json.JsonSerializerSettings",
+                "Newtonsoft.Json.JsonTextReader",
+                "Newtonsoft.Json.JsonTextWriter",
+                "Newtonsoft.Json.JsonValidatingReader",
+                "Newtonsoft.Json.JsonWriter",
+                "Newtonsoft.Json.JsonWriterException",
+                "Newtonsoft.Json Miscellaneous"
+            ]
+        },
+        {
+            "name": "Newtonsoft.Json.DefaultJsonNameTable",
+            "description": "The default JSON name table implementation.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.DefaultJsonNameTable*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.JsonArrayAttribute",
+            "description": "Instructs the JsonSerializer how to serialize the collection.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.JsonArrayAttribute*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.JsonConstructorAttribute",
+            "description": "Instructs the JsonSerializer to use the specified constructor when deserializing that object.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.JsonConstructorAttribute*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.JsonContainerAttribute",
+            "description": "Instructs the JsonSerializer how to serialize the object.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.JsonContainerAttribute*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.JsonConvert",
+            "description": "Provides methods for converting between .NET types and JSON types.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.JsonConvert*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.JsonConverter",
+            "description": "Converts an object to and from JSON.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.JsonConverter*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.JsonConverter<T>",
+            "description": "Converts an object to and from JSON.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.JsonConverter`1<*>*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.JsonConverterAttribute",
+            "description": "Instructs the JsonSerializer to use the specified JsonConverter when serializing the member or class.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.JsonConverterAttribute*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.JsonConverterCollection",
+            "description": "Represents a collection of JsonConverter.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.JsonConverterCollection*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.JsonDictionaryAttribute",
+            "description": "Instructs the JsonSerializer how to serialize the collection.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.JsonDictionaryAttribute*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.JsonException",
+            "description": "The exception thrown when an error occurs during JSON serialization or deserialization.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.JsonException*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.JsonExtensionDataAttribute",
+            "description": "Instructs the JsonSerializer to deserialize properties with no matching class member into the specified collection and write values during serialization.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.JsonExtensionDataAttribute*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.JsonIgnoreAttribute",
+            "description": "Instructs the JsonSerializer not to serialize the public field or public read/write property value.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.JsonIgnoreAttribute*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.JsonNameTable",
+            "description": "Base class for a table of atomized string objects.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.JsonNameTable*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.JsonObjectAttribute",
+            "description": "Instructs the JsonSerializer how to serialize the object.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.JsonObjectAttribute*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.JsonPropertyAttribute",
+            "description": "Instructs the JsonSerializer to always serialize the member with the specified name.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.JsonPropertyAttribute*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.JsonReader",
+            "description": "Represents a reader that provides fast, non-cached, forward-only access to serialized JSON data.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.JsonReader*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.JsonReaderException",
+            "description": "The exception thrown when an error occurs while reading JSON text.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.JsonReaderException*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.JsonRequiredAttribute",
+            "description": "Instructs the JsonSerializer to always serialize the member, and to require that the member has a value.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.JsonRequiredAttribute*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.JsonSerializationException",
+            "description": "The exception thrown when an error occurs during JSON serialization or deserialization.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.JsonSerializationException*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.JsonSerializer",
+            "description": "Serializes and deserializes objects into and from the JSON format. The JsonSerializer enables you to control how objects are encoded into JSON.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.JsonSerializer*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.JsonSerializerSettings",
+            "description": "Specifies the settings on a JsonSerializer object.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.JsonSerializerSettings*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.JsonTextReader",
+            "description": "Represents a reader that provides fast, non-cached, forward-only access to JSON text data.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.JsonTextReader*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.JsonTextWriter",
+            "description": "Represents a writer that provides a fast, non-cached, forward-only way of generating JSON data.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.JsonTextWriter*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.JsonValidatingReader",
+            "description": "Obsolete. Represents a reader that provides JsonSchema validation.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.JsonValidatingReader*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.JsonWriter",
+            "description": "Represents a writer that provides a fast, non-cached, forward-only way of generating JSON data.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.JsonWriter*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.JsonWriterException",
+            "description": "The exception thrown when an error occurs while writing JSON text.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.JsonWriterException*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json Miscellaneous",
+            "description": "Miscellaneous classes of the Newtonsoft.Json namespace",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ]
+                    }
+                ],
+                "exclude": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.Bson.*",
+                            "*Newtonsoft.Json.Converters.*",
+                            "*Newtonsoft.Json.Linq.*",
+                            "*Newtonsoft.Json.Schema.*",
+                            "*Newtonsoft.Json.Serialization.*"
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}

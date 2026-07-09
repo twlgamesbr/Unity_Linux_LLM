@@ -1,12 +1,12 @@
 using System;
 using System.IO;
-using Process = System.Diagnostics.Process;
-using ProcessStartInfo = System.Diagnostics.ProcessStartInfo;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Profile;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
+using Process = System.Diagnostics.Process;
+using ProcessStartInfo = System.Diagnostics.ProcessStartInfo;
 
 public static class NPCDialogueBuild
 {
@@ -34,7 +34,7 @@ public static class NPCDialogueBuild
         {
             buildProfile = LoadProfile(LinuxServerProfilePath),
             locationPathName = ResolvePath("Builds/Server/NPCServer.x86_64"),
-            options = BuildOptions.CompressWithLz4HC | BuildOptions.ShowBuiltPlayer
+            options = BuildOptions.CompressWithLz4HC | BuildOptions.ShowBuiltPlayer,
         };
 
         BuildReport report = BuildPipeline.BuildPlayer(options);
@@ -49,7 +49,7 @@ public static class NPCDialogueBuild
         {
             buildProfile = LoadProfile(LinuxProfilePath),
             locationPathName = ResolvePath("Builds/Client/NPCClient.x86_64"),
-            options = BuildOptions.CompressWithLz4HC | BuildOptions.ShowBuiltPlayer
+            options = BuildOptions.CompressWithLz4HC | BuildOptions.ShowBuiltPlayer,
         };
 
         BuildReport report = BuildPipeline.BuildPlayer(options);
@@ -60,16 +60,19 @@ public static class NPCDialogueBuild
     [MenuItem("Build/WebGL")]
     public static void BuildWebGL()
     {
-        string outputPath = ResolvePath("Builds/WebGL_client/LinuxWebGLWS");
+        string outputPath = ResolvePath("Builds/WebGL_client/WebGL");
         var options = new BuildPlayerWithProfileOptions
         {
             buildProfile = LoadProfile(WebGLProfilePath),
             locationPathName = outputPath,
-            options = BuildOptions.None
+            options = BuildOptions.None,
         };
 
         BuildReport report = BuildPipeline.BuildPlayer(options);
-        EnsureLinuxDockerReadableArtifacts(outputPath, report.summary.result == BuildResult.Succeeded);
+        EnsureLinuxDockerReadableArtifacts(
+            outputPath,
+            report.summary.result == BuildResult.Succeeded
+        );
         HandleBuildReport(report, "WebGL");
     }
 
@@ -89,15 +92,17 @@ public static class NPCDialogueBuild
 
         try
         {
-            using var proc = Process.Start(new ProcessStartInfo
-            {
-                FileName = "docker",
-                Arguments = $"compose -f \"{composeDir}/docker-compose.yml\" restart",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            });
+            using var proc = Process.Start(
+                new ProcessStartInfo
+                {
+                    FileName = "docker",
+                    Arguments = $"compose -f \"{composeDir}/docker-compose.yml\" restart",
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                }
+            );
             proc?.WaitForExit(30000);
             string stdout = proc?.StandardOutput.ReadToEnd() ?? "";
             string stderr = proc?.StandardError.ReadToEnd() ?? "";
@@ -116,7 +121,9 @@ public static class NPCDialogueBuild
         BuildSummary summary = report.summary;
         if (summary.result == BuildResult.Succeeded)
         {
-            Debug.Log($"[NPCBuild] {label} build succeeded: {summary.outputPath} ({summary.totalSize / 1048576} MB)");
+            Debug.Log(
+                $"[NPCBuild] {label} build succeeded: {summary.outputPath} ({summary.totalSize / 1048576} MB)"
+            );
         }
         else
         {
@@ -128,25 +135,31 @@ public static class NPCDialogueBuild
 
     // CLI entry points
     public static void PerformServerBuild() => BuildServer();
+
     public static void PerformClientBuild() => BuildClient();
+
     public static void PerformWebGLBuild() => BuildWebGL();
 
     static void EnsureLinuxDockerReadableArtifacts(string outputPath, bool buildSucceeded)
     {
-        if (!buildSucceeded || !Directory.Exists(outputPath)) return;
-        if (Application.platform != RuntimePlatform.LinuxEditor) return;
+        if (!buildSucceeded || !Directory.Exists(outputPath))
+            return;
+        if (Application.platform != RuntimePlatform.LinuxEditor)
+            return;
 
         try
         {
-            using var chmod = Process.Start(new ProcessStartInfo
-            {
-                FileName = "chmod",
-                Arguments = $"-R a+rX \"{outputPath}\"",
-                RedirectStandardError = true,
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            });
+            using var chmod = Process.Start(
+                new ProcessStartInfo
+                {
+                    FileName = "chmod",
+                    Arguments = $"-R a+rX \"{outputPath}\"",
+                    RedirectStandardError = true,
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                }
+            );
 
             chmod?.WaitForExit();
             if (chmod is { ExitCode: 0 })
@@ -160,7 +173,9 @@ public static class NPCDialogueBuild
         }
         catch (Exception ex)
         {
-            Debug.LogWarning($"[NPCBuild] Failed to normalize WebGL artifact permissions: {ex.Message}");
+            Debug.LogWarning(
+                $"[NPCBuild] Failed to normalize WebGL artifact permissions: {ex.Message}"
+            );
         }
     }
 }

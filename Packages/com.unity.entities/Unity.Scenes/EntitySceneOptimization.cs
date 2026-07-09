@@ -1,6 +1,5 @@
 
 using System;
-using System.Collections.Generic;
 using Unity.Collections;
 
 namespace Unity.Entities.Streaming

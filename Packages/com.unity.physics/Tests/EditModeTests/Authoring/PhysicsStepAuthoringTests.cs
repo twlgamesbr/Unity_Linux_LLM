@@ -1,5 +1,4 @@
 using NUnit.Framework;
-using Unity.Mathematics;
 using Unity.Physics.Authoring;
 using UnityEngine;
 

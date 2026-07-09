@@ -1,6 +1,5 @@
 using System;
 using UnityEditor;
-using UnityObject = UnityEngine.Object;
 
 namespace Unity.Editor.Bridge
 {

@@ -1,7 +1,6 @@
 using System;
 using System.ComponentModel;
 using UnityEngine.InputSystem.Controls;
-using UnityEngine.Scripting;
 #if UNITY_EDITOR
 using UnityEngine.InputSystem.Editor;
 using UnityEngine.UIElements;

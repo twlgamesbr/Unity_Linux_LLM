@@ -1,0 +1,840 @@
+{
+    "submodules": [
+        {
+            "name": "Unity Collections",
+            "description": "Provides support for Unity's native collection types from the Unity.Collections package (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/manual/index.html).",
+            "version": "1.0.0",
+            "submodules": [
+                "Unity Collections - NativeArray",
+                "Unity Collections - NativeList",
+                "Unity Collections - NativeHashMap",
+                "Unity Collections - NativeHashSet",
+                "Unity Collections - NativeQueue",
+                "Unity Collections - NativeStream",
+                "Unity Collections - NativeReference",
+                "Unity Collections - NativeParallelHashMap",
+                "Unity Collections - NativeParallelHashSet",
+                "Unity Collections - NativeParallelMultiHashMap",
+                "Unity Collections - NativeRingQueue",
+                "Unity Collections - NativeText",
+                "Unity Collections - NativeBitArray",
+                "Unity Collections - NativeKeyValueArrays",
+                "Unity Collections - FixedList32Bytes",
+                "Unity Collections - FixedList64Bytes",
+                "Unity Collections - FixedList128Bytes",
+                "Unity Collections - FixedList512Bytes",
+                "Unity Collections - FixedList4096Bytes",
+                "Unity Collections - FixedString32Bytes",
+                "Unity Collections - FixedString64Bytes",
+                "Unity Collections - FixedString128Bytes",
+                "Unity Collections - FixedString512Bytes",
+                "Unity Collections - FixedString4096Bytes",
+                "Unity Collections - UnsafeList",
+                "Unity Collections - UnsafeHashMap",
+                "Unity Collections - UnsafeHashSet",
+                "Unity Collections - UnsafePtrList",
+                "Unity Collections - UnsafeParallelHashMap",
+                "Unity Collections - UnsafeParallelHashSet",
+                "Unity Collections - UnsafeParallelMultiHashMap",
+                "Unity Collections - UnsafeBitArray",
+                "Unity Collections - UnsafeRingQueue",
+                "Unity Collections - UnsafeStream",
+                "Unity Collections - UnsafeAppendBuffer",
+                "Unity Collections - UnsafeText",
+                "Unity Collections - UnsafeAtomicCounter32",
+                "Unity Collections - UnsafeAtomicCounter64",
+                "Unity Collections - UnsafeScratchAllocator"
+            ]
+        },
+        {
+            "name": "Unity Collections - NativeArray",
+            "description": "Provides support for NativeArray<T>, a fixed-size native memory array (https://docs.unity3d.com/ScriptReference/Unity.Collections.NativeArray_1.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.NativeArray`1<*>::*",
+                            "* Unity.Collections.NativeArray`1/*"
+                        ]
+                    }
+                ],
+                "exclude": [
+                    {
+                        "assemblies": [
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "System.Void Unity.Collections.NativeArray`1<*>::Dispose()"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - NativeList",
+            "description": "Provides support for NativeList<T>, a resizable native memory list (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.NativeList-1.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.NativeList*::*",
+                            "* Unity.Collections.NativeList*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - NativeHashMap",
+            "description": "Provides support for NativeHashMap<TKey, TValue>, a native key-value dictionary (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.NativeHashMap-2.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.NativeHashMap*::*",
+                            "* Unity.Collections.NativeHashMap*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - NativeHashSet",
+            "description": "Provides support for NativeHashSet<T>, a native set of unique values (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.NativeHashSet-1.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.NativeHashSet*::*",
+                            "* Unity.Collections.NativeHashSet*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - NativeQueue",
+            "description": "Provides support for NativeQueue<T>, a native FIFO queue (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.NativeQueue-1.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.NativeQueue*::*",
+                            "* Unity.Collections.NativeQueue*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - NativeStream",
+            "description": "Provides support for NativeStream, a native parallel data stream for writing and reading data in parallel jobs (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.NativeStream.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.NativeStream*::*",
+                            "* Unity.Collections.NativeStream*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - NativeReference",
+            "description": "Provides support for NativeReference<T>, a native reference to a single value (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.NativeReference-1.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.NativeReference*::*",
+                            "* Unity.Collections.NativeReference*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - NativeParallelHashMap",
+            "description": "Provides support for NativeParallelHashMap<TKey, TValue>, a parallel-safe native key-value dictionary (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.NativeParallelHashMap-2.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.NativeParallelHashMap*::*",
+                            "* Unity.Collections.NativeParallelHashMap*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - NativeParallelHashSet",
+            "description": "Provides support for NativeParallelHashSet<T>, a parallel-safe native set of unique values (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.NativeParallelHashSet-1.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.NativeParallelHashSet*::*",
+                            "* Unity.Collections.NativeParallelHashSet*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - NativeParallelMultiHashMap",
+            "description": "Provides support for NativeParallelMultiHashMap<TKey, TValue>, a parallel-safe native multi-hash map allowing multiple values per key (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.NativeParallelMultiHashMap-2.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.NativeParallelMultiHashMap*::*",
+                            "* Unity.Collections.NativeParallelMultiHashMap*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - UnsafeList",
+            "description": "Provides support for UnsafeList<T>, an unsafe resizable list with no safety checks for maximum performance (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.LowLevel.Unsafe.UnsafeList-1.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.LowLevel.Unsafe.UnsafeList*::*",
+                            "* Unity.Collections.LowLevel.Unsafe.UnsafeList*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - UnsafeHashMap",
+            "description": "Provides support for UnsafeHashMap<TKey, TValue>, an unsafe key-value dictionary with no safety checks for maximum performance (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.LowLevel.Unsafe.UnsafeHashMap-2.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.LowLevel.Unsafe.UnsafeHashMap*::*",
+                            "* Unity.Collections.LowLevel.Unsafe.UnsafeHashMap*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - UnsafeHashSet",
+            "description": "Provides support for UnsafeHashSet<T>, an unsafe set of unique values with no safety checks for maximum performance (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.LowLevel.Unsafe.UnsafeHashSet-1.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.LowLevel.Unsafe.UnsafeHashSet*::*",
+                            "* Unity.Collections.LowLevel.Unsafe.UnsafeHashSet*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - UnsafePtrList",
+            "description": "Provides support for UnsafePtrList<T>, an unsafe pointer list with no safety checks for maximum performance (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.LowLevel.Unsafe.UnsafePtrList-1.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.LowLevel.Unsafe.UnsafePtrList*::*",
+                            "* Unity.Collections.LowLevel.Unsafe.UnsafePtrList*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - NativeRingQueue",
+            "description": "Provides support for NativeRingQueue<T>, a fixed-size circular buffer for single-threaded use (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.NativeRingQueue-1.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.NativeRingQueue*::*",
+                            "* Unity.Collections.NativeRingQueue*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - NativeText",
+            "description": "Provides support for NativeText, a resizable UTF-8 string stored in native memory (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.NativeText.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.NativeText*::*",
+                            "* Unity.Collections.NativeText*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - NativeBitArray",
+            "description": "Provides support for NativeBitArray, an arbitrarily-sized array of bits stored in native memory (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.NativeBitArray.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.NativeBitArray*::*",
+                            "* Unity.Collections.NativeBitArray*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - NativeKeyValueArrays",
+            "description": "Provides support for NativeKeyValueArrays<TKey, TValue>, parallel arrays for keys and values (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.NativeKeyValueArrays-2.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.NativeKeyValueArrays*::*",
+                            "* Unity.Collections.NativeKeyValueArrays*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - FixedList32Bytes",
+            "description": "Provides support for FixedList32Bytes<T>, a fixed-size list with 32 bytes of embedded storage (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.FixedList32Bytes-1.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.FixedList32Bytes*::*",
+                            "* Unity.Collections.FixedList32Bytes*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - FixedList64Bytes",
+            "description": "Provides support for FixedList64Bytes<T>, a fixed-size list with 64 bytes of embedded storage (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.FixedList64Bytes-1.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.FixedList64Bytes*::*",
+                            "* Unity.Collections.FixedList64Bytes*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - FixedList128Bytes",
+            "description": "Provides support for FixedList128Bytes<T>, a fixed-size list with 128 bytes of embedded storage (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.FixedList128Bytes-1.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.FixedList128Bytes*::*",
+                            "* Unity.Collections.FixedList128Bytes*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - FixedList512Bytes",
+            "description": "Provides support for FixedList512Bytes<T>, a fixed-size list with 512 bytes of embedded storage (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.FixedList512Bytes-1.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.FixedList512Bytes*::*",
+                            "* Unity.Collections.FixedList512Bytes*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - FixedList4096Bytes",
+            "description": "Provides support for FixedList4096Bytes<T>, a fixed-size list with 4096 bytes of embedded storage (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.FixedList4096Bytes-1.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.FixedList4096Bytes*::*",
+                            "* Unity.Collections.FixedList4096Bytes*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - FixedString32Bytes",
+            "description": "Provides support for FixedString32Bytes, a fixed-size UTF-8 string with 32 bytes of storage (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.FixedString32Bytes.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.FixedString32Bytes*::*",
+                            "* Unity.Collections.FixedString32Bytes*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - FixedString64Bytes",
+            "description": "Provides support for FixedString64Bytes, a fixed-size UTF-8 string with 64 bytes of storage (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.FixedString64Bytes.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.FixedString64Bytes*::*",
+                            "* Unity.Collections.FixedString64Bytes*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - FixedString128Bytes",
+            "description": "Provides support for FixedString128Bytes, a fixed-size UTF-8 string with 128 bytes of storage (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.FixedString128Bytes.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.FixedString128Bytes*::*",
+                            "* Unity.Collections.FixedString128Bytes*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - FixedString512Bytes",
+            "description": "Provides support for FixedString512Bytes, a fixed-size UTF-8 string with 512 bytes of storage (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.FixedString512Bytes.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.FixedString512Bytes*::*",
+                            "* Unity.Collections.FixedString512Bytes*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - FixedString4096Bytes",
+            "description": "Provides support for FixedString4096Bytes, a fixed-size UTF-8 string with 4096 bytes of storage (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.FixedString4096Bytes.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.FixedString4096Bytes*::*",
+                            "* Unity.Collections.FixedString4096Bytes*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - UnsafeParallelHashMap",
+            "description": "Provides support for UnsafeParallelHashMap<TKey, TValue>, an unsafe parallel-safe key-value dictionary (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.LowLevel.Unsafe.UnsafeParallelHashMap-2.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.LowLevel.Unsafe.UnsafeParallelHashMap*::*",
+                            "* Unity.Collections.LowLevel.Unsafe.UnsafeParallelHashMap*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - UnsafeParallelHashSet",
+            "description": "Provides support for UnsafeParallelHashSet<T>, an unsafe parallel-safe set of unique values (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.LowLevel.Unsafe.UnsafeParallelHashSet-1.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.LowLevel.Unsafe.UnsafeParallelHashSet*::*",
+                            "* Unity.Collections.LowLevel.Unsafe.UnsafeParallelHashSet*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - UnsafeParallelMultiHashMap",
+            "description": "Provides support for UnsafeParallelMultiHashMap<TKey, TValue>, an unsafe parallel-safe multi-hash map allowing multiple values per key (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.LowLevel.Unsafe.UnsafeParallelMultiHashMap-2.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.LowLevel.Unsafe.UnsafeParallelMultiHashMap*::*",
+                            "* Unity.Collections.LowLevel.Unsafe.UnsafeParallelMultiHashMap*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - UnsafeBitArray",
+            "description": "Provides support for UnsafeBitArray, an unsafe arbitrarily-sized array of bits (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.LowLevel.Unsafe.UnsafeBitArray.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.LowLevel.Unsafe.UnsafeBitArray*::*",
+                            "* Unity.Collections.LowLevel.Unsafe.UnsafeBitArray*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - UnsafeRingQueue",
+            "description": "Provides support for UnsafeRingQueue<T>, an unsafe fixed-size circular buffer (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.LowLevel.Unsafe.UnsafeRingQueue-1.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.LowLevel.Unsafe.UnsafeRingQueue*::*",
+                            "* Unity.Collections.LowLevel.Unsafe.UnsafeRingQueue*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - UnsafeStream",
+            "description": "Provides support for UnsafeStream, an unsafe set of untyped append-only buffers (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.LowLevel.Unsafe.UnsafeStream.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.LowLevel.Unsafe.UnsafeStream*::*",
+                            "* Unity.Collections.LowLevel.Unsafe.UnsafeStream*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - UnsafeAppendBuffer",
+            "description": "Provides support for UnsafeAppendBuffer, an unsafe unmanaged, untyped, heterogeneous buffer (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.LowLevel.Unsafe.UnsafeAppendBuffer.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.LowLevel.Unsafe.UnsafeAppendBuffer*::*",
+                            "* Unity.Collections.LowLevel.Unsafe.UnsafeAppendBuffer*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - UnsafeText",
+            "description": "Provides support for UnsafeText, an unsafe unmanaged, mutable, resizable UTF-8 string (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.LowLevel.Unsafe.UnsafeText.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.LowLevel.Unsafe.UnsafeText*::*",
+                            "* Unity.Collections.LowLevel.Unsafe.UnsafeText*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - UnsafeAtomicCounter32",
+            "description": "Provides support for UnsafeAtomicCounter32, a 32-bit atomic counter for thread-safe incrementing (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.LowLevel.Unsafe.UnsafeAtomicCounter32.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.LowLevel.Unsafe.UnsafeAtomicCounter32*::*",
+                            "* Unity.Collections.LowLevel.Unsafe.UnsafeAtomicCounter32*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - UnsafeAtomicCounter64",
+            "description": "Provides support for UnsafeAtomicCounter64, a 64-bit atomic counter for thread-safe incrementing (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.LowLevel.Unsafe.UnsafeAtomicCounter64.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.LowLevel.Unsafe.UnsafeAtomicCounter64*::*",
+                            "* Unity.Collections.LowLevel.Unsafe.UnsafeAtomicCounter64*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity Collections - UnsafeScratchAllocator",
+            "description": "Provides support for UnsafeScratchAllocator, a fixed-size buffer from which temporary allocations can be made (https://docs.unity3d.com/Packages/com.unity.collections@latest?subfolder=/api/Unity.Collections.LowLevel.Unsafe.UnsafeScratchAllocator.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.Collections",
+                            "Unity.Collections.LowLevel.ILSupport",
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "* Unity.Collections.LowLevel.Unsafe.UnsafeScratchAllocator*::*",
+                            "* Unity.Collections.LowLevel.Unsafe.UnsafeScratchAllocator*/*"
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}

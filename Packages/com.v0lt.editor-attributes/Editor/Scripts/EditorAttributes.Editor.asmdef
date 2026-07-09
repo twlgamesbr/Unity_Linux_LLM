@@ -2,8 +2,8 @@
     "name": "EditorAttributes.Editor",
     "rootNamespace": "EditorAttributes.Editor",
     "references": [
-        "GUID:febaf25a60dafbd44941357b21678606",
-        "GUID:69448af7b92c7f342b298e06a37122aa"
+        "EditorAttributes",
+        "Unity.Addressables.Editor"
     ],
     "includePlatforms": [
         "Editor"

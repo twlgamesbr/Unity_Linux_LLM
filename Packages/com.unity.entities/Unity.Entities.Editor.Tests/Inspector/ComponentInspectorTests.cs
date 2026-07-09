@@ -1,13 +1,7 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using Unity.Collections;
 using Unity.Entities.Hybrid.Tests;
-using Unity.Entities.UI;
-using Unity.Transforms;
 using UnityEngine.LowLevel;
-using UnityEngine.UIElements;
 
 namespace Unity.Entities.Editor.Tests
 {

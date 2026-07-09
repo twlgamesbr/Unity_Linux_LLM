@@ -3,7 +3,6 @@ using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
-using UnityEditor;
 using UnityEditor.UIElements;
 
 namespace UnityEditor.UI

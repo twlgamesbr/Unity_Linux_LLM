@@ -1,9 +1,3 @@
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEditor;
-using GladeAgenticAI.Core.Tools;
-
 #if GLADE_UGUI
 namespace GladeAgenticAI.Core.Tools.Implementations.UI
 {
@@ -33,13 +27,17 @@ namespace GladeAgenticAI.Core.Tools.Implementations.UI
 
         public string Execute(Dictionary<string, object> args)
         {
-            string gameObjectPath = args.ContainsKey("gameObjectPath") ? args["gameObjectPath"].ToString() : "";
+            string gameObjectPath = args.ContainsKey("gameObjectPath")
+                ? args["gameObjectPath"].ToString()
+                : "";
             string eventType = args.ContainsKey("eventType") ? args["eventType"].ToString() : "";
             bool removeAll = true;
             if (args.ContainsKey("removeAll"))
             {
-                if (args["removeAll"] is bool ra) removeAll = ra;
-                else if (bool.TryParse(args["removeAll"].ToString(), out bool rav)) removeAll = rav;
+                if (args["removeAll"] is bool ra)
+                    removeAll = ra;
+                else if (bool.TryParse(args["removeAll"].ToString(), out bool rav))
+                    removeAll = rav;
             }
 
             if (string.IsNullOrEmpty(gameObjectPath) || string.IsNullOrEmpty(eventType))
@@ -66,18 +64,29 @@ namespace GladeAgenticAI.Core.Tools.Implementations.UI
                             if (removeAll)
                             {
                                 success = ClearPersistentCalls(button, "m_OnClick");
-                                if (!success) errorMsg = "Failed to clear Button.onClick";
+                                if (!success)
+                                    errorMsg = "Failed to clear Button.onClick";
                             }
                             else
                             {
-                                string targetPath = args.ContainsKey("targetGameObjectPath") ? args["targetGameObjectPath"].ToString() : "";
-                                string methodName = args.ContainsKey("methodName") ? args["methodName"].ToString() : "";
-                                if (string.IsNullOrEmpty(targetPath) || string.IsNullOrEmpty(methodName))
+                                string targetPath = args.ContainsKey("targetGameObjectPath")
+                                    ? args["targetGameObjectPath"].ToString()
+                                    : "";
+                                string methodName = args.ContainsKey("methodName")
+                                    ? args["methodName"].ToString()
+                                    : "";
+                                if (
+                                    string.IsNullOrEmpty(targetPath)
+                                    || string.IsNullOrEmpty(methodName)
+                                )
                                 {
-                                    return ToolUtils.CreateErrorResponse("targetGameObjectPath and methodName are required when removeAll=false");
+                                    return ToolUtils.CreateErrorResponse(
+                                        "targetGameObjectPath and methodName are required when removeAll=false"
+                                    );
                                 }
                                 success = ClearPersistentCalls(button, "m_OnClick");
-                                if (!success) errorMsg = "Failed to clear Button.onClick";
+                                if (!success)
+                                    errorMsg = "Failed to clear Button.onClick";
                             }
                         }
                         else
@@ -98,13 +107,17 @@ namespace GladeAgenticAI.Core.Tools.Implementations.UI
                         {
                             success = ClearPersistentCalls(inputValueField, "m_OnValueChanged");
                         }
-                        else if (obj.GetComponent(UIHelpers.GetTmpInputFieldType()) is Component tmpInputValueField)
+                        else if (
+                            obj.GetComponent(UIHelpers.GetTmpInputFieldType())
+                            is Component tmpInputValueField
+                        )
                         {
                             success = ClearPersistentCalls(tmpInputValueField, "m_OnValueChanged");
                         }
                         else
                         {
-                            errorMsg = "GameObject does not have a Toggle, Slider, InputField, or TMP_InputField component";
+                            errorMsg =
+                                "GameObject does not have a Toggle, Slider, InputField, or TMP_InputField component";
                         }
                         break;
                     case "onendedit":
@@ -112,13 +125,17 @@ namespace GladeAgenticAI.Core.Tools.Implementations.UI
                         {
                             success = ClearPersistentCalls(inputField, "m_OnEndEdit");
                         }
-                        else if (obj.GetComponent(UIHelpers.GetTmpInputFieldType()) is Component tmpInputField)
+                        else if (
+                            obj.GetComponent(UIHelpers.GetTmpInputFieldType())
+                            is Component tmpInputField
+                        )
                         {
                             success = ClearPersistentCalls(tmpInputField, "m_OnEndEdit");
                         }
                         else
                         {
-                            errorMsg = "GameObject does not have an InputField or TMP_InputField component";
+                            errorMsg =
+                                "GameObject does not have an InputField or TMP_InputField component";
                         }
                         break;
                     case "onsubmit":
@@ -126,13 +143,17 @@ namespace GladeAgenticAI.Core.Tools.Implementations.UI
                         {
                             success = ClearPersistentCalls(inputField2, "m_OnSubmit");
                         }
-                        else if (obj.GetComponent(UIHelpers.GetTmpInputFieldType()) is Component tmpInputField2)
+                        else if (
+                            obj.GetComponent(UIHelpers.GetTmpInputFieldType())
+                            is Component tmpInputField2
+                        )
                         {
                             success = ClearPersistentCalls(tmpInputField2, "m_OnSubmit");
                         }
                         else
                         {
-                            errorMsg = "GameObject does not have an InputField or TMP_InputField component";
+                            errorMsg =
+                                "GameObject does not have an InputField or TMP_InputField component";
                         }
                         break;
                     case "onvaluechangedint":
@@ -140,13 +161,17 @@ namespace GladeAgenticAI.Core.Tools.Implementations.UI
                         {
                             success = ClearPersistentCalls(dropdown, "m_OnValueChanged");
                         }
-                        else if (obj.GetComponent(UIHelpers.GetTmpDropdownType()) is Component tmpDropdown)
+                        else if (
+                            obj.GetComponent(UIHelpers.GetTmpDropdownType())
+                            is Component tmpDropdown
+                        )
                         {
                             success = ClearPersistentCalls(tmpDropdown, "m_OnValueChanged");
                         }
                         else
                         {
-                            errorMsg = "GameObject does not have a Dropdown or TMP_Dropdown component";
+                            errorMsg =
+                                "GameObject does not have a Dropdown or TMP_Dropdown component";
                         }
                         break;
                     default:
@@ -161,7 +186,9 @@ namespace GladeAgenticAI.Core.Tools.Implementations.UI
 
             if (success)
             {
-                return ToolUtils.CreateSuccessResponse($"Removed {eventType} event handlers from '{gameObjectPath}'");
+                return ToolUtils.CreateSuccessResponse(
+                    $"Removed {eventType} event handlers from '{gameObjectPath}'"
+                );
             }
             else
             {

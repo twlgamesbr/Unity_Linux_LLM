@@ -188,28 +188,28 @@ namespace NPCSystem.Tests
         public void IsTechnicalCodebaseQuestion_DetectsTechnicalMarkers()
         {
             Assert.That(
-                NPCDialogueManager.IsTechnicalCodebaseQuestion(
+                NPCDialogueSessionService.IsTechnicalCodebaseQuestion(
                     "Where is the script for PlayerController?"
                 ),
                 Is.True
             );
             Assert.That(
-                NPCDialogueManager.IsTechnicalCodebaseQuestion("How does the RAG collection work?"),
+                NPCDialogueSessionService.IsTechnicalCodebaseQuestion("How does the RAG collection work?"),
                 Is.True
             );
             Assert.That(
-                NPCDialogueManager.IsTechnicalCodebaseQuestion(
+                NPCDialogueSessionService.IsTechnicalCodebaseQuestion(
                     "Which file implements NPCDialogueManager?"
                 ),
                 Is.True
             );
             Assert.That(
-                NPCDialogueManager.IsTechnicalCodebaseQuestion("Tell me about your day"),
+                NPCDialogueSessionService.IsTechnicalCodebaseQuestion("Tell me about your day"),
                 Is.False
             );
-            Assert.That(NPCDialogueManager.IsTechnicalCodebaseQuestion(""), Is.False);
-            Assert.That(NPCDialogueManager.IsTechnicalCodebaseQuestion("   "), Is.False);
-            Assert.That(NPCDialogueManager.IsTechnicalCodebaseQuestion(null), Is.False);
+            Assert.That(NPCDialogueSessionService.IsTechnicalCodebaseQuestion(""), Is.False);
+            Assert.That(NPCDialogueSessionService.IsTechnicalCodebaseQuestion("   "), Is.False);
+            Assert.That(NPCDialogueSessionService.IsTechnicalCodebaseQuestion(null), Is.False);
         }
 
         [Test]

@@ -3,7 +3,6 @@ using System.Linq;
 using System.Collections.Generic;
 using Unity.Multiplayer.Tools.NetworkProfiler.Editor.NoDataView;
 using UnityEditor;
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Unity.Multiplayer.Tools.NetworkProfiler.Editor

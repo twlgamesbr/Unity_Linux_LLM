@@ -2,7 +2,6 @@
     "name": "Unity.Entities.Editor.Properties",
     "rootNamespace": "",
     "references": [
-        "Unity.Properties",
         "Unity.Entities.UI.Editor",
         "Unity.Serialization"
     ],

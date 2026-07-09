@@ -1,5 +1,3 @@
-using System.Linq;
-
 namespace UnityEngine.UI
 {
     [AddComponentMenu("UI (Canvas)/Effects/Position As UV1", 82)]

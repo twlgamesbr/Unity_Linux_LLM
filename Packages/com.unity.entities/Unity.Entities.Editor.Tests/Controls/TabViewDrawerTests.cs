@@ -1,5 +1,4 @@
-﻿using System;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using NUnit.Framework;
 using Unity.Entities.UI;
 using Unity.Serialization.Editor;

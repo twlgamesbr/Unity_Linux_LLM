@@ -1,0 +1,54 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <Style src="project://database/Packages/com.unity.platformtoolkit/Editor/PlayMode/UI/Styles.uss?fileID=7433441132597879392&amp;guid=8d8d414ba2ad6ce4bbfe36e0ed291897&amp;type=3#Styles"/>
+    <engine:VisualElement name="pmc-warnings" class="column justify mb-20" style="flex-grow: 1;">
+        <engine:Label text="Validation" class="title"/>
+        <Unity.PlatformToolkit.PlayMode.ToggleFoldout text="Storage API Warnings" enabled="true" toggle-value-data-source-path="StorageWarningsEnabled" toggle-value="false" foldout-view-data-key="storageWarningFoldout" internal-foldout-view-data-key="storageWarningFoldout" viewDataKey="storageWarningFoldout" name="ToggleFoldout" tooltip="Enable warnings for storage API usage" class="row" style="flex-direction: column; align-items: flex-start;">
+            <engine:GroupBox text="Operation Frequency" tooltip="Warn if a save operation is performed multiple times with a timeframe with the same destination or location." class="group-header groupbox">
+                <Unity.PlatformToolkit.PlayMode.TimeDropdown label="Open" name="warning-open-frequency" tooltip="Warn if save opens are performed on the same save before the set time has passed. Opens for Read and Write are treated separately." formatting-prefix="&lt; " class="row my warning-time-dropdowns">
+                    <Bindings>
+                        <engine:DataBinding property="Configuration" binding-mode="ToTarget" data-source-path="WarningFrequencyTimeOptions"/>
+                        <engine:DataBinding property="value" binding-mode="TwoWay" data-source-path="WarningOpenFrequencyInterval" source-to-ui-converters="TimeOptionToTimeSpan" ui-to-source-converters="TimeOptionToTimeSpan"/>
+                    </Bindings>
+                </Unity.PlatformToolkit.PlayMode.TimeDropdown>
+                <Unity.PlatformToolkit.PlayMode.TimeDropdown label="Write" name="warning-write-frequency" tooltip="Warn if save writes are performed on the same save files before the set time has passed." formatting-prefix="&lt; " class="row my warning-time-dropdowns">
+                    <Bindings>
+                        <engine:DataBinding property="Configuration" binding-mode="ToTarget" data-source-path="WarningFrequencyTimeOptions"/>
+                        <engine:DataBinding property="value" binding-mode="TwoWay" data-source-path="WarningWriteFrequencyInterval" source-to-ui-converters="TimeOptionToTimeSpan" ui-to-source-converters="TimeOptionToTimeSpan"/>
+                    </Bindings>
+                </Unity.PlatformToolkit.PlayMode.TimeDropdown>
+                <Unity.PlatformToolkit.PlayMode.TimeDropdown label="Read" name="warning-read-frequency" tooltip="Warn if save reads are performed on the same save files before the set time has passed." formatting-prefix="&lt; " class="row my warning-time-dropdowns">
+                    <Bindings>
+                        <engine:DataBinding property="Configuration" binding-mode="ToTarget" data-source-path="WarningFrequencyTimeOptions"/>
+                        <engine:DataBinding property="value" binding-mode="TwoWay" data-source-path="WarningReadFrequencyInterval" source-to-ui-converters="TimeOptionToTimeSpan" ui-to-source-converters="TimeOptionToTimeSpan"/>
+                    </Bindings>
+                </Unity.PlatformToolkit.PlayMode.TimeDropdown>
+                <Unity.PlatformToolkit.PlayMode.TimeDropdown label="Enumerate" name="warning-enum-frequency" tooltip="Warn if save or save file enumerations are performed on the same saves before the set time has passed." formatting-prefix="&lt; " class="row my warning-time-dropdowns">
+                    <Bindings>
+                        <engine:DataBinding property="Configuration" binding-mode="ToTarget" data-source-path="WarningFrequencyTimeOptions"/>
+                        <engine:DataBinding property="value" binding-mode="TwoWay" data-source-path="WarningEnumFrequencyInterval" source-to-ui-converters="TimeOptionToTimeSpan" ui-to-source-converters="TimeOptionToTimeSpan"/>
+                    </Bindings>
+                </Unity.PlatformToolkit.PlayMode.TimeDropdown>
+                <Unity.PlatformToolkit.PlayMode.TimeDropdown label="Commit" name="warning-commit-frequency" tooltip="Warn if save commits are performed on the same saves before the set time has passed." formatting-prefix="&lt; " class="row my warning-time-dropdowns">
+                    <Bindings>
+                        <engine:DataBinding property="Configuration" binding-mode="ToTarget" data-source-path="WarningFrequencyTimeOptions"/>
+                        <engine:DataBinding property="value" binding-mode="TwoWay" data-source-path="WarningCommitFrequencyInterval" source-to-ui-converters="TimeOptionToTimeSpan" ui-to-source-converters="TimeOptionToTimeSpan"/>
+                    </Bindings>
+                </Unity.PlatformToolkit.PlayMode.TimeDropdown>
+                <Unity.PlatformToolkit.PlayMode.TimeDropdown label="Delete" name="warning-delete-frequency" tooltip="Warn if save deletes are performed on the same saves or files before the set time has passed." formatting-prefix="&lt; " class="row my warning-time-dropdowns">
+                    <Bindings>
+                        <engine:DataBinding property="Configuration" binding-mode="ToTarget" data-source-path="WarningFrequencyTimeOptions"/>
+                        <engine:DataBinding property="value" binding-mode="TwoWay" data-source-path="WarningDeleteFrequencyInterval" source-to-ui-converters="TimeOptionToTimeSpan" ui-to-source-converters="TimeOptionToTimeSpan"/>
+                    </Bindings>
+                </Unity.PlatformToolkit.PlayMode.TimeDropdown>
+            </engine:GroupBox>
+            <engine:GroupBox text="Object Lifetime" tooltip="Warn if an object&apos;s lifetime exceeds a specified timeframe." class="groupbox">
+                <Unity.PlatformToolkit.PlayMode.TimeDropdown label="Undisposed saves" name="warning-undisposed-saves" tooltip="Warn if a disposable save object is not disposed until after the set time has passed. This helps surface potential submission issues or hanging file handles." formatting-prefix="&gt; " class="row my warning-time-dropdowns">
+                    <Bindings>
+                        <engine:DataBinding property="Configuration" binding-mode="ToTarget" data-source-path="WarningUndisposedSavesTimeOptions"/>
+                        <engine:DataBinding property="value" binding-mode="TwoWay" data-source-path="WarningUndisposedSavesInterval" source-to-ui-converters="TimeOptionToTimeSpan" ui-to-source-converters="TimeOptionToTimeSpan"/>
+                    </Bindings>
+                </Unity.PlatformToolkit.PlayMode.TimeDropdown>
+            </engine:GroupBox>
+        </Unity.PlatformToolkit.PlayMode.ToggleFoldout>
+    </engine:VisualElement>
+</engine:UXML>

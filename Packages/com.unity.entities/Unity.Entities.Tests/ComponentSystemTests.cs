@@ -4,7 +4,6 @@ using Unity.Collections;
 using Unity.Jobs;
 using UnityEngine.Scripting;
 using Unity.Burst;
-using System.Collections.Generic;
 using Unity.Burst.Intrinsics;
 using static Unity.Entities.SystemAPI;
 

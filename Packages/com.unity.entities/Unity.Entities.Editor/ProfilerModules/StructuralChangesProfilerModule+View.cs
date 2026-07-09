@@ -6,7 +6,6 @@ using UnityEditor.UIElements;
 using UnityEngine.Pool;
 using UnityEngine.UIElements;
 using static Unity.Entities.StructuralChangesProfiler;
-using TreeView = UnityEngine.UIElements.TreeView;
 
 namespace Unity.Entities.Editor
 {

@@ -2,7 +2,6 @@ using NUnit.Framework;
 using System;
 using System.Collections;
 using System.Linq;
-using Unity.Collections;
 
 namespace Unity.Entities.Editor.Tests
 {

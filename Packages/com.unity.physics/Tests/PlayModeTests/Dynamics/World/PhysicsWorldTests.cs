@@ -1,4 +1,3 @@
-using System;
 using NUnit.Framework;
 
 namespace Unity.Physics.Tests.Dynamics.World

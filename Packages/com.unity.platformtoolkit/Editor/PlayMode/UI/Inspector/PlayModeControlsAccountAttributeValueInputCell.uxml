@@ -1,0 +1,8 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:pt="Unity.PlatformToolkit.PlayMode" xmlns:engine="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <pt:PlayModeControlsAccountAttributeValueInputCell name="value-field" class="attribute-definition__cell">
+        <Bindings>
+            <engine:DataBinding property="valueType" data-source-path="AttributeDefinition.ValueType"/>
+            <engine:DataBinding property="value" data-source-path="Value"/>
+        </Bindings>
+    </pt:PlayModeControlsAccountAttributeValueInputCell>
+</engine:UXML>

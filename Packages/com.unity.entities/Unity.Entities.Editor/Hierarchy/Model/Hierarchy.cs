@@ -6,7 +6,6 @@ using JetBrains.Annotations;
 using Unity.Collections;
 using Unity.Properties;
 using Unity.Scenes;
-using Unity.Scenes.Editor;
 using UnityEditor;
 using UnityEngine;
 

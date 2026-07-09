@@ -1,8 +1,6 @@
 using System;
-using Unity.Entities;
 using NUnit.Framework;
 using Unity.Collections;
-using Unity.Jobs;
 using Unity.Mathematics;
 
 namespace Unity.Entities.Tests

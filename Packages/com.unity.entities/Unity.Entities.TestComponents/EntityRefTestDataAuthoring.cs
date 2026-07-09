@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using Unity.Entities;
-using Unity.Entities.Conversion;
 using UnityEngine;
 
 namespace Unity.Entities.Tests

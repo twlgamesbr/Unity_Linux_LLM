@@ -10,7 +10,6 @@ using UnityEngine;
 using Unity.Collections;
 using Unity.Profiling;
 using UnityEngine.LowLevel;
-using UnityEngine.PlayerLoop;
 
 namespace Unity.Entities
 {

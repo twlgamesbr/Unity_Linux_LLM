@@ -1,4 +1,3 @@
-using JetBrains.Annotations;
 using UnityEngine.UIElements;
 
 namespace Unity.Entities.UI

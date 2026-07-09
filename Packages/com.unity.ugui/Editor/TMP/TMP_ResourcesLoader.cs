@@ -1,9 +1,4 @@
-﻿using System.Collections;
-using UnityEditor;
-using UnityEngine;
-
-
-namespace TMPro.EditorUtilities
+﻿namespace TMPro.EditorUtilities
 {
     /*
     [InitializeOnLoad]

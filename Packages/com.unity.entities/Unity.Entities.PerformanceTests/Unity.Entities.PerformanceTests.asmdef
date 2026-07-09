@@ -5,7 +5,6 @@
         "Unity.PerformanceTesting",
         "Unity.Entities",
         "Unity.Mathematics",
-        "Unity.Properties",
         "Unity.Burst",
         "Unity.Collections",
         "Unity.Entities.Tests",

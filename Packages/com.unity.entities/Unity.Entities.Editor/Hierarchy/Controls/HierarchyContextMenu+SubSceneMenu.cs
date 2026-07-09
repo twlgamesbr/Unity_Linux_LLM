@@ -1,9 +1,6 @@
-﻿using System.Linq;
-using Unity.Editor.Bridge;
+﻿using Unity.Editor.Bridge;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
 
 namespace Unity.Entities.Editor

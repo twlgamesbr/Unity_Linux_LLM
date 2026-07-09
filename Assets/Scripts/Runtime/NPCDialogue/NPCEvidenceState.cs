@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using EditorAttributes;
+using Void = EditorAttributes.Void;
 using UnityEngine;
 
 namespace NPCSystem
@@ -78,15 +80,65 @@ namespace NPCSystem
 
     public class NPCEvidenceState : MonoBehaviour
     {
-        [Header("Investigation State")]
+        [HelpBox(
+            "Tracks persistent game state changes driven by NPC dialogue: clues revealed, items obtained, locations visited, NPC moods and trust levels.",
+            MessageMode.Log,
+            drawAbove: true
+        )]
+        [SerializeField]
+        Void _docsGroup;
+
+        [Title("Runtime Status")]
+        [ShowInInspector, ReadOnly]
+        int TotalClues => discoveredClues?.Count ?? 0;
+
+        [ShowInInspector, ReadOnly]
+        int TotalItems => obtainedItems?.Count ?? 0;
+
+        [ShowInInspector, ReadOnly]
+        int TotalLocations => visitedLocations?.Count ?? 0;
+
+        [ShowInInspector, ReadOnly]
+        string TrackedNpcs
+        {
+            get
+            {
+                var keys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                if (npcMoodKeys != null)
+                    foreach (var k in npcMoodKeys) keys.Add(k);
+                if (npcTrustKeys != null)
+                    foreach (var k in npcTrustKeys) keys.Add(k);
+                return keys.Count > 0 ? string.Join(", ", keys.OrderBy(x => x)) : "<none>";
+            }
+        }
+
+        [FoldoutGroup("Investigation State", true, nameof(discoveredClues), nameof(obtainedItems), nameof(visitedLocations))]
+        [SerializeField]
+        Void investigationGroup;
+
+        [SerializeField, HideProperty]
         public List<ClueEntry> discoveredClues = new List<ClueEntry>();
+
+        [SerializeField, HideProperty]
         public List<string> obtainedItems = new List<string>();
+
+        [SerializeField, HideProperty]
         public List<string> visitedLocations = new List<string>();
 
-        [Header("NPC States (serialized backing)")]
+        [FoldoutGroup("NPC States (serialized backing)", true, nameof(npcMoodKeys), nameof(npcMoodValues), nameof(npcTrustKeys), nameof(npcTrustValues))]
+        [SerializeField]
+        Void npcStatesGroup;
+
+        [SerializeField, HideProperty]
         public List<string> npcMoodKeys = new List<string>();
+
+        [SerializeField, HideProperty]
         public List<string> npcMoodValues = new List<string>();
+
+        [SerializeField, HideProperty]
         public List<string> npcTrustKeys = new List<string>();
+
+        [SerializeField, HideProperty]
         public List<int> npcTrustValues = new List<int>();
 
         // Runtime dedup / fast lookup
@@ -95,6 +147,20 @@ namespace NPCSystem
         void Awake()
         {
             RebuildRuntimeCaches();
+        }
+
+        [Button("Clear All Evidence")]
+        void ClearAllEvidence()
+        {
+            discoveredClues.Clear();
+            obtainedItems.Clear();
+            visitedLocations.Clear();
+            npcMoodKeys.Clear();
+            npcMoodValues.Clear();
+            npcTrustKeys.Clear();
+            npcTrustValues.Clear();
+            RebuildRuntimeCaches();
+            Log("All evidence state cleared via inspector button.");
         }
 
         void WarmLookups()

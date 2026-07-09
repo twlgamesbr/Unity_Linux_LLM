@@ -1,0 +1,23 @@
+{
+    "submodules": [
+        {
+            "name": "System.Dynamic",
+            "description": "Provides access to classes and interfaces of the Dynamic Language Runtime (https://learn.microsoft.com/en-us/dotnet/api/system.dynamic).",
+            "version": "1.0.0",
+            "functions": [
+            ],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "System.Core"
+                        ],
+                        "methods": [
+                            "* System.Dynamic.*"
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}

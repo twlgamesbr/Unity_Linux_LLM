@@ -17,7 +17,13 @@ namespace NPCSystem
         public string RequestId => _requestId;
         public long ElapsedMilliseconds => _stopwatch.ElapsedMilliseconds;
 
-        NPCFlowScope(NPCFlowLogger logger, NPCFlowStage stage, string source, string requestId, string npcSlug)
+        NPCFlowScope(
+            NPCFlowLogger logger,
+            NPCFlowStage stage,
+            string source,
+            string requestId,
+            string npcSlug
+        )
         {
             _logger = logger;
             _stage = stage;
@@ -33,35 +39,70 @@ namespace NPCSystem
             string source,
             string requestId = null,
             string npcSlug = null,
-            Dictionary<string, object> data = null)
+            Dictionary<string, object> data = null
+        )
         {
             logger ??= NPCFlowLogger.FindOrCreate();
             var scope = new NPCFlowScope(logger, stage, source, requestId, npcSlug);
-            logger.Log(stage, NPCFlowStatus.Start, NPCFlowLogLevel.Info, $"{stage} started.", source, requestId, npcSlug, 0, data);
+            logger.Log(
+                stage,
+                NPCFlowStatus.Start,
+                NPCFlowLogLevel.Info,
+                $"{stage} started.",
+                source,
+                requestId,
+                npcSlug,
+                0,
+                data
+            );
             return scope;
         }
 
         public void Success(string message = null, Dictionary<string, object> data = null)
         {
-            Complete(NPCFlowStatus.Success, NPCFlowLogLevel.Info, message ?? $"{_stage} completed.", data);
+            Complete(
+                NPCFlowStatus.Success,
+                NPCFlowLogLevel.Info,
+                message ?? $"{_stage} completed.",
+                data
+            );
         }
 
         public void Fallback(string message = null, Dictionary<string, object> data = null)
         {
-            Complete(NPCFlowStatus.Fallback, NPCFlowLogLevel.Warning, message ?? $"{_stage} fell back.", data);
+            Complete(
+                NPCFlowStatus.Fallback,
+                NPCFlowLogLevel.Warning,
+                message ?? $"{_stage} fell back.",
+                data
+            );
         }
 
         public void Skipped(string message = null, Dictionary<string, object> data = null)
         {
-            Complete(NPCFlowStatus.Skipped, NPCFlowLogLevel.Info, message ?? $"{_stage} skipped.", data);
+            Complete(
+                NPCFlowStatus.Skipped,
+                NPCFlowLogLevel.Info,
+                message ?? $"{_stage} skipped.",
+                data
+            );
         }
 
         public void Warning(string message = null, Dictionary<string, object> data = null)
         {
-            Complete(NPCFlowStatus.Warning, NPCFlowLogLevel.Warning, message ?? $"{_stage} warning.", data);
+            Complete(
+                NPCFlowStatus.Warning,
+                NPCFlowLogLevel.Warning,
+                message ?? $"{_stage} warning.",
+                data
+            );
         }
 
-        public void Error(Exception exception, string message = null, Dictionary<string, object> data = null)
+        public void Error(
+            Exception exception,
+            string message = null,
+            Dictionary<string, object> data = null
+        )
         {
             data ??= new Dictionary<string, object>();
             if (exception != null)
@@ -69,7 +110,12 @@ namespace NPCSystem
                 data["exceptionType"] = exception.GetType().Name;
                 data["exceptionMessage"] = exception.Message;
             }
-            Complete(NPCFlowStatus.Error, NPCFlowLogLevel.Error, message ?? $"{_stage} failed.", data);
+            Complete(
+                NPCFlowStatus.Error,
+                NPCFlowLogLevel.Error,
+                message ?? $"{_stage} failed.",
+                data
+            );
         }
 
         public void Dispose()
@@ -77,12 +123,28 @@ namespace NPCSystem
             _stopwatch.Stop();
         }
 
-        void Complete(NPCFlowStatus status, NPCFlowLogLevel level, string message, Dictionary<string, object> data)
+        void Complete(
+            NPCFlowStatus status,
+            NPCFlowLogLevel level,
+            string message,
+            Dictionary<string, object> data
+        )
         {
-            if (_completed) return;
+            if (_completed)
+                return;
             _completed = true;
             _stopwatch.Stop();
-            _logger?.Log(_stage, status, level, message, _source, _requestId, _npcSlug, _stopwatch.ElapsedMilliseconds, data);
+            _logger?.Log(
+                _stage,
+                status,
+                level,
+                message,
+                _source,
+                _requestId,
+                _npcSlug,
+                _stopwatch.ElapsedMilliseconds,
+                data
+            );
         }
     }
 }

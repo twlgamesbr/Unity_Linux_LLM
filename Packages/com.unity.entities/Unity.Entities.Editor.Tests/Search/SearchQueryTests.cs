@@ -1,11 +1,5 @@
 using NUnit.Framework;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
-using UnityEditor.Search;
-using UnityEngine.TestTools;
-using Unity.Entities;
 
 namespace Unity.Entities.Editor.Tests.Search
 {

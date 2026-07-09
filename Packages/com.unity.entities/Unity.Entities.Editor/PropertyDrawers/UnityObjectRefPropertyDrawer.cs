@@ -1,7 +1,4 @@
 using UnityEditor;
-using UnityEngine;
-using Unity.Entities.Content;
-using Unity.Entities.Serialization;
 using System;
 using System.Collections;
 using UnityEditor.UIElements;

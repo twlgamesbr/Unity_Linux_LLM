@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Unity.Profiling;
 using Unity.Properties;

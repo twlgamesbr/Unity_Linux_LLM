@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using EditorAttributes;
 using UnityEngine;
 
@@ -69,6 +71,7 @@ namespace NPCSystem
 
         [Range(0f, 2f)]
         public float repeatPenalty = 1.1f;
+        [Suffix("tokens")]
         public int maxTokens = 150;
 
         [Title("Knowledge")]
@@ -186,6 +189,52 @@ namespace NPCSystem
         static string NormalizeRelativePath(string path)
         {
             return string.IsNullOrWhiteSpace(path) ? string.Empty : path.Trim().Replace('\\', '/');
+        }
+
+        /// <summary>
+        /// Find an NPCProfile in a profiles array by slug, display name, or asset name.
+        /// Returns null when no match is found.
+        /// </summary>
+        public static NPCProfile FindProfileInArray(string npcName, NPCProfile[] profiles)
+        {
+            if (string.IsNullOrWhiteSpace(npcName) || profiles == null)
+                return null;
+
+            string key = npcName.Trim();
+
+            // Try slug match first
+            foreach (NPCProfile profile in profiles)
+            {
+                if (profile == null)
+                    continue;
+
+                if (
+                    string.Equals(
+                        profile.GetNpcSlug(),
+                        key,
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                )
+                    return profile;
+            }
+
+            // Fall back to display name / asset name
+            return profiles.FirstOrDefault(
+                profile =>
+                    profile != null
+                    && (
+                        string.Equals(
+                            profile.GetDisplayName(),
+                            key,
+                            StringComparison.OrdinalIgnoreCase
+                        )
+                        || string.Equals(
+                            profile.name,
+                            key,
+                            StringComparison.OrdinalIgnoreCase
+                        )
+                    )
+            );
         }
     }
 }

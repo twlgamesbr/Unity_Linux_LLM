@@ -1,8 +1,6 @@
 #if UNITY_EDITOR
 using System;
-using UnityEditor;
 using UnityEngine.InputSystem.LowLevel;
-using UnityEngine.Serialization;
 
 namespace UnityEngine.InputSystem.Editor
 {

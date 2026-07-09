@@ -16,7 +16,6 @@ using UnityEditor;
 using UnityEngine.Profiling;
 using BinaryReader = Unity.Entities.Serialization.BinaryReader;
 using BinaryWriter = Unity.Entities.Serialization.BinaryWriter;
-using Random = Unity.Mathematics.Random;
 using System.IO;
 
 namespace Unity.Entities.Tests

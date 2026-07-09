@@ -3,7 +3,6 @@ using NUnit.Framework;
 using Unity.Collections;
 using Unity.Entities.Tests.InAnotherAssembly;
 using Unity.Jobs;
-using UnityEngine;
 using UnityEngine.TestTools;
 
 namespace Unity.Entities.Tests

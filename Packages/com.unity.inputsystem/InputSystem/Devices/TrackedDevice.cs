@@ -1,6 +1,5 @@
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem.Layouts;
-using UnityEngine.Scripting;
 
 namespace UnityEngine.InputSystem
 {

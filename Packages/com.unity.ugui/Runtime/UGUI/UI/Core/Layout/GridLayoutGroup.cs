@@ -1,6 +1,3 @@
-using UnityEngine;
-using System.Collections.Generic;
-
 namespace UnityEngine.UI
 {
     [AddComponentMenu("Layout/Grid Layout Group", 152)]

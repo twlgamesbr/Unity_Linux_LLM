@@ -3,7 +3,6 @@ using Unity.Entities.UI;
 using Unity.Properties;
 using Unity.Scenes.Editor;
 using Unity.Serialization;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
 

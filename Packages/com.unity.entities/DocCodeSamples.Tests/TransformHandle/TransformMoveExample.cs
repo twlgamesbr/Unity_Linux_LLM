@@ -1,5 +1,3 @@
-using System;
-
 namespace Doc.CodeSamples.Tests
 {
 #region example

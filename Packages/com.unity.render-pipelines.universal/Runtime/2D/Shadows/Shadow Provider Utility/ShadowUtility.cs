@@ -1,15 +1,12 @@
 using System;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Unity.Collections;
-using System.Collections.Generic;
 using UnityEngine.U2D;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 using Unity.Burst;
 
 #if USING_2DCOMMON
-using UnityEngine.U2D.Common;
 #endif
 
 namespace UnityEngine.Rendering.Universal

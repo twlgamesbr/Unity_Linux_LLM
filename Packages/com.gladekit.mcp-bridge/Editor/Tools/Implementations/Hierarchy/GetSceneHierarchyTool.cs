@@ -1,7 +1,5 @@
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.SceneManagement;
-using GladeAgenticAI.Core.Tools;
 
 namespace GladeAgenticAI.Core.Tools.Implementations.Hierarchy
 {
@@ -28,7 +26,8 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Hierarchy
             var queue = new Queue<(UnityEngine.GameObject go, int depth, string parentPath)>();
             foreach (var root in roots)
             {
-                if (!includeInactive && !root.activeInHierarchy) continue;
+                if (!includeInactive && !root.activeInHierarchy)
+                    continue;
                 queue.Enqueue((root, 0, null));
             }
 
@@ -45,13 +44,16 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Hierarchy
                 if (!capped || paths.Count < maxResults)
                     paths.Add(fullPath);
 
-                if (rootOnly) continue;
-                if (maxDepth >= 0 && depth + 1 > maxDepth) continue;
+                if (rootOnly)
+                    continue;
+                if (maxDepth >= 0 && depth + 1 > maxDepth)
+                    continue;
 
                 for (int i = 0; i < go.transform.childCount; i++)
                 {
                     var child = go.transform.GetChild(i).gameObject;
-                    if (!includeInactive && !child.activeInHierarchy) continue;
+                    if (!includeInactive && !child.activeInHierarchy)
+                        continue;
                     queue.Enqueue((child, depth + 1, fullPath));
                 }
             }
@@ -66,9 +68,10 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Hierarchy
             };
             if (truncated)
             {
-                result["note"] = $"Hierarchy capped at {maxResults} of {totalSeen} paths. " +
-                    "Use find_game_objects (nameContains/hasComponent/tag) or list_children " +
-                    "for specific subtrees instead of raising maxResults.";
+                result["note"] =
+                    $"Hierarchy capped at {maxResults} of {totalSeen} paths. "
+                    + "Use find_game_objects (nameContains/hasComponent/tag) or list_children "
+                    + "for specific subtrees instead of raising maxResults.";
             }
 
             return ToolUtils.SerializeDictToJson(result);
@@ -76,17 +79,23 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Hierarchy
 
         private static bool ParseBoolArg(Dictionary<string, object> args, string key, bool fallback)
         {
-            if (!args.ContainsKey(key) || args[key] == null) return fallback;
-            if (args[key] is bool b) return b;
+            if (!args.ContainsKey(key) || args[key] == null)
+                return fallback;
+            if (args[key] is bool b)
+                return b;
             return bool.TryParse(args[key].ToString(), out bool parsed) ? parsed : fallback;
         }
 
         private static int ParseIntArg(Dictionary<string, object> args, string key, int fallback)
         {
-            if (!args.ContainsKey(key) || args[key] == null) return fallback;
-            if (args[key] is int i) return i;
-            if (args[key] is float f) return (int)f;
-            if (args[key] is double d) return (int)d;
+            if (!args.ContainsKey(key) || args[key] == null)
+                return fallback;
+            if (args[key] is int i)
+                return i;
+            if (args[key] is float f)
+                return (int)f;
+            if (args[key] is double d)
+                return (int)d;
             return int.TryParse(args[key].ToString(), out int parsed) ? parsed : fallback;
         }
     }

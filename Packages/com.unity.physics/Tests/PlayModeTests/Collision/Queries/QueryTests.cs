@@ -8,7 +8,6 @@ using Unity.Collections;
 using Random = Unity.Mathematics.Random;
 using static Unity.Physics.Math;
 using Unity.Physics.Tests.Utils;
-using UnityEngine;
 
 namespace Unity.Physics.Tests.Collision.Queries
 {

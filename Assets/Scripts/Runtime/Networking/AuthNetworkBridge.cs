@@ -77,7 +77,6 @@ namespace NPCSystem
         /// Also used by NPCPlayerNetworkAvatar to auto-register on client spawn.
         /// </summary>
         public static string ActivePlayerName { get; private set; } = "Player";
-
         void Reset()
         {
             ResolveReferences();
@@ -229,6 +228,7 @@ namespace NPCSystem
             );
             if (uiController != null)
             {
+                NPCPlayerCharacterController.RequestUIActive();
                 GameObject gameplayCanvas = uiController.GetGameplayCanvas();
                 if (gameplayCanvas != null)
                 {

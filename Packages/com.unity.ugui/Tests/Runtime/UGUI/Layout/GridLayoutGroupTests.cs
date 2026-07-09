@@ -1,5 +1,4 @@
 using NUnit.Framework;
-using UnityEngine.EventSystems;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.TestTools;

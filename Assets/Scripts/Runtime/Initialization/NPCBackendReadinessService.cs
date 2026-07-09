@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using EditorAttributes;
 using UnityEngine;
 using UnityEngine.Networking;
+using Void = EditorAttributes.Void;
 
 namespace NPCSystem
 {
@@ -39,40 +40,74 @@ namespace NPCSystem
             MessageMode.Log,
             drawAbove: true
         )]
-        [Header("References")]
+        [FoldoutGroup("References", true, nameof(authService), nameof(dialogueManager))]
+        [SerializeField]
+        private Void referencesGroup;
+
+        [SerializeField, HideProperty]
         public PlayerAuthService authService;
+
+        [SerializeField, HideProperty]
         public NPCDialogueManager dialogueManager;
 
-        [Header("Probe Targets")]
+        [FoldoutGroup(
+            "Probe Targets",
+            true,
+            nameof(authProbeRelativePath),
+            nameof(localAiProbeRelativePath),
+            nameof(requestTimeoutSeconds),
+            nameof(requireAuthBackend),
+            nameof(requireLocalAiBackend),
+            nameof(failInitializationOnRequiredBackendFailure)
+        )]
         [SerializeField]
+        private Void probeTargetsGroup;
+
+        [SerializeField, HideProperty]
         string authProbeRelativePath = "auth/v1/health";
 
-        [SerializeField]
+        [SerializeField, HideProperty]
         string localAiProbeRelativePath = "v1/models";
 
-        [SerializeField]
+        [SerializeField, HideProperty]
         float requestTimeoutSeconds = 5f;
 
-        [SerializeField]
+        [SerializeField, HideProperty]
         bool requireAuthBackend = true;
 
-        [SerializeField]
+        [SerializeField, HideProperty]
         bool requireLocalAiBackend = true;
 
-        [SerializeField]
+        [HelpBox(
+            "When enabled, a failed backend probe throws an exception during initialization. Use this for early-exit server builds where backends are guaranteed.",
+            MessageMode.Warning
+        )]
+        [SerializeField, HideProperty]
         bool failInitializationOnRequiredBackendFailure = false;
 
-        [Header("Runtime Diagnostics")]
-        [SerializeField, ReadOnly]
+        [FoldoutGroup(
+            "Runtime Diagnostics",
+            true,
+            nameof(lastReadinessStatus),
+            nameof(lastAuthBackendStatus),
+            nameof(lastLocalAiBackendStatus)
+        )]
+        [SerializeField]
+        private Void diagnosticsGroup;
+
+        [SerializeField, HideProperty, ReadOnly]
         string lastReadinessStatus = "Not checked.";
 
-        [SerializeField, ReadOnly]
+        [SerializeField, HideProperty, ReadOnly]
         string lastAuthBackendStatus = "Idle";
 
-        [SerializeField, ReadOnly]
+        [SerializeField, HideProperty, ReadOnly]
         string lastLocalAiBackendStatus = "Idle";
 
-        [SerializeField, ReadOnly]
+        [ShowInInspector]
+        long LastProbeDurationMs => lastProbeDurationMs;
+
+        [SerializeField]
         long lastProbeDurationMs;
 
         public NPCBackendReadinessSnapshot LastSnapshot { get; private set; } =

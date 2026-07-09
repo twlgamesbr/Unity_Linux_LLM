@@ -2,7 +2,6 @@ using NUnit.Framework;
 using Unity.Core;
 using Unity.Entities;
 using Unity.Physics;
-using UnityEngine;
 
 namespace Unity.CharacterController.RuntimeTests
 {

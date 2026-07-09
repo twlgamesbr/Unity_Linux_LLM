@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using GladeAgenticAI.Core.Tools;
 using GladeAgenticAI.Services;
 
 namespace GladeAgenticAI.Core.Tools.Implementations.Runtime
@@ -57,11 +56,15 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Runtime
             if (args == null)
                 return ToolUtils.CreateErrorResponse("args required");
 
-            string proposalId = args.TryGetValue("proposalId", out var pidObj) ? pidObj?.ToString() : null;
+            string proposalId = args.TryGetValue("proposalId", out var pidObj)
+                ? pidObj?.ToString()
+                : null;
             if (string.IsNullOrEmpty(proposalId))
                 return ToolUtils.CreateErrorResponse("proposalId is required");
 
-            string summary = args.TryGetValue("summary", out var sObj) ? sObj?.ToString() ?? "" : "";
+            string summary = args.TryGetValue("summary", out var sObj)
+                ? sObj?.ToString() ?? ""
+                : "";
 
             // Idempotency check (Issue 2.C).
             var prior = FixApplyTracker.TryGet(proposalId);
@@ -77,7 +80,8 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Runtime
                 };
                 return ToolUtils.CreateSuccessResponse(
                     "Fix already applied — returning prior result",
-                    alreadyExtras);
+                    alreadyExtras
+                );
             }
 
             // Re-hydrate the changes array. Per the 2026-04-30 audit pass 5
@@ -98,7 +102,9 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Runtime
                 }
             }
             if (changesList == null || changesList.Count == 0)
-                return ToolUtils.CreateErrorResponse("changes array is required and must be non-empty");
+                return ToolUtils.CreateErrorResponse(
+                    "changes array is required and must be non-empty"
+                );
 
             // Hash-drift check (Live Loop critical gap fix, 2026-05-21).
             // If the cloud captured per-file hashes at propose time, verify
@@ -126,16 +132,19 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Runtime
                     // actual == null means file missing or unreadable; we
                     // treat that as drift because the AI's plan assumed
                     // the file existed in a specific state.
-                    bool drifted = actual == null
+                    bool drifted =
+                        actual == null
                         || !string.Equals(actual, expected, StringComparison.OrdinalIgnoreCase);
                     if (drifted)
                     {
-                        driftDetails.Add(new Dictionary<string, object>
-                        {
-                            { "scriptPath", path },
-                            { "expectedHash", expected },
-                            { "actualHash", actual ?? "<missing or unreadable>" },
-                        });
+                        driftDetails.Add(
+                            new Dictionary<string, object>
+                            {
+                                { "scriptPath", path },
+                                { "expectedHash", expected },
+                                { "actualHash", actual ?? "<missing or unreadable>" },
+                            }
+                        );
                     }
                 }
                 if (driftDetails.Count > 0)
@@ -148,12 +157,15 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Runtime
                         { "driftedFiles", driftDetails },
                         { "proposalId", proposalId },
                     };
-                    string fileList = string.Join(", ",
-                        driftDetails.ConvertAll(d => d["scriptPath"].ToString()));
+                    string fileList = string.Join(
+                        ", ",
+                        driftDetails.ConvertAll(d => d["scriptPath"].ToString())
+                    );
                     return ToolUtils.CreateErrorResponse(
                         $"Apply refused — {driftDetails.Count} file(s) changed since the proposal was generated: {fileList}. "
-                        + "Re-investigate (the proposal may overwrite recent edits) or retry without expectedFileHashes to force-apply.",
-                        driftExtras);
+                            + "Re-investigate (the proposal may overwrite recent edits) or retry without expectedFileHashes to force-apply.",
+                        driftExtras
+                    );
                 }
             }
 
@@ -175,27 +187,35 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Runtime
                 var changeDict = changeObj as Dictionary<string, object>;
                 if (changeDict == null)
                 {
-                    perResults.Add(new Dictionary<string, object>
-                    {
-                        { "index", i },
-                        { "success", false },
-                        { "error", "change entry is not an object" },
-                    });
+                    perResults.Add(
+                        new Dictionary<string, object>
+                        {
+                            { "index", i },
+                            { "success", false },
+                            { "error", "change entry is not an object" },
+                        }
+                    );
                     failCount++;
                     continue;
                 }
 
                 string toolName = changeDict.TryGetValue("toolName", out var tnObj)
                     ? tnObj?.ToString()
-                    : (changeDict.TryGetValue("tool_name", out var tnObj2) ? tnObj2?.ToString() : null);
+                    : (
+                        changeDict.TryGetValue("tool_name", out var tnObj2)
+                            ? tnObj2?.ToString()
+                            : null
+                    );
                 if (string.IsNullOrEmpty(toolName))
                 {
-                    perResults.Add(new Dictionary<string, object>
-                    {
-                        { "index", i },
-                        { "success", false },
-                        { "error", "toolName is required on each change" },
-                    });
+                    perResults.Add(
+                        new Dictionary<string, object>
+                        {
+                            { "index", i },
+                            { "success", false },
+                            { "error", "toolName is required on each change" },
+                        }
+                    );
                     failCount++;
                     continue;
                 }
@@ -225,18 +245,25 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Runtime
                     innerSuccess = false;
                 }
 
-                perResults.Add(new Dictionary<string, object>
-                {
-                    { "index", i },
-                    { "toolName", toolName },
-                    { "success", innerSuccess },
-                    { "result", innerResult },
-                });
-                if (innerSuccess) successCount++; else failCount++;
+                perResults.Add(
+                    new Dictionary<string, object>
+                    {
+                        { "index", i },
+                        { "toolName", toolName },
+                        { "success", innerSuccess },
+                        { "result", innerResult },
+                    }
+                );
+                if (innerSuccess)
+                    successCount++;
+                else
+                    failCount++;
             }
 
             bool overallSuccess = failCount == 0;
-            double ts = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
+            double ts = (
+                DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)
+            ).TotalSeconds;
             FixApplyTracker.Record(proposalId, overallSuccess, summary, ts);
 
             var extras = new Dictionary<string, object>
@@ -271,11 +298,14 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Runtime
         /// </summary>
         private static bool LooksLikeErrorResponse(string result)
         {
-            if (string.IsNullOrEmpty(result)) return true;
+            if (string.IsNullOrEmpty(result))
+                return true;
             // Cheap negative test: presence of "success":true at the start
             // OR absence of "error" altogether.
-            if (result.Contains("\"success\":true")) return false;
-            if (result.Contains("\"error\":")) return true;
+            if (result.Contains("\"success\":true"))
+                return false;
+            if (result.Contains("\"error\":"))
+                return true;
             // Default: treat ambiguous responses as success. Real failures
             // from existing tools always include "error".
             return false;

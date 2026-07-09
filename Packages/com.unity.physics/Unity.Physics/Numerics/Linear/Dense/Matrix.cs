@@ -1,6 +1,5 @@
 using Unity.Burst;
 using Unity.Collections;
-using Unity.Mathematics;
 
 namespace Unity.Numerics.Linear.Dense.Primitives
 {

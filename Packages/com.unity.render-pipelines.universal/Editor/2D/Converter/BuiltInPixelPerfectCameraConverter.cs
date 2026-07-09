@@ -4,8 +4,6 @@ using UnityEditor.Rendering.Converter;
 using UnityEngine;
 using UnityEngine.Categorization;
 
-using URPPackage = UnityEngine.Rendering.Universal;
-
 #if PIXEL_PERFECT_2D_EXISTS
 using U2DPackage = UnityEngine.U2D;
 #endif

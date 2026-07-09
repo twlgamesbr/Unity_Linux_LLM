@@ -5,7 +5,6 @@ using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Entities.Tests;
-using UnityEngine.TestTools;
 
 #if UNITY_EDITOR
 /// <summary>

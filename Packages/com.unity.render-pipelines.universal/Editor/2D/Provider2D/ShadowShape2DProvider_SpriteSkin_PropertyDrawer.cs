@@ -1,8 +1,5 @@
 #if USING_2DANIMATION
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEditor;
 using UnityEngine.Rendering.Universal;
 
 namespace UnityEditor.Rendering.Universal

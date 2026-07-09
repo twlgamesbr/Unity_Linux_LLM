@@ -1,8 +1,5 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using Unity.Entities.Editor;
-using UnityEngine;
 
 namespace Unity.Entities.Editor
 {

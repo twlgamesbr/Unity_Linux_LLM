@@ -1,4 +1,3 @@
-using System.Linq;
 using System.Runtime.InteropServices;
 using NUnit.Framework;
 using Unity.Mathematics;

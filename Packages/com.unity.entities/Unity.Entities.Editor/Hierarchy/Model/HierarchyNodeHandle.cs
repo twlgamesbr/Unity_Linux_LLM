@@ -1,10 +1,7 @@
 using System;
-using Unity.Burst;
-using Unity.Scenes;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
 
 namespace Unity.Entities.Editor
 {

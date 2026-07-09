@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using Unity.Burst;
-using Unity.Collections.LowLevel.Unsafe;
 #if UNITY_EDITOR
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -8,7 +7,6 @@ using Unity.Scenes.Editor.Tests;
 #endif
 using Unity.Entities;
 using Unity.Entities.Tests;
-using UnityEditor;
 
 namespace Unity.Scenes.Hybrid.Tests
 {

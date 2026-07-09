@@ -7,7 +7,6 @@ using Unity.Scenes;
 using Unity.Scenes.Editor;
 using UnityEditor;
 using UnityEditor.SceneManagement;
-using UnityEditor.Search;
 using UnityEngine;
 using UnityEngine.LowLevel;
 using UnityEngine.SceneManagement;

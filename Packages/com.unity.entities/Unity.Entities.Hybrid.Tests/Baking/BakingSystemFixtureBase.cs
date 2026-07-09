@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using Unity.Entities.Tests;
-using Unity.Transforms;
 using UnityEditor;
 using UnityEngine;
 using UnityObject = UnityEngine.Object;

@@ -14,7 +14,6 @@ using System.IO;
 using System.Runtime.InteropServices;
 using Unity.Entities.Serialization;
 using Unity.Entities.LowLevel.Unsafe;
-using Unity.IO.LowLevel.Unsafe;
 
 public partial class BlobTests : ECSTestsFixture
 {

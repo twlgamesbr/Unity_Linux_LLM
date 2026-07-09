@@ -1,8 +1,6 @@
 using System;
 using UnityEditor.Build.Reporting;
-using UnityEngine;
 using UnityEngine.Analytics;
-using UnityEngine.Serialization;
 
 namespace UnityEditor.UI.Analytics
 {

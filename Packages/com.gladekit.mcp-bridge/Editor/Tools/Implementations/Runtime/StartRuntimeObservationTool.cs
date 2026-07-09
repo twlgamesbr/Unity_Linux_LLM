@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using GladeAgenticAI.Core.Tools;
 using GladeAgenticAI.Services;
 
 namespace GladeAgenticAI.Core.Tools.Implementations.Runtime
@@ -25,9 +24,7 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Runtime
                 { "isPlaying", PlayModeObserver.IsPlaying },
                 { "ringBufferSize", RuntimeLogStream.CurrentSize },
             };
-            return ToolUtils.CreateSuccessResponse(
-                "Runtime observation started",
-                extras);
+            return ToolUtils.CreateSuccessResponse("Runtime observation started", extras);
         }
     }
 }

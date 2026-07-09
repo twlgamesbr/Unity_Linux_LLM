@@ -1,8 +1,6 @@
-using System;
 using NUnit.Framework;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
-using UnityEngine;
 using Assert = UnityEngine.Assertions.Assert;
 
 namespace Unity.Physics.Tests.Base.Containers

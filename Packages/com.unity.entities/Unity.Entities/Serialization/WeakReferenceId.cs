@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 using Unity.Collections.LowLevel.Unsafe;
 using System.Runtime.InteropServices;
 #if UNITY_EDITOR

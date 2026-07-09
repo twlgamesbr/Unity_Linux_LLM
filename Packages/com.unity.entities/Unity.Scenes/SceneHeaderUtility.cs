@@ -1,4 +1,3 @@
-using System;
 using System.Runtime.InteropServices;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -9,7 +8,6 @@ using Unity.Jobs;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-using UnityEngine;
 using Hash128 = Unity.Entities.Hash128;
 
 namespace Unity.Scenes

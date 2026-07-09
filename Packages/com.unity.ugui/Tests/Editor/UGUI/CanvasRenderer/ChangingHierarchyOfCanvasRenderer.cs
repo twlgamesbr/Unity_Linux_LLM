@@ -1,7 +1,5 @@
 using UnityEngine;
-using UnityEngine.TestTools;
 using NUnit.Framework;
-using System.Collections;
 using UnityEditor.SceneManagement;
 
 internal class ChangingHierarchyOfCanvasRenderer

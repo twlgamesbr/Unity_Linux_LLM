@@ -36,7 +36,7 @@ namespace NPCSystem
         {
             Formatting = Formatting.None,
             NullValueHandling = NullValueHandling.Ignore,
-            Converters = new List<JsonConverter> { new StringEnumConverter() }
+            Converters = new List<JsonConverter> { new StringEnumConverter() },
         };
     }
 }

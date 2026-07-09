@@ -2,10 +2,9 @@ using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using GladeAgenticAI.Core.Tools;
-
 #if GLADE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
+
 namespace GladeAgenticAI.Core.Tools.Implementations.Input
 {
     public class CreateInputActionAssetTool : ITool
@@ -15,9 +14,11 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Input
         public string Execute(Dictionary<string, object> args)
         {
             // Check if the project uses the new Input System
-            #if !ENABLE_INPUT_SYSTEM
-            return ToolUtils.CreateErrorResponse("Cannot create InputActionAsset: The project is not using the new Input System. The new Input System package (com.unity.inputsystem) must be installed and enabled in Project Settings > Player > Active Input Handling.");
-            #else
+#if !ENABLE_INPUT_SYSTEM
+            return ToolUtils.CreateErrorResponse(
+                "Cannot create InputActionAsset: The project is not using the new Input System. The new Input System package (com.unity.inputsystem) must be installed and enabled in Project Settings > Player > Active Input Handling."
+            );
+#else
             string assetPath = args.ContainsKey("assetPath") ? args["assetPath"].ToString() : "";
             if (string.IsNullOrEmpty(assetPath))
             {
@@ -37,13 +38,13 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Input
             AssetDatabase.CreateAsset(asset, assetPath);
             AssetDatabase.SaveAssets();
 
-            var extras = new Dictionary<string, object>
-            {
-                { "assetPath", assetPath }
-            };
-            
-            return ToolUtils.CreateSuccessResponse($"Created InputActionAsset at '{assetPath}'", extras);
-            #endif
+            var extras = new Dictionary<string, object> { { "assetPath", assetPath } };
+
+            return ToolUtils.CreateSuccessResponse(
+                $"Created InputActionAsset at '{assetPath}'",
+                extras
+            );
+#endif
         }
     }
 }

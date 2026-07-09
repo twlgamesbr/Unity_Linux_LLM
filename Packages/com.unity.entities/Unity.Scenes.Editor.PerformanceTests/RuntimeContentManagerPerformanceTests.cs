@@ -1,7 +1,6 @@
 #if !UNITY_DISABLE_MANAGED_COMPONENTS
 using NUnit.Framework;
 using System.Collections;
-using System.Collections.Generic;
 using Unity.Entities.Content;
 using Unity.Entities.Serialization;
 using Unity.Loading;

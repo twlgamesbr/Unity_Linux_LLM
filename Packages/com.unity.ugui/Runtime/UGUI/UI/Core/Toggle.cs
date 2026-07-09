@@ -1,7 +1,6 @@
 using System;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
-using UnityEngine.Serialization;
 
 namespace UnityEngine.UI
 {

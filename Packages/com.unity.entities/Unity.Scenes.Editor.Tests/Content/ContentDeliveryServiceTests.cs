@@ -4,7 +4,6 @@ using System.Collections;
 using System.IO;
 using Unity.Collections;
 using Unity.Entities.Content;
-using Unity.Entities.Tests;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.TestTools;

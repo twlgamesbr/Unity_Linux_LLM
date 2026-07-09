@@ -5,10 +5,8 @@ using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
-using System;
 using Unity.Assertions;
 using Unity.Core;
-using UnityEngine;
 
 namespace Unity.CharacterController
 {

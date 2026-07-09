@@ -1,0 +1,74 @@
+{
+    "submodules": [
+        {
+            "name": "Newtonsoft Json.NET",
+            "description": "Newtonsoft's JSON framework for .NET, version 13.0.2.",
+            "version": "1.0.0",
+            "submodules": [
+                "Newtonsoft.Json",
+                "Newtonsoft.Json.Bson",
+                "Newtonsoft.Json.Converters",
+                "Newtonsoft.Json.Linq",
+                "Newtonsoft.Json.Schema",
+                "Newtonsoft.Json.Serialization"
+            ]
+        },
+        {
+            "name": "Newtonsoft.Json.Bson",
+            "description": "The Newtonsoft.Json.Bson namespace provides classes that are used to implement BSON.",
+            "version": "1.0.0",
+            "functions": [
+            ],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.Bson.*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.Linq",
+            "description": "The Newtonsoft.Json.Linq namespace provides classes that are used to implement LINQ to JSON.",
+            "version": "1.0.0",
+            "functions": [
+            ],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.Linq.*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.Schema",
+            "description": "The Newtonsoft.Json.Schema namespace provides classes that are used to implement JSON schema.",
+            "version": "1.0.0",
+            "functions": [
+            ],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.Schema.*"
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}

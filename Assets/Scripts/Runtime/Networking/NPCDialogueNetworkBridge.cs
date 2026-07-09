@@ -12,16 +12,20 @@ namespace NPCSystem
     [RequireComponent(typeof(NetworkObject))]
     public class NPCDialogueNetworkBridge : NetworkBehaviour
     {
-        [Header("References")]
         public NPCDialogueManager dialogueManager;
+
         public NPCNetworkSessionManager sessionManager;
 
-        [Header("Events")]
         public UnityEvent<string> onNPCChanged = new UnityEvent<string>();
+
         public UnityEvent<string> onResponseStart = new UnityEvent<string>();
+
         public UnityEvent<string> onResponseUpdated = new UnityEvent<string>();
+
         public UnityEvent<string, string> onResponseComplete = new UnityEvent<string, string>();
+
         public UnityEvent<string> onError = new UnityEvent<string>();
+
         public UnityEvent<NPCNotebookStateMessage> onNotebookStateChanged =
             new UnityEvent<NPCNotebookStateMessage>();
 
@@ -114,8 +118,10 @@ namespace NPCSystem
                     CaptureBaselineState();
                     UpdateNotebookStateLocal();
                 }
-                else if (dialogueManager.initializeOnStart)
+                else
                 {
+                    // Ensure the dialogue manager is initialized when the network bridge starts,
+                    // even if the manager itself was configured for deferred startup.
                     await dialogueManager.InitializeAsync();
                     CaptureBaselineState();
                     UpdateNotebookStateLocal();
@@ -195,6 +201,11 @@ namespace NPCSystem
             }
 
             SubmitDialogueServerRpc(request);
+        }
+
+        public new void SendMessage(string playerMessage)
+        {
+            SubmitPlayerMessage(playerMessage);
         }
 
         public void CancelActiveRequest()
@@ -851,7 +862,7 @@ namespace NPCSystem
                         ? dialogueManager.currentProfile.GetDisplayName()
                     : currentProfile != null ? currentProfile.GetDisplayName()
                     : string.Empty,
-                content = content ?? string.Empty,
+                content = NPCFlowTextSanitizer.CleanDialogueText(content),
             };
         }
 

@@ -4,7 +4,6 @@ using UnityEngine.Scripting.APIUpdating;
 using UnityEngine.U2D;
 using UnityEngine.Rendering.RenderGraphModule;
 using System.Collections.Generic;
-using UnityEditor;
 
 namespace UnityEngine.Rendering.Universal
 {

@@ -1,6 +1,5 @@
 #if UNITY_EDITOR
 using System;
-using System.Linq;
 using UnityEditor;
 
 #if UNITY_6000_0_OR_NEWER

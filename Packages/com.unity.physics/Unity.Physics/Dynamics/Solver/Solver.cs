@@ -9,14 +9,12 @@
 // When enabled, the direct solver will solve independent islands in parallel. Disable this option for simplifying debugging activities.
 #define DIRECT_SOLVER_SOLVE_ISLANDS_IN_PARALLEL
 
-using System;
 using System.Runtime.CompilerServices;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using Unity.Mathematics;
-using UnityEngine;
 using UnityEngine.Assertions;
 using static Unity.Physics.Math;
 

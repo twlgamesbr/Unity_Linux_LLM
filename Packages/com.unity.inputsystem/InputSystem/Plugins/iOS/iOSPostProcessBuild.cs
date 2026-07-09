@@ -2,8 +2,6 @@
 using System.IO;
 using UnityEditor;
 using UnityEditor.Callbacks;
-using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace UnityEngine.InputSystem
 {

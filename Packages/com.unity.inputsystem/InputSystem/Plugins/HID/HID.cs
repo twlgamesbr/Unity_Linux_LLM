@@ -8,7 +8,6 @@ using UnityEngine.InputSystem.Utilities;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Profiling;
 using UnityEngine.InputSystem.Layouts;
-using UnityEngine.Scripting;
 using UnityEngine.Pool;
 
 // HID support is currently broken in 32-bit Windows standalone players. Consider 32bit Windows players unsupported for now.

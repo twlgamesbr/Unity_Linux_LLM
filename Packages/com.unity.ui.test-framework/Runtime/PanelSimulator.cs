@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using NUnit.Framework;
-using UnityEditor;
 
 namespace UnityEngine.UIElements.TestFramework
 {

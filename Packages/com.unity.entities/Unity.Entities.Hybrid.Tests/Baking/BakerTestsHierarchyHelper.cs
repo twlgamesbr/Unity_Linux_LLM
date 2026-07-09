@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using NUnit.Framework;
-using Unity.Entities.Conversion;
-using Unity.Entities.Tests;
-using Unity.Scenes.Editor.Tests;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Unity.Entities.Hybrid.Tests.Baking

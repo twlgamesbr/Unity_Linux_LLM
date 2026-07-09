@@ -13,10 +13,10 @@ elif [ -f "/server/ServerWS.x86_64" ]; then
     SERVER_BINARY="/server/ServerWS.x86_64"
 elif [ -f "/server/NPCServer.x86_64" ]; then
     SERVER_BINARY="/server/NPCServer.x86_64"
-elif [ -f "/server/Linux.x86_64" ]; then
-    SERVER_BINARY="/server/Linux.x86_64"
 elif [ -f "/server/Server.x86_64" ]; then
     SERVER_BINARY="/server/Server.x86_64"
+elif [ -f "/server/Linux.x86_64" ]; then
+    SERVER_BINARY="/server/Linux.x86_64"
 elif ls /server/*.x86_64 1>/dev/null 2>&1; then
     SERVER_BINARY="$(ls /server/*.x86_64 | head -n 1)"
 else

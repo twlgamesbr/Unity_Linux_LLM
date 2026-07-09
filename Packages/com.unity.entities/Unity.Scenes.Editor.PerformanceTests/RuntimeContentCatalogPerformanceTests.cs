@@ -2,13 +2,11 @@
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Unity.Collections;
 using Unity.Entities.Content;
 using Unity.Entities.Serialization;
 using Unity.Mathematics;
 using Unity.PerformanceTesting;
-using UnityEditor;
 
 namespace Unity.Entities.Tests.Content
 {

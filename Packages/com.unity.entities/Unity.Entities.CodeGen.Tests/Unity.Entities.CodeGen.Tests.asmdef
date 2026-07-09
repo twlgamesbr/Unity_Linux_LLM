@@ -1,14 +1,13 @@
 {
     "name": "Unity.Entities.CodeGen.Tests",
+    "rootNamespace": "",
     "references": [
         "Unity.Collections",
         "Unity.Entities",
         "Unity.Entities.Tests",
         "Unity.Entities.CodeGen",
-        "Unity.Entities.CodeGen.Tests.TestTypes",
         "Unity.Burst",
         "Unity.Mathematics",
-        "Unity.Properties",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "Unity.Entities.Hybrid",
@@ -24,12 +23,12 @@
         "Mono.Cecil.dll",
         "Mono.Cecil.Rocks.dll",
         "Mono.Cecil.Pdb.dll",
-        "nunit.framework.dll",
-        "ExternalCSharpCompiler.dll"
+        "nunit.framework.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [
         "UNITY_INCLUDE_TESTS"
     ],
+    "versionDefines": [],
     "noEngineReferences": false
 }

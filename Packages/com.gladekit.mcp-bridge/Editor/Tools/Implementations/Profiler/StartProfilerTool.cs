@@ -1,9 +1,5 @@
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEditorInternal;
-using UnityEngine;
-using UnityEngine.Profiling;
-using GladeAgenticAI.Core.Tools;
 
 namespace GladeAgenticAI.Core.Tools.Implementations.Profiler
 {

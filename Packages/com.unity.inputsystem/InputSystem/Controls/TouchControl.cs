@@ -2,7 +2,6 @@ using UnityEngine.InputSystem.Utilities;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine.InputSystem.Layouts;
 using UnityEngine.InputSystem.LowLevel;
-using UnityEngine.Scripting;
 
 ////TODO: enforce memory layout of TouchControl to be that of TouchState (build that into the layout system? "freeze"/final layout?)
 

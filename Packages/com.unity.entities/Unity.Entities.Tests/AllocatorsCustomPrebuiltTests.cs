@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using Unity.Collections;
-using Unity.Core;
 using Unity.Entities;
 
 // This is the example code used in

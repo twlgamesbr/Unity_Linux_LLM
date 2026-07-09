@@ -2,10 +2,8 @@ using NUnit.Framework;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using System;
-using System.Collections.Generic;
 using Unity.Burst.Intrinsics;
 using Unity.Jobs;
-using System.Linq;
 
 
 // ******* COPY AND PASTE WARNING *************

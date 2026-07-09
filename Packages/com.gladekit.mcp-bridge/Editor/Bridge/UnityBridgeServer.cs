@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
@@ -10,7 +9,6 @@ using UnityEditor;
 using UnityEditor.Compilation;
 using UnityEngine;
 using GladeAgenticAI.Services;
-using GladeAgenticAI.Bridge;
 using GladeAgenticAI.Core.Tools;
 
 namespace GladeAgenticAI.Bridge

@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.IO;
 using NUnit.Framework;
 using Unity.Collections;
 using Unity.Entities.Conversion;

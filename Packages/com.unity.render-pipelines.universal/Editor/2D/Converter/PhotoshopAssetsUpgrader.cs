@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using UnityEditor.Rendering.Converter;
 using UnityEngine.Categorization;
 using UnityEngine.Rendering.Universal;

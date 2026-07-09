@@ -1,0 +1,22 @@
+{
+    "name": "Unity.PlatformToolkit.LocalSaving",
+    "rootNamespace": "Unity.PlatformToolkit.LocalSaving",
+    "references": [
+        "Unity.PlatformToolkit"
+    ],
+    "includePlatforms": [
+        "Editor",
+        "LinuxStandalone64",
+        "macOSStandalone",
+        "WindowsStandalone32",
+        "WindowsStandalone64"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

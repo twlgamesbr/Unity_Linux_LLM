@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Unity.Editor.Bridge;
 using UnityEditor;
 using UnityEngine;

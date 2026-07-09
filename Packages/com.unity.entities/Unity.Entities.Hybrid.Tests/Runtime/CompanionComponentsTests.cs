@@ -2,7 +2,6 @@
 using NUnit.Framework;
 using Unity.Collections;
 using Unity.Entities.Hybrid.Tests;
-using Unity.Entities.Tests.Conversion;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;

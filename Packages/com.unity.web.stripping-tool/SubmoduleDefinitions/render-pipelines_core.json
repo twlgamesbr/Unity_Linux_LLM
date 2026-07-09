@@ -1,0 +1,82 @@
+{
+    "submodules": [
+        {
+            "name": "GPU Resident Drawer",
+            "description": "Enables using the GPU Resident Drawer feature (https://docs.unity3d.com/Manual/urp/gpu-resident-drawer.html).",
+            "version": "1.0.0",
+            "maxUnityVersion": "6000.6",
+            "submodules": [
+                "GPU Resident Drawer Core",
+                "GPU Resident Drawer Rendering Debugger"
+            ]
+        },
+        {
+            "name": "GPU Resident Drawer Core",
+            "description": "Core implementation of the GPU Resident Drawer feature (https://docs.unity3d.com/Manual/urp/gpu-resident-drawer.html).",
+            "version": "1.0.0",
+            "maxUnityVersion": "6000.6",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.RenderPipelines.GPUDriven.Runtime"
+                        ]
+                    }
+                ],
+                "exclude": [
+                    {
+                        "methods": [
+                            "* *BurstDirectCallInitializer*",
+                            "* *JobReflectionRegistrationOutput*",
+                            "System.Void UnityEngine.Rendering.IGPUResidentRenderPipeline::ReinitializeGPUResidentDrawer()",
+                            "* UnityEngine.Rendering.GPUResidentDrawer::*",
+                            "System.Void UnityEngine.Rendering.GPUResidentDrawer/Strings::.cctor()",
+                            "* UnityEngine.Rendering.DebugDisplayGPUResidentDrawer::*",
+                            "* UnityEngine.Rendering.DebugDisplayGPUResidentDrawer/*"
+                        ],
+                        "assemblies": [
+                            "Unity.RenderPipelines.GPUDriven.Runtime"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "GPU Resident Drawer Rendering Debugger",
+            "description": "Rendering debugger for the GPU Resident Drawer (https://docs.unity3d.com/Manual/urp/features/rendering-debugger-use.html).",
+            "version": "1.0.0",
+            "maxUnityVersion": "6000.6",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.RenderPipelines.GPUDriven.Runtime"
+                        ],
+                        "methods": [
+                            "* UnityEngine.Rendering.GPUResidentDrawer::*",
+                            "* UnityEngine.Rendering.DebugDisplayGPUResidentDrawer::*",
+                            "* UnityEngine.Rendering.DebugDisplayGPUResidentDrawer/*"
+                        ]
+                    }
+                ],
+                "exclude": [
+                     {
+                        "assemblies": [
+                            "Unity.RenderPipelines.GPUDriven.Runtime"
+                        ],
+                        "methods": [
+                            "System.Boolean UnityEngine.Rendering.GPUResidentDrawer::IsInstanceOcclusionCullingEnabled()",
+                            "System.Void UnityEngine.Rendering.GPUResidentDrawer::PostCullBeginCameraRendering(UnityEngine.Rendering.RenderRequestBatcherContext)",
+                            "UnityEngine.Rendering.GPUResidentDrawerSettings UnityEngine.Rendering.GPUResidentDrawer::GetGlobalSettingsFromRPAsset()",
+                            "System.Void UnityEngine.Rendering.GPUResidentDrawer::Recreate(UnityEngine.Rendering.GPUResidentDrawerSettings)",
+                            "System.Boolean UnityEngine.Rendering.GPUResidentDrawer::IsGPUResidentDrawerSupportedBySRP(UnityEngine.Rendering.GPUResidentDrawerSettings,System.String&,UnityEngine.LogType&)",
+                            "System.Void UnityEngine.Rendering.GPUResidentDrawer/Strings::.cctor()",
+                            "System.Void UnityEngine.Rendering.DebugDisplayGPUResidentDrawer::.ctor()",
+                            "System.Boolean UnityEngine.Rendering.DebugDisplayGPUResidentDrawer::get_AreAnySettingsActive()"
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}

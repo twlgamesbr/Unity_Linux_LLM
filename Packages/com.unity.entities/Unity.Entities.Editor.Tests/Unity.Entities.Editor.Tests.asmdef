@@ -1,7 +1,7 @@
 {
     "name": "Unity.Entities.Editor.Tests",
+    "rootNamespace": "",
     "references": [
-        "Unity.Build",
         "Unity.Burst",
         "Unity.Collections",
         "Unity.Entities",
@@ -11,7 +11,6 @@
         "Unity.InternalAPIEditorBridge.002",
         "Unity.InternalAPIEngineBridge.002",
         "Unity.Mathematics",
-        "Unity.Properties",
         "Unity.Entities.UI",
         "Unity.Entities.UI.Editor",
         "Unity.Scenes",
@@ -21,15 +20,12 @@
         "Unity.Transforms",
         "Unity.Entities.Hybrid.Tests",
         "Unity.Entities.TestComponents",
-        "Unity.Hierarchy"
-    ],
-    "optionalUnityReferences": [
-        "TestAssemblies"
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
     ],
     "includePlatforms": [
         "Editor"
     ],
-    "precompiledReferences": [],
     "excludePlatforms": [],
     "allowUnsafeCode": true,
     "overrideReferences": true,
@@ -38,6 +34,7 @@
     ],
     "autoReferenced": false,
     "defineConstraints": [
+        "UNITY_INCLUDE_TESTS",
         "UNITY_INCLUDE_TESTS"
     ],
     "versionDefines": [],

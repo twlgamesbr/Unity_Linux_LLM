@@ -1,6 +1,5 @@
 using System.IO;
 using NUnit.Framework;
-using UnityEditor;
 using UnityEditor.SettingsManagement;
 
 namespace UnityEngine.SettingsManagement.EditorTests

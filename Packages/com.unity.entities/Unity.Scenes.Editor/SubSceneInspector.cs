@@ -1,14 +1,11 @@
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Unity.Entities;
-using Unity.Entities.Conversion;
 using Unity.Mathematics;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Hash128 = Unity.Entities.Hash128;
 
 namespace Unity.Scenes.Editor
 {

@@ -5,7 +5,6 @@ using Unity.Entities;
 using Unity.Entities.UI;
 using Unity.Entities.Editor;
 using Unity.Mathematics;
-using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
 

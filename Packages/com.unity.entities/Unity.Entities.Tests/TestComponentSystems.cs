@@ -1,5 +1,3 @@
-using Unity.Jobs;
-
 namespace Unity.Entities.Tests
 {
     public partial class TestEcsChangeSystem : SystemBase

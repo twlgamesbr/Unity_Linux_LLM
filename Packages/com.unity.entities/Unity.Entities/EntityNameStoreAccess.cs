@@ -1,10 +1,7 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
-using UnityEngine;
 
 #if !ENTITY_STORE_V1 && !DOTS_DISABLE_DEBUG_NAMES
 internal unsafe struct EntityNameStoreAccessData

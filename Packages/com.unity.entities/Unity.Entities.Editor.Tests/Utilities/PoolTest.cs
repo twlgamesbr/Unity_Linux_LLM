@@ -1,6 +1,4 @@
-using System;
 using NUnit.Framework;
-using System.Collections.Generic;
 
 namespace Unity.Entities.Editor.Tests
 {

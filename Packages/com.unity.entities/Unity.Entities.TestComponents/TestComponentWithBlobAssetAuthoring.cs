@@ -1,5 +1,3 @@
-using System;
-using Unity.Collections;
 using UnityEngine;
 
 namespace Unity.Entities.Tests

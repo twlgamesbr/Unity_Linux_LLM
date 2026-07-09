@@ -1,7 +1,6 @@
 using Unity.Entities;
 using System;
 using System.Collections.Generic;
-using Unity.Transforms;
 
 namespace Unity.Physics.Systems
 {

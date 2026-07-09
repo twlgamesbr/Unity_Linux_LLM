@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 
 #pragma warning disable 0649 // Disabled warnings.
 

@@ -1,10 +1,8 @@
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
 
-using System;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using Unity.Jobs.LowLevel.Unsafe;
 using UnityEngine;

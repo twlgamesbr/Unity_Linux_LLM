@@ -1356,7 +1356,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCServerCharacterSpawner
   networkManager: {fileID: 1161870791}
-  networkBootstrap: {fileID: 1161870789}
+  networkBootstrap: {fileID: 774187519}
   dialogueManager: {fileID: 1778380623}
   npcPrefab: {fileID: 6903247061848355748, guid: 3adc01a49d3d92f3eb81281b65e4b9c9, type: 3}
   npcPrefabResourcesPath: Networking/NPCServerCharacter
@@ -1388,9 +1388,11 @@ MonoBehaviour:
   failInitializationOnRequiredBackendFailure: 1
   lastReadinessStatus: References assigned. auth=http://localhost:8091/auth/v1/health
     localai=http://127.0.0.1:8080/v1/models
-  lastAuthBackendStatus: Idle
-  lastLocalAiBackendStatus: Idle
-  lastProbeDurationMs: 0
+  lastAuthBackendStatus: AuthBackend reachable via http://localhost:8091/auth/v1/health
+    (HTTP 404).
+  lastLocalAiBackendStatus: LocalAI reachable via http://127.0.0.1:8080/v1/models
+    (HTTP 200).
+  lastProbeDurationMs: 21
 --- !u!114 &276694095
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2387,17 +2389,17 @@ MonoBehaviour:
   m_MoveRepeatDelay: 0.5
   m_MoveRepeatRate: 0.1
   m_XRTrackingOrigin: {fileID: 0}
-  m_ActionsAsset: {fileID: -944628639613478452, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
-  m_PointAction: {fileID: -1654692200621890270, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
-  m_MoveAction: {fileID: -8784545083839296357, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
-  m_SubmitAction: {fileID: 392368643174621059, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
-  m_CancelAction: {fileID: 7727032971491509709, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
-  m_LeftClickAction: {fileID: 3001919216989983466, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
-  m_MiddleClickAction: {fileID: -2185481485913320682, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
-  m_RightClickAction: {fileID: -4090225696740746782, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
-  m_ScrollWheelAction: {fileID: 6240969308177333660, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
-  m_TrackedDevicePositionAction: {fileID: 6564999863303420839, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
-  m_TrackedDeviceOrientationAction: {fileID: 7970375526676320489, guid: ca9f5fa95ffab41fb9a615ab714db018, type: 3}
+  m_ActionsAsset: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  m_PointAction: {fileID: -1654692200621890270, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  m_MoveAction: {fileID: -8784545083839296357, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  m_SubmitAction: {fileID: 392368643174621059, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  m_CancelAction: {fileID: 7727032971491509709, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  m_LeftClickAction: {fileID: 3001919216989983466, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  m_MiddleClickAction: {fileID: -2185481485913320682, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  m_RightClickAction: {fileID: -4090225696740746782, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  m_ScrollWheelAction: {fileID: 6240969308177333660, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  m_TrackedDevicePositionAction: {fileID: 6564999863303420839, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  m_TrackedDeviceOrientationAction: {fileID: 7970375526676320489, guid: 052faaac586de48259a63d0c4782560b, type: 3}
   m_DeselectOnBackgroundClick: 1
   m_PointerBehavior: 0
   m_CursorLockBehavior: 0
@@ -4111,6 +4113,7 @@ GameObject:
   - component: {fileID: 774187517}
   - component: {fileID: 774187516}
   - component: {fileID: 774187518}
+  - component: {fileID: 774187519}
   m_Layer: 0
   m_Name: NPCSceneInitialization
   m_TagString: Untagged
@@ -4131,7 +4134,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCSceneInitializationController
   flowLogger: {fileID: 1788130158}
-  networkBootstrap: {fileID: 1161870789}
+  networkBootstrap: {fileID: 774187519}
   dialogueManager: {fileID: 1778380623}
   backendReadiness: {fileID: 276694094}
   networkBridge: {fileID: 1471440990}
@@ -4167,6 +4170,38 @@ MultiplayerRolesData:
   m_GameObject: {fileID: 774187515}
   m_GameObjectRolesMask: 3
   m_ComponentsRolesMasks: []
+--- !u!114 &774187519
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 774187515}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d567a7fe4dc4bec3aeafcca3a9dc101, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCNetworkBootstrap
+  networkManager: {fileID: 1161870791}
+  unityTransport: {fileID: 1161870790}
+  playerPrefab: {fileID: 4442102780728157853, guid: af939554eec0434dbb3f6a2e162aea74, type: 3}
+  playerPrefabResourcesPath: Networking/NPCPlayerAvatar
+  serverNpcPrefab: {fileID: 6903247061848355748, guid: 3adc01a49d3d92f3eb81281b65e4b9c9, type: 3}
+  serverNpcPrefabResourcesPath: Networking/NPCServerCharacter
+  transferableItemPrefab: {fileID: 7291902954840310053, guid: a38d0f6a35d285b58a8264207005b243, type: 3}
+  transferableItemPrefabResourcesPath: Networking/NPCTransferableItem
+  transportConfig:
+    connectAddress: 127.0.0.1
+    listenAddress: 0.0.0.0
+    port: 11474
+    useWebSockets: 1
+    webSocketPath: /npc-dialogue
+    autoStartMode: 0
+  configureOnAwake: 1
+  autoStartInPlayMode: 0
+  autoAssignClientBindPort: 1
+  clientBindPortOverride: 0
+  forceRunInBackground: 1
 --- !u!1 &805977037
 GameObject:
   m_ObjectHideFlags: 0
@@ -6987,7 +7022,6 @@ GameObject:
   - component: {fileID: 1161870792}
   - component: {fileID: 1161870791}
   - component: {fileID: 1161870790}
-  - component: {fileID: 1161870789}
   - component: {fileID: 1161870793}
   m_Layer: 0
   m_Name: Network_Manager
@@ -6996,38 +7030,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1161870789
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1161870788}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6d567a7fe4dc4bec3aeafcca3a9dc101, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCNetworkBootstrap
-  networkManager: {fileID: 1161870791}
-  unityTransport: {fileID: 1161870790}
-  playerPrefab: {fileID: 4442102780728157853, guid: af939554eec0434dbb3f6a2e162aea74, type: 3}
-  playerPrefabResourcesPath: Networking/NPCPlayerAvatar
-  serverNpcPrefab: {fileID: 6903247061848355748, guid: 3adc01a49d3d92f3eb81281b65e4b9c9, type: 3}
-  serverNpcPrefabResourcesPath: Networking/NPCServerCharacter
-  transferableItemPrefab: {fileID: 7291902954840310053, guid: a38d0f6a35d285b58a8264207005b243, type: 3}
-  transferableItemPrefabResourcesPath: Networking/NPCTransferableItem
-  transportConfig:
-    connectAddress: 127.0.0.1
-    listenAddress: 0.0.0.0
-    port: 11474
-    useWebSockets: 1
-    webSocketPath: /npc-dialogue
-    autoStartMode: 0
-  configureOnAwake: 1
-  autoStartInPlayMode: 0
-  autoAssignClientBindPort: 1
-  clientBindPortOverride: 0
-  forceRunInBackground: 1
 --- !u!114 &1161870790
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7051,7 +7053,7 @@ MonoBehaviour:
   m_DisconnectTimeoutMS: 30000
   ConnectionData:
     Address: 127.0.0.1
-    Port: 7777
+    Port: 11474
     WebSocketPath: /npc-dialogue
     ServerListenAddress: 0.0.0.0
     ClientBindPort: 0
@@ -7126,143 +7128,6 @@ MultiplayerRolesData:
   m_GameObject: {fileID: 1161870788}
   m_GameObjectRolesMask: 3
   m_ComponentsRolesMasks: []
---- !u!1 &1167487265
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1167487266}
-  - component: {fileID: 1167487267}
-  - component: {fileID: 1167487268}
-  m_Layer: 5
-  m_Name: AuthTitle
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &1167487266
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1167487265}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2127035642}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 344, y: 44}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!222 &1167487267
-CanvasRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1167487265}
-  m_CullTransparentMesh: 1
---- !u!114 &1167487268
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1167487265}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_text: Welcome Back
-  m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_fontSharedMaterials: []
-  m_fontMaterial: {fileID: 0}
-  m_fontMaterials: []
-  m_fontColor32:
-    serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
-  m_enableVertexGradient: 0
-  m_colorMode: 3
-  m_fontColorGradient:
-    topLeft: {r: 1, g: 1, b: 1, a: 1}
-    topRight: {r: 1, g: 1, b: 1, a: 1}
-    bottomLeft: {r: 1, g: 1, b: 1, a: 1}
-    bottomRight: {r: 1, g: 1, b: 1, a: 1}
-  m_fontColorGradientPreset: {fileID: 0}
-  m_spriteAsset: {fileID: 0}
-  m_tintAllSprites: 0
-  m_StyleSheet: {fileID: 0}
-  m_TextStyleHashCode: -1183493901
-  m_overrideHtmlColors: 0
-  m_faceColor:
-    serializedVersion: 2
-    rgba: 4294967295
-  m_fontSize: 32
-  m_fontSizeBase: 32
-  m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
-  m_fontStyle: 0
-  m_HorizontalAlignment: 2
-  m_VerticalAlignment: 512
-  m_textAlignment: 65535
-  m_characterSpacing: 0
-  m_characterHorizontalScale: 1
-  m_wordSpacing: 0
-  m_lineSpacing: 0
-  m_lineSpacingMax: 0
-  m_paragraphSpacing: 0
-  m_charWidthMaxAdj: 0
-  m_TextWrappingMode: 1
-  m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
-  m_linkedTextComponent: {fileID: 0}
-  parentLinkedComponent: {fileID: 0}
-  m_enableKerning: 0
-  m_ActiveFontFeatures: 6e72656b
-  m_enableExtraPadding: 0
-  checkPaddingRequired: 0
-  m_isRichText: 1
-  m_EmojiFallbackSupport: 1
-  m_parseCtrlCharacters: 1
-  m_isOrthographic: 1
-  m_isCullingEnabled: 0
-  m_horizontalMapping: 0
-  m_verticalMapping: 0
-  m_uvLineOffset: 0
-  m_geometrySortingOrder: 0
-  m_IsTextObjectScaleStatic: 0
-  m_VertexBufferAutoSizeReduction: 0
-  m_useMaxVisibleDescender: 1
-  m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
-  m_isUsingLegacyAnimationComponent: 0
-  m_isVolumetricText: 0
-  m_hasFontAssetChanged: 0
-  m_baseMaterial: {fileID: 0}
-  m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
 --- !u!1 &1171575132
 GameObject:
   m_ObjectHideFlags: 0
@@ -8699,7 +8564,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.AuthUIController
   authPanel: {fileID: 1205281769}
-  authTitle: {fileID: 1167487268}
+  authTitle: {fileID: 0}
   usernameInput: {fileID: 165042073}
   passwordInput: {fileID: 1190051227}
   confirmPasswordGroup: {fileID: 661725270}
@@ -8758,10 +8623,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.PlayerAuthService
   supabaseUrl: http://localhost:8091
   supabaseAnonKey: dev-local-anon-key
+  restApiUrl: http://localhost:8092
   requestTimeoutSeconds: 15
   validateStoredSessionOnStart: 1
-  lastAuthStatus: 'Auth service settings look valid: http://localhost:5100/api/auth/login
-    | timeout=15s'
+  lastAuthStatus: No stored auth session found.
   lastAuthRoute: 
   lastAuthDurationMs: 0
 --- !u!114 &1351714797
@@ -8777,7 +8642,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.AuthNetworkBridge
   authController: {fileID: 1351714794}
-  networkBootstrap: {fileID: 1161870789}
+  networkBootstrap: {fileID: 774187519}
   autoDetectStartupMode: 0
   startAsHost: 0
   hostAddress: 127.0.0.1
@@ -10998,12 +10863,16 @@ GameObject:
   - component: {fileID: 1778380628}
   - component: {fileID: 1778380629}
   - component: {fileID: 1778380630}
-  - component: {fileID: 1778380631}
   - component: {fileID: 1778380632}
   - component: {fileID: 1778380636}
   - component: {fileID: 1778380633}
   - component: {fileID: 1778380634}
   - component: {fileID: 1778380635}
+  - component: {fileID: 1778380637}
+  - component: {fileID: 1778380640}
+  - component: {fileID: 1778380639}
+  - component: {fileID: 1778380638}
+  - component: {fileID: 1778380641}
   m_Layer: 0
   m_Name: NPCDialogueSystem
   m_TagString: Untagged
@@ -11026,30 +10895,30 @@ MonoBehaviour:
   chatClient: {fileID: 1778380636}
   localRag: {fileID: 1778380634}
   ragEmbeddingPath: RAG/NPCDialogues-minilm-chunked.rag
-  qdrantRag: {fileID: 1778380628}
   useQdrantRag: 1
+  qdrantRag: {fileID: 1778380628}
   actionPlanner: {fileID: 1778380629}
   evidenceState: {fileID: 1778380630}
-  supabaseRepo: {fileID: 0}
+  supabaseRepo: {fileID: 1778380637}
   remoteHost: 127.0.0.1
   remotePort: 8080
-  remoteModel: llama32-unity-blended-20260707-q4_k_m
+  remoteModel: llama-3.2-3b-instruct:q8_0
   _cachedModelNames:
-  - gemma-4-e2b-it
-  - llama-3.1-8b-q4-k-m-vulkan
+  - embeddinggemma-300m
   - llama-3.2-3b-instruct:q4_k_m
-  - nomic-embed-text-v1.5
+  - llama-3.2-3b-instruct:q8_0
+  - npc-codebase-v1
+  - npc-codebase-v4
+  - qwen3-tts-cpp-1.7b-base-q4
+  - llama-3.1-8b-q4-k-m
+  - npc-codebase-v3
   - intelligent-router
   - llama32-unity-blended-20260707-q4_k_m
   - modal-vllm-qwen
-  - npc-codebase-v3
-  - npc-codebase-v4
-  - qwen3-tts-cpp-1.7b-base-q4
-  - embeddinggemma-300m
-  - llama-3.2-3b-instruct:q8_0
-  - llama-3.1-8b-q4-k-m
+  - nomic-embed-text-v1.5
+  - gemma-4-e2b-it
+  - llama-3.1-8b-q4-k-m-vulkan
   - llama32-qdrant-safe-20260706-ckpt100-q4_k_m
-  - npc-codebase-v1
   - qwen2.5-1.5b-instruct-q4-k-m
   remoteEmbeddingHost: 127.0.0.1
   remoteEmbeddingPort: 8080
@@ -11062,7 +10931,7 @@ MonoBehaviour:
   rebuildRagFromKnowledgeIfMissing: 1
   maxHistoryPerNPC: 20
   initializeOnStart: 0
-  lastBackendStatus: Idle
+  lastBackendStatus: LocalAI response received for player 'deco'.
   onNPCChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -11106,7 +10975,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPCSystem.NPCDialogueBootstrapper
   dialogueManager: {fileID: 1778380623}
-  autoSelectDefaultNPC: 1
+  autoSelectDefaultNPC: 0
   defaultNpcSlug: butler
   initializeOnStart: 0
 --- !u!114 &1778380626
@@ -11141,7 +11010,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.QdrantRAGService
   qdrantUrl: http://localhost:6333
-  collectionName: unity_linux_llm_codebase_v1
+  collectionName: unity_linux_llm_codebase_experiment_v1
   embedder: {fileID: 1778380633}
   inspectorStatus: 'Logged Qdrant configuration: http://localhost:6333/collections/unity_linux_llm_codebase_v1/points/search'
 --- !u!114 &1778380629
@@ -11170,30 +11039,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCEvidenceState
   discoveredClues: []
   obtainedItems: []
-  visitedLocations: []
+  visitedLocations:
+  - foyer
   npcMoodKeys: []
   npcMoodValues: []
   npcTrustKeys: []
   npcTrustValues: 
---- !u!114 &1778380631
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1778380622}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1bbaa1683951907bcb6f158a4d307434, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.EditorUX.NPCInspectorDiagnosticsPilot
-  dialogueManager: {fileID: 1778380623}
-  useQdrantDiagnostics: 1
-  qdrantRag: {fileID: 1778380628}
-  localAiHost: 127.0.0.1
-  localAiPort: 8080
-  localAiModel: llama32-unity-blended-20260707-q4_k_m
-  lastValidationStatus: 'References assigned. LocalAI preview: http://localhost:8080/v1'
 --- !u!1652712579 &1778380632
 MultiplayerRolesData:
   m_ObjectHideFlags: 2
@@ -11264,7 +11115,7 @@ MonoBehaviour:
   host: 127.0.0.1
   port: 8080
   apiKey: 
-  model: llama32-unity-blended-20260707-q4_k_m
+  model: llama-3.2-3b-instruct:q8_0
   temperature: 0.2
   topP: 0.9
   topK: 40
@@ -11272,6 +11123,89 @@ MonoBehaviour:
   repeatPenalty: 1.1
   maxTokens: 256
   numRetries: 3
+  requestTimeoutSeconds: 120
+--- !u!114 &1778380637
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778380622}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73162eddfe7ece41e8f7b4bb33778b79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.SupabaseDialogueRepository
+  restUrl: http://localhost:8000
+  anonKey: dev-local-anon-key
+  authService: {fileID: 1351714796}
+  requestTimeoutSeconds: 10
+  lastStatus: Repository settings look valid.
+  lastOperation: ValidateRepositorySettings
+  lastOperationDurationMs: 0
+--- !u!114 &1778380638
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778380622}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b3deb4159d078137a4afe1e40a1b90c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCDialogueSessionService
+--- !u!114 &1778380639
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778380622}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfe3f9c7f728fc8e88b6a9c0dee91390, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCDialogueRetrievalService
+--- !u!114 &1778380640
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778380622}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d3d8c6f0677f7f6bad1e541cea397cc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCDialogueHistoryService
+--- !u!54 &1778380641
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778380622}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &1779205794
 GameObject:
   m_ObjectHideFlags: 0
@@ -11737,24 +11671,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Col Gold reported the diamond missing during dinner.
-
-
-    The glass case
-    it was in was smashed.
-
-
-    The Colonel called the police on his cell phone.
-
-    All
-    guests refused to speak to the police and retained lawyers.
-
-
-    The robots
-    know a lot about the house.
-
-    The robots do not know who actually took the
-    diamond or where it is now.'
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 0}
   m_sharedMaterial: {fileID: 0}
@@ -12217,33 +12134,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Rooms
-
-    Living Room (Welcoming)
-
-    Office (unused?)
-
-    Dining Room
-    (Dinner)
-
-    Study (Speech)
-
-    Kitchen (unused?)
-
-
-    Events
-
-    Welcoming
-    (Maid, Butler)
-
-    Speech (Maid, Butler)
-
-    Cocktails (Butler)
-
-    Dinner
-    (Maid, Butler)
-
-    Call to Police (unseen)'
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 0}
   m_sharedMaterial: {fileID: 0}
@@ -13515,7 +13406,6 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1167487266}
   - {fileID: 852115857}
   - {fileID: 1279688182}
   - {fileID: 661725271}

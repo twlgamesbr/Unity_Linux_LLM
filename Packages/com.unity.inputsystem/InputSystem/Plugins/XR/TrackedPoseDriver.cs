@@ -1,6 +1,5 @@
 using System;
 using UnityEngine.InputSystem.LowLevel;
-using UnityEngine.UIElements;
 
 namespace UnityEngine.InputSystem.XR
 {

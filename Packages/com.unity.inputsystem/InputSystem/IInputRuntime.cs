@@ -1,6 +1,5 @@
 using System;
 using Unity.Collections.LowLevel.Unsafe;
-using UnityEngine.Analytics;
 using UnityEngine.InputSystem.Layouts;
 
 #if UNITY_EDITOR

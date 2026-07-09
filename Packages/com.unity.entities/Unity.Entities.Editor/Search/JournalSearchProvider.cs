@@ -8,9 +8,6 @@ using UnityEditor;
 using UnityEditor.Search;
 using UnityEngine;
 using Unity.Editor.Bridge;
-using Unity.Entities.UI;
-using UnityEngine.UIElements;
-using System.Text.RegularExpressions;
 
 namespace Unity.Entities.Editor
 {

@@ -1,7 +1,6 @@
 using Unity.Entities;
 using UnityEngine;
 #if UNITY_EDITOR
-using Unity.Entities.Tests;
 #endif
 
 public struct TestMetadata : IComponentData

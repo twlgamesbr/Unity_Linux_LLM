@@ -1,6 +1,5 @@
 using UnityEditorInternal;
 using UnityEngine;
-using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using Styles = UnityEditor.Rendering.Universal.UniversalRenderPipelineAssetUI.Styles;
 

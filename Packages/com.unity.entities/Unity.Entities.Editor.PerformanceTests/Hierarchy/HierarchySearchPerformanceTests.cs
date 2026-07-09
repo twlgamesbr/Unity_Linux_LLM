@@ -1,13 +1,9 @@
 using NUnit.Framework;
-using System.Collections;
 using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Entities.Editor.Tests;
 using Unity.PerformanceTesting;
-using UnityEditor;
-using UnityEditor.Search;
 using UnityEngine;
-using UnityEngine.TestTools;
 using Unity.Entities.Editor.Tests.Search;
 
 namespace Unity.Entities.Editor.PerformanceTests.Search

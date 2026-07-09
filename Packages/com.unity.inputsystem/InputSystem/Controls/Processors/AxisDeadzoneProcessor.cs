@@ -1,5 +1,4 @@
 using System;
-using UnityEngine.Scripting;
 
 #if UNITY_EDITOR
 using UnityEngine.InputSystem.Editor;

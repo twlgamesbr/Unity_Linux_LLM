@@ -1,9 +1,6 @@
 using UnityEngine;
 using NUnit.Framework;
 using System.IO;
-using System.Collections.Generic;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
 
 namespace TMPro
 {

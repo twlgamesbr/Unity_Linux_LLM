@@ -1,5 +1,4 @@
 using System;
-using Unity.Entities.Conversion;
 
 namespace Unity.Entities.Editor
 {

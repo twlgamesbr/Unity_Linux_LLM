@@ -4,7 +4,6 @@ using System;
 using UnityEditor;
 using UnityEditor.Experimental;
 using Hash128 = UnityEngine.Hash128;
-using System.Runtime.CompilerServices;
 
 namespace Unity.Scenes
 {

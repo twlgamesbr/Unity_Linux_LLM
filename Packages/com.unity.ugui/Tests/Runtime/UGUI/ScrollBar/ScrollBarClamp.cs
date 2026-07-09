@@ -1,12 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.TestTools;
 using System.IO;
 using System.Reflection;
 using NUnit.Framework;
-using UnityEngine.EventSystems;
 using UnityEditor;
 
 internal class ScrollBarClamp : IPrebuildSetup

@@ -2,7 +2,6 @@ using System;
 using NUnit.Framework;
 using System.Collections.Generic;
 using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.Burst;
 
 namespace Unity.Entities.Tests

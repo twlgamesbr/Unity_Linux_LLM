@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using GladeAgenticAI.Core.Tools;
 using GladeAgenticAI.Services;
 
 namespace GladeAgenticAI.Core.Tools.Implementations.Runtime
@@ -37,25 +36,26 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Runtime
             {
                 int.TryParse(lObj.ToString(), out limit);
             }
-            if (limit <= 0) limit = 200;
+            if (limit <= 0)
+                limit = 200;
 
             var events = RuntimeLogStream.GetEventsSinceCursor(sinceCursor, limit);
-            long nextCursor = events.Count > 0
-                ? events[events.Count - 1].Cursor
-                : sinceCursor;
+            long nextCursor = events.Count > 0 ? events[events.Count - 1].Cursor : sinceCursor;
 
             var eventsOut = new List<Dictionary<string, object>>();
             foreach (var e in events)
             {
-                eventsOut.Add(new Dictionary<string, object>
-                {
-                    { "cursor", e.Cursor },
-                    { "message", e.Message },
-                    { "stackTrace", e.StackTrace },
-                    { "logType", e.LogType },
-                    { "timestamp", e.Timestamp },
-                    { "fingerprint", e.Fingerprint },
-                });
+                eventsOut.Add(
+                    new Dictionary<string, object>
+                    {
+                        { "cursor", e.Cursor },
+                        { "message", e.Message },
+                        { "stackTrace", e.StackTrace },
+                        { "logType", e.LogType },
+                        { "timestamp", e.Timestamp },
+                        { "fingerprint", e.Fingerprint },
+                    }
+                );
             }
 
             var extras = new Dictionary<string, object>
@@ -70,9 +70,8 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Runtime
                 { "totalEventsObserved", RuntimeLogStream.TotalEventsObserved },
             };
 
-            string msg = events.Count == 0
-                ? "No new runtime events"
-                : $"{events.Count} runtime event(s)";
+            string msg =
+                events.Count == 0 ? "No new runtime events" : $"{events.Count} runtime event(s)";
             return ToolUtils.CreateSuccessResponse(msg, extras);
         }
     }

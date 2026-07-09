@@ -1,23 +1,10 @@
-using UnityEngine;
 using NUnit.Framework;
-using System;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using Unity.Burst;
 using Unity.Collections;
-using Unity.Jobs;
 using Unity.Entities;
-using Unity.Entities.Tests;
-using Unity.Collections.LowLevel.Unsafe;
 using Assert = NUnit.Framework.Assert;
-using Unity.Mathematics;
-using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Unity.Entities.DebugProxies;
-using Unity.Entities.Serialization;
-using Unity.Entities.LowLevel.Unsafe;
-using Unity.IO.LowLevel.Unsafe;
 
 [TestFixture]
 public class BlobDebugTests

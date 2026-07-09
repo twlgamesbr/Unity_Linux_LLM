@@ -1,6 +1,4 @@
 using System.Collections;
-using System.Text;
-using System.Text.RegularExpressions;
 using NUnit.Framework;
 using UnityEngine.TestTools;
 using Unity.Entities;
@@ -9,7 +7,6 @@ using UnityEngine;
 using Hash128 = Unity.Entities.Hash128;
 
 #if UNITY_EDITOR
-using UnityEditor;
 #endif
 
 namespace Unity.Scenes.Hybrid.Tests.Playmode

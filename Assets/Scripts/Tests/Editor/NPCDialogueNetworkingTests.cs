@@ -35,6 +35,25 @@ namespace NPCSystem.Tests
         }
 
         [Test]
+        public void DialogueResponseMessageSanitizeInPlaceCleansContentAndDisplayName()
+        {
+            var response = new NPCDialogueResponseMessage
+            {
+                requestId = "  abc123  ",
+                npcSlug = "  Butler  ",
+                displayName = "  Butler\n\t ",
+                content = "Hello\r\nworld!\x00 "
+            };
+
+            response.SanitizeInPlace();
+
+            Assert.That(response.requestId, Is.EqualTo("abc123"));
+            Assert.That(response.npcSlug, Is.EqualTo("butler"));
+            Assert.That(response.displayName, Is.EqualTo("Butler"));
+            Assert.That(response.content, Is.EqualTo("Hello world!"));
+        }
+
+        [Test]
         public void NetworkSessionManagerStoresAndRetrievesPerClientSelection()
         {
             var gameObject = new GameObject("NPCNetworkSessionManagerTests");

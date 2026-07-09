@@ -1,8 +1,6 @@
-using System;
 using NUnit.Framework;
 using Unity.Mathematics;
 using Unity.Collections;
-using UnityEngine;
 
 namespace Unity.Physics.Tests.Collision.Geometry
 {

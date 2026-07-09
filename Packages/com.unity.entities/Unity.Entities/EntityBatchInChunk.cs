@@ -1,5 +1,3 @@
-using System;
-
 namespace Unity.Entities
 {
     internal struct EntityBatchInChunk

@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Unity.Collections;
 using static Unity.Entities.EntitiesProfiler;
 using static Unity.Entities.MemoryProfiler;

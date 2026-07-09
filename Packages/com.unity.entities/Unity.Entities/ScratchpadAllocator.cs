@@ -1,11 +1,9 @@
 using System;
-using System.Runtime.InteropServices;
 using System.Threading;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs.LowLevel.Unsafe;
-using UnityEngine.Assertions;
 
 namespace Unity.Entities
 {

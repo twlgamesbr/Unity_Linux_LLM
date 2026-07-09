@@ -1,14 +1,11 @@
 #if !UNITY_DISABLE_MANAGED_COMPONENTS
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using NUnit.Framework;
 using Unity.Collections;
-using Unity.Entities.Conversion;
 using Unity.Entities.Hybrid.Tests;
 using Unity.Entities.Tests;
 using Unity.Entities.Tests.Conversion;
-using Unity.Mathematics;
 using Unity.PerformanceTesting;
 using Unity.Scenes.Editor.Tests;
 using Unity.Transforms;

@@ -6,7 +6,6 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine.InputSystem.Controls;
 using UnityEngine.InputSystem.LowLevel;
-using Unity.Profiling;
 using UnityEngine.InputSystem.Utilities;
 
 using ProfilerMarker = Unity.Profiling.ProfilerMarker;

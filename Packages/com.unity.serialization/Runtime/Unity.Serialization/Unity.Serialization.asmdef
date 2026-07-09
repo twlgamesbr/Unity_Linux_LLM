@@ -1,0 +1,24 @@
+{
+    "name": "Unity.Serialization",
+    "rootNamespace": "",
+    "references": [
+        "Unity.Burst",
+        "Unity.Collections",
+        "Unity.Mathematics"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "Unity",
+            "expression": "6000.3.0a6",
+            "define": "GLOBAL_OBJECT_IDENTIFIER_USING_ENTITY_ID"
+        }
+    ],
+    "noEngineReferences": false
+}

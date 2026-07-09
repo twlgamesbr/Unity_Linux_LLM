@@ -1,8 +1,6 @@
-using System;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics;
-using UnityEngine;
 
 namespace Unity.CharacterController.RuntimeTests
 {

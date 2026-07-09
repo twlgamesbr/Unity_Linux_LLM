@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
-using Unity.Entities.Conversion;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;

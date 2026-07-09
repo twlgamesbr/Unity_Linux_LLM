@@ -1,0 +1,104 @@
+{
+    "submodules": [
+        {
+            "name": "Unity 2D Feature Set",
+            "description": "Provides support for Unity's 2D graphics features including sprite atlases, sprite shapes, and tilemaps (https://docs.unity3d.com/Documentation/Manual/2DFeature.html).",
+            "version": "1.0.0",
+            "submodules": [
+                "Unity 2D Core",
+                "Unity 2D Packages",
+                "Unity 2D Animation"
+            ]
+        },
+        {
+            "name": "Unity 2D Core",
+            "description": "2D graphics features that are part of the core engine module.",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "UnityEngine.CoreModule",
+                            "UnityEngine.SpriteShapeModule",
+                            "UnityEngine.TilemapModule",
+                            "UnityEngine.SpriteMaskModule",
+                            "UnityEngine.Sprites"
+                        ],
+                        "methods": [
+                            "* UnityEngine.U2D::*",
+                            "* UnityEngine.U2D.*::*",
+                            "* UnityEngine.U2D.*/*"
+                        ]
+                    }
+                ],
+                "exclude": [
+                    {
+                        "assemblies": [
+                            "UnityEngine.CoreModule"
+                        ],
+                        "methods": [
+                            "System.Void UnityEngine.U2D.SpriteAtlasManager::add_atlasRegistered(*)",
+                            "System.Void UnityEngine.U2D.SpriteAtlasManager::remove_atlasRegistered(*)"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity 2D Packages",
+            "description": "Additional 2D features installed via packages referenced by the 2D feature set (https://docs.unity3d.com/Documentation/Manual/2DFeature.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.2D.Common.Runtime",
+                            "Unity.2D.Triangulation.Runtime",
+                            "Unity.InternalAPIEngineBridge.001",
+                            "Unity.2D.PixelPerfect",
+                            "Unity.2D.Tilemap.Extras"
+                        ],
+                        "methods": [
+                            "* UnityEngine.U2D::*",
+                            "* UnityEngine.U2D.*::*",
+                            "* UnityEngine.U2D.*/*",
+                            "* UnityEngine.Tilemaps::*",
+                            "* UnityEngine.Tilemaps.*::*",
+                            "* UnityEngine.Tilemaps.*/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Unity 2D Animation",
+            "description": "The 2D Animation package includes features and tools that allow you to quickly rig and animate 2D characters in Unity in a variety of ways (https://docs.unity3d.com/Packages/com.unity.2d.animation@latest?subfolder=/manual/index.html).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity.2D.Animation.Runtime",
+                            "Unity.2D.IK.Runtime"
+                        ],
+                        "methods": [
+                            "* UnityEngine.U2D::*",
+                            "* UnityEngine.U2D.*::*",
+                            "* UnityEngine.U2D.*/*"
+                        ]
+                    }
+                ],
+                "exclude": [
+                    {
+                        "assemblies": [
+                            "Unity.2D.Animation.Runtime"
+                        ],
+                        "methods": [
+                            "System.Void UnityEngine.U2D.Animation.GpuDeformationSystem::CreateFallbackBuffer()"
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}

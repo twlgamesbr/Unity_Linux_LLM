@@ -1,14 +1,8 @@
-using System;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using NUnit.Framework;
 using Unity.Collections;
 using Unity.Entities.Hybrid.Baking;
 using Unity.Entities.TestComponents;
 using Unity.Transforms;
-using UnityEngine;
-using UnityEngine.TestTools;
-using UnityObject = UnityEngine.Object;
 
 namespace Unity.Entities.Tests.Conversion
 {

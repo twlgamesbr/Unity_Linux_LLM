@@ -1,0 +1,10 @@
+{
+    "name": "Unity.Web.Stripping.Editor",
+    "references": [
+        "Unity.Settings.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": []
+}

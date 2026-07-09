@@ -1,7 +1,5 @@
-using System;
 using NUnit.Framework;
 using Unity.Mathematics;
-using UnityEngine;
 using Unity.Physics.Extensions;
 
 namespace Unity.Physics.Tests.Dynamics.Motion

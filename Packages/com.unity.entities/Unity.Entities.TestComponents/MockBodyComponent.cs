@@ -1,5 +1,4 @@
 using Unity.Collections;
-using Unity.Entities.Tests;
 using UnityEngine;
 
 namespace Unity.Entities.TestComponents

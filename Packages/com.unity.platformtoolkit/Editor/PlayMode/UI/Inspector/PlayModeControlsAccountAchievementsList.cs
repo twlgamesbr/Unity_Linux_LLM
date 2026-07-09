@@ -1,0 +1,48 @@
+using Unity.PlatformToolkit.Editor;
+using UnityEditor;
+using UnityEngine.UIElements;
+
+namespace Unity.PlatformToolkit.PlayMode
+{
+    /// <summary>
+    /// Editor UI (part of a custom Inspector) for play mode account achievement state.
+    /// </summary>
+    [UxmlElement]
+    internal partial class PlayModeControlsAccountAchievementsList : VisualElement
+    {
+        // Dummy instance placed on each fresh achievement ListView item in makeItem to avoid Warning being thrown
+        // on declarative uxml bindings evaluation
+        private static readonly PlayModeAchievementData s_DefaultAchievementData = new(new StoredAchievement());
+
+        public PlayModeControlsAccountAchievementsList()
+        {
+            var uxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>("Packages/com.unity.platformtoolkit/Editor/Playmode/UI/Inspector/PlayModeControlsAccountAchievementsList.uxml");
+            uxml.CloneTree(this);
+        }
+
+        internal void Bind(PlayModeAccountAchievementData achievementData)
+        {
+            achievementData.UpdateAchievementList();
+
+            var achievementsList = this.Q<ListView>("achievements-list");
+
+            achievementsList.makeItem = () =>
+            {
+                var field = new PlayModeControlsAchievementField();
+                field.dataSource = s_DefaultAchievementData;
+                return field;
+            };
+            achievementsList.bindItem = (achievementField, index) => achievementField.dataSource = achievementData.Achievements[index];
+            achievementsList.dataSource = achievementData;
+
+            var resetButton = this.Q<Button>("reset-all-button");
+            resetButton.clicked += () =>
+            {
+                foreach (var achievement in achievementData.Achievements)
+                {
+                    achievement.Reset();
+                }
+            };
+        }
+    }
+}

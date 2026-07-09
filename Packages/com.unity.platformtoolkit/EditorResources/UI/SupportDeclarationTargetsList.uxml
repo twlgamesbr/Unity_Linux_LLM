@@ -1,0 +1,14 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Packages/com.unity.platformtoolkit/EditorResources/UI/SupportDeclarationTargetsList.uss?fileID=7433441132597879392&amp;guid=2f869146c5ea99d429f31a835beb82a6&amp;type=3#SupportDeclarationTargetsList"/>
+    <ui:VisualElement name="build-profile-warning">
+        <ui:HelpBox message-type="Warning" text="Editing these global Platform Toolkit settings will not affect the current state of the project, because the active build profile is using its own Platform Toolkit settings. Edit the build profile to change them." name="HelpBox">
+            <ui:Button name="edit-build-profile-button" text="Edit Build Profile" />
+        </ui:HelpBox>
+        <Bindings>
+            <ui:DataBinding property="style.display" data-source-path="ShowBuildProfileWarning" source-to-ui-converters="Show Warning Converter" binding-mode="ToTarget"/>
+        </Bindings>
+    </ui:VisualElement>
+    <ui:GroupBox name="GroupBox" text="Active build target associations" style="padding-left: 10px;">
+        <ui:ScrollView name="declaration-targets-list" mode="VerticalAndHorizontal"/>
+    </ui:GroupBox>
+</ui:UXML>

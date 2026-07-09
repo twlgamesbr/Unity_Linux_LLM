@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEditor.Callbacks;
-using UnityEditor.Rendering.Analytics;
 using UnityEditor.Rendering.Universal.Analytics;
 using UnityEditor.Rendering.Universal.ShaderGUI;
 using UnityEditor.ShaderGraph;
@@ -10,7 +8,6 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 using static Unity.Rendering.Universal.ShaderUtils;
-using BlendMode = UnityEngine.Rendering.BlendMode;
 
 namespace UnityEditor.Rendering.Universal
 {

@@ -1,6 +1,5 @@
 #if UNITY_EDITOR
 using System;
-using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine.UIElements;
 

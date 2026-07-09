@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Assertions;
-using UnityEngine;
 using Unity.Burst;
 
 namespace Unity.Entities

@@ -1,6 +1,5 @@
 ﻿using UnityEditor;
 using UnityEditor.Toolbars;
-using UnityEngine.UIElements;
 using PopupWindow = UnityEditor.PopupWindow;
 
 namespace Unity.Multiplayer.Tools.NetVis.Editor.UI

@@ -1,0 +1,63 @@
+<engine:UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:engine="UnityEngine.UIElements"
+    xmlns:editor="UnityEditor.UIElements"
+    editor-extension-mode="True"
+>
+    <Style src="project://database/Packages/com.unity.web.stripping-tool/Editor/UI/SubmoduleStrippingWindow.uss"/>
+    <Style src="project://database/Packages/com.unity.web.stripping-tool/Editor/UI/CommonStyles.uss"/>
+
+    <editor:Toolbar>
+        <!-- The buttons have min. widths so that they push each other out nicely when docked and window made very thin -->
+        <editor:ToolbarButton text="Add Build" name="add-build-button" style="min-width: 55px;"/>
+        <editor:ToolbarSpacer style="flex-grow: 1; min-width: 100px;"/>
+        <editor:ToolbarButton text="Player Settings" name="player-settings-button" style="min-width: 86px;"/>
+        <editor:ToolbarButton text="Build Profiles" name="build-profiles-button" style="min-width: 74px;"/>
+    </editor:Toolbar>
+    <engine:TwoPaneSplitView fixed-pane-initial-dimension="310">
+        <!--TwoPaneSplitView1.Pane1:Builds-->
+        <engine:ScrollView name="builds-pane" mode="Vertical" style="min-width: 310px; padding: 5px;">
+            <engine:MultiColumnListView name="builds-list" fixed-item-height="20">
+                <engine:Columns>
+                    <engine:Column name="name" title="Name" width="160" />
+                    <engine:Column name="date" title="Date" width="140" />
+                </engine:Columns>
+            </engine:MultiColumnListView>
+        </engine:ScrollView>
+        <!--TwoPaneSplitView1.Pane2:SettingsAndDetails-->
+        <!--The initial width is set so that "DefaultSubmoduleStrippingSettings" fit into the object field-->
+        <engine:TwoPaneSplitView fixed-pane-initial-dimension="470">
+            <!--TwoPaneSplitView2.Pane1:Settings-->
+            <engine:ScrollView mode="Vertical" name="settings-and-details-pane" style="min-width: 360px; padding:5px">
+                <engine:VisualElement style="flex-direction: row; justify-content: center;">
+                    <engine:Button text="Strip" name="strip-build-button"/>
+                    <engine:Button text="Strip and Run" name="strip-and-run-build-button"/>
+                    <engine:Button text="Run" name="run-build-button"/>
+                    <engine:Button text="Add Profiling" name="add-profiling-button"/>
+                    <engine:Button text="Restore" name="restore-build-button" tooltip="Restore original state of a build"/>
+                </engine:VisualElement>
+                <!-- the following acts also as a spacer when there are no instructions -->
+                <engine:VisualElement name="instructions-container" style="padding:5px"/>
+                <engine:Label text="Stripping Settings" class="bold-label" style="padding-bottom: 5px;"/>
+                <engine:Toggle
+                    name="strip-after-build-toggle"
+                    label="Strip Automatically After Build"
+                    tooltip="Run submodule stripping automatically after a build has completed. Requires active stripping settings."
+                />
+                <engine:VisualElement name="object-field-container">
+                    <editor:ObjectField
+                        name="active-settings-field"
+                        type="Unity.Web.Stripping.Editor.SubmoduleStrippingSettings, Unity.Web.Stripping.Editor"
+                        label="Stripping Settings"
+                        tooltip="The currently active submodule stripping settings asset."
+                    />
+                </engine:VisualElement>
+                <engine:VisualElement name="settings-container"/>
+            </engine:ScrollView>
+            <!--TwoPaneSplitView2.Pane2:Details-->
+            <engine:ScrollView mode= "Vertical" name="details-pane-container" style="min-width: 300px; padding:5px;">
+                <engine:VisualElement name="details-pane"/>
+            </engine:ScrollView>
+        </engine:TwoPaneSplitView>
+    </engine:TwoPaneSplitView>
+</engine:UXML>

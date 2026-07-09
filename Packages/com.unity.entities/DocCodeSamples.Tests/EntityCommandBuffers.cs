@@ -1,9 +1,7 @@
-using Doc.CodeSamples.Tests;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
-using UnityEngine;
 
 // The files in this namespace are used to compile/test the code samples in the documentation.
 // Snippets used in entity_command_buffer.md

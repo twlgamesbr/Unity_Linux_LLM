@@ -3,7 +3,6 @@ using Unity.Numerics.Linear.Dense.Primitives;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
-using Unity.Mathematics;
 using Unity.Numerics.Memory;
 using Unity.Physics.Tests;
 

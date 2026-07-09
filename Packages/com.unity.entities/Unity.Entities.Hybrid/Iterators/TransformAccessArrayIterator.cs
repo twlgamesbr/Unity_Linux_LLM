@@ -1,11 +1,6 @@
 using System;
-using System.Linq;
-using System.Reflection;
-
-using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 using UnityEngine.Jobs;
-using UnityEngine.Scripting;
 
 namespace Unity.Entities
 {

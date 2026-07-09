@@ -4,7 +4,6 @@ using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using Unity.Burst;
 using Unity.Jobs.LowLevel.Unsafe;
-using Unity.Mathematics;
 using System.Diagnostics;
 
 namespace Unity.Entities

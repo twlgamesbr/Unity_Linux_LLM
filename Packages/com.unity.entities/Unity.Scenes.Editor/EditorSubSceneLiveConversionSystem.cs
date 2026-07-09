@@ -2,11 +2,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Entities.Conversion;
-using UnityEditor;
 using UnityEditor.SceneManagement;
-using UnityEngine;
-using UnityEngine.Rendering;
 using Hash128 = Unity.Entities.Hash128;
 
 namespace Unity.Scenes.Editor

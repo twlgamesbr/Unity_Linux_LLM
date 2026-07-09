@@ -1,8 +1,7 @@
 {
     "name": "UnityEngine.UI",
-    "references": [
-        "UnityEngine.UIElementsModule"
-    ],
+    "rootNamespace": "",
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

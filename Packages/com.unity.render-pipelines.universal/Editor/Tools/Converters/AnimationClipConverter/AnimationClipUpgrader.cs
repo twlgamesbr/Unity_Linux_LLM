@@ -8,9 +8,6 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Rendering;
-using UnityEngine.UIElements;
-using static UnityEditor.Rendering.AnimationClipUpgrader;
-using static UnityEditor.Rendering.Universal.AnimationClipConverter;
 using IMaterial = UnityEditor.Rendering.UpgradeUtility.IMaterial;
 using UID = UnityEditor.Rendering.UpgradeUtility.UID;
 

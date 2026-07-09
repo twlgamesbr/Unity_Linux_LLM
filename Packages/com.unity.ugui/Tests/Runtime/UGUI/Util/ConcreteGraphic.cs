@@ -1,5 +1,3 @@
-using UnityEngine.UI;
-
 namespace UnityEngine.UI.Tests
 {
     // Make a non-abstract Graphic.

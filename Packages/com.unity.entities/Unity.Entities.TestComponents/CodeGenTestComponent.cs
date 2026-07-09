@@ -1,5 +1,3 @@
-using System;
-
 namespace Unity.Entities.Tests
 {
     public struct CodeGenTestComponent : IComponentData

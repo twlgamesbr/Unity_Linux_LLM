@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace Unity.Entities.Hybrid.Baking
+﻿namespace Unity.Entities.Hybrid.Baking
 {
     [BakingType]
     internal struct LinkedEntityGroupBakingData : IBufferElementData

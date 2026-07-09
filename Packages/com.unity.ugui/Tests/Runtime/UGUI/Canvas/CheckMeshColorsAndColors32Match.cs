@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.TestTools;
 using NUnit.Framework;
 using System.Collections;
-using UnityEngine.Rendering;
 using UnityEngine.TestTools.Utils;
 
 [TestFixture]

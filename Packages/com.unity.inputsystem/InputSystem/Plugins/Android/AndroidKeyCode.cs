@@ -1,10 +1,4 @@
 #if UNITY_EDITOR || UNITY_ANDROID || PACKAGE_DOCS_GENERATION
-using System;
-using System.Linq;
-using System.Runtime.InteropServices;
-using UnityEngine.InputSystem.Android.LowLevel;
-using UnityEngine.InputSystem.Utilities;
-
 namespace UnityEngine.InputSystem.Android.LowLevel
 {
     /// <summary>

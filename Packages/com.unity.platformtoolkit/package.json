@@ -1,0 +1,26 @@
+{
+  "name": "com.unity.platformtoolkit",
+  "version": "1.1.0",
+  "unity": "6000.3",
+  "unityRelease": "0f1",
+  "displayName": "Platform Toolkit",
+  "description": "Unity Platform Toolkit package contains API interfaces that are platform agnostic and allow game developers to interact with the system. The platform implementation packages provide platform-specific implementations for the API interfaces. Implementations are available for all supported platforms and also for the Unity Editor as a platform.",
+  "keywords": [
+    "platform",
+    "services"
+  ],
+  "dependencies": {
+    "com.unity.modules.jsonserialize": "1.0.0",
+    "com.unity.sharp-zip-lib": "1.4.0"
+  },
+  "repository": {
+    "revision": "619bb91e39a550c0a8e2f6f588cf622d9663c1b2",
+    "type": "git",
+    "url": "https://github.cds.internal.unity3d.com/unity/SystemCapabilities.git"
+  },
+  "documentationUrl": "https://docs.unity3d.com/Packages/com.unity.platformtoolkit@1.1/manual/index.html",
+  "_upm": {
+    "changelog": "### Added\n- Support for Build Profiles has been added for 6000.4+. This is provided via a new Build Profile component which allows an implementation to be configured to override the Platform Toolkit settings in Project Settings. These settings still function as the default for when this component is non in-use.\n- Added a new validation option to Play Mode Controls to help identify storage operations which may lead to issues or violate submission requirements on some platforms.\n- Support for configuring and testing account Attributes in the Editor through Play Mode Controls.\n\n### Fixed\n- Play Mode Controls account sign ins via the PT APIs now only throw for the 'offline' environment option if using a platform behaviour which could do so in the equivalent runtime.\n- Fixed an issue where a build target not having a valid PT implementation would cause an exception to throw from the builder.\n- Fixed some minor issues with exception documentation on saving system APIs.\n- Fixed a bug where Play Mode Control Settings test accounts could not have their pictures set to 'none'.\n- Fixed undocumented CorruptedSaveException and NotEnoughSpaceException in ISavingSystem.\n- Fixed a Play Mode Controls issue where UI would not update when adding or deleting a save\n- Fixed a bug where rapid input device change events could trigger an exception.\n- Fixed ISaveWritable.WriteFile() accepting null data without throwing; it now throws ArgumentNullException immediately.\n- Fixed an incorrect ArgumentNullException being thrown when an empty save name is passed to saving APIs; these now correctly throw ArgumentException.\n- Fixed an Error where creating a large number of Play Mode Control accounts would throw NullReferenceExceptions.\n- Fixed the Warning for creating duplicate Attributes with the same name only showing on initial string definition but not after returning to the settings.\n- Fixed broken link behind the Help button of the Play Mode Controls Settings asset."
+  },
+  "_fingerprint": "fe08569fdccac0292c2e485d90701548e81dd9ca"
+}

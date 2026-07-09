@@ -1,0 +1,71 @@
+{
+    "submodules": [
+        {
+            "name": "Text Selecting Utilities",
+            "description": "Provides support for selecting text in UI Toolkit and IMGUI.",
+            "version": "1.0.0",
+            "minUnityVersion": "6000.3",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "UnityEngine.TextCoreTextEngineModule",
+                            "UnityEngine.UIElementsModule",
+                            "UnityEngine.IMGUIModule"
+                        ],
+                        "methods": [
+                            "* UnityEngine.TextSelectingUtilities::*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Text Editing Utilities",
+            "description": "Provides support for editing text in IMGUI TextEditor and UI Toolkit TextElement.",
+            "version": "1.0.0",
+            "minUnityVersion": "6000.3",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "UnityEngine.TextCoreTextEngineModule",
+                            "UnityEngine.UIElementsModule",
+                            "UnityEngine.IMGUIModule"
+                        ],
+                        "methods": [
+                            "* UnityEngine.TextEditingUtilities::*",
+                            "* UnityEngine.TextEditingUtilities/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "IMGUI Script Bindings",
+            "description": "Provides support for using IMGUI in your game via scripting.",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "UnityEngine.IMGUIModule"
+                        ]
+                    }
+                ],
+                "exclude": [
+                    {
+                        "methods": [
+                            "System.Int32 UnityEngine.GUITargetAttribute::GetGUITargetAttrValue(System.Type,System.String)",
+                            "* UnityEngine.GUIUtility::*",
+                            "* UnityEngine.Event::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.IMGUIModule"
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}

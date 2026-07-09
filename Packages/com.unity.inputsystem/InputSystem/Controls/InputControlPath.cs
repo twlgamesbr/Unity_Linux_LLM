@@ -1,7 +1,6 @@
 using System;
 using System.Text;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using Unity.Collections;
 using UnityEngine.InputSystem.Layouts;

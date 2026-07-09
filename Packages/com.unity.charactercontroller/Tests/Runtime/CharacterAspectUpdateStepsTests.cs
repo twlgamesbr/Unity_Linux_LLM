@@ -4,7 +4,6 @@ using Unity.Mathematics;
 using Unity.Physics;
 using Unity.Physics.Authoring;
 using Unity.Transforms;
-using UnityEngine;
 
 namespace Unity.CharacterController.RuntimeTests
 {

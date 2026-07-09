@@ -1,5 +1,4 @@
 using NUnit.Framework;
-using Unity.Collections;
 using Unity.Entities.Editor.Tests;
 using Unity.PerformanceTesting;
 

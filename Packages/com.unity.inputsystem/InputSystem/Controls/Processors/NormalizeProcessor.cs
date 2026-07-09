@@ -1,5 +1,3 @@
-using UnityEngine.Scripting;
-
 ////REVIEW: handle values dropping below min and above max?
 
 namespace UnityEngine.InputSystem.Processors

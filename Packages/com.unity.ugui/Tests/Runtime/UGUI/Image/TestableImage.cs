@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using UnityEngine.UI;
-using System.Reflection;
 
 internal class TestableImage : Image
 {

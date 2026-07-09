@@ -1,0 +1,20 @@
+{
+    "submodules": [
+        {
+            "name": "System.Data",
+            "description": "Provides access to classes that represent the ADO.NET API (https://learn.microsoft.com/en-us/dotnet/api/system.data).",
+            "version": "1.0.0",
+            "functions": [
+            ],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "System.Data"
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}

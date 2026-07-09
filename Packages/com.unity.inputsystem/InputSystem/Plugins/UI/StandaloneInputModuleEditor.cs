@@ -1,6 +1,5 @@
 #if UNITY_EDITOR && UNITY_INPUT_SYSTEM_ENABLE_UI
 
-using System;
 using UnityEditor;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.Editor;

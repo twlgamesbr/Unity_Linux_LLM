@@ -3,8 +3,6 @@ using System.Linq;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Entities.Serialization;
-using Unity.Scenes;
-using Unity.Scenes.Editor;
 using UnityEditor;
 using UnityEditor.AssetImporters;
 using UnityEditor.SceneManagement;

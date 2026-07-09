@@ -4,7 +4,6 @@ using JetBrains.Annotations;
 using Unity.Collections;
 using Unity.Hierarchy;
 using Unity.Profiling;
-using Unity.Scenes;
 using UnityEditor;
 using UnityEngine.UIElements;
 

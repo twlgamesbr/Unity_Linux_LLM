@@ -1,7 +1,5 @@
-using System;
 using NUnit.Framework;
 using Unity.Mathematics;
-using UnityEngine;
 using Assert = UnityEngine.Assertions.Assert;
 
 namespace Unity.Physics.Tests.Dynamics.Integrator

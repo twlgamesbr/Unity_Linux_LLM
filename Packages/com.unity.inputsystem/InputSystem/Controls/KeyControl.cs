@@ -1,6 +1,5 @@
 using System.Globalization;
 using UnityEngine.InputSystem.LowLevel;
-using UnityEngine.Scripting;
 
 namespace UnityEngine.InputSystem.Controls
 {

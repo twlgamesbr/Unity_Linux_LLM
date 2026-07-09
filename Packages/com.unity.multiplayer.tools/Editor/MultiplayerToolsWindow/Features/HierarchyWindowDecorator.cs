@@ -1,5 +1,4 @@
 #if UNITY_NETCODE_GAMEOBJECTS_1_1_ABOVE
-using System;
 using Unity.Netcode;
 using UnityEditor;
 using UnityEngine;

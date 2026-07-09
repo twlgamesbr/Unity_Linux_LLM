@@ -1,8 +1,5 @@
 using System;
-using System.Linq;
-using System.Reflection;
 using NUnit.Framework;
-using Mono.Cecil.Cil;
 using Unity.CompilationPipeline.Common.ILPostProcessing;
 
 namespace Unity.Entities.CodeGen.Tests

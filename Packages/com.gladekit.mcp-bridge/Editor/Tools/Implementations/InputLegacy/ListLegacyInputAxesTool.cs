@@ -1,9 +1,3 @@
-using System.Collections.Generic;
-using System.Text;
-using UnityEditor;
-using UnityEngine;
-using GladeAgenticAI.Core.Tools;
-
 #if ENABLE_LEGACY_INPUT_MANAGER
 namespace GladeAgenticAI.Core.Tools.Implementations.InputLegacy
 {
@@ -13,9 +7,13 @@ namespace GladeAgenticAI.Core.Tools.Implementations.InputLegacy
 
         public string Execute(Dictionary<string, object> args)
         {
-            UnityEngine.Object[] assets = AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/InputManager.asset");
+            UnityEngine.Object[] assets = AssetDatabase.LoadAllAssetsAtPath(
+                "ProjectSettings/InputManager.asset"
+            );
             if (assets == null || assets.Length == 0)
-                return ToolUtils.CreateErrorResponse("ProjectSettings/InputManager.asset not found.");
+                return ToolUtils.CreateErrorResponse(
+                    "ProjectSettings/InputManager.asset not found."
+                );
 
             SerializedObject so = new SerializedObject(assets[0]);
             SerializedProperty axesProp = so.FindProperty("m_Axes");
@@ -31,8 +29,14 @@ namespace GladeAgenticAI.Core.Tools.Implementations.InputLegacy
                     { "name", axis.FindPropertyRelative("m_Name").stringValue },
                     { "positiveButton", axis.FindPropertyRelative("positiveButton").stringValue },
                     { "negativeButton", axis.FindPropertyRelative("negativeButton").stringValue },
-                    { "altPositiveButton", axis.FindPropertyRelative("altPositiveButton").stringValue },
-                    { "altNegativeButton", axis.FindPropertyRelative("altNegativeButton").stringValue },
+                    {
+                        "altPositiveButton",
+                        axis.FindPropertyRelative("altPositiveButton").stringValue
+                    },
+                    {
+                        "altNegativeButton",
+                        axis.FindPropertyRelative("altNegativeButton").stringValue
+                    },
                     { "gravity", axis.FindPropertyRelative("gravity").floatValue },
                     { "dead", axis.FindPropertyRelative("dead").floatValue },
                     { "sensitivity", axis.FindPropertyRelative("sensitivity").floatValue },
@@ -40,7 +44,7 @@ namespace GladeAgenticAI.Core.Tools.Implementations.InputLegacy
                     { "invert", axis.FindPropertyRelative("invert").intValue != 0 },
                     { "type", axis.FindPropertyRelative("type").intValue },
                     { "axis", axis.FindPropertyRelative("axis").intValue },
-                    { "joyNum", axis.FindPropertyRelative("joyNum").intValue }
+                    { "joyNum", axis.FindPropertyRelative("joyNum").intValue },
                 };
                 axesList.Add(ax);
             }
@@ -49,7 +53,8 @@ namespace GladeAgenticAI.Core.Tools.Implementations.InputLegacy
             sb.Append("{\"success\":true,\"message\":\"List of legacy input axes\",\"axes\":[");
             for (int i = 0; i < axesList.Count; i++)
             {
-                if (i > 0) sb.Append(",");
+                if (i > 0)
+                    sb.Append(",");
                 sb.Append(SerializeAxisToJson(axesList[i]));
             }
             sb.Append("]}");
@@ -61,10 +66,18 @@ namespace GladeAgenticAI.Core.Tools.Implementations.InputLegacy
             var sb = new StringBuilder();
             sb.Append("{");
             sb.Append($"\"name\":\"{ToolUtils.EscapeJsonString((string)ax["name"])}\"");
-            sb.Append($",\"positiveButton\":\"{ToolUtils.EscapeJsonString((string)ax["positiveButton"])}\"");
-            sb.Append($",\"negativeButton\":\"{ToolUtils.EscapeJsonString((string)ax["negativeButton"])}\"");
-            sb.Append($",\"altPositiveButton\":\"{ToolUtils.EscapeJsonString((string)ax["altPositiveButton"])}\"");
-            sb.Append($",\"altNegativeButton\":\"{ToolUtils.EscapeJsonString((string)ax["altNegativeButton"])}\"");
+            sb.Append(
+                $",\"positiveButton\":\"{ToolUtils.EscapeJsonString((string)ax["positiveButton"])}\""
+            );
+            sb.Append(
+                $",\"negativeButton\":\"{ToolUtils.EscapeJsonString((string)ax["negativeButton"])}\""
+            );
+            sb.Append(
+                $",\"altPositiveButton\":\"{ToolUtils.EscapeJsonString((string)ax["altPositiveButton"])}\""
+            );
+            sb.Append(
+                $",\"altNegativeButton\":\"{ToolUtils.EscapeJsonString((string)ax["altNegativeButton"])}\""
+            );
             sb.Append($",\"gravity\":{ax["gravity"]}");
             sb.Append($",\"dead\":{ax["dead"]}");
             sb.Append($",\"sensitivity\":{ax["sensitivity"]}");

@@ -18,36 +18,52 @@ namespace NPCSystem
         static readonly int SprintingHash = Animator.StringToHash("Sprinting");
         static readonly int JumpHash = Animator.StringToHash("Jump");
 
-        [Header("References")]
         public CharacterController characterController;
+        
         public Animator animator;
+        
         public Transform cameraFollowTarget;
+        
         public PlayerInput playerInput;
+        
         public InputActionAsset inputActions;
+        
         public string actionMapName = "Player";
+        
         public string moveActionName = "Move";
+        
         public string lookActionName = "Look";
+        
         public string jumpActionName = "Jump";
+        
         public string sprintActionName = "Sprint";
 
-        [Header("Movement")]
         public float walkSpeed = 3.5f;
+        
         public float sprintSpeed = 6.0f;
+        
         public float rotationSpeed = 720f;
+        
         public float jumpHeight = 1.25f;
+        
         public float gravity = -24f;
+        
         public float groundedStickVelocity = -2f;
 
-        [Header("Owner Camera")]
         public bool driveMainCameraForOwner = true;
+        
         public Vector3 cameraOffset = new Vector3(0f, 4.5f, -6f);
+        
         public float cameraFollowSharpness = 12f;
+        
         public float lookYawSensitivity = 0.12f;
+        
         public bool lockCursorForOwner = false;
 
-        [Header("Input Robustness")]
         public bool usePlayerInputCopy = true;
+        
         public bool allowKeyboardFallback = true;
+        
         public bool logSpawnDiagnostics = true;
 
         Vector2 _moveInput;

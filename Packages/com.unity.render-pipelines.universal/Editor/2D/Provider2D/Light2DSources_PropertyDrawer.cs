@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEditor;
 using UnityEngine.Rendering.Universal;
 
 namespace UnityEditor.Rendering.Universal

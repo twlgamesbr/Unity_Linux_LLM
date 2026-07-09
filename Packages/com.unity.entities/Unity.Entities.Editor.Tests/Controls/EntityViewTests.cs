@@ -1,6 +1,5 @@
 #if !DOTS_DISABLE_DEBUG_NAMES
 using NUnit.Framework;
-using Unity.Collections;
 using UnityEngine.UIElements;
 
 namespace Unity.Entities.Editor.Tests

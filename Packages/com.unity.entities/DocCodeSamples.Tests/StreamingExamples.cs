@@ -3,10 +3,7 @@ using Unity.Entities;
 using Unity.Entities.Serialization;
 using Unity.Mathematics;
 using Unity.Scenes;
-using Unity.Transforms;
-using UnityEditor;
 using UnityEngine;
-using Hash128 = Unity.Entities.Hash128;
 
 using LocalTransform = Unity.Transforms.LocalTransform;
 

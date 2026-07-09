@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import re
+import sys
 from pathlib import Path
 
 from .asmdef_parser import AssemblyRecord, resolve_asmdef_for_file
 from .discovery import classify_unity_region
 from .records import IndexRecord, RelationRecord
+from .roslyn_wrapper import parse_csharp_files_with_roslyn
 
 NS_RE = re.compile(r"\bnamespace\s+([A-Za-z_][A-Za-z0-9_.]*)")
 TYPE_RE = re.compile(r"(?:^|[;{}])\s*(?P<attrs>(?:\[[^\]]+\]\s*)*)(?P<mods>(?:(?:public|internal|private|protected|static|abstract|sealed|partial|readonly|unsafe|new)\s+)*)?(?P<kind>class|struct|interface|enum)\s+(?P<name>[A-Za-z_][A-Za-z0-9_]*)(?:\s*:\s*(?P<bases>[^\{]+))?", re.MULTILINE)
@@ -92,6 +94,26 @@ def _purpose_text(type_name: str, ns: str, region: str, asm_name: str) -> str:
 
 
 def analyze_csharp_files(root: Path, csharp_paths: list[Path], assemblies: list[AssemblyRecord], project: str = "Unity_Linux_LLM") -> tuple[list[IndexRecord], list[RelationRecord]]:
+    try:
+        records, relations = parse_csharp_files_with_roslyn(root, csharp_paths)
+        path_to_asm = {asm.directory.rstrip("/"): asm for asm in assemblies}
+        for rec in records:
+            path = rec.payload.get("path", "")
+            for prefix, asm in path_to_asm.items():
+                if path.startswith(prefix + "/") or path == prefix:
+                    rec.payload.setdefault("asmdef", asm.name)
+                    rec.payload.setdefault("asmdef_path", asm.path)
+                    break
+        for rel in relations:
+            path = rel.path
+            for prefix, asm in path_to_asm.items():
+                if path.startswith(prefix + "/") or path == prefix:
+                    rel.payload.setdefault("asmdef", asm.name)
+                    break
+        return records, relations
+    except Exception as exc:  # pragma: no cover
+        print(f"Roslyn parser unavailable or failed: {exc}", file=sys.stderr)
+
     records: list[IndexRecord] = []
     relations: list[RelationRecord] = []
     for path in csharp_paths:

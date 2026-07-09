@@ -10,11 +10,7 @@ using System.Runtime.InteropServices;
 using UnityEngine.SceneManagement;
 using Unity.Content;
 using Unity.Burst;
-using System.Threading;
 #if ENABLE_PROFILER
-using Unity.Profiling;
-using System.Runtime.CompilerServices;
-using Unity.Profiling.LowLevel.Unsafe;
 #endif
 
 namespace Unity.Entities.Content

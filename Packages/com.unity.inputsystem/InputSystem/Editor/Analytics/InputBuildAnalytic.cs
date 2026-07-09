@@ -2,9 +2,7 @@
 using System;
 using UnityEditor;
 using UnityEditor.Build;
-using UnityEditor.Build.Content;
 using UnityEditor.Build.Reporting;
-using UnityEngine.Serialization;
 
 namespace UnityEngine.InputSystem.Editor
 {

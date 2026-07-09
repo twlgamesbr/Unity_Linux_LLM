@@ -1,9 +1,6 @@
 using System;
 using System.Globalization;
 using Unity.Burst;
-using Unity.Burst.CompilerServices;
-using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Properties;

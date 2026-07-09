@@ -1,11 +1,9 @@
-using System;
 using TMPro;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 namespace UnityEditor.UI.Analytics
 {

@@ -1,16 +1,11 @@
 using System;
-using System.Collections.Generic;
 using Unity.Burst;
 using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Entities.Content;
-using Unity.Mathematics;
 using Unity.Profiling;
-using UnityEngine;
 using UnityEngine.Assertions;
 using Unity.Entities.Serialization;
-using System.Runtime.InteropServices;
 
 namespace Unity.Scenes
 {

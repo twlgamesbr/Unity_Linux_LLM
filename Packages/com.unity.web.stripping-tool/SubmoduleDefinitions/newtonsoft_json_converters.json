@@ -1,0 +1,334 @@
+{
+    "submodules": [
+        {
+            "name": "Newtonsoft.Json.Converters",
+            "description": "The Newtonsoft.Json.Converters namespace provides classes that inherit from JsonConverter.",
+            "version": "1.0.0",
+            "submodules": [
+                "Newtonsoft.Json.Converters.BinaryConverter",
+                "Newtonsoft.Json.Converters.BsonObjectIdConverter",
+                "Newtonsoft.Json.Converters.CustomCreationConverter<T>",
+                "Newtonsoft.Json.Converters.DataSetConverter",
+                "Newtonsoft.Json.Converters.DataTableConverter",
+                "Newtonsoft.Json.Converters.DateTimeConverterBase",
+                "Newtonsoft.Json.Converters.DiscriminatedUnionConverter",
+                "Newtonsoft.Json.Converters.EntityKeyMemberConverter",
+                "Newtonsoft.Json.Converters.ExpandoObjectConverter",
+                "Newtonsoft.Json.Converters.IsoDateTimeConverter",
+                "Newtonsoft.Json.Converters.JavaScriptDateTimeConverter",
+                "Newtonsoft.Json.Converters.KeyValuePairConverter",
+                "Newtonsoft.Json.Converters.RegexConverter",
+                "Newtonsoft.Json.Converters.StringEnumConverter",
+                "Newtonsoft.Json.Converters.UnixDateTimeConverter",
+                "Newtonsoft.Json.Converters.VersionConverter",
+                "Newtonsoft.Json.Converters.XmlNodeConverter"
+            ]
+        },
+        {
+            "name": "Newtonsoft.Json.Converters.BinaryConverter",
+            "description": "Converts a binary value to and from a base 64 string value.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.Converters.BinaryConverter*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.Converters.BsonObjectIdConverter",
+            "description": "Obsolete. Converts a BsonObjectId to and from JSON and BSON.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.Converters.BsonObjectIdConverter*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.Converters.CustomCreationConverter<T>",
+            "description": "Creates a custom object.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.Converters.CustomCreationConverter`1<*>*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.Converters.DataSetConverter",
+            "description": "Converts a DataSet to and from JSON.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.Converters.DataSetConverter*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.Converters.DataTableConverter",
+            "description": "Converts a DataTable to and from JSON.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.Converters.DataTableConverter*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.Converters.DateTimeConverterBase",
+            "description": "Provides a base class for converting a DateTime to and from JSON.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.Converters.DateTimeConverterBase*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.Converters.DiscriminatedUnionConverter",
+            "description": "Converts a F# discriminated union type to and from JSON.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.Converters.DiscriminatedUnionConverter*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.Converters.EntityKeyMemberConverter",
+            "description": "Converts an Entity Framework EntityKeyMember to and from JSON.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.Converters.EntityKeyMemberConverter*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.Converters.ExpandoObjectConverter",
+            "description": "Converts an ExpandoObject to and from JSON.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.Converters.ExpandoObjectConverter*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.Converters.IsoDateTimeConverter",
+            "description": "Converts a DateTime to and from the ISO 8601 date format (e.g. \"2008-04-12T12:53Z\").",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.Converters.IsoDateTimeConverter*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.Converters.JavaScriptDateTimeConverter",
+            "description": "Converts a DateTime to and from a JavaScript Date constructor (e.g. new Date(52231943)).",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.Converters.JavaScriptDateTimeConverter*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.Converters.KeyValuePairConverter",
+            "description": "Converts a KeyValuePair<TKey, TValue> to and from JSON.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.Converters.KeyValuePairConverter*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.Converters.RegexConverter",
+            "description": "Converts a Regex to and from JSON and BSON.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.Converters.RegexConverter*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.Converters.StringEnumConverter",
+            "description": "Converts an Enum to and from its name string value.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.Converters.StringEnumConverter*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.Converters.UnixDateTimeConverter",
+            "description": "Converts a DateTime to and from Unix epoch time.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.Converters.UnixDateTimeConverter*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.Converters.VersionConverter",
+            "description": "Converts a Version to and from a string (e.g. \"1.2.3.4\").",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.Converters.VersionConverter*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Newtonsoft.Json.Converters.XmlNodeConverter",
+            "description": "Converts XML to and from JSON.",
+            "version": "1.0.0",
+            "functions": [],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Newtonsoft.Json"
+                        ],
+                        "methods": [
+                            "*Newtonsoft.Json.Converters.XmlNodeConverter*"
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}

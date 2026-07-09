@@ -7,7 +7,6 @@
         "Unity.Multiplayer.Tools.MetricTypes",
         "Unity.Multiplayer.Tools.NetStats",
         "Unity.Networking.Transport",
-        "Unity.Netcode.TestHelpers.Runtime",
         "Unity.Mathematics",
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",

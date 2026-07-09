@@ -1,6 +1,5 @@
 using System;
 using UnityEngine.InputSystem.Utilities;
-using UnityEngine.Scripting;
 
 ////REVIEW: should this *not* be inherited? inheritance can lead to surprises
 

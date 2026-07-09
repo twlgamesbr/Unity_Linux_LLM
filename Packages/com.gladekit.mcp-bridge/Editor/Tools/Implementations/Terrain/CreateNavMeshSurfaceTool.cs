@@ -1,11 +1,8 @@
-using System;
 using System.Collections.Generic;
 using UnityEditor;
-using UnityEngine;
 #if GLADE_AI_NAVIGATION
 using Unity.AI.Navigation;
 #endif
-using GladeAgenticAI.Core.Tools;
 
 #if GLADE_AI_NAVIGATION
 namespace GladeAgenticAI.Core.Tools.Implementations.Terrain

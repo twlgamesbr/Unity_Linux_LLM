@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using Unity.Mathematics;
-using Unity.Physics.Authoring;
 
 namespace Unity.Physics.Tests.Authoring
 {

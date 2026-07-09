@@ -2,7 +2,6 @@ using System;
 using System.Threading;
 using Unity.Assertions;
 using Unity.Burst.CompilerServices;
-using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 

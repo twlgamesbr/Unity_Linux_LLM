@@ -1,11 +1,9 @@
 using System;
 using UnityEngine.InputSystem.Controls;
-using UnityEngine.Scripting;
 #if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine.InputSystem.Editor;
 using UnityEngine.UIElements;
-using UnityEditor.UIElements;
 #endif
 
 ////TODO: add ability to respond to any of the taps in the sequence (e.g. one response for single tap, another for double tap)

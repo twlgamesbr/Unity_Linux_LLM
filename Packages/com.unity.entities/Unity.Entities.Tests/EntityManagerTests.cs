@@ -1,15 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Threading;
 using Unity.Collections;
 using NUnit.Framework;
 using Unity.Burst;
 using Unity.Collections.LowLevel.Unsafe;
-using Unity.Core;
 using Unity.Jobs;
-using UnityEngine;
-using Unity.Jobs.LowLevel.Unsafe;
 
 namespace Unity.Entities.Tests
 {

@@ -4,10 +4,8 @@ using System;
 using Unity.Entities;
 using Unity.Physics.Systems;
 using UnityEditor;
-using UnityEngine;
 using UnityEngine.Analytics;
 #if UNITY_2023_2_OR_NEWER
-using Unity.CodeEditor;
 #endif
 
 namespace Unity.Physics.Hybrid

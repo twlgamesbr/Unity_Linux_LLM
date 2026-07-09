@@ -1,18 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using NUnit.Framework;
-using Unity.Collections;
-using Unity.Entities;
-using Unity.Entities.Conversion;
-using Unity.Entities.Hybrid.Tests;
-using UnityEditor;
-using UnityEditor.SceneManagement;
-using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.TestTools;
-using Hash128 = Unity.Entities.Hash128;
-
 namespace Unity.Scenes.Editor.Tests
 {
     /*

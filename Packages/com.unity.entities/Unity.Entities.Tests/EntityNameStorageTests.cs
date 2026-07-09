@@ -1,7 +1,6 @@
 #if !UNITY_DOTSPLAYER
 using System;
 using System.Globalization;
-using System.Text;
 using System.Threading;
 using NUnit.Framework;
 using Unity.Collections;

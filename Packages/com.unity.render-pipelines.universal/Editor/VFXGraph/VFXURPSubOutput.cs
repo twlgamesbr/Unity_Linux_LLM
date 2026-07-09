@@ -1,5 +1,3 @@
-using UnityEngine.Rendering.Universal;
-
 #if HAS_VFX_GRAPH
 
 namespace UnityEditor.VFX.URP

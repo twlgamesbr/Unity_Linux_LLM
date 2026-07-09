@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -12,10 +11,10 @@ namespace NPCSystem
     public class NPCLocalAIClient : MonoBehaviour
     {
         [Header("LocalAI Chat Endpoint")]
-        public string host = "localhost";
-        public int port = 11435;
+        public string host = "127.0.0.1";
+        public int port = 8080;
         public string apiKey = "";
-        public string model = "default-llm";
+        public string model = "llama32-unity-blended-20260707-q4_k_m";
 
         [Header("Generation Parameters")]
         public float temperature = 0.2f;
@@ -25,6 +24,25 @@ namespace NPCSystem
         public float repeatPenalty = 1.1f;
         public int maxTokens = 256;
         public int numRetries = 3;
+        public int requestTimeoutSeconds = 120;
+
+        UnityWebRequest _activeRequest;
+        bool _activeRequestCanceled;
+
+        /// <summary>
+        /// Cancels the currently active LocalAI request, if any.
+        /// </summary>
+        public void CancelActiveRequest()
+        {
+            if (_activeRequest != null && !_activeRequest.isDone)
+            {
+                Debug.Log("[NPCLocalAIClient] Aborting active LocalAI request.");
+                _activeRequestCanceled = true;
+                _activeRequest.Abort();
+            }
+
+            _activeRequest = null;
+        }
 
         /// <summary>
         /// Send a chat completion request to LocalAI with message history.
@@ -107,21 +125,44 @@ namespace NPCSystem
             {
                 request.uploadHandler = new UploadHandlerRaw(bodyRaw);
                 request.downloadHandler = new DownloadHandlerBuffer();
-                request.timeout = 60;
+                request.timeout = Mathf.Max(1, requestTimeoutSeconds);
                 request.SetRequestHeader("Content-Type", "application/json");
                 if (!string.IsNullOrEmpty(apiKey))
                     request.SetRequestHeader("Authorization", $"Bearer {apiKey}");
 
+                _activeRequest = request;
+                _activeRequestCanceled = false;
                 var operation = request.SendWebRequest();
                 while (!operation.isDone)
+                {
                     await Task.Yield();
+                    if (_activeRequestCanceled)
+                    {
+                        Debug.LogWarning(
+                            "[NPCLocalAIClient] LocalAI request was canceled during execution."
+                        );
+                        return null;
+                    }
+                }
+
+                _activeRequest = null;
 
                 if (
                     request.result == UnityWebRequest.Result.ConnectionError
                     || request.result == UnityWebRequest.Result.ProtocolError
                 )
                 {
-                    Debug.LogError($"[NPCLocalAIClient] Request failed: {request.error}");
+                    Debug.LogError(
+                        $"[NPCLocalAIClient] Request failed ({request.responseCode}): {request.error}"
+                    );
+                    return null;
+                }
+
+                if (request.result == UnityWebRequest.Result.DataProcessingError)
+                {
+                    Debug.LogError(
+                        $"[NPCLocalAIClient] Response processing failed: {request.error}"
+                    );
                     return null;
                 }
 

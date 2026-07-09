@@ -5,7 +5,6 @@ using System.Diagnostics;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 using Unity.Properties;
-using Unity.Properties.Internal;
 
 namespace Unity.Entities
 {

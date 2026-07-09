@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Unity.Entities.Editor
+﻿namespace Unity.Entities.Editor
 {
     /// <summary>
     /// Detect world list changes when new worlds are created or old worlds are destroyed.

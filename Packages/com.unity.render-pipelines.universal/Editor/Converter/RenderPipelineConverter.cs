@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEditor.Rendering.Converter;
-using UnityEngine.Categorization;
 
 [assembly: InternalsVisibleTo("PPv2URPConverters")]
 [assembly: InternalsVisibleTo("Unity.2D.PixelPerfect.Editor")]

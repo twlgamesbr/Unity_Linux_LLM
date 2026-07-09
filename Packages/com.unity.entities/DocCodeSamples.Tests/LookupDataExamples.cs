@@ -1,11 +1,8 @@
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Transforms;
-using UnityEngine;
-using NUnit.Framework;
 
 // The files in this namespace are used to compile/test the code samples in the documentation.
 namespace Doc.CodeSamples.Tests

@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using Unity.Collections.LowLevel.Unsafe;
-using UnityEngine.Analytics;
 using UnityEngine.InputSystem.Utilities;
 using UnityEngineInternal.Input;
 

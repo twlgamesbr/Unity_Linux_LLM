@@ -1,6 +1,5 @@
 using UnityEditor;
 using UnityEngine;
-using Hash128 = Unity.Entities.Hash128;
 
 namespace Unity.Scenes.Editor
 {

@@ -1,7 +1,4 @@
-using System.Collections.Generic;
-using Unity.Collections;
 using Unity.Entities;
-using UnityComponent = UnityEngine.Component;
 
 namespace Unity.Physics.Authoring
 {

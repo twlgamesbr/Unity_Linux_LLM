@@ -1,10 +1,5 @@
-using System;
-using System.Collections;
 using UnityEngine;
-using UnityEngine.TestTools;
 using NUnit.Framework;
-using UnityEngine.SceneManagement;
-using UnityEditor;
 
 [TestFixture]
 internal class CanvasResizeCorrectlyForRenderTexture

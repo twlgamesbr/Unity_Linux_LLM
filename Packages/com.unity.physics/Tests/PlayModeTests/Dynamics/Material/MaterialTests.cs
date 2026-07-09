@@ -1,6 +1,4 @@
-using System;
 using NUnit.Framework;
-using UnityEngine;
 
 namespace Unity.Physics.Tests.Dynamics.Materials
 {

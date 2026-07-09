@@ -67,8 +67,10 @@ namespace NPCSystem
                 : npcSlug.Trim().ToLowerInvariant();
             displayName = string.IsNullOrWhiteSpace(displayName)
                 ? string.Empty
-                : displayName.Trim();
-            content = string.IsNullOrWhiteSpace(content) ? string.Empty : content.Trim();
+                : NPCFlowTextSanitizer.CleanDialogueText(displayName);
+            content = string.IsNullOrWhiteSpace(content)
+                ? string.Empty
+                : NPCFlowTextSanitizer.CleanDialogueText(content);
         }
 
         public void NetworkSerialize<T>(BufferSerializer<T> serializer)

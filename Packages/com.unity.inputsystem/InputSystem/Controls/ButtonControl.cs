@@ -1,6 +1,5 @@
 using System.Runtime.CompilerServices;
 using UnityEngine.InputSystem.LowLevel;
-using UnityEngine.Scripting;
 
 ////REVIEW: introduce separate base class for ButtonControl and AxisControl instead of deriving ButtonControl from AxisControl?
 

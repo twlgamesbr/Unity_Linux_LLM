@@ -1,15 +1,10 @@
 #if USING_SPRITESHAPE
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine.U2D;
 using Unity.Mathematics;
 
 #if UNITY_EDITOR
-using UnityEditor;
 #endif
 
 namespace UnityEngine.Rendering.Universal

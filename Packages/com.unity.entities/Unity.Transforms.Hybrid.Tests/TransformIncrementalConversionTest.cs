@@ -1,9 +1,7 @@
 using NUnit.Framework;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Collections;
-using Unity.Jobs;
 using Unity.Entities.Conversion;
 
 namespace Unity.Transforms.Hybrid.Tests

@@ -6,7 +6,6 @@ using Unity.Physics;
 using Unity.Physics.Authoring;
 using Unity.Physics.Systems;
 using Unity.Transforms;
-using UnityEngine;
 using BoxCollider = Unity.Physics.BoxCollider;
 using CapsuleCollider = Unity.Physics.CapsuleCollider;
 using Collider = Unity.Physics.Collider;

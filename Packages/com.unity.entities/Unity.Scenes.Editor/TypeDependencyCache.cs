@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Unity.Entities;
 using UnityEditor;
 using UnityEngine;
 using UnityEditor.AssetImporters;
 using System.Reflection;
-using Unity.Entities.Conversion;
 using Unity.Entities.Serialization;
 using Unity.Profiling;
 

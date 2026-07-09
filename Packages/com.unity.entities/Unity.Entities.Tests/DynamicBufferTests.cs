@@ -4,7 +4,6 @@ using NUnit.Framework;
 using Unity.Jobs;
 using Unity.Collections;
 using static Unity.Burst.CompilerServices.Aliasing;
-using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 using UnityEngine.TestTools;
 using System.Text.RegularExpressions;

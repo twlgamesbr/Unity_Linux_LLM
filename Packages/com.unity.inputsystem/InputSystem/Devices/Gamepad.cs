@@ -6,7 +6,6 @@ using UnityEngine.InputSystem.Haptics;
 using UnityEngine.InputSystem.Layouts;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.Utilities;
-using UnityEngine.Scripting;
 
 ////TODO: come up with consistent naming for buttons; (xxxButton? xxx?)
 

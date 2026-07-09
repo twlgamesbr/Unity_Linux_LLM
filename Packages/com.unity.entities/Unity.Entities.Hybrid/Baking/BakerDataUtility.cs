@@ -7,7 +7,6 @@ using System.Reflection;
 #if UNITY_EDITOR
 using Unity.Entities.Build;
 #endif
-using Unity.Entities.Conversion;
 
 namespace Unity.Entities
 {

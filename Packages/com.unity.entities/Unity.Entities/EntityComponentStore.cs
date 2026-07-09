@@ -4,14 +4,11 @@ using System.Threading;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
-using Unity.Jobs;
 using Unity.Assertions;
 using Unity.Mathematics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Collections.Generic;
 using Unity.Burst.CompilerServices;
-using Unity.Entities.LowLevel;
 using UnityEngine;
 
 // ---------------------------------------------------------------------------------------------------------

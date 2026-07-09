@@ -4,8 +4,6 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
-using UnityEngine;
-using UnityObject = UnityEngine.Object;
 
 namespace Unity.Entities
 {

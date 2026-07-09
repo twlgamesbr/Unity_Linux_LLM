@@ -4,7 +4,6 @@ using Unity.Entities;
 using Unity.Entities.Serialization;
 using UnityEngine;
 using UnityEngine.Scripting.APIUpdating;
-using UnityObject = UnityEngine.Object;
 
 namespace Unity.Scenes
 {

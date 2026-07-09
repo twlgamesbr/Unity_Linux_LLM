@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using Unity.Collections;
 using Unity.Entities.Hybrid.Baking;
 using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityObject = UnityEngine.Object;
 
 #pragma warning disable 162
 

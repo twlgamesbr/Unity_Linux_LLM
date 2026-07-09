@@ -1,0 +1,18 @@
+<engine:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:engine="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Packages/com.unity.platformtoolkit/Editor/PlayMode/UI/Inspector/Styles.uss?fileID=7433441132597879392&amp;guid=2c5dcac6c00794199998ccd2e7c525b0&amp;type=3#Styles"/>
+    <engine:HelpBox message-type="Warning" text="You have two or more attributes with the same name.">
+        <Bindings>
+            <engine:DataBinding property="style.display" data-source-path="ShowAttributeDefinitionsWarning" source-to-ui-converters="Show Warning Converter" binding-mode="ToTarget" update-trigger="EveryUpdate"/>
+        </Bindings>
+    </engine:HelpBox>
+    <engine:MultiColumnListView name="attribute-definitions" virtualization-method="FixedHeight" fixed-item-height="24" show-foldout-header="true" header-title="Attributes" show-add-remove-footer="true" show-bound-collection-size="false" binding-source-selection-mode="AutoAssign" show-border="true" sorting-mode="None" class="attribute-definition">
+        <Bindings>
+            <engine:DataBinding property="itemsSource" data-source-path="AttributeDefinitions"/>
+        </Bindings>
+        <engine:Columns primary-column-name="AttributeDefinition" resize-preview="false" stretch-mode="GrowAndFill" reorderable="false" resizable="false">
+            <!-- The Type column cell template is set in code due to a UI Toolkit bug with teamplates that contain custom elements. -->
+            <engine:Column name="Type" title="Type" width="100%" sortable="false" optional="false" resizable="false" min-width="50%"/>
+            <engine:Column name="Name" title="Name" cell-template="project://database/Packages/com.unity.platformtoolkit/Editor/PlayMode/UI/Inspector/PlayModeControlsAttributeDefinitionNameCell.uxml?fileID=9197481963319205126&amp;guid=220604d3cb8ef4821bac59d234e0cd6c&amp;type=3#PlayModeControlsAttributeDefinitionNameCell" width="100%" sortable="false" resizable="false" optional="false" min-width="50%"/>
+        </engine:Columns>
+    </engine:MultiColumnListView>
+</engine:UXML>

@@ -2,9 +2,7 @@ using NUnit.Framework;
 using Unity.Burst;
 using Unity.Burst.Intrinsics;
 using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities.Tests;
-using Unity.Mathematics;
 using Unity.PerformanceTesting;
 
 namespace Unity.Entities.PerformanceTests

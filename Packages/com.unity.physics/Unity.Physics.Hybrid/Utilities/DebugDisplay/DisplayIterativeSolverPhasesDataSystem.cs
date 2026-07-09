@@ -6,7 +6,6 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Physics.Systems;
 using Unity.Transforms;
-using static Unity.Physics.DispatchPairSequencer.IterativeSolverSchedulerInfo;
 
 namespace Unity.Physics.Authoring
 {

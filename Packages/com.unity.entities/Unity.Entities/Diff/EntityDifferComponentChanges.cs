@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using Unity.Assertions;
 using Unity.Burst;
 using Unity.Mathematics;
 using Unity.Collections;

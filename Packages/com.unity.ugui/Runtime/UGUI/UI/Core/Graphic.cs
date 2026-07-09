@@ -2,7 +2,6 @@ using System;
 #if UNITY_EDITOR
 using System.Reflection;
 #endif
-using System.Collections.Generic;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;

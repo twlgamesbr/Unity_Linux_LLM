@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Unity.Multiplayer.Tools.Common;
 using Unity.Multiplayer.Tools.DependencyInjection;
 using Unity.Multiplayer.Tools.DependencyInjection.UIElements;
@@ -6,7 +5,6 @@ using Unity.Multiplayer.Tools.NetVis.Configuration;
 using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine.UIElements;
-using PopupWindow = UnityEditor.PopupWindow;
 
 namespace Unity.Multiplayer.Tools.NetVis.Editor.UI
 {

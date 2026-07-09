@@ -1,4 +1,3 @@
-using System;
 using static Unity.Mathematics.math;
 
 namespace Unity.Mathematics

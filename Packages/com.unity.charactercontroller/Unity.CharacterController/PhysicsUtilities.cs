@@ -1,8 +1,8 @@
 ﻿using System.Runtime.CompilerServices;
 using Unity.Mathematics;
 using Unity.Physics;
-using Unity.Physics.Extensions;
 using Unity.Physics.Authoring;
+using Unity.Physics.Extensions;
 using Unity.Transforms;
 
 namespace Unity.CharacterController
@@ -20,7 +20,11 @@ namespace Unity.CharacterController
         /// <param name="faceNormal"> The face normal </param>
         /// <returns> True if a face normal was successfully computed </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe bool GetHitFaceNormal(RigidBody hitBody, ColliderKey colliderKey, out float3 faceNormal)
+        public static unsafe bool GetHitFaceNormal(
+            RigidBody hitBody,
+            ColliderKey colliderKey,
+            out float3 faceNormal
+        )
         {
             faceNormal = default;
 
@@ -30,8 +34,15 @@ namespace Unity.CharacterController
 
                 if (colliderType == ColliderType.Triangle || colliderType == ColliderType.Quad)
                 {
-                    BlobArray.Accessor<float3> verticesAccessor = ((PolygonCollider*)hitChildCollider.Collider)->Vertices;
-                    float3 localFaceNormal = math.normalizesafe(math.cross(verticesAccessor[1] - verticesAccessor[0], verticesAccessor[2] - verticesAccessor[0]));
+                    BlobArray.Accessor<float3> verticesAccessor = (
+                        (PolygonCollider*)hitChildCollider.Collider
+                    )->Vertices;
+                    float3 localFaceNormal = math.normalizesafe(
+                        math.cross(
+                            verticesAccessor[1] - verticesAccessor[0],
+                            verticesAccessor[2] - verticesAccessor[0]
+                        )
+                    );
                     faceNormal = math.rotate(hitBody.WorldFromBody, localFaceNormal);
 
                     return true;
@@ -48,7 +59,10 @@ namespace Unity.CharacterController
         /// <param name="rigidbodyIndex"> The body index </param>
         /// <returns> True if the body has velocity and mass or not </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool DoesBodyHavePhysicsVelocityAndMass(in PhysicsWorld physicsWorld, int rigidbodyIndex)
+        public static bool DoesBodyHavePhysicsVelocityAndMass(
+            in PhysicsWorld physicsWorld,
+            int rigidbodyIndex
+        )
         {
             if (rigidbodyIndex < physicsWorld.NumDynamicBodies)
             {
@@ -86,7 +100,11 @@ namespace Unity.CharacterController
         /// <param name="tag"> The physics body tag to check for </param>
         /// <returns> True if the body has the physics tag </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool HasPhysicsTag(in PhysicsWorld physicsWorld, int bodyIndex, CustomPhysicsBodyTags tag)
+        public static bool HasPhysicsTag(
+            in PhysicsWorld physicsWorld,
+            int bodyIndex,
+            CustomPhysicsBodyTags tag
+        )
         {
             if (tag.Value > CustomPhysicsBodyTags.Nothing.Value)
             {
@@ -123,7 +141,13 @@ namespace Unity.CharacterController
         /// <param name="physicsVelocity"> The body's physics velocity </param>
         /// <param name="physicsMass"> The body's physics mass </param>
         /// <returns> If the components were found successfully </returns>
-        public static bool GetBodyComponents(in PhysicsWorld physicsWorld, int rigidbodyIndex, out LocalTransform transform, out PhysicsVelocity physicsVelocity, out PhysicsMass physicsMass)
+        public static bool GetBodyComponents(
+            in PhysicsWorld physicsWorld,
+            int rigidbodyIndex,
+            out LocalTransform transform,
+            out PhysicsVelocity physicsVelocity,
+            out PhysicsMass physicsMass
+        )
         {
             if (rigidbodyIndex >= 0 && rigidbodyIndex < physicsWorld.MotionVelocities.Length)
             {
@@ -169,8 +193,10 @@ namespace Unity.CharacterController
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsCollidable(in Material material)
         {
-            if (material.CollisionResponse == CollisionResponsePolicy.Collide ||
-                material.CollisionResponse == CollisionResponsePolicy.CollideRaiseCollisionEvents)
+            if (
+                material.CollisionResponse == CollisionResponsePolicy.Collide
+                || material.CollisionResponse == CollisionResponsePolicy.CollideRaiseCollisionEvents
+            )
             {
                 return true;
             }
@@ -186,7 +212,11 @@ namespace Unity.CharacterController
         /// <param name="collisionResponse"> The desired collision response </param>
         /// <returns> True if the target collider was found </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe bool SetCollisionResponse(RigidBody rigidBody, ColliderKey colliderKey, CollisionResponsePolicy collisionResponse)
+        public static unsafe bool SetCollisionResponse(
+            RigidBody rigidBody,
+            ColliderKey colliderKey,
+            CollisionResponsePolicy collisionResponse
+        )
         {
             if (rigidBody.Collider.Value.GetLeaf(colliderKey, out ChildCollider leafCollider))
             {
@@ -203,7 +233,10 @@ namespace Unity.CharacterController
         /// <param name="rigidBody"> The rigidbody to change </param>
         /// <param name="collisionResponse"> The desired collision response </param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static unsafe void SetCollisionResponse(RigidBody rigidBody, CollisionResponsePolicy collisionResponse)
+        public static unsafe void SetCollisionResponse(
+            RigidBody rigidBody,
+            CollisionResponsePolicy collisionResponse
+        )
         {
             ((Collider*)rigidBody.Collider.GetUnsafePtr())->SetCollisionResponse(collisionResponse);
         }
@@ -232,16 +265,33 @@ namespace Unity.CharacterController
             float3 collisionPoint,
             float3 collisionNormalBToA,
             out float3 impulseOnA,
-            out float3 impulseOnB)
+            out float3 impulseOnB
+        )
         {
             impulseOnA = default;
             impulseOnB = default;
 
-            float3 pointVelocityA = physicsVelA.GetLinearVelocity(physicsMassA, transformA.pos, transformA.rot, collisionPoint);
-            float3 pointVelocityB = physicsVelB.GetLinearVelocity(physicsMassB, transformB.pos, transformB.rot, collisionPoint);
+            float3 pointVelocityA = physicsVelA.GetLinearVelocity(
+                physicsMassA,
+                transformA.pos,
+                transformA.rot,
+                collisionPoint
+            );
+            float3 pointVelocityB = physicsVelB.GetLinearVelocity(
+                physicsMassB,
+                transformB.pos,
+                transformB.rot,
+                collisionPoint
+            );
 
-            float3 centerOfMassA = physicsMassA.GetCenterOfMassWorldSpace(transformA.pos, transformA.rot);
-            float3 centerOfMassB = physicsMassB.GetCenterOfMassWorldSpace(transformB.pos, transformB.rot);
+            float3 centerOfMassA = physicsMassA.GetCenterOfMassWorldSpace(
+                transformA.pos,
+                transformA.rot
+            );
+            float3 centerOfMassB = physicsMassB.GetCenterOfMassWorldSpace(
+                transformB.pos,
+                transformB.rot
+            );
             float3 centerOfMassAToPoint = collisionPoint - centerOfMassA;
             float3 centerOfMassBToPoint = collisionPoint - centerOfMassB;
 
@@ -252,10 +302,22 @@ namespace Unity.CharacterController
             {
                 float3 crossA = math.cross(centerOfMassAToPoint, collisionNormalBToA);
                 float3 crossB = math.cross(collisionNormalBToA, centerOfMassBToPoint);
-                float3 angularA = math.mul(new Math.MTransform(transformA).InverseRotation, crossA).xyz;
-                float3 angularB = math.mul(new Math.MTransform(transformB).InverseRotation, crossB).xyz;
-                float3 temp = angularA * angularA * physicsMassA.InverseInertia + angularB * angularB * physicsMassB.InverseInertia;
-                float invEffectiveMass = temp.x + temp.y + temp.z + (physicsMassA.InverseMass + physicsMassB.InverseMass);
+                float3 angularA = math.mul(
+                    new Math.MTransform(transformA).InverseRotation,
+                    crossA
+                ).xyz;
+                float3 angularB = math.mul(
+                    new Math.MTransform(transformB).InverseRotation,
+                    crossB
+                ).xyz;
+                float3 temp =
+                    angularA * angularA * physicsMassA.InverseInertia
+                    + angularB * angularB * physicsMassB.InverseInertia;
+                float invEffectiveMass =
+                    temp.x
+                    + temp.y
+                    + temp.z
+                    + (physicsMassA.InverseMass + physicsMassB.InverseMass);
 
                 if (invEffectiveMass > 0f)
                 {
@@ -276,13 +338,17 @@ namespace Unity.CharacterController
         /// <param name="storedCharacterData"> The character component that stores character data </param>
         /// <returns> The resulting physics mass </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static PhysicsMass GetKinematicCharacterPhysicsMass(StoredKinematicCharacterData storedCharacterData)
+        public static PhysicsMass GetKinematicCharacterPhysicsMass(
+            StoredKinematicCharacterData storedCharacterData
+        )
         {
             return new PhysicsMass
             {
                 AngularExpansionFactor = 0f,
                 InverseInertia = float3.zero,
-                InverseMass = storedCharacterData.SimulateDynamicBody ? (1f / storedCharacterData.Mass) : 0f,
+                InverseMass = storedCharacterData.SimulateDynamicBody
+                    ? (1f / storedCharacterData.Mass)
+                    : 0f,
                 Transform = new RigidTransform(quaternion.identity, float3.zero),
             };
         }
@@ -293,13 +359,17 @@ namespace Unity.CharacterController
         /// <param name="characterProperties"> The character properties component </param>
         /// <returns> The resulting physics mass </returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static PhysicsMass GetKinematicCharacterPhysicsMass(KinematicCharacterProperties characterProperties)
+        public static PhysicsMass GetKinematicCharacterPhysicsMass(
+            KinematicCharacterProperties characterProperties
+        )
         {
             return new PhysicsMass
             {
                 AngularExpansionFactor = 0f,
                 InverseInertia = float3.zero,
-                InverseMass = characterProperties.SimulateDynamicBody ? (1f / characterProperties.Mass) : 0f,
+                InverseMass = characterProperties.SimulateDynamicBody
+                    ? (1f / characterProperties.Mass)
+                    : 0f,
                 Transform = new RigidTransform(quaternion.identity, float3.zero),
             };
         }

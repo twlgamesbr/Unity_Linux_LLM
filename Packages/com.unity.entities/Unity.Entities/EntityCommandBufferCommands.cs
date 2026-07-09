@@ -1,6 +1,5 @@
 ﻿using System.Runtime.InteropServices;
 using Unity.Collections;
-using Unity.Mathematics;
 
 namespace Unity.Entities
 {

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEditor;
-using GladeAgenticAI.Core.Tools;
 using GladeAgenticAI.Services;
 
 namespace GladeAgenticAI.Core.Tools.Implementations.Scripts

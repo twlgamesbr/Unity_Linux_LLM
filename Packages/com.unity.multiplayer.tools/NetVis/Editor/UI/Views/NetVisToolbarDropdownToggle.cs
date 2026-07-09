@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-using Unity.Multiplayer.Tools.Common;
-using Unity.Multiplayer.Tools.NetVis.Configuration;
+﻿using Unity.Multiplayer.Tools.NetVis.Configuration;
 using UnityEditor;
 using UnityEditor.Toolbars;
 using UnityEngine.UIElements;

@@ -2,11 +2,9 @@
 using System.Collections;
 using Unity.Burst;
 using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Transforms;
-using UnityEditor;
 
 namespace Unity.Entities.Editor
 {

@@ -2,7 +2,6 @@ using System;
 using System.ComponentModel;
 using UnityEngine.InputSystem.Layouts;
 using UnityEngine.InputSystem.Utilities;
-using UnityEngine.Scripting;
 
 ////TODO: remove this once we can break the API
 

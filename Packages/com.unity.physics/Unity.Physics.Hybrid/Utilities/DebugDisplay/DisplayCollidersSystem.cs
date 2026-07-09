@@ -4,7 +4,6 @@ using Unity.Mathematics;
 using UnityEngine;
 using Unity.Jobs;
 using Unity.Burst;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.DebugDisplay;
 using Unity.Transforms;
 using static Unity.Physics.Math;

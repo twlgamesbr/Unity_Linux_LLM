@@ -3,7 +3,6 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using Unity.Networking.Transport.Logging;
-using Unity.Networking.Transport.Utilities;
 
 namespace Unity.Networking.Transport
 {

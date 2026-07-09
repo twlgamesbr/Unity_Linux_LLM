@@ -7,7 +7,6 @@ using Unity.Entities;
 using Unity.Entities.Serialization;
 #if UNITY_EDITOR
 using Unity.Assertions;
-using Unity.Entities.Conversion;
 
 #endif
 using Hash128 = Unity.Entities.Hash128;

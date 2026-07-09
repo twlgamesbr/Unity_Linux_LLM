@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEditor.Rendering.Converter;
-using UnityEngine;
 using UnityEngine.Categorization;
-using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
 namespace UnityEditor.Rendering.Universal

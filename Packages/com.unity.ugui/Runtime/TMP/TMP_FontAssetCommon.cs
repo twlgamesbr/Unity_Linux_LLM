@@ -1,9 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.Serialization;
-using UnityEngine.TextCore;
-using UnityEngine.TextCore.LowLevel;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 

@@ -3,7 +3,6 @@ using Unity.Multiplayer.Tools.Adapters;
 using Unity.Multiplayer.Tools.Common;
 using Unity.Multiplayer.Tools.DependencyInjection;
 using Unity.Multiplayer.Tools.NetVis.Configuration;
-using UnityEditor;
 
 namespace Unity.Multiplayer.Tools.NetVis.Editor.UI
 {

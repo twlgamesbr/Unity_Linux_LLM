@@ -1,6 +1,5 @@
 using System;
 using NUnit.Framework;
-using Unity.Collections;
 
 // ******* COPY AND PASTE WARNING *************
 // NOTE: Duplicate tests (with only type differences)

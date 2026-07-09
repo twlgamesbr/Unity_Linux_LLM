@@ -1,0 +1,12 @@
+.bold-label {
+    -unity-font-style: bold;
+    font-size: 13px;
+}
+
+.unity-object-field__input {
+    width: 200px;
+}
+
+.unity-base-field__label {
+    min-width: 210px;
+}

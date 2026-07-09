@@ -1,9 +1,7 @@
 using System;
 using System.Threading;
-using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
 using BurstRuntime = Unity.Burst.BurstRuntime;

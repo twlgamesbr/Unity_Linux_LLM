@@ -2,7 +2,6 @@ using NUnit.Framework;
 using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
-using UnityEngine.TestTools;
 
 namespace Unity.Entities.Tests
 {

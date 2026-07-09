@@ -196,7 +196,12 @@ namespace NPCSystem
             );
             foreach (NPCTransferableItem item in items)
             {
-                if (item != null && item.IsSpawned && item.IsHeldByPlayer && item.OwnerClientId == clientId)
+                if (
+                    item != null
+                    && item.IsSpawned
+                    && item.IsHeldByPlayer
+                    && item.OwnerClientId == clientId
+                )
                     return item;
             }
 

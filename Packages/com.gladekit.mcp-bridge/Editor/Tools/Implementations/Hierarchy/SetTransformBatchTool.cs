@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using GladeAgenticAI.Core.Tools;
 using GladeAgenticAI.Services;
 
 namespace GladeAgenticAI.Core.Tools.Implementations.Hierarchy
@@ -22,7 +21,10 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Hierarchy
 
             // Re-hydrate JSON-array strings so transforms works whether it arrives
             // already-typed or string-encoded (e.g. via batch_execute).
-            if (itemsObj is string itemsJson && ToolUtils.TryParseJsonArrayToList(itemsJson, out var parsedItems))
+            if (
+                itemsObj is string itemsJson
+                && ToolUtils.TryParseJsonArrayToList(itemsJson, out var parsedItems)
+            )
                 itemsObj = parsedItems;
 
             var items = new List<Dictionary<string, object>>();
@@ -30,7 +32,8 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Hierarchy
             {
                 foreach (var item in list)
                 {
-                    if (item is Dictionary<string, object> dict) items.Add(dict);
+                    if (item is Dictionary<string, object> dict)
+                        items.Add(dict);
                 }
             }
             else
@@ -45,18 +48,19 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Hierarchy
 
             foreach (var item in items)
             {
-                string path = item.ContainsKey("gameObjectPath") ? item["gameObjectPath"].ToString() : "";
-                if (string.IsNullOrEmpty(path)) continue;
+                string path = item.ContainsKey("gameObjectPath")
+                    ? item["gameObjectPath"].ToString()
+                    : "";
+                if (string.IsNullOrEmpty(path))
+                    continue;
                 var callArgs = new Dictionary<string, object>(item);
                 callArgs["gameObjectPath"] = path;
                 var result = setTransformTool.Execute(callArgs);
-                if (result.Contains("\"success\":true")) updated++;
+                if (result.Contains("\"success\":true"))
+                    updated++;
             }
 
-            var extras = new Dictionary<string, object>
-            {
-                { "updated", updated }
-            };
+            var extras = new Dictionary<string, object> { { "updated", updated } };
             return ToolUtils.CreateSuccessResponse($"Updated {updated} object(s)", extras);
         }
     }

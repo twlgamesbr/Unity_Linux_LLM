@@ -1,0 +1,19 @@
+{
+    "submodules": [
+        {
+            "name": "Unity In-App Purchasing",
+            "description": "The Unity In-App Purchasing package (https://docs.unity.com/en-us/iap) lets you set up in-app purchases for your game across multiple app stores. The package isn't applicable for the Web platform.",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "Unity*.Purchasing*",
+                            "Purchasing.Common"
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}

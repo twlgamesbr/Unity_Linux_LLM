@@ -1,8 +1,6 @@
 using System;
 using NUnit.Framework;
 using Unity.Collections;
-using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace Unity.Entities.Tests
 {

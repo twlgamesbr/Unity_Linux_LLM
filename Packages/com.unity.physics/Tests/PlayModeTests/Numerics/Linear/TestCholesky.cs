@@ -6,7 +6,6 @@ using Unity.Jobs;
 using Unity.Numerics.Memory;
 using Unity.PerformanceTesting;
 using Unity.Physics.Tests;
-using UnityEngine;
 
 namespace Unity.Numerics.Linear.Tests
 {

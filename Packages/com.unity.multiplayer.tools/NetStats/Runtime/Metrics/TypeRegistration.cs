@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Reflection;
 using UnityEngine;
 #if UNITY_6000_5_OR_NEWER

@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using UnityEditor;
 using System.IO;
-using System.Collections;
 using UnityEngine.TextCore.LowLevel;
 using UnityEngine.TextCore.Text;
 

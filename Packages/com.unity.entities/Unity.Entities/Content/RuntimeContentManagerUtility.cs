@@ -4,7 +4,6 @@ using Unity.Entities.Serialization;
 using Unity.Collections.LowLevel.Unsafe;
 using System.Runtime.InteropServices;
 using Unity.Burst;
-using Unity.Entities.LowLevel;
 using SpinLock = Unity.Entities.LowLevel.SpinLock;
 
 namespace Unity.Entities.Content

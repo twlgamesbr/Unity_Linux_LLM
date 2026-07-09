@@ -6,7 +6,6 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Core.Compression;
 using Unity.Entities;
-using Unity.Entities.Content;
 using Unity.Entities.Baking;
 using Unity.Entities.Serialization;
 using Unity.Entities.Streaming;

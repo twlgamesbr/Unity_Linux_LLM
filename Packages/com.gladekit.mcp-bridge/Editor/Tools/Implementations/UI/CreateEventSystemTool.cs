@@ -1,11 +1,5 @@
-using System.Collections.Generic;
-using UnityEditor;
-using UnityEngine;
-using UnityEngine.EventSystems;
-using GladeAgenticAI.Core.Tools;
 
 #if GLADE_INPUT_SYSTEM
-using UnityEngine.InputSystem.UI;
 #endif
 
 #if GLADE_UGUI

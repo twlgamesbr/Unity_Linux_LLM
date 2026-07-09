@@ -1,0 +1,31 @@
+<engine:UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:engine="UnityEngine.UIElements"
+    xmlns:editor="UnityEditor.UIElements"
+    editor-extension-mode="True"
+>
+    <Style src="project://database/Packages/com.unity.web.stripping-tool/Editor/UI/SubmoduleSelectionWindow.uss"/>
+    <Style src="project://database/Packages/com.unity.web.stripping-tool/Editor/UI/CommonStyles.uss"/>
+    <editor:Toolbar>
+        <editor:ToolbarButton text="Select All" name="SelectAllButton" />
+        <editor:ToolbarButton text="Select None" name="SelectNoneButton" />
+        <editor:ToolbarSpacer/>
+        <editor:ToolbarButton
+            text="Import Profiling Data"
+            tooltip="Set submodules from profiling data."
+            name="SetFromProfilingDataButton"
+        />
+        <editor:ToolbarSpacer style="flex-grow: 1;"/>
+    </editor:Toolbar>
+    <engine:TwoPaneSplitView fixed-pane-initial-dimension="400">
+        <engine:ScrollView mode="Vertical" name="ScrollView" style="align-items: flex-start; min-width: 240px;">
+            <engine:MultiColumnTreeView selection-type="Single">
+                <engine:Columns stretch-mode="GrowAndFill">
+                    <engine:Column name="index" title="Name" min-width="120" stretchable="true" />
+                    <engine:Column name="active" title="Strip" width="40" />
+                </engine:Columns>
+            </engine:MultiColumnTreeView>
+        </engine:ScrollView>
+        <engine:ScrollView mode="Vertical" name="detail-pane" style="min-width: 200px; padding:5px"/>
+    </engine:TwoPaneSplitView>
+</engine:UXML>

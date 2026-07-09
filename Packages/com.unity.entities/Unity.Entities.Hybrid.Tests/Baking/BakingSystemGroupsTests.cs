@@ -1,10 +1,5 @@
-﻿using System;
-using NUnit.Framework;
-using Unity.Collections;
-using Unity.Entities.Conversion;
-using Unity.Entities.Tests;
+﻿using NUnit.Framework;
 using Unity.Scenes.Editor.Tests;
-using Unity.Transforms;
 using UnityEngine;
 
 namespace Unity.Entities.Hybrid.Tests.Baking

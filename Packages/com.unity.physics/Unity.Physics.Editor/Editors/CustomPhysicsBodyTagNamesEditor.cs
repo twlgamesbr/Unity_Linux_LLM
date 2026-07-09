@@ -1,7 +1,6 @@
 using Unity.Physics.Authoring;
 using UnityEditor;
 using UnityEditorInternal;
-using UnityEngine;
 
 namespace Unity.Physics.Editor
 {

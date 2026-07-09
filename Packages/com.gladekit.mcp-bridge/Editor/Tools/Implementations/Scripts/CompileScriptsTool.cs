@@ -1,10 +1,7 @@
 using System.Collections.Generic;
 using System.Text;
-using UnityEditor;
-using UnityEditor.Compilation;
-using UnityEngine;
-using GladeAgenticAI.Core.Tools;
 using GladeAgenticAI.Services;
+using UnityEditor;
 
 namespace GladeAgenticAI.Core.Tools.Implementations.Scripts
 {
@@ -21,11 +18,12 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Scripts
                 var extras = new Dictionary<string, object>
                 {
                     { "isCompiling", true },
-                    { "status", "compiling" }
+                    { "status", "compiling" },
                 };
                 return ToolUtils.CreateSuccessResponse(
                     "Unity is still compiling scripts. Call compile_scripts again to check when it finishes. Do NOT call add_component until compilation is complete.",
-                    extras);
+                    extras
+                );
             }
 
             // Not compiling — trigger a refresh in case new files haven't been picked up
@@ -37,11 +35,12 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Scripts
                 var extras = new Dictionary<string, object>
                 {
                     { "isCompiling", true },
-                    { "status", "compiling" }
+                    { "status", "compiling" },
                 };
                 return ToolUtils.CreateSuccessResponse(
                     "Compilation started after refresh. Call compile_scripts again to check when it finishes.",
-                    extras);
+                    extras
+                );
             }
 
             // Compilation is idle — check for errors from the last round
@@ -54,7 +53,7 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Scripts
                     { "isCompiling", false },
                     { "status", "idle" },
                     { "hasErrors", true },
-                    { "errorCount", errors.Count }
+                    { "errorCount", errors.Count },
                 };
                 return ToolUtils.CreateSuccessResponse(message, errorExtras);
             }
@@ -63,11 +62,12 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Scripts
             {
                 { "isCompiling", false },
                 { "status", "idle" },
-                { "hasErrors", false }
+                { "hasErrors", false },
             };
             return ToolUtils.CreateSuccessResponse(
                 "Compilation complete. All script types are ready to use with add_component.",
-                doneExtras);
+                doneExtras
+            );
         }
 
         private static string BuildErrorMessage(List<ErrorTracker.CompilationError> errors)
@@ -76,7 +76,9 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Scripts
             var sb = new StringBuilder();
             int shown = System.Math.Min(errors.Count, maxErrors);
 
-            sb.AppendLine($"Compilation finished with {errors.Count} error(s). Fix these errors before calling add_component or proceeding.");
+            sb.AppendLine(
+                $"Compilation finished with {errors.Count} error(s). Fix these errors before calling add_component or proceeding."
+            );
             sb.AppendLine();
 
             for (int i = 0; i < shown; i++)
@@ -97,7 +99,9 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Scripts
             }
 
             if (errors.Count > maxErrors)
-                sb.AppendLine($"... and {errors.Count - maxErrors} more error(s). Fix the above first.");
+                sb.AppendLine(
+                    $"... and {errors.Count - maxErrors} more error(s). Fix the above first."
+                );
 
             return sb.ToString().TrimEnd();
         }

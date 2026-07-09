@@ -5,13 +5,11 @@ using System.Text.RegularExpressions;
 using NUnit.Framework;
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Entities.Conversion;
 using Unity.Entities.Hybrid.Tests;
 using Unity.Entities.Tests;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.LowLevel;
-using UnityEngine.SceneManagement;
 using UnityEngine.TestTools;
 
 namespace Unity.Scenes.Editor.Tests

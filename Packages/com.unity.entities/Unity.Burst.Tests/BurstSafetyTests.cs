@@ -7,7 +7,6 @@ using Unity.Burst;
 using UnityEngine;
 using UnityEngine.TestTools;
 using System.Diagnostics;
-using Unity.Jobs.LowLevel.Unsafe;
 
 public class BurstSafetyTests
 {

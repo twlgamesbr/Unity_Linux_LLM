@@ -1,9 +1,6 @@
 using System;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
-using Unity.Burst;
 using Unity.Jobs;
-using Unity.Jobs.LowLevel.Unsafe;
 using UnityEngine.Scripting;
 
 namespace Unity.Entities

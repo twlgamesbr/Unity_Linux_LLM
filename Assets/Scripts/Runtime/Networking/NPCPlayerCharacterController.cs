@@ -27,11 +27,20 @@ namespace NPCSystem
     public sealed class NPCPlayerCharacterController : NetworkBehaviour
     {
         [Header("References")]
-        [SerializeField] NPCMultiplayerInputActions inputHandler;
-        [SerializeField] NPCCharacterMotor motor;
-        [SerializeField] NPCCharacterAnimatorBridge animBridge;
-        [SerializeField] NPCThirdPersonCameraController cameraController;
-        [SerializeField] NPCNetworkItemInteractor interactor;
+        [SerializeField]
+        NPCMultiplayerInputActions inputHandler;
+
+        [SerializeField]
+        NPCCharacterMotor motor;
+
+        [SerializeField]
+        NPCCharacterAnimatorBridge animBridge;
+
+        [SerializeField]
+        NPCThirdPersonCameraController cameraController;
+
+        [SerializeField]
+        NPCNetworkItemInteractor interactor;
 
         [Header("Input Asset")]
         public InputActionAsset inputActions;
@@ -44,7 +53,21 @@ namespace NPCSystem
         // ─── Singleton-style access for the owning client ───
         public static NPCPlayerCharacterController LocalInstance { get; private set; }
 
+        public static bool PendingUIModeRequest { get; private set; }
+
+        [Header("Runtime Status")]
         public bool IsInUIMode { get; private set; }
+
+        public static void RequestUIActive()
+        {
+            PendingUIModeRequest = true;
+            LocalInstance?.SetUIActive(true);
+        }
+
+        public static void ClearUIActiveRequest()
+        {
+            PendingUIModeRequest = false;
+        }
 
         bool _eventsSubscribed;
 
@@ -71,7 +94,19 @@ namespace NPCSystem
             if (IsOwner)
             {
                 LocalInstance = this;
-                EnableOwnerInput();
+                if (PendingUIModeRequest)
+                {
+                    SetUIActive(true);
+                }
+                else if (IsInUIMode)
+                {
+                    SetUIActive(true);
+                }
+                else
+                {
+                    EnableOwnerInput();
+                }
+
                 if (cameraController != null)
                     cameraController.StartFollowing();
             }
@@ -94,7 +129,16 @@ namespace NPCSystem
         void OnEnable()
         {
             if (!Application.isPlaying || (IsSpawned && IsOwner))
-                EnableOwnerInput();
+            {
+                if (IsInUIMode)
+                {
+                    SetUIActive(true);
+                }
+                else
+                {
+                    EnableOwnerInput();
+                }
+            }
         }
 
         void OnDisable()
@@ -217,6 +261,7 @@ namespace NPCSystem
                 inputHandler.EnableUIActions();
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
+                ClearUIActiveRequest();
             }
             else
             {
@@ -228,6 +273,8 @@ namespace NPCSystem
                     Cursor.visible = false;
                 }
             }
+
+            IsInUIMode = active;
         }
 
         void ResolveReferences()

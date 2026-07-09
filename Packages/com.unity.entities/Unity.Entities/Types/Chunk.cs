@@ -4,8 +4,6 @@ using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
 
 #if ENABLE_UNITY_CHUNK_METADATA_ACCESSOR_COUNTERS
 using Unity.Profiling;

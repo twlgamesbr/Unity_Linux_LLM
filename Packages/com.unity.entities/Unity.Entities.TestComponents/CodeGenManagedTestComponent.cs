@@ -1,5 +1,3 @@
-using System;
-
 namespace Unity.Entities.Tests
 {
 #if !UNITY_DISABLE_MANAGED_COMPONENTS

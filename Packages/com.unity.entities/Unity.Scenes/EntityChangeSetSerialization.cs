@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using Unity.Assertions;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Collections.NotBurstCompatible;

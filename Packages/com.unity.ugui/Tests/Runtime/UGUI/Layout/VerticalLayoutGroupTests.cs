@@ -1,12 +1,9 @@
 using System.IO;
-using System.Collections.Generic;
 using NUnit.Framework;
-using UnityEngine.EventSystems;
 using UnityEngine.TestTools;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.UI.Tests;
 
 namespace LayoutTests
 {

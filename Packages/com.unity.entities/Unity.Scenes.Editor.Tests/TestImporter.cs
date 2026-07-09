@@ -1,4 +1,3 @@
-using System.IO;
 using UnityEditor.AssetImporters;
 
 namespace Unity.Scenes.Tests

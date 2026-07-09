@@ -1,7 +1,5 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEditorInternal;
-using UnityEditor.AnimatedValues;
 
 namespace UnityEditor.UI
 {

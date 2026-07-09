@@ -4,7 +4,6 @@ using System.Reflection;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine.InputSystem.Layouts;
 using UnityEngine.InputSystem.Utilities;
-using UnityEngine.Scripting;
 
 namespace UnityEngine.InputSystem
 {

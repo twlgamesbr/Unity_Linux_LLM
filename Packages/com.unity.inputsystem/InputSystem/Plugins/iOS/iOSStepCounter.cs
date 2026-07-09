@@ -1,7 +1,6 @@
 #if UNITY_EDITOR || UNITY_IOS || PACKAGE_DOCS_GENERATION
 using System.Runtime.InteropServices;
 using AOT;
-using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine.InputSystem.Layouts;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.Utilities;

@@ -4,8 +4,7 @@
     "references": [
         "Unity.Burst",
         "Unity.Collections",
-        "Unity.Entities",
-        "Unity.Properties"
+        "Unity.Entities"
     ],
     "includePlatforms": [
         "Editor"
@@ -17,9 +16,7 @@
         "Mono.Cecil.dll",
         "Mono.Cecil.Rocks.dll",
         "Mono.Cecil.Pdb.dll",
-	"Unity.Cecil.Awesome.dll",
-        "Unity.IL2CPP",
-        "Unity.IL2CPP.Common"
+        "Unity.Cecil.Awesome.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

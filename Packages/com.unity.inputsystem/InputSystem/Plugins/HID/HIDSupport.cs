@@ -8,8 +8,6 @@ using UnityEngine.InputSystem.HID.Editor;
 
 namespace UnityEngine.InputSystem.HID
 {
-    using ShouldCreateHIDCallback = System.Func<HID.HIDDeviceDescriptor, bool?>;
-
     /// <summary>
     /// Adds support for generic HID devices to the input system.
     /// </summary>

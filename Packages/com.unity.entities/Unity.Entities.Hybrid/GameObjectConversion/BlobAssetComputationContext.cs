@@ -1,8 +1,5 @@
 using System;
 using Unity.Collections;
-using Unity.Collections.NotBurstCompatible;
-using UnityEngine;
-using UnityObject = UnityEngine.Object;
 
 namespace Unity.Entities
 {

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
-using GladeAgenticAI.Core.Tools;
 
 namespace GladeAgenticAI.Core.Tools.Implementations.Prefabs
 {
@@ -21,18 +20,25 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Prefabs
                 return ToolUtils.CreateErrorResponse("prefabPath is required");
 
             string parentPath = args.ContainsKey("parentPath") ? args["parentPath"].ToString() : "";
-            string childName = args.ContainsKey("childName") ? args["childName"].ToString() : "GameObject";
-            string primitiveType = args.ContainsKey("primitiveType") ? args["primitiveType"].ToString() : "";
+            string childName = args.ContainsKey("childName")
+                ? args["childName"].ToString()
+                : "GameObject";
+            string primitiveType = args.ContainsKey("primitiveType")
+                ? args["primitiveType"].ToString()
+                : "";
 
             // Normalize path
             if (!prefabPath.StartsWith("Assets/", StringComparison.OrdinalIgnoreCase))
                 prefabPath = "Assets/" + prefabPath;
 
             // Load prefab asset
-            UnityEngine.GameObject prefabAsset = AssetDatabase.LoadAssetAtPath<UnityEngine.GameObject>(prefabPath);
+            UnityEngine.GameObject prefabAsset =
+                AssetDatabase.LoadAssetAtPath<UnityEngine.GameObject>(prefabPath);
             if (prefabAsset == null)
             {
-                prefabAsset = ToolUtils.LoadAssetAtPathCaseInsensitive<UnityEngine.GameObject>(prefabPath);
+                prefabAsset = ToolUtils.LoadAssetAtPathCaseInsensitive<UnityEngine.GameObject>(
+                    prefabPath
+                );
                 if (prefabAsset == null)
                     return ToolUtils.CreateErrorResponse($"Prefab not found at '{prefabPath}'");
             }
@@ -45,10 +51,13 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Prefabs
                 UnityEngine.Transform current = prefabAsset.transform;
                 foreach (string segment in segments)
                 {
-                    if (string.IsNullOrEmpty(segment)) continue;
+                    if (string.IsNullOrEmpty(segment))
+                        continue;
                     UnityEngine.Transform child = FindChildByName(current, segment);
                     if (child == null)
-                        return ToolUtils.CreateErrorResponse($"Parent object '{parentPath}' not found in prefab hierarchy");
+                        return ToolUtils.CreateErrorResponse(
+                            $"Parent object '{parentPath}' not found in prefab hierarchy"
+                        );
                     current = child;
                 }
                 parentObject = current.gameObject;
@@ -66,7 +75,7 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Prefabs
                     "Cylinder" => PrimitiveType.Cylinder,
                     "Plane" => PrimitiveType.Plane,
                     "Quad" => PrimitiveType.Quad,
-                    _ => PrimitiveType.Cube
+                    _ => PrimitiveType.Cube,
                 };
                 childObject = UnityEngine.GameObject.CreatePrimitive(type);
                 childObject.name = childName;
@@ -88,10 +97,13 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Prefabs
                 ["prefabPath"] = prefabPath,
                 ["parentPath"] = parentPath ?? prefabAsset.name,
                 ["childName"] = childName,
-                ["childPath"] = parentPath != null ? $"{parentPath}/{childName}" : childName
+                ["childPath"] = parentPath != null ? $"{parentPath}/{childName}" : childName,
             };
 
-            return ToolUtils.CreateSuccessResponse($"Added child '{childName}' to '{parentObject.name}' in prefab '{prefabPath}'. Changes apply to all future instantiations.", extras);
+            return ToolUtils.CreateSuccessResponse(
+                $"Added child '{childName}' to '{parentObject.name}' in prefab '{prefabPath}'. Changes apply to all future instantiations.",
+                extras
+            );
         }
 
         private UnityEngine.Transform FindChildByName(UnityEngine.Transform parent, string name)
@@ -101,7 +113,7 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Prefabs
                 UnityEngine.Transform child = parent.GetChild(i);
                 if (string.Equals(child.name, name, StringComparison.OrdinalIgnoreCase))
                     return child;
-                
+
                 UnityEngine.Transform found = FindChildByName(child, name);
                 if (found != null)
                     return found;

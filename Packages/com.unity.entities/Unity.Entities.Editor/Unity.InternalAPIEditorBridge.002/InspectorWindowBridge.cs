@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using UnityEditor;
-using UnityObject = UnityEngine.Object;
 
 namespace Unity.Editor.Bridge
 {

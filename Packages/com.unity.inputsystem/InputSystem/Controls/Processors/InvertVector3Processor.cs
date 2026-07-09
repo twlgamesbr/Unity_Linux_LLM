@@ -1,5 +1,3 @@
-using UnityEngine.Scripting;
-
 namespace UnityEngine.InputSystem.Processors
 {
     /// <summary>

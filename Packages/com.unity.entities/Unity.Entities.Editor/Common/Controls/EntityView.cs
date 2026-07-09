@@ -1,5 +1,3 @@
-using System;
-using Unity.Hierarchy;
 using UnityEditor;
 using UnityEngine.UIElements;
 

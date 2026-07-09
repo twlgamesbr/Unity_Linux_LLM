@@ -2,8 +2,6 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
-using Unity.Physics;
-using Unity.Physics.Authoring;
 
 namespace Unity.Physics.Authoring
 {

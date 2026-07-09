@@ -1,17 +1,12 @@
 using System;
 using Unity.Collections;
 using System.Collections.Generic;
-using System.Text;
-using System.Xml;
 #if UNITY_EDITOR
 using Unity.Entities.Build;
 #endif
-using Unity.Collections.LowLevel.Unsafe;
-using Unity.Entities;
 using Unity.Entities.Baking;
 using UnityEngine;
 using Unity.Entities.Conversion;
-using Unity.Mathematics;
 
 namespace Unity.Entities
 {

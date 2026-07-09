@@ -2,7 +2,6 @@ using System.Linq;
 using NUnit.Framework;
 using Unity.Entities.Conversion;
 using UnityEngine;
-using UnityObject = UnityEngine.Object;
 
 namespace Unity.Entities.Tests.Conversion
 {

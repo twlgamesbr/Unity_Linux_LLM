@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.TextCore;
-using UnityEngine.TextCore.LowLevel;
 
 
 namespace TMPro

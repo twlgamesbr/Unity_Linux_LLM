@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using UnityEngine;
-using GladeAgenticAI.Core.Tools;
 
 namespace GladeAgenticAI.Core.Tools.Implementations.Animation
 {

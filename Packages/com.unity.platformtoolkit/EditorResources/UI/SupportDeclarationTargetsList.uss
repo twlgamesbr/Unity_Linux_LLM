@@ -1,0 +1,18 @@
+
+/* Overrides for the warning HelpBox to align the appearance to the one which Player settings can show when a Build Profile override is active. */
+
+#build-profile-warning {
+    min-width: 320px;
+}
+
+#build-profile-warning > HelpBox {
+    flex-direction: row;
+}
+
+#build-profile-warning > HelpBox > #edit-build-profile-button {
+    align-self: center;
+}
+
+#build-profile-warning > HelpBox > .unity-help-box__top-container > .unity-help-box__icon {
+    margin-top: 3px;
+}

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using GladeAgenticAI.Core.Tools;
 
 namespace GladeAgenticAI.Core.Tools.Implementations.Utility
 {
@@ -27,16 +26,17 @@ namespace GladeAgenticAI.Core.Tools.Implementations.Utility
 #endif
 
             string recommended = activeInputHandling;
-            string reason = activeInputHandling == "BOTH"
-                ? "BOTH – caller should decide from project scripts"
-                : "Active input handling is " + activeInputHandling;
+            string reason =
+                activeInputHandling == "BOTH"
+                    ? "BOTH – caller should decide from project scripts"
+                    : "Active input handling is " + activeInputHandling;
 
             var extras = new Dictionary<string, object>
             {
                 { "activeInputHandling", activeInputHandling },
                 { "newPackageInstalled", newPackageInstalled },
                 { "recommended", recommended },
-                { "reason", reason }
+                { "reason", reason },
             };
             return ToolUtils.CreateSuccessResponse("Input system info", extras);
         }

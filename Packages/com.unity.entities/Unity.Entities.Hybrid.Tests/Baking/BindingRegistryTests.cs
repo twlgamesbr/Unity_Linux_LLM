@@ -2,7 +2,6 @@ using System.Linq;
 using NUnit.Framework;
 using Unity.Entities.Tests;
 using Unity.Scenes.Editor.Tests;
-using UnityObject = UnityEngine.Object;
 
 namespace Unity.Entities.Hybrid.Tests.Baking
 {

@@ -1,4 +1,3 @@
-using System.Globalization;
 using UnityEngine;
 
 namespace Unity.Entities.TestComponents

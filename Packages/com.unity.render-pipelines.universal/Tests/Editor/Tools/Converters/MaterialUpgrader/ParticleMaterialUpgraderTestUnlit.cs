@@ -1,11 +1,7 @@
-using System;
 using System.Collections;
 using NUnit.Framework;
-using UnityEditor;
-using UnityEditor.Rendering;
 using UnityEditor.Rendering.Universal;
 using UnityEngine;
-using UnityEngine.TestTools;
 [Category("Graphics Tools")]
 class ParticleMaterialUpgraderTestUnlit : MaterialUpgraderTestBase<ParticleUpgrader>
 {

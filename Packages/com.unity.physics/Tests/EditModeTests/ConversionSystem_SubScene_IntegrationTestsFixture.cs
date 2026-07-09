@@ -6,7 +6,6 @@ using Unity.Scenes;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.LowLevel;
 using UnityEngine.SceneManagement;
 
 namespace Unity.Physics.Tests.Authoring

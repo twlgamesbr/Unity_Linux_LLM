@@ -1,0 +1,18 @@
+{
+  "name": "com.unity.serialization",
+  "displayName": "Serialization",
+  "version": "6.5.0",
+  "unity": "6000.5",
+  "description": "Use Unity's Serialization to serialize and deserialize from/to JSON and Binary formats.",
+  "keywords": [
+    "serialization",
+    "json",
+    "binary",
+    "unity"
+  ],
+  "dependencies": {
+    "com.unity.collections": "2.1.2",
+    "com.unity.burst": "1.7.2"
+  },
+  "_fingerprint": "a9c71a20a0830c7d14914a52fa36e21d741ec6d5"
+}

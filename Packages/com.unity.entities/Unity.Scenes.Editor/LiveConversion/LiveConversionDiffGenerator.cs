@@ -1,13 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Text;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Entities.Build;
 using Unity.Entities.Conversion;
 using Unity.Profiling;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Hash128 = Unity.Entities.Hash128;

@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Linq;
 using NUnit.Framework;
 using Unity.Burst;
 #if UNITY_EDITOR
@@ -7,8 +5,6 @@ using Unity.Scenes.Editor.Tests;
 #endif
 using Unity.Collections;
 using Unity.Entities;
-using UnityEngine;
-using UnityEngine.TestTools;
 
 namespace Unity.Scenes.Hybrid.Tests.Playmode
 {

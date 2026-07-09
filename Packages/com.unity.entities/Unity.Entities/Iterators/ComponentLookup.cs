@@ -1,8 +1,5 @@
 using System;
-using System.Diagnostics;
-using Unity.Burst;
 using Unity.Burst.CompilerServices;
-using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 
 namespace Unity.Entities

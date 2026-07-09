@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 using System.Diagnostics;
-using Unity.Collections;
-using Unity.Jobs.LowLevel.Unsafe;
 
 
 namespace Unity.Entities

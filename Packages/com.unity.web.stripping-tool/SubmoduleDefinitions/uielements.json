@@ -1,0 +1,1381 @@
+{
+    "submodules": [
+        {
+            "name": "UI Toolkit Framework",
+            "description": "UI Toolkit is a collection of features, resources, and tools for developing user interface (UI). (https://docs.unity3d.com/Documentation/Manual/UIElements.html)",
+            "version": "1.0.0",
+            "submodules": [
+                "UI Toolkit",
+                "UI Toolkit Visual Elements",
+                "UI Toolkit TextSelectingManipulator",
+                "UI Toolkit TextEditingManipulator"
+            ]
+        },
+        {
+            "name": "UI Toolkit Visual Elements",
+            "description": "Various UI Elements of UI Toolkit (https://docs.unity3d.com/Documentation/Manual/UIElements.html)",
+            "version": "1.0.0",
+            "submodules": [
+                "UI Toolkit Base Fields",
+                "UI Toolkit BaseVerticalCollectionView",
+                "UI Toolkit BoundsField",
+                "UI Toolkit BoundsIntField",
+                "UI Toolkit Box",
+                "UI Toolkit Button",
+                "UI Toolkit Columns",
+                "UI Toolkit ContextualMenu",
+                "UI Toolkit DoubleField",
+                "UI Toolkit DropdownMenu",
+                "UI Toolkit EnumField",
+                "UI Toolkit FloatField",
+                "UI Toolkit Foldout",
+                "UI Toolkit GroupBox",
+                "UI Toolkit Hash128Field",
+                "UI Toolkit HelpBox",
+                "UI Toolkit Image",
+                "UI Toolkit IMGUIContainer",
+                "UI Toolkit ImmediateModeElement",
+                "UI Toolkit ImmediateModeElement",
+                "UI Toolkit IntegerField",
+                "UI Toolkit Label",
+                "UI Toolkit ListView",
+                "UI Toolkit LongField",
+                "UI Toolkit MinMaxSlider",
+                "UI Toolkit MultiColumnController",
+                "UI Toolkit MultiColumnListView",
+                "UI Toolkit MultiColumnTreeView",
+                "UI Toolkit Painter2D",
+                "UI Toolkit PopupField",
+                "UI Toolkit PopupWindow",
+                "UI Toolkit ProgressBar",
+                "UI Toolkit RadioButton",
+                "UI Toolkit RadioButtonGroup",
+                "UI Toolkit RadioButtonGroup",
+                "UI Toolkit RectField",
+                "UI Toolkit RectIntField",
+                "UI Toolkit RepeatButton",
+                "UI Toolkit Scroller",
+                "UI Toolkit ScrollView",
+                "UI Toolkit Slider",
+                "UI Toolkit SliderInt",
+                "UI Toolkit Tab",
+                "UI Toolkit TabView",
+                "UI Toolkit TemplateContainer",
+                "UI Toolkit TextElement",
+                "UI Toolkit TextField",
+                "UI Toolkit TextInputBaseField<T0>",
+                "UI Toolkit TextValueField<T0>",
+                "UI Toolkit Toggle",
+                "UI Toolkit ToggleButtonGroup",
+                "UI Toolkit TreeView",
+                "UI Toolkit TwoPaneSplitView",
+                "UI Toolkit UIDocument",
+                "UI Toolkit UIRenderer",
+                "UI Toolkit UnsignedIntegerField",
+                "UI Toolkit UnsignedLongField",
+                "UI Toolkit Vector2Field",
+                "UI Toolkit Vector2IntField",
+                "UI Toolkit Vector3Field",
+                "UI Toolkit Vector3IntField",
+                "UI Toolkit Vector4Field",
+                "UI Toolkit VectorImage",
+                "UI Toolkit VisualElement",
+                "UI Toolkit VisualElementExtensions",
+                "UI Toolkit VisualElementFocusChangeDirection",
+                "UI Toolkit VisualElementFocusRing",
+                "UI Toolkit VisualTreeAsset"
+            ]
+        },
+        {
+            "name": "UI Toolkit Base Fields",
+            "description": "Base classes for UI elements with bindable value (https://docs.unity3d.com/ScriptReference/UIElements.BindableElement.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.BindableElement*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.BindableElement,UnityEngine.UIElements.BindableElement/UxmlTraits>::*",
+                            "* UnityEngine.UIElements.BaseField*",
+                            "* UnityEngine.UIElements.BaseBoolField*",
+                            "* UnityEngine.UIElements.BaseCompositeField*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit BaseVerticalCollectionView",
+            "description": "BaseVerticalCollectionView base UI Element (https://docs.unity3d.com/ScriptReference/UIElements.BaseVerticalCollectionView.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.BaseVerticalCollectionView*",
+                            "* UnityEngine.UIElements.CollectionViewController*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit BoundsField",
+            "description": "BoundsField UI Element (https://docs.unity3d.com/ScriptReference/UIElements.BoundsField.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.BoundsField*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.BoundsField,UnityEngine.UIElements.BoundsField/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit BoundsIntField",
+            "description": "BoundsIntField UI Element (https://docs.unity3d.com/ScriptReference/UIElements.BoundsIntField.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.BoundsIntField*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.BoundsIntField,UnityEngine.UIElements.BoundsIntField/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit Box",
+            "description": "Box UI Element (https://docs.unity3d.com/ScriptReference/UIElements.Box.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.Box*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.Box,UnityEngine.UIElements.Box/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit Button",
+            "description": "Button UI Element (https://docs.unity3d.com/ScriptReference/UIElements.Button.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.Button*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.Button,UnityEngine.UIElements.Button/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit Columns",
+            "description": "Columns data structures for multi column views (https://docs.unity3d.com/ScriptReference/UIElements.Columns.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.Columns*",
+                            "* UnityEngine.UIElements.Column*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit ContextualMenu",
+            "description": "Classes for contextual menus (https://docs.unity3d.com/ScriptReference/UIElements.ContextualMenuManager.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.ContextualMenuManager*",
+                            "* UnityEngine.UIElements.ContextualMenuManipulator*",
+                            "* UnityEngine.UIElements.ContextualMenuPopulateEvent*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit DoubleField",
+            "description": "DoubleField UI Element (https://docs.unity3d.com/ScriptReference/UIElements.DoubleField.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.DoubleField*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.DoubleField,UnityEngine.UIElements.DoubleField/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit DropdownMenu",
+            "description": "DropdownMenu UI Element (https://docs.unity3d.com/ScriptReference/UIElements.DropdownMenu.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.DropdownField*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.DropdownField,UnityEngine.UIElements.DropdownField/UxmlTraits>::*",
+                            "* UnityEngine.UIElements.GenericDropdownMenu*",
+                            "* UnityEngine.UIElements.DropdownMenu*",
+                            "* UnityEngine.UIElements.DropdownMenuAction*",
+                            "* UnityEngine.UIElements.DropdownMenuEventInfo*",
+                            "* UnityEngine.UIElements.DropdownMenuItem*",
+                            "* System.Collections.Generic.List`1<UnityEngine.UIElements.DropdownMenuItem>::*",
+                            "* System.Collections.Generic.List`1/Enumerator<UnityEngine.UIElements.DropdownMenuItem>::*",
+                            "* UnityEngine.UIElements.DropdownMenuSeparator*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit EnumField",
+            "description": "EnumField UI Element (https://docs.unity3d.com/ScriptReference/UIElements.EnumField.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.EnumField*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.EnumField,UnityEngine.UIElements.EnumField/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit FloatField",
+            "description": "EnumField UI Element (https://docs.unity3d.com/ScriptReference/UIElements.FloatField.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.FloatField*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.FloatField,UnityEngine.UIElements.FloatField/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit Foldout",
+            "description": "Foldout UI Element (https://docs.unity3d.com/ScriptReference/UIElements.Foldout.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.Foldout*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.Foldout,UnityEngine.UIElements.Foldout/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit GroupBox",
+            "description": "GroupBox UI Element (https://docs.unity3d.com/ScriptReference/UIElements.GroupBox.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.GroupBox*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.GroupBox,UnityEngine.UIElements.GroupBox/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit Hash128Field",
+            "description": "Hash128Field UI Element (https://docs.unity3d.com/ScriptReference/UIElements.Hash128Field.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.Hash128Field*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.Hash128Field,UnityEngine.UIElements.Hash128Field/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit HelpBox",
+            "description": "HelpBox UI Element (https://docs.unity3d.com/ScriptReference/UIElements.HelpBox.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.HelpBox*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.HelpBox,UnityEngine.UIElements.HelpBox/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit Image",
+            "description": "Image UI Element (https://docs.unity3d.com/ScriptReference/UIElements.Image.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.Image*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.Image,UnityEngine.UIElements.Image/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit IMGUIContainer",
+            "description": "IMGUIContainer UI Element (https://docs.unity3d.com/ScriptReference/UIElements.IMGUIContainer.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.IMGUIContainer*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.IMGUIContainer,UnityEngine.UIElements.Image/UxmlTraits>::*",
+                            "* UnityEngine.UIElements.IMGUIEvent*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit ImmediateModeElement",
+            "description": "ImmediateModeElement UI Element (https://docs.unity3d.com/ScriptReference/UIElements.ImmediateModeElement.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.ImmediateModeElement*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.ImmediateModeElement,UnityEngine.UIElements.ImmediateModeElement/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit ImmediateModeElement",
+            "description": "ImmediateModeElement UI Element (https://docs.unity3d.com/ScriptReference/UIElements.ImmediateModeElement.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.ImmediateModeElement*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.ImmediateModeElement,UnityEngine.UIElements.ImmediateModeElement/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit IntegerField",
+            "description": "IntegerField UI Element (https://docs.unity3d.com/ScriptReference/UIElements.IntegerField.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.IntegerField*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.IntegerField,UnityEngine.UIElements.IntegerField/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit Label",
+            "description": "Label UI Element (https://docs.unity3d.com/ScriptReference/UIElements.Label.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.Label*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.Label,UnityEngine.UIElements.Label/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit ListView",
+            "description": "ListView UI Element (https://docs.unity3d.com/ScriptReference/UIElements.ListView.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.BaseListView*",
+                            "* UnityEngine.UIElements.ListView*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.ListView,UnityEngine.UIElements.ListView/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit LongField",
+            "description": "LongField UI Element (https://docs.unity3d.com/ScriptReference/UIElements.LongField.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.LongField*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.LongField,UnityEngine.UIElements.LongField/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit MinMaxSlider",
+            "description": "MinMaxSlider UI Element (https://docs.unity3d.com/ScriptReference/UIElements.MinMaxSlider.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.MinMaxSlider*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.MinMaxSlider,UnityEngine.UIElements.MinMaxSlider/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit MultiColumnController",
+            "description": "Default controller for multi column UI elements (https://docs.unity3d.com/ScriptReference/UIElements.MultiColumnController.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.MultiColumnController*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit MultiColumnListView",
+            "description": "MultiColumnListView UI Element (https://docs.unity3d.com/ScriptReference/UIElements.MultiColumnListView.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.MultiColumnListViewController*",
+                            "* UnityEngine.UIElements.MultiColumnListView*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.MultiColumnListView,UnityEngine.UIElements.MultiColumnListView/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit MultiColumnTreeView",
+            "description": "MultiColumnTreeView UI Element (https://docs.unity3d.com/ScriptReference/UIElements.MultiColumnTreeView.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.MultiColumnTreeViewController*",
+                            "* UnityEngine.UIElements.DefaultMultiColumnTreeViewController*",
+                            "* UnityEngine.UIElements.MultiColumnTreeView*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.MultiColumnTreeView,UnityEngine.UIElements.MultiColumnTreeView/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit Painter2D",
+            "description": "Object to draw 2D vector graphics. (https://docs.unity3d.com/ScriptReference/UIElements.Painter2D.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.Painter2D*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit PopupField",
+            "description": "PopupField UI Element (https://docs.unity3d.com/ScriptReference/UIElements.PopupField_1.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.BasePopupField*",
+                            "* UnityEngine.UIElements.PopupField*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.PopupField*,UnityEngine.UIElements.PopupField*>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit PopupWindow",
+            "description": "PopupWindow UI Element (https://docs.unity3d.com/ScriptReference/UIElements.PopupWindow.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.PopupWindow*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.PopupWindow*,UnityEngine.UIElements.PopupWindow*>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit ProgressBar",
+            "description": "ProgressBar UI Element (https://docs.unity3d.com/ScriptReference/UIElements.ProgressBar.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.AbstractProgressBar*",
+                            "* UnityEngine.UIElements.ProgressBar*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.ProgressBar,UnityEngine.UIElements.ProgressBar/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit RadioButton",
+            "description": "RadioButton UI Element (https://docs.unity3d.com/ScriptReference/UIElements.RadioButton.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.RadioButton*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.RadioButton*,UnityEngine.UIElements.RadioButton*>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit RadioButtonGroup",
+            "description": "RadioButtonGroup UI Element (https://docs.unity3d.com/ScriptReference/UIElements.RadioButtonGroup.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.RadioButtonGroup*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.RadioButtonGroup*,UnityEngine.UIElements.RadioButtonGroup*>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit RadioButtonGroup",
+            "description": "RadioButtonGroup UI Element (https://docs.unity3d.com/ScriptReference/UIElements.RadioButtonGroup.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.RadioButtonGroup*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.RadioButtonGroup*,UnityEngine.UIElements.RadioButtonGroup*>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit RectField",
+            "description": "RectField UI Element (https://docs.unity3d.com/ScriptReference/UIElements.RectField.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.RectField*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.RectField*,UnityEngine.UIElements.RectField*>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit RectIntField",
+            "description": "RectIntField UI Element (https://docs.unity3d.com/ScriptReference/UIElements.RectIntField.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.RectIntField*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.RectIntField*,UnityEngine.UIElements.RectIntField*>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit RepeatButton",
+            "description": "RepeatButton UI Element (https://docs.unity3d.com/ScriptReference/UIElements.RepeatButton.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.RepeatButton*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.RepeatButton*,UnityEngine.UIElements.RepeatButton*>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit Scroller",
+            "description": "Scroller UI Element (https://docs.unity3d.com/ScriptReference/UIElements.Scroller.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.Scroller*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.Scroller*,UnityEngine.UIElements.Scroller*>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit ScrollView",
+            "description": "ScrollView UI Element (https://docs.unity3d.com/ScriptReference/UIElements.ScrollView.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.ScrollView*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.ScrollView*,UnityEngine.UIElements.ScrollView*>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit Slider",
+            "description": "Slider UI Element (https://docs.unity3d.com/ScriptReference/UIElements.Slider.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.BaseSlider*",
+                            "* UnityEngine.UIElements.Slider::*",
+                            "* UnityEngine.UIElements.Slider/*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.Slider,UnityEngine.UIElements.Slider/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit SliderInt",
+            "description": "SliderInt UI Element (https://docs.unity3d.com/ScriptReference/UIElements.SliderInt.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.SliderInt::*",
+                            "* UnityEngine.UIElements.SliderInt/*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.SliderInt,UnityEngine.UIElements.SliderInt/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit Tab",
+            "description": "Tab UI Element (https://docs.unity3d.com/ScriptReference/UIElements.Tab.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.Tab::*",
+                            "* UnityEngine.UIElements.Tab/*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.Tab,UnityEngine.UIElements.Tab/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit TabView",
+            "description": "TabView UI Element (https://docs.unity3d.com/ScriptReference/UIElements.TabView.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.TabView::*",
+                            "* UnityEngine.UIElements.TabView/*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.TabView,UnityEngine.UIElements.TabView/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit TemplateContainer",
+            "description": "TemplateContainer UI Element (https://docs.unity3d.com/ScriptReference/UIElements.TemplateContainer.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.TemplateContainer::*",
+                            "* UnityEngine.UIElements.TemplateContainer/*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.TemplateContainer,UnityEngine.UIElements.TemplateContainer/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit TextElement",
+            "description": "TextElement UI Element (https://docs.unity3d.com/ScriptReference/UIElements.TextElement.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.TextElement::*",
+                            "* UnityEngine.UIElements.TextElement/*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.TextElement,UnityEngine.UIElements.TextElement/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit TextField",
+            "description": "TextField UI Element (https://docs.unity3d.com/ScriptReference/UIElements.TextField.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.TextField::*",
+                            "* UnityEngine.UIElements.TextField/*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.TextField,UnityEngine.UIElements.TextField/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit TextInputBaseField<T0>",
+            "description": "TextInputBaseField<T0> UI Element (https://docs.unity3d.com/ScriptReference/UIElements.TextInputBaseField_1.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.TextInputBaseField`1*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit TextValueField<T0>",
+            "description": "TextValueField<T0> UI Element (https://docs.unity3d.com/ScriptReference/UIElements.TextValueField_1.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.TextValueField`1*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit Toggle",
+            "description": " Toggle UI Element (https://docs.unity3d.com/ScriptReference/UIElements.Toggle.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.Toggle::*",
+                            "* UnityEngine.UIElements.Toggle/*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.Toggle,UnityEngine.UIElements.Toggle/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit ToggleButtonGroup",
+            "description": " ToggleButtonGroup UI Element (https://docs.unity3d.com/ScriptReference/UIElements.ToggleButtonGroup.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.ToggleButtonGroup::*",
+                            "* UnityEngine.UIElements.ToggleButtonGroup/*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.ToggleButtonGroup,UnityEngine.UIElements.ToggleButtonGroup/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit TreeView",
+            "description": "TreeView UI Element (https://docs.unity3d.com/ScriptReference/UIElements.TreeView.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.DefaultTreeViewController*",
+                            "* UnityEngine.UIElements.TreeViewController*",
+                            "* UnityEngine.UIElements.TreeViewExpansionChangedArgs*",
+                            "* UnityEngine.UIElements.BaseTreeView*",
+                            "* UnityEngine.UIElements.TreeView*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.TreeView,UnityEngine.UIElements.TreeView/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit TwoPaneSplitView",
+            "description": " TwoPaneSplitView UI Element (https://docs.unity3d.com/ScriptReference/UIElements.TwoPaneSplitView.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.TwoPaneSplitView::*",
+                            "* UnityEngine.UIElements.TwoPaneSplitView/*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.TwoPaneSplitView,UnityEngine.UIElements.TwoPaneSplitView/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit UIDocument",
+            "description": " UIDocument (https://docs.unity3d.com/ScriptReference/UIElements.UIDocument.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.UIDocument*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit UIRenderer",
+            "description": " UIRenderer (https://docs.unity3d.com/ScriptReference/UIElements.UIRenderer.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.UIRenderer*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit UnsignedIntegerField",
+            "description": " UnsignedIntegerField UI Element (https://docs.unity3d.com/ScriptReference/UIElements.UnsignedIntegerField.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.UnsignedIntegerField::*",
+                            "* UnityEngine.UIElements.UnsignedIntegerField/*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.UnsignedIntegerField,UnityEngine.UIElements.UnsignedIntegerField/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit UnsignedLongField",
+            "description": " UnsignedLongField UI Element (https://docs.unity3d.com/ScriptReference/UIElements.UnsignedLongField.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.UnsignedLongField::*",
+                            "* UnityEngine.UIElements.UnsignedLongField/*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.UnsignedLongField,UnityEngine.UIElements.UnsignedLongField/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit Vector2Field",
+            "description": " Vector2Field UI Element (https://docs.unity3d.com/ScriptReference/UIElements.Vector2Field.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.Vector2Field::*",
+                            "* UnityEngine.UIElements.Vector2Field/*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.Vector2Field,UnityEngine.UIElements.Vector2Field/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit Vector2IntField",
+            "description": " Vector2IntField UI Element (https://docs.unity3d.com/ScriptReference/UIElements.Vector2IntField.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.Vector2IntField::*",
+                            "* UnityEngine.UIElements.Vector2IntField/*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.Vector2IntField,UnityEngine.UIElements.Vector2IntField/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit Vector3Field",
+            "description": " Vector3Field UI Element (https://docs.unity3d.com/ScriptReference/UIElements.Vector3Field.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.Vector3Field::*",
+                            "* UnityEngine.UIElements.Vector3Field/*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.Vector3Field,UnityEngine.UIElements.Vector3Field/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit Vector3IntField",
+            "description": " Vector3IntField UI Element (https://docs.unity3d.com/ScriptReference/UIElements.Vector3IntField.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.Vector3IntField::*",
+                            "* UnityEngine.UIElements.Vector3IntField/*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.Vector3IntField,UnityEngine.UIElements.Vector3IntField/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit Vector4Field",
+            "description": " Vector4Field UI Element (https://docs.unity3d.com/ScriptReference/UIElements.Vector4Field.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.Vector4Field::*",
+                            "* UnityEngine.UIElements.Vector4Field/*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.Vector4Field,UnityEngine.UIElements.Vector4Field/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit VectorImage",
+            "description": " VectorImage UI Element (https://docs.unity3d.com/ScriptReference/UIElements.VectorImage.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.VectorImage::*",
+                            "* UnityEngine.UIElements.VectorImage/*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.VectorImage,UnityEngine.UIElements.VectorImage/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit VisualElement",
+            "description": "VisualElement (https://docs.unity3d.com/ScriptReference/UIElements.VisualElement.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.VisualElement::*",
+                            "* UnityEngine.UIElements.VisualElement/*",
+                            "* UnityEngine.UIElements.BaseUxmlFactory`2<UnityEngine.UIElements.VisualElement,UnityEngine.UIElements.VisualElement/UxmlTraits>::*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit VisualElementExtensions",
+            "description": " VisualElementExtensions (https://docs.unity3d.com/ScriptReference/UIElements.VisualElementExtensions.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.VisualElementExtensions*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit VisualElementFocusChangeDirection",
+            "description": " VisualElementFocusChangeDirection (https://docs.unity3d.com/ScriptReference/UIElements.VisualElementFocusChangeDirection.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.VisualElementFocusChangeDirection*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit VisualElementFocusRing",
+            "description": " VisualElementFocusRing (https://docs.unity3d.com/ScriptReference/UIElements.VisualElementFocusRing.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.VisualElementFocusRing*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit VisualTreeAsset",
+            "description": " VisualTreeAsset (https://docs.unity3d.com/ScriptReference/UIElements.VisualTreeAsset.html)",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "* UnityEngine.UIElements.VisualTreeAsset*"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit TextSelectingManipulator",
+            "description": "Provides support for selecting text in UI Toolkit.",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ],
+                        "methods": [
+                            "* UnityEngine.UIElements.TextSelectingManipulator::*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "UI Toolkit TextEditingManipulator",
+            "description": "Provides support for editing text in UI Toolkit.",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "UnityEngine.UIElementsModule"
+                        ],
+                        "methods": [
+                            "* UnityEngine.UIElements.TextEditingManipulator::*"
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}

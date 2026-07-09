@@ -1,13 +1,3 @@
-using System;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Threading;
-using Unity.Burst;
-using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
-using Unity.Jobs.LowLevel.Unsafe;
-using Unity.Mathematics;
-
 namespace Unity.Entities
 {
     /// <summary>

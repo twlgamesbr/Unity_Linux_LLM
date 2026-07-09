@@ -1,0 +1,20 @@
+{
+    "submodules": [
+        {
+            "name": "AndroidJNIModule",
+            "description": "AndroidJNIModule (https://docs.unity3d.com/ScriptReference/UnityEngine.AndroidJNIModule.html) allows you to call Java code from C# scripts. AndroidJNIModule's features aren't applicable in Unity Web builds.",
+            "version": "1.0.0",
+            "functions": [
+            ],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "UnityEngine.AndroidJNIModule"
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}

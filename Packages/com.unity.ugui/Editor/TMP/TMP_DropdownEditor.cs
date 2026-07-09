@@ -1,7 +1,5 @@
-﻿using UnityEngine;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEditor.UI;
-using UnityEngine.UI;
 
 namespace TMPro.EditorUtilities
 {

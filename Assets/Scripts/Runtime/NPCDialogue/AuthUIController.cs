@@ -11,29 +11,69 @@ namespace NPCSystem
     public class AuthUIController : MonoBehaviour
     {
         [Header("Auth UI References")]
-        [SerializeField] GameObject authPanel;
-        [SerializeField] TMP_Text authTitle;
-        [SerializeField] TMP_InputField usernameInput;
-        [SerializeField] TMP_InputField passwordInput;
-        [SerializeField] GameObject confirmPasswordGroup;
-        [SerializeField] TMP_InputField confirmPasswordInput;
-        [SerializeField] Toggle rememberToggle;
-        [SerializeField] TMP_Text rememberLabel;
-        [SerializeField] Button submitButton;
-        [SerializeField] TMP_Text submitButtonText;
-        [SerializeField] Button switchModeButton;
-        [SerializeField] TMP_Text switchModeText;
-        [SerializeField] TMP_Text errorText;
-        [SerializeField] PlayerAuthService authService;
-        [SerializeField] Canvas authCanvas;
-        [SerializeField] GraphicRaycaster authRaycaster;
-        [SerializeField] Canvas gameplayCanvas;
-        [SerializeField] GraphicRaycaster gameplayRaycaster;
-        [SerializeField] int authCanvasSortingOrder = 100;
+        [SerializeField]
+        GameObject authPanel;
+
+        [SerializeField]
+        TMP_Text authTitle;
+
+        [SerializeField]
+        TMP_InputField usernameInput;
+
+        [SerializeField]
+        TMP_InputField passwordInput;
+
+        [SerializeField]
+        GameObject confirmPasswordGroup;
+
+        [SerializeField]
+        TMP_InputField confirmPasswordInput;
+
+        [SerializeField]
+        Toggle rememberToggle;
+
+        [SerializeField]
+        TMP_Text rememberLabel;
+
+        [SerializeField]
+        Button submitButton;
+
+        [SerializeField]
+        TMP_Text submitButtonText;
+
+        [SerializeField]
+        Button switchModeButton;
+
+        [SerializeField]
+        TMP_Text switchModeText;
+
+        [SerializeField]
+        TMP_Text errorText;
+
+        [SerializeField]
+        PlayerAuthService authService;
+
+        [SerializeField]
+        Canvas authCanvas;
+
+        [SerializeField]
+        GraphicRaycaster authRaycaster;
+
+        [SerializeField]
+        Canvas gameplayCanvas;
+
+        [SerializeField]
+        GraphicRaycaster gameplayRaycaster;
+
+        [SerializeField]
+        int authCanvasSortingOrder = 100;
 
         [Header("Validation")]
-        [SerializeField] int minUsernameLength = 3;
-        [SerializeField] int minPasswordLength = 6;
+        [SerializeField]
+        int minUsernameLength = 3;
+
+        [SerializeField]
+        int minPasswordLength = 6;
 
         [Header("Events")]
         public AuthEvents events = new AuthEvents();
@@ -75,9 +115,15 @@ namespace NPCSystem
 
         async void Start()
         {
-            NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.SceneBootstrap, NPCFlowStatus.Start,
-                NPCFlowLogLevel.Debug, "AuthUIController starting.",
-                source: nameof(AuthUIController));
+            NPCFlowLogger
+                .FindOrCreate()
+                ?.Log(
+                    NPCFlowStage.SceneBootstrap,
+                    NPCFlowStatus.Start,
+                    NPCFlowLogLevel.Debug,
+                    "AuthUIController starting.",
+                    source: nameof(AuthUIController)
+                );
 
             ResolveReferences();
             ConfigureInputs();
@@ -90,9 +136,15 @@ namespace NPCSystem
             _initialized = true;
             SetInputEnabled(true);
 
-            NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.SceneBootstrap, NPCFlowStatus.Success,
-                NPCFlowLogLevel.Debug, "AuthUIController ready.",
-                source: nameof(AuthUIController));
+            NPCFlowLogger
+                .FindOrCreate()
+                ?.Log(
+                    NPCFlowStage.SceneBootstrap,
+                    NPCFlowStatus.Success,
+                    NPCFlowLogLevel.Debug,
+                    "AuthUIController ready.",
+                    source: nameof(AuthUIController)
+                );
         }
 
         void OnValidate()
@@ -138,24 +190,81 @@ namespace NPCSystem
             }
             Transform root = authPanel != null ? authPanel.transform : null;
 
-            authTitle = authTitle != null ? authTitle : FindChildComponent<TMP_Text>(root, "AuthContent/AuthTitle");
-            usernameInput = usernameInput != null ? usernameInput : FindChildComponent<TMP_InputField>(root, "AuthContent/UsernameGroup/UsernameInput");
-            passwordInput = passwordInput != null ? passwordInput : FindChildComponent<TMP_InputField>(root, "AuthContent/PasswordGroup/PasswordInput");
-            confirmPasswordGroup = confirmPasswordGroup != null ? confirmPasswordGroup : FindChild(root, "AuthContent/ConfirmPasswordGroup");
-            confirmPasswordInput = confirmPasswordInput != null ? confirmPasswordInput : FindChildComponent<TMP_InputField>(root, "AuthContent/ConfirmPasswordGroup/ConfirmPasswordInput");
-            rememberToggle = rememberToggle != null ? rememberToggle : FindChildComponent<Toggle>(root, "AuthContent/RememberToggle");
-            rememberLabel = rememberLabel != null ? rememberLabel : FindChildComponent<TMP_Text>(root, "AuthContent/RememberToggle/RememberLabel");
-            submitButton = submitButton != null ? submitButton : FindChildComponent<Button>(root, "AuthContent/SubmitButton");
-            submitButtonText = submitButtonText != null ? submitButtonText : FindButtonText(submitButton);
-            switchModeButton = switchModeButton != null ? switchModeButton : FindChildComponent<Button>(root, "AuthContent/SwitchModeButton");
-            switchModeText = switchModeText != null ? switchModeText : FindButtonText(switchModeButton);
-            errorText = errorText != null ? errorText : FindChildComponent<TMP_Text>(root, "AuthContent/ErrorText");
+            authTitle =
+                authTitle != null
+                    ? authTitle
+                    : FindChildComponent<TMP_Text>(root, "AuthContent/AuthTitle");
+            usernameInput =
+                usernameInput != null
+                    ? usernameInput
+                    : FindChildComponent<TMP_InputField>(
+                        root,
+                        "AuthContent/UsernameGroup/UsernameInput"
+                    );
+            passwordInput =
+                passwordInput != null
+                    ? passwordInput
+                    : FindChildComponent<TMP_InputField>(
+                        root,
+                        "AuthContent/PasswordGroup/PasswordInput"
+                    );
+            confirmPasswordGroup =
+                confirmPasswordGroup != null
+                    ? confirmPasswordGroup
+                    : FindChild(root, "AuthContent/ConfirmPasswordGroup");
+            confirmPasswordInput =
+                confirmPasswordInput != null
+                    ? confirmPasswordInput
+                    : FindChildComponent<TMP_InputField>(
+                        root,
+                        "AuthContent/ConfirmPasswordGroup/ConfirmPasswordInput"
+                    );
+            rememberToggle =
+                rememberToggle != null
+                    ? rememberToggle
+                    : FindChildComponent<Toggle>(root, "AuthContent/RememberToggle");
+            rememberLabel =
+                rememberLabel != null
+                    ? rememberLabel
+                    : FindChildComponent<TMP_Text>(
+                        root,
+                        "AuthContent/RememberToggle/RememberLabel"
+                    );
+            submitButton =
+                submitButton != null
+                    ? submitButton
+                    : FindChildComponent<Button>(root, "AuthContent/SubmitButton");
+            submitButtonText =
+                submitButtonText != null ? submitButtonText : FindButtonText(submitButton);
+            switchModeButton =
+                switchModeButton != null
+                    ? switchModeButton
+                    : FindChildComponent<Button>(root, "AuthContent/SwitchModeButton");
+            switchModeText =
+                switchModeText != null ? switchModeText : FindButtonText(switchModeButton);
+            errorText =
+                errorText != null
+                    ? errorText
+                    : FindChildComponent<TMP_Text>(root, "AuthContent/ErrorText");
             authService = authService != null ? authService : GetComponent<PlayerAuthService>();
-            authService = authService != null ? authService : FindAnyObjectByType<PlayerAuthService>(FindObjectsInactive.Include);
-            authCanvas = authCanvas != null ? authCanvas : authPanel != null ? authPanel.GetComponent<Canvas>() : null;
-            authRaycaster = authRaycaster != null ? authRaycaster : authPanel != null ? authPanel.GetComponent<GraphicRaycaster>() : null;
-            gameplayCanvas = gameplayCanvas != null ? gameplayCanvas : FindGameplayCanvas(authPanel);
-            gameplayRaycaster = gameplayRaycaster != null ? gameplayRaycaster : gameplayCanvas != null ? gameplayCanvas.GetComponent<GraphicRaycaster>() : null;
+            authService =
+                authService != null
+                    ? authService
+                    : FindAnyObjectByType<PlayerAuthService>(FindObjectsInactive.Include);
+            authCanvas =
+                authCanvas != null ? authCanvas
+                : authPanel != null ? authPanel.GetComponent<Canvas>()
+                : null;
+            authRaycaster =
+                authRaycaster != null ? authRaycaster
+                : authPanel != null ? authPanel.GetComponent<GraphicRaycaster>()
+                : null;
+            gameplayCanvas =
+                gameplayCanvas != null ? gameplayCanvas : FindGameplayCanvas(authPanel);
+            gameplayRaycaster =
+                gameplayRaycaster != null ? gameplayRaycaster
+                : gameplayCanvas != null ? gameplayCanvas.GetComponent<GraphicRaycaster>()
+                : null;
         }
 
         void BindRuntimeEvents()
@@ -210,13 +319,33 @@ namespace NPCSystem
 
         void NormalizeVisualLayout()
         {
-            NormalizeTextRect(submitButtonText, new Vector2(320f, 40f), Vector2.zero, new Vector2(0.5f, 0.5f), TextAlignmentOptions.Center);
-            NormalizeTextRect(switchModeText, new Vector2(320f, 36f), Vector2.zero, new Vector2(0.5f, 0.5f), TextAlignmentOptions.Center);
-            NormalizeTextRect(rememberLabel, new Vector2(150f, 24f), new Vector2(96f, 0f), new Vector2(0f, 0.5f), TextAlignmentOptions.Left);
+            NormalizeTextRect(
+                submitButtonText,
+                new Vector2(320f, 40f),
+                Vector2.zero,
+                new Vector2(0.5f, 0.5f),
+                TextAlignmentOptions.Center
+            );
+            NormalizeTextRect(
+                switchModeText,
+                new Vector2(320f, 36f),
+                Vector2.zero,
+                new Vector2(0.5f, 0.5f),
+                TextAlignmentOptions.Center
+            );
+            NormalizeTextRect(
+                rememberLabel,
+                new Vector2(150f, 24f),
+                new Vector2(96f, 0f),
+                new Vector2(0f, 0.5f),
+                TextAlignmentOptions.Left
+            );
 
             if (authPanel != null)
             {
-                LayoutRebuilder.ForceRebuildLayoutImmediate(authPanel.GetComponent<RectTransform>());
+                LayoutRebuilder.ForceRebuildLayoutImmediate(
+                    authPanel.GetComponent<RectTransform>()
+                );
             }
         }
 
@@ -224,11 +353,16 @@ namespace NPCSystem
         {
             _isRegisterMode = registerMode;
 
-            if (authTitle != null) authTitle.text = registerMode ? "Create Account" : "Welcome Back";
-            if (submitButtonText != null) submitButtonText.text = registerMode ? "Register" : "Login";
-            if (switchModeText != null) switchModeText.text = registerMode ? "Switch to Login" : "Switch to Register";
-            if (confirmPasswordGroup != null) confirmPasswordGroup.SetActive(registerMode);
-            if (rememberToggle != null) rememberToggle.gameObject.SetActive(!registerMode);
+            if (authTitle != null)
+                authTitle.text = registerMode ? "Create Account" : "Welcome Back";
+            if (submitButtonText != null)
+                submitButtonText.text = registerMode ? "Register" : "Login";
+            if (switchModeText != null)
+                switchModeText.text = registerMode ? "Switch to Login" : "Switch to Register";
+            if (confirmPasswordGroup != null)
+                confirmPasswordGroup.SetActive(registerMode);
+            if (rememberToggle != null)
+                rememberToggle.gameObject.SetActive(!registerMode);
         }
 
         void ApplyCanvasFocus(bool isAuthVisible)
@@ -279,7 +413,8 @@ namespace NPCSystem
 
             string username = usernameInput != null ? usernameInput.text.Trim() : string.Empty;
             string password = passwordInput != null ? passwordInput.text : string.Empty;
-            string confirmPassword = confirmPasswordInput != null ? confirmPasswordInput.text : string.Empty;
+            string confirmPassword =
+                confirmPasswordInput != null ? confirmPasswordInput.text : string.Empty;
 
             HideError();
             SetInputEnabled(false);
@@ -296,7 +431,11 @@ namespace NPCSystem
                 if (_isRegisterMode)
                     await HandleRegisterAsync(username, password);
                 else
-                    await HandleLoginAsync(username, password, rememberToggle != null && rememberToggle.isOn);
+                    await HandleLoginAsync(
+                        username,
+                        password,
+                        rememberToggle != null && rememberToggle.isOn
+                    );
             }
             catch (Exception ex)
             {
@@ -347,25 +486,43 @@ namespace NPCSystem
             if (authService == null)
                 throw new InvalidOperationException("Player auth service is not configured.");
 
-            NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.UIInput, NPCFlowStatus.Start,
-                NPCFlowLogLevel.Info, "Login attempt.", source: nameof(AuthUIController),
-                data: new Dictionary<string, object>
-                {
-                    ["username"] = username,
-                    ["rememberMe"] = rememberMe
-                });
+            NPCFlowLogger
+                .FindOrCreate()
+                ?.Log(
+                    NPCFlowStage.UIInput,
+                    NPCFlowStatus.Start,
+                    NPCFlowLogLevel.Info,
+                    "Login attempt.",
+                    source: nameof(AuthUIController),
+                    data: new Dictionary<string, object>
+                    {
+                        ["username"] = username,
+                        ["rememberMe"] = rememberMe,
+                    }
+                );
 
-            PlayerAuthSessionResponse session = await authService.LoginAsync(username, password, rememberMe);
+            PlayerAuthSessionResponse session = await authService.LoginAsync(
+                username,
+                password,
+                rememberMe
+            );
 
-            NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.UIInput, NPCFlowStatus.Success,
-                NPCFlowLogLevel.Info, "Login success.", source: nameof(AuthUIController),
-                data: new Dictionary<string, object>
-                {
-                    ["username"] = session.username,
-                    ["rememberMe"] = rememberMe,
-                    ["sessionId"] = session.sessionId,
-                    ["expiresAtUtc"] = session.expiresAtUtc
-                });
+            NPCFlowLogger
+                .FindOrCreate()
+                ?.Log(
+                    NPCFlowStage.UIInput,
+                    NPCFlowStatus.Success,
+                    NPCFlowLogLevel.Info,
+                    "Login success.",
+                    source: nameof(AuthUIController),
+                    data: new Dictionary<string, object>
+                    {
+                        ["username"] = session.username,
+                        ["rememberMe"] = rememberMe,
+                        ["sessionId"] = session.sessionId,
+                        ["expiresAtUtc"] = session.expiresAtUtc,
+                    }
+                );
 
             events.onLoginSuccess?.Invoke(session.username);
         }
@@ -375,31 +532,54 @@ namespace NPCSystem
             if (authService == null)
                 throw new InvalidOperationException("Player auth service is not configured.");
 
-            NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.UIInput, NPCFlowStatus.Start,
-                NPCFlowLogLevel.Info, "Register attempt.", source: nameof(AuthUIController),
-                data: new Dictionary<string, object> { ["username"] = username });
+            NPCFlowLogger
+                .FindOrCreate()
+                ?.Log(
+                    NPCFlowStage.UIInput,
+                    NPCFlowStatus.Start,
+                    NPCFlowLogLevel.Info,
+                    "Register attempt.",
+                    source: nameof(AuthUIController),
+                    data: new Dictionary<string, object> { ["username"] = username }
+                );
 
-            PlayerAuthRegisterResponse registration = await authService.RegisterAsync(username, password);
+            PlayerAuthRegisterResponse registration = await authService.RegisterAsync(
+                username,
+                password
+            );
 
-            NPCFlowLogger.FindOrCreate()?.Log(NPCFlowStage.UIInput, NPCFlowStatus.Success,
-                NPCFlowLogLevel.Info, "Register success.", source: nameof(AuthUIController),
-                data: new Dictionary<string, object>
-                {
-                    ["username"] = registration.username,
-                    ["playerId"] = registration.playerId
-                });
+            NPCFlowLogger
+                .FindOrCreate()
+                ?.Log(
+                    NPCFlowStage.UIInput,
+                    NPCFlowStatus.Success,
+                    NPCFlowLogLevel.Info,
+                    "Register success.",
+                    source: nameof(AuthUIController),
+                    data: new Dictionary<string, object>
+                    {
+                        ["username"] = registration.username,
+                        ["playerId"] = registration.playerId,
+                    }
+                );
 
             events.onRegisterSuccess?.Invoke(registration.username);
         }
 
         void SetInputEnabled(bool enabled)
         {
-            if (usernameInput != null) usernameInput.interactable = enabled;
-            if (passwordInput != null) passwordInput.interactable = enabled;
-            if (confirmPasswordInput != null) confirmPasswordInput.interactable = enabled;
-            if (rememberToggle != null) rememberToggle.interactable = enabled && !_isRegisterMode;
-            if (submitButton != null) submitButton.interactable = enabled;
-            if (switchModeButton != null) switchModeButton.interactable = enabled;
+            if (usernameInput != null)
+                usernameInput.interactable = enabled;
+            if (passwordInput != null)
+                passwordInput.interactable = enabled;
+            if (confirmPasswordInput != null)
+                confirmPasswordInput.interactable = enabled;
+            if (rememberToggle != null)
+                rememberToggle.interactable = enabled && !_isRegisterMode;
+            if (submitButton != null)
+                submitButton.interactable = enabled;
+            if (switchModeButton != null)
+                switchModeButton.interactable = enabled;
         }
 
         public void ClosePanel()
@@ -415,7 +595,13 @@ namespace NPCSystem
             }
         }
 
-        static void NormalizeTextRect(TMP_Text label, Vector2 size, Vector2 anchoredPosition, Vector2 anchor, TextAlignmentOptions alignment)
+        static void NormalizeTextRect(
+            TMP_Text label,
+            Vector2 size,
+            Vector2 anchoredPosition,
+            Vector2 anchor,
+            TextAlignmentOptions alignment
+        )
         {
             if (label == null)
                 return;
@@ -440,7 +626,8 @@ namespace NPCSystem
             return button != null ? button.GetComponentInChildren<TMP_Text>(true) : null;
         }
 
-        static T FindChildComponent<T>(Transform root, string relativePath) where T : Component
+        static T FindChildComponent<T>(Transform root, string relativePath)
+            where T : Component
         {
             GameObject child = FindChild(root, relativePath);
             return child != null ? child.GetComponent<T>() : null;

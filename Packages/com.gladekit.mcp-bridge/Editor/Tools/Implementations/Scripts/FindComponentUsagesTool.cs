@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using GladeAgenticAI.Core.Tools;
 using GladeAgenticAI.Services;
 
 namespace GladeAgenticAI.Core.Tools.Implementations.Scripts

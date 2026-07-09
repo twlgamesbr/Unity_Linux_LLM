@@ -3,9 +3,6 @@ using Unity.Mathematics;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
-using System;
-using NUnit.Framework;
-using Unity.Numerics.Memory;
 
 namespace Unity.Numerics.Linear.Tests
 {

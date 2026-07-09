@@ -1,0 +1,10 @@
+.title-label {
+    font-size: 19px;
+    -unity-font-style: bold;
+    padding-bottom: 5px;
+    white-space: normal;
+}
+
+.description-label {
+    white-space: normal;
+}

@@ -1,12 +1,9 @@
 using System;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Threading;
 using Unity.Burst.CompilerServices;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
-using Unity.Jobs;
 
 namespace Unity.Entities
 {

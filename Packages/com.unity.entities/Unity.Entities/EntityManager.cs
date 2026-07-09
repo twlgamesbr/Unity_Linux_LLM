@@ -11,7 +11,6 @@ using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using Unity.Jobs.LowLevel.Unsafe;
 using Unity.Profiling;
-using Unity.Mathematics;
 using UnityEngine.Scripting;
 using UnityEngine.TestTools;
 

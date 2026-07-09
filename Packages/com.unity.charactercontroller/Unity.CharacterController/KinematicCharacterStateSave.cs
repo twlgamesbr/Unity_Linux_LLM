@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS0618
+#pragma warning disable CS0618
 using System;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -34,6 +34,7 @@ namespace Unity.CharacterController
         /// Saved physics collider data
         /// </summary>
         [NativeDisableContainerSafetyRestriction]
+        [System.NonSerialized]
         public NativeArray<byte> SavedPhysicsColliderMemory;
 
         /// <summary>
@@ -44,6 +45,7 @@ namespace Unity.CharacterController
         /// The character hits buffer
         /// </summary>
         [NativeDisableContainerSafetyRestriction]
+        [System.NonSerialized]
         public NativeArray<KinematicCharacterHit> SavedCharacterHitsBuffer;
         /// <summary>
         /// Count for the saved stateful character hits buffer
@@ -53,6 +55,7 @@ namespace Unity.CharacterController
         /// The stateful character hits buffer
         /// </summary>
         [NativeDisableContainerSafetyRestriction]
+        [System.NonSerialized]
         public NativeArray<StatefulKinematicCharacterHit> SavedStatefulHitsBuffer;
         /// <summary>
         /// Count for the saved deferred impulses buffer
@@ -62,6 +65,7 @@ namespace Unity.CharacterController
         /// The deferred impulses buffer
         /// </summary>
         [NativeDisableContainerSafetyRestriction]
+        [System.NonSerialized]
         public NativeArray<KinematicCharacterDeferredImpulse> SavedDeferredImpulsesBuffer;
         /// <summary>
         /// Count for the saved velocity projection hits buffer
@@ -71,6 +75,7 @@ namespace Unity.CharacterController
         /// The velocity projection hits buffer
         /// </summary>
         [NativeDisableContainerSafetyRestriction]
+        [System.NonSerialized]
         public NativeArray<KinematicVelocityProjectionHit> SavedVelocityProjectionHits;
 
         #if !UNITY_6000_5_OR_NEWER

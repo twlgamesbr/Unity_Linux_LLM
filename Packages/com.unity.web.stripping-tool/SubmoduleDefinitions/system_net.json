@@ -1,0 +1,25 @@
+{
+    "submodules": [
+        {
+            "name": "System.Net",
+            "description": "Provides access to classes for network protocols (https://learn.microsoft.com/en-us/dotnet/api/system.net).",
+            "version": "1.0.0",
+            "functions": [
+            ],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "System",
+                            "System.Net",
+                            "System.Net.*"
+                        ],
+                        "methods": [
+                            "*System.Net.*"
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}

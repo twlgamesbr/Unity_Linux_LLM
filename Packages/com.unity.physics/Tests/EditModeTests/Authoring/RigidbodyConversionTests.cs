@@ -1,12 +1,8 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
-using Unity.Collections;
-using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Physics.Authoring;
-using Unity.Physics.Extensions;
-using Unity.Physics.Systems;
 using UnityEngine;
 using UnityEngine.TestTools.Utils;
 

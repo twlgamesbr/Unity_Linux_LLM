@@ -205,9 +205,9 @@ def _write_report(path: Path, counts: dict[str, int], records: list[IndexRecord]
     lines = ["# Codebase Index Report", "", "## Counts", ""]
     lines.extend(f"- {k}: {v}" for k, v in counts.items())
     lines += ["", "## Records by Type", ""]
-    lines.extend(f"- {k}: {v}" for k, v in sorted(by_type.items()))
+    lines.extend(f"- {k}: {v}" for k, v in sorted(by_type.items(), key=lambda pair: str(pair[0])))
     lines += ["", "## Records by Assembly", ""]
-    lines.extend(f"- {k}: {v}" for k, v in sorted(by_asm.items()))
+    lines.extend(f"- {k}: {v}" for k, v in sorted(by_asm.items(), key=lambda pair: str(pair[0])))
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 

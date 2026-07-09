@@ -1,6 +1,4 @@
-using System;
 using NUnit.Framework;
-using Unity.Collections;
 
 namespace Unity.Entities.Tests
 {

@@ -1,0 +1,57 @@
+{
+    "submodules": [
+        {
+            "name": "System.DateTimeParse",
+            "description": "Provides access to classes that convert strings to DateTime objects (https://learn.microsoft.com/en-us/dotnet/api/system.datetime).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "mscorlib"
+                        ],
+                        "methods": [
+                            "* System.DateTimeParse::*",
+                            "* System.DateTimeParse/*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "System.DateTimeOffset",
+            "description": "Provides access to the struct that represents a point in time relative to Coordinate Universal Time (UTC) (https://learn.microsoft.com/en-us/dotnet/api/system.datetimeoffset).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "mscorlib"
+                        ],
+                        "methods": [
+                            "* System.DateTimeOffset::*"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "System.TimeZoneInfo",
+            "description": "Provides access to time zone information and conversions between time zones (https://learn.microsoft.com/en-us/dotnet/api/system.timezoneinfo).",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "mscorlib"
+                        ],
+                        "methods": [
+                            "* System.TimeZoneInfo::*",
+                            "* System.TimeZoneInfo/*"
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}

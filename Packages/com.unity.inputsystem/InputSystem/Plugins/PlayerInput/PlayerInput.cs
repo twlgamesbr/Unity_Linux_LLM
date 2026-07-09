@@ -7,7 +7,6 @@ using UnityEngine.InputSystem.Utilities;
 using UnityEngine.InputSystem.OnScreen;
 
 #if UNITY_EDITOR
-using UnityEngine.InputSystem.Editor;
 #endif
 
 #if PACKAGE_DOCS_GENERATION || UNITY_INPUT_SYSTEM_ENABLE_UI

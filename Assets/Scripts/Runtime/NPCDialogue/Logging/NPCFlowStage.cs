@@ -38,6 +38,6 @@ namespace NPCSystem
         PlayerSpawn,
         NpcSpawn,
         PlayerNameRegistration,
-        EditorWorkflow
+        EditorWorkflow,
     }
 }

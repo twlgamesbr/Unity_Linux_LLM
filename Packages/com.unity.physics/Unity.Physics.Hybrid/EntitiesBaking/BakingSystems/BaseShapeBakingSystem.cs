@@ -10,8 +10,6 @@ using Unity.Entities;
 using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Profiling;
-using UnityEngine;
-using UnityEngine.Profiling;
 using Hash128 = Unity.Entities.Hash128;
 
 namespace Unity.Physics.Authoring

@@ -1,0 +1,20 @@
+{
+    "name": "Unity.PlatformToolkit.LocalSaving.Editor",
+    "rootNamespace": "Unity.PlatformToolkit.LocalSaving.Editor",
+    "references": [
+        "Unity.PlatformToolkit",
+        "Unity.PlatformToolkit.Editor",
+        "Unity.PlatformToolkit.LocalSaving"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

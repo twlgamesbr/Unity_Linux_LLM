@@ -100,6 +100,7 @@ namespace Unity.CharacterController
         /// <summary>
         /// Hit entity
         /// </summary>
+        [System.NonSerialized]
         public Entity Entity;
         /// <summary>
         /// Hit rigidbody index
@@ -108,6 +109,7 @@ namespace Unity.CharacterController
         /// <summary>
         /// Hit collider key
         /// </summary>
+        [System.NonSerialized]
         public ColliderKey ColliderKey;
         /// <summary>
         /// Hit point

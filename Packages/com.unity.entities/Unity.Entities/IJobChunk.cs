@@ -1,5 +1,4 @@
 using System;
-using Unity.Assertions;
 using Unity.Burst;
 using Unity.Burst.CompilerServices;
 using Unity.Burst.Intrinsics;
@@ -7,7 +6,6 @@ using Unity.Jobs;
 using Unity.Jobs.LowLevel.Unsafe;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
-using System.Diagnostics;
 using Assert = UnityEngine.Assertions.Assert;
 
 namespace Unity.Entities

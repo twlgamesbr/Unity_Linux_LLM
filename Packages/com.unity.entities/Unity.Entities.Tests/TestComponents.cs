@@ -6,7 +6,6 @@ using Unity.Entities.Tests;
 using Unity.Assertions;
 using Unity.Burst;
 using Unity.Collections;
-using Unity.Burst.Intrinsics;
 using Unity.Entities.Serialization;
 
 [assembly: RegisterGenericComponentType(typeof(EcsTestGeneric<int>))]

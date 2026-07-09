@@ -1,12 +1,9 @@
 using System;
-using System.IO;
-using Unity.Assertions;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Entities.Serialization;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Hash128 = Unity.Entities.Hash128;
 
 namespace Unity.Scenes

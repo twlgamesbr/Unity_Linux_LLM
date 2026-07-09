@@ -1,5 +1,4 @@
-﻿using System.IO;
-using Unity.Entities;
+﻿using Unity.Entities;
 
 namespace Unity.Scenes.Editor
 {

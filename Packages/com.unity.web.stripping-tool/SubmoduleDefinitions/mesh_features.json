@@ -1,0 +1,182 @@
+{
+    "submodules": [
+        {
+            "name": "Mesh Features",
+            "description": "Various features related to UnityEngine.Mesh.",
+            "version": "1.1.0",
+            "submodules": [
+                "Mesh Optimizer",
+                "Mesh Combiner",
+                "Mesh Compression",
+                "Mesh Blend Shapes",
+                "Mesh Sprite Rendering",
+                "Mesh Script Bindings",
+                "Mesh Advanced Editing API",
+                "Mesh Recalculate Normals API",
+                "Mesh Recalculate Bounds API",
+                "Mesh Async Upload",
+                "Mesh Skinning"
+            ]
+        },
+        {
+            "name": "Mesh Combiner",
+            "description": "Provides support for batch rendering of meshes. Used by UnityEngine.Mesh.CombineMeshes().",
+            "version": "1.1.0",
+            "functions": [
+                "GetSubMeshBounds(CombineInstance const&, bool)",
+                "CombineMeshIndicesForStaticBatching(core::vector<CombineInstance, core::allocator<CombineInstance, 0ul>> const&, Mesh&, bool, bool)",
+                "unsigned long ExtractMeshIndices<unsigned int>(std::__2::vector<unsigned int, stl_allocator<unsigned int, (MemLabelIdentifier)1, 16>>&, CombineInstance const&, bool, unsigned long&, unsigned int*)",
+                "unsigned long ExtractMeshIndices<unsigned short>(std::__2::vector<unsigned int, stl_allocator<unsigned int, (MemLabelIdentifier)1, 16>>&, CombineInstance const&, bool, unsigned long&, unsigned short*)",
+                "CombineMeshVerticesForStaticBatching(core::vector<CombineInstance, core::allocator<CombineInstance, 0ul>> const&, core::basic_string<char, core::StringStorageDefault<char>> const&, Mesh&, bool, bool)",
+                "CombineMeshVerticesForStaticBatching(core::vector<CombineInstance, core::allocator<CombineInstance, 0ul>> const&, Mesh&, bool, bool)",
+                "IsBatchableAndGetMeshForChannel(CombineInstance const&, ShaderChannel, Mesh const**)",
+                "CopyOrSetW(VertexFormatAndDimension const&, VertexFormatAndDimension const&, unsigned char const*, unsigned char*)",
+                "CombineMeshMetricsForStaticBatching(core::vector<CombineInstance, core::allocator<CombineInstance, 0ul>> const&, Mesh&)",
+                "IsMeshBatchable(Mesh const*)",
+                "CombineMeshes(core::vector<CombineInstance, core::allocator<CombineInstance, 0ul>> const&, Mesh&, bool, bool, ScriptingExceptionPtr*)",
+                "MeshScripting::CombineMeshes(Mesh*, core::vector<MeshScripting::MeshCombineInstance, core::allocator<MeshScripting::MeshCombineInstance, 0ul>> const&, bool, bool, bool, ScriptingExceptionPtr*)",
+                "Mesh_CUSTOM_CombineMeshesImpl(void*, BindingsManagedSpan*, unsigned char, unsigned char, unsigned char)"
+            ],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "void UnityEngine.Mesh::CombineMeshes(*)",
+                            "void UnityEngine.Mesh::CombineMeshesImpl(*)",
+                            "void UnityEngine.Mesh::CombineMeshesImpl_Injected(*)"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.CoreModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Mesh Optimizer",
+            "description": "Provides support for optimizing meshes. Used by UnityEngine.Mesh.Optimize(), UnityEngine.Mesh.OptimizeIndexBuffers() and UnityEngine.Mesh.OptimizeReorderVertexBuffer()",
+            "version": "1.1.0",
+            "functions": [
+                "OptimizeRemapVertexDataChannels(Mesh&, core::vector<unsigned int, core::allocator<unsigned int, 0ul>>&, core::vector<unsigned int, core::allocator<unsigned int, 0ul>>&)",
+                "OptimizeReorderVertexBuffer(Mesh&, core::vector<unsigned int, core::allocator<unsigned int, 0ul>>*, core::vector<unsigned int, core::allocator<unsigned int, 0ul>>*)",
+                "SetVertexCacheOptimizerPrimsPerJobCount(int)",
+                "OptimizeIndexBuffers(Mesh&, core::vector<core::vector<unsigned char, core::allocator<unsigned char, 0ul>>, core::allocator<core::vector<unsigned char, core::allocator<unsigned char, 0ul>>, 0ul>>*)",
+                "void OptimizeTypedIndexBuffers<unsigned short>(Mesh&, core::vector<core::vector<unsigned char, core::allocator<unsigned char, 0ul>>, core::allocator<core::vector<unsigned char, core::allocator<unsigned char, 0ul>>, 0ul>>*)",
+                "void OptimizeTypedIndexBuffers<unsigned int>(Mesh&, core::vector<core::vector<unsigned char, core::allocator<unsigned char, 0ul>>, core::allocator<core::vector<unsigned char, core::allocator<unsigned char, 0ul>>, 0ul>>*)",
+                "DeOptimizeIndexBuffers(Mesh&)",
+                "VertexCacheDeOptimizer<unsigned int, 16>::DeOptimizeTriangles(unsigned int*, unsigned int, unsigned int const*, unsigned int)",
+                "OptimizeMeshJobData<unsigned short>::OptimizeMeshJob(OptimizeMeshJobData<unsigned short>*, unsigned int)",
+                "OptimizeMeshJobData<unsigned short>::OptimizeMeshJob(unsigned int)",
+                "void OptimizeVertexCache::OptimizeVertexCacheHits<unsigned short, 3u>(unsigned int, unsigned int, unsigned int, unsigned int, unsigned short const*, unsigned short*)",
+                "void OptimizeVertexCache::OptimizeVertexCacheHits<unsigned short, 4u>(unsigned int, unsigned int, unsigned int, unsigned int, unsigned short const*, unsigned short*)",
+                "OptimizeMeshJobData<unsigned int>::OptimizeMeshJob(OptimizeMeshJobData<unsigned int>*, unsigned int)",
+                "OptimizeMeshJobData<unsigned int>::OptimizeMeshJob(unsigned int)",
+                "void OptimizeVertexCache::OptimizeVertexCacheHits<unsigned int, 3u>(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int const*, unsigned int*)",
+                "void OptimizeVertexCache::OptimizeVertexCacheHits<unsigned int, 4u>(unsigned int, unsigned int, unsigned int, unsigned int, unsigned int const*, unsigned int*)",
+                "Mesh::Optimize()",
+                "Mesh::OptimizeIndexBuffers()",
+                "Mesh::OptimizeReorderVertexBuffer()",
+                "Mesh_CUSTOM_OptimizeImpl(void*)",
+                "Mesh_CUSTOM_OptimizeIndexBuffersImpl(void*)",
+                "Mesh_CUSTOM_OptimizeReorderVertexBufferImpl(void*)"
+            ],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "void UnityEngine.Mesh::Optimize()",
+                            "void UnityEngine.Mesh::OptimizeImpl()",
+                            "void UnityEngine.Mesh::OptimizeImpl_Injected(System.IntPtr)",
+                            "void UnityEngine.Mesh::OptimizeIndexBuffers()",
+                            "void UnityEngine.Mesh::OptimizeIndexBuffersImpl()",
+                            "void UnityEngine.Mesh::OptimizeIndexBuffersImpl_Injected(System.IntPtr)",
+                            "void UnityEngine.Mesh::OptimizeReorderVertexBuffer()",
+                            "void UnityEngine.Mesh::OptimizeReorderVertexBufferImpl()",
+                            "void UnityEngine.Mesh::OptimizeReorderVertexBufferImpl_Injected(System.IntPtr)"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.CoreModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Mesh Advanced Editing API",
+            "description": "Advanced C# API for manipulating meshes. Used by UnityEngine.Mesh::AllocateWritableMeshData(), UnityEngine.Mesh::ApplyAndDisposeWritableMeshData(), ...",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "void UnityEngine.Mesh::Clear()",
+                            "void UnityEngine.Mesh::ClearImpl(bool)",
+                            "void UnityEngine.Mesh::ClearImpl_Injected(System.IntPtr,bool)",
+                            "int UnityEngine.Mesh::get_subMeshCount()",
+                            "void UnityEngine.Mesh::set_subMeshCount(int)",
+                            "int UnityEngine.Mesh::get_vertexAttributeCount()",
+                            "int UnityEngine.Mesh::get_vertexBufferCount()",
+                            "int UnityEngine.Mesh::get_vertexCount()",
+                            "UnityEngine.Mesh/MeshDataArray UnityEngine.Mesh::AllocateWritableMeshData(int)",
+                            "void UnityEngine.Mesh::ApplyAndDisposeWritableMeshData(*)",
+                            "* UnityEngine.Mesh/MeshData::*",
+                            "int UnityEngine.Mesh/MeshDataArray::get_Length()",
+                            "UnityEngine.Mesh/MeshData UnityEngine.Mesh/MeshDataArray::get_Item(int)"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.CoreModule"
+                        ]
+                    }
+                ],
+                "exclude": [
+                    {
+                        "methods": [
+                            "void UnityEngine.Mesh/MeshData::.ctor(System.Int32)"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.CoreModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Mesh Recalculate Bounds API",
+            "description": "C# API for updating bounds of a mesh. Used by UnityEngine.Mesh::RecalculateBounds().",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "void UnityEngine.Mesh::RecalculateBounds(*)",
+                            "void UnityEngine.Mesh::RecalculateBoundsImpl(UnityEngine.Rendering.MeshUpdateFlags)",
+                            "void UnityEngine.Mesh::RecalculateBoundsImpl_Injected(System.IntPtr,UnityEngine.Rendering.MeshUpdateFlags)"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.CoreModule"
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Mesh Recalculate Normals API",
+            "description": "C# API for recalculating normals of a mesh. Used by UnityEngine.Mesh::RecalculateNormals().",
+            "version": "1.0.0",
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "methods": [
+                            "void UnityEngine.Mesh::RecalculateNormals(*)",
+                            "void UnityEngine.Mesh::RecalculateNormalsImp(UnityEngine.Rendering.MeshUpdateFlags)",
+                            "void UnityEngine.Mesh::RecalculateNormalsImpl_Injected(System.IntPtr,UnityEngine.Rendering.MeshUpdateFlags)"
+                        ],
+                        "assemblies": [
+                            "UnityEngine.CoreModule"
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}

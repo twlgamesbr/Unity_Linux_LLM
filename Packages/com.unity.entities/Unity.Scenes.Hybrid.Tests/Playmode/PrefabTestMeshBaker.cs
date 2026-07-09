@@ -1,6 +1,3 @@
-using Unity.Entities;
-using UnityEngine;
-
 namespace Unity.Scenes.Hybrid.Tests.Playmode
 {
     /*

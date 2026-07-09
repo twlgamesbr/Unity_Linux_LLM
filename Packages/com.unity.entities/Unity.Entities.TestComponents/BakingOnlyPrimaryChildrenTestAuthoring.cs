@@ -1,6 +1,5 @@
 using Unity.Burst;
 using Unity.Collections;
-using Unity.Entities.Hybrid.Baking;
 using UnityEngine;
 
 namespace Unity.Entities.Tests

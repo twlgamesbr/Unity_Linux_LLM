@@ -5,7 +5,6 @@ using Unity.Mathematics;
 using UnityEngine.U2D;
 
 #if USING_2DCOMMON
-using UnityEngine.U2D.Common;
 #endif
 
 namespace UnityEngine.Rendering.Universal

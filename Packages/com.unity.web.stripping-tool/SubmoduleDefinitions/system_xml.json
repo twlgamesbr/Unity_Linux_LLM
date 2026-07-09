@@ -1,0 +1,42 @@
+{
+    "submodules": [
+        {
+            "name": "System.Xml",
+            "description": "Provides standards-based support for processing XML using the .NET APIs (https://learn.microsoft.com/en-us/dotnet/api/system.xml).",
+            "version": "1.0.0",
+            "functions": [
+            ],
+            "csharpMethodFilters": {
+                "include": [
+                    {
+                        "assemblies": [
+                            "System.Xml"
+                        ]
+                    }
+                ],
+                "exclude": [
+                    {
+                        "methods": [
+                            "System.Boolean System.Xml.Ref::Equal(System.String,System.String)",
+                            "System.Boolean System.Xml.Schema.SchemaEntity::get_ParsingInProgress()",
+                            "System.String System.Xml.XmlAttribute::get_LocalName()",
+                            "System.Xml.XmlNodeType System.Xml.XmlDocument::get_NodeType()",
+                            "System.Int32 System.Xml.Serialization.XmlTypeMapElementInfo::GetHashCode()",
+                            "System.String System.Xml.Schema.DtdValidator/NamespaceManager::LookupNamespace(System.String)",
+                            "System.Xml.XmlTokenizedType System.Xml.Schema.Datatype_ENUMERATION::get_TokenizedType()",
+                            "System.String System.Xml.XmlCharacterData::get_InnerText()",
+                            "System.Void System.Xml.Schema.XmlSchema::set_BaseUri(System.Uri)",
+                            "System.Boolean System.Xml.Serialization.XmlTypeMapMember::get_IsOptionalValueType()",
+                            "System.Boolean System.Xml.Serialization.XmlTypeMapMember::get_IsReturnValue()",
+                            "System.Xml.Schema.SchemaElementDecl System.Xml.Schema.XmlSchemaElement::get_ElementDecl()",
+                            "System.Boolean System.Xml.XmlNode::CanInsertBefore(System.Xml.XmlNode,System.Xml.XmlNode)"
+                        ],
+                        "assemblies": [
+                            "System.Xml"
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
+}

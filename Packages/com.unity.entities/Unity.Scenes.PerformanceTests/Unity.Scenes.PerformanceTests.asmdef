@@ -3,9 +3,8 @@
     "references": [
         "Unity.PerformanceTesting",
         "Unity.Entities",
-		"Unity.Scenes",
+        "Unity.Scenes",
         "Unity.Mathematics",
-        "Unity.Properties",
         "Unity.Jobs",
         "Unity.Burst",
         "Unity.Collections",
