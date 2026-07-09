@@ -3,7 +3,7 @@ services:
     build:
       context: ../..
       dockerfile: Backend/webgl-client/Dockerfile
-    container_name: npc-dedicated-server
+    container_name: npc-server-webgl
     # Host networking: the server sees localhost as the host machine,
     # so it can reach LocalAI (8080, 11435), Qdrant (6333), and
     # PlayerAuthService (6000) directly, no extra config.
