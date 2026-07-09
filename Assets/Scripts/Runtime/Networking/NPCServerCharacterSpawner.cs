@@ -30,8 +30,10 @@ namespace NPCSystem
         [Header("Spawn Layout")]
         public Vector3 spawnOrigin = new Vector3(-4f, 1f, 6f);
         public Vector3 spawnSpacing = new Vector3(2.75f, 0f, 2.5f);
-        public int maxColumns = 3;
-        public bool clearExistingNpcCharactersBeforeSpawn = true;
+        [FormerlySerializedAs("MaxColumns")]
+        public int MaxColumns = 3;
+        [FormerlySerializedAs("ClearExistingNpcCharactersBeforeSpawn")]
+        public bool ClearExistingNpcCharactersBeforeSpawn = true;
 
         [Header("Diagnostics")]
         [SerializeField, ReadOnly]
@@ -124,7 +126,7 @@ namespace NPCSystem
                 return;
             }
 
-            if (clearExistingNpcCharactersBeforeSpawn)
+            if (ClearExistingNpcCharactersBeforeSpawn)
             {
                 ClearExistingNpcCharacters();
             }
@@ -262,7 +264,7 @@ namespace NPCSystem
 
         Vector3 GetSpawnPosition(int index)
         {
-            int columnCount = Mathf.Max(1, maxColumns);
+            int columnCount = Mathf.Max(1, MaxColumns);
             int row = index / columnCount;
             int column = index % columnCount;
             return spawnOrigin + new Vector3(spawnSpacing.x * column, 0f, spawnSpacing.z * row);

@@ -41,8 +41,8 @@ namespace NPCSystem.Tests
         {
             var bridgeObject = new GameObject(nameof(AuthNetworkBridgeTests));
             var bridge = bridgeObject.AddComponent<AuthNetworkBridge>();
-            bridge.startAsHost = true;
-            bridge.autoDetectStartupMode = false;
+            bridge.StartAsHost = true;
+            bridge.AutoDetectStartupMode = false;
 
             try
             {

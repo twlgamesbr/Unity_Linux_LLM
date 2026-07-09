@@ -64,7 +64,7 @@ namespace NPCSystem.Tests
             Assert.That(playerInput, Is.Not.Null);
             Assert.That(playerInput.actions, Is.SameAs(AssetDatabase.LoadAssetAtPath<InputActionAsset>(InputActionsPath)));
             Assert.That(playerInput.defaultActionMap, Is.EqualTo("Player"));
-            Assert.That(controller.lockCursorForOwner, Is.True);
+            Assert.That(controller.LockCursorForOwner, Is.True);
         }
 
         [Test]

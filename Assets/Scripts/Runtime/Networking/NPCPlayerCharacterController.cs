@@ -1,6 +1,7 @@
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 namespace NPCSystem
 {
@@ -44,11 +45,14 @@ namespace NPCSystem
 
         [Header("Input Asset")]
         public InputActionAsset inputActions;
-        public string actionMapName = "Player";
+        [FormerlySerializedAs("ActionMapName")]
+        public string ActionMapName = "Player";
 
         [Header("Owner Settings")]
-        public bool lockCursorForOwner = true;
-        public bool logSpawnDiagnostics = true;
+        [FormerlySerializedAs("LockCursorForOwner")]
+        public bool LockCursorForOwner = true;
+        [FormerlySerializedAs("LogSpawnDiagnostics")]
+        public bool LogSpawnDiagnostics = true;
 
         // ─── Singleton-style access for the owning client ───
         public static NPCPlayerCharacterController LocalInstance { get; private set; }
@@ -238,7 +242,7 @@ namespace NPCSystem
                 inputHandler.EnableActions();
             }
 
-            if (lockCursorForOwner)
+            if (LockCursorForOwner)
             {
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
@@ -250,7 +254,7 @@ namespace NPCSystem
             if (inputHandler != null)
                 inputHandler.DisableAll();
 
-            if (lockCursorForOwner && IsOwner)
+            if (LockCursorForOwner && IsOwner)
             {
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
@@ -274,7 +278,7 @@ namespace NPCSystem
             {
                 inputHandler.DisableUIActions();
                 inputHandler.EnableActions();
-                if (lockCursorForOwner)
+                if (LockCursorForOwner)
                 {
                     Cursor.lockState = CursorLockMode.Locked;
                     Cursor.visible = false;

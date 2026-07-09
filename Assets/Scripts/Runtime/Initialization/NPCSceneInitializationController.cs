@@ -49,17 +49,24 @@ namespace NPCSystem
         public NPCDialogueSmokeValidator SmokeValidator;
 
         [Header("Startup")]
-        public bool initializeOnStart = true;
-        public bool configureNetworkTransport = false;
+        [FormerlySerializedAs("InitializeOnStart")]
+        public bool InitializeOnStart = true;
+        [FormerlySerializedAs("ConfigureNetworkTransport")]
+        public bool ConfigureNetworkTransport = false;
 
         [Tooltip(
             "If true, initializes the dialogue manager immediately during scene start. Set to false to delay initialization until after player login (recommended for WebGL memory-smart start)."
         )]
-        public bool initializeDialogueManager = false;
-        public bool verifyBackendsDuringInitialization = false;
-        public bool initializeNetworkBridge = true;
-        public bool validateAfterInitialization = true;
-        public bool startNetworkingAfterInitialization = false;
+        [FormerlySerializedAs("InitializeDialogueManager")]
+        public bool InitializeDialogueManager = false;
+        [FormerlySerializedAs("VerifyBackendsDuringInitialization")]
+        public bool VerifyBackendsDuringInitialization = false;
+        [FormerlySerializedAs("InitializeNetworkBridge")]
+        public bool InitializeNetworkBridge = true;
+        [FormerlySerializedAs("ValidateAfterInitialization")]
+        public bool ValidateAfterInitialization = true;
+        [FormerlySerializedAs("StartNetworkingAfterInitialization")]
+        public bool StartNetworkingAfterInitialization = false;
 
         bool _started;
         Task _initializationTask;
@@ -88,7 +95,7 @@ namespace NPCSystem
 
         async void Start()
         {
-            if (!initializeOnStart)
+            if (!InitializeOnStart)
                 return;
             if (ShouldDeferInitializationForWebGL())
             {
@@ -157,34 +164,34 @@ namespace NPCSystem
                         ResolveReferences();
                         break;
                     case NPCSceneInitializationPhase.NetworkTransport:
-                        if (configureNetworkTransport && NetworkBootstrap != null)
+                        if (ConfigureNetworkTransport && NetworkBootstrap != null)
                         {
                             NetworkBootstrap.ApplyTransportConfiguration();
                         }
                         break;
                     case NPCSceneInitializationPhase.DialogueServices:
-                        if (initializeDialogueManager && DialogueManager != null)
+                        if (InitializeDialogueManager && DialogueManager != null)
                         {
                             await DialogueManager.InitializeAsync();
                         }
                         break;
                     case NPCSceneInitializationPhase.BackendReadiness:
-                        if (verifyBackendsDuringInitialization && BackendReadiness != null)
+                        if (VerifyBackendsDuringInitialization && BackendReadiness != null)
                         {
                             bool probeLocalAi =
-                                initializeDialogueManager
-                                && (DialogueManager != null && DialogueManager.initializeOnStart);
+                                InitializeDialogueManager
+                                && (DialogueManager != null && DialogueManager.InitializeOnStart);
                             await BackendReadiness.ProbeAsync(probeLocalAi);
                         }
                         break;
                     case NPCSceneInitializationPhase.NetworkBridge:
-                        if (initializeNetworkBridge && NetworkBridge != null)
+                        if (InitializeNetworkBridge && NetworkBridge != null)
                         {
                             await NetworkBridge.InitializeAsync();
                         }
                         break;
                     case NPCSceneInitializationPhase.Validation:
-                        if (validateAfterInitialization && SmokeValidator != null)
+                        if (ValidateAfterInitialization && SmokeValidator != null)
                         {
                             if (DialogueManager != null && !DialogueManager.IsInitialized)
                             {
@@ -207,7 +214,7 @@ namespace NPCSystem
                         }
                         break;
                     case NPCSceneInitializationPhase.Spawning:
-                        if (startNetworkingAfterInitialization && NetworkBootstrap != null)
+                        if (StartNetworkingAfterInitialization && NetworkBootstrap != null)
                         {
                             bool skipForBatchmodeBootstrap =
                                 Application.isBatchMode

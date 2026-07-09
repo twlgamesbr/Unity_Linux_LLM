@@ -43,7 +43,7 @@ namespace NPCSystem.Tests
                 dialogueManager.remoteHost = "127.0.0.1";
                 dialogueManager.remotePort = 8080;
                 service.authService = authService;
-                service.dialogueManager = dialogueManager;
+                service.DialogueManager = dialogueManager;
 
                 MethodInfo authMethod = typeof(NPCBackendReadinessService).GetMethod(
                     "BuildAuthProbeUrl",

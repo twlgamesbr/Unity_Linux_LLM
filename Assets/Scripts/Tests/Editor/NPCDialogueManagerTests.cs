@@ -17,7 +17,7 @@ namespace NPCSystem.Tests
             manager.profiles = new[] { profile };
             manager.persistHistory = false;
             manager.enableRAG = false;
-            manager.initializeOnStart = false;
+            manager.InitializeOnStart = false;
 
             string changedName = null;
             manager.OnNpcChanged.AddListener(name => changedName = name);
@@ -46,7 +46,7 @@ namespace NPCSystem.Tests
             manager.profiles = new[] { profile };
             manager.persistHistory = false;
             manager.enableRAG = false;
-            manager.initializeOnStart = false;
+            manager.InitializeOnStart = false;
 
             string errorMessage = null;
             string responseStart = null;
@@ -78,7 +78,7 @@ namespace NPCSystem.Tests
             manager.profiles = Array.Empty<NPCProfile>();
             manager.persistHistory = false;
             manager.enableRAG = false;
-            manager.initializeOnStart = false;
+            manager.InitializeOnStart = false;
 
             string errorMessage = null;
             manager.OnError.AddListener(message => errorMessage = message);
@@ -102,7 +102,7 @@ namespace NPCSystem.Tests
             manager.profiles = Array.Empty<NPCProfile>();
             manager.persistHistory = false;
             manager.enableRAG = false;
-            manager.initializeOnStart = false;
+            manager.InitializeOnStart = false;
 
             string errorMessage = null;
             manager.OnError.AddListener(message => errorMessage = message);
@@ -124,7 +124,7 @@ namespace NPCSystem.Tests
             var managerObject = new GameObject(nameof(NPCDialogueManagerTests));
             var manager = managerObject.AddComponent<NPCDialogueManager>();
             manager.profiles = Array.Empty<NPCProfile>();
-            manager.initializeOnStart = false;
+            manager.InitializeOnStart = false;
 
             try
             {
@@ -145,7 +145,7 @@ namespace NPCSystem.Tests
             var butler = CreateProfile("butler", "Butler");
             var maid = CreateProfile("maid", "Maid");
             manager.profiles = new[] { butler, maid };
-            manager.initializeOnStart = false;
+            manager.InitializeOnStart = false;
 
             try
             {
@@ -168,7 +168,7 @@ namespace NPCSystem.Tests
             var butler = CreateProfile("butler", "Butler");
             var maid = CreateProfile("maid", "Maid");
             manager.profiles = new[] { butler, maid };
-            manager.initializeOnStart = false;
+            manager.InitializeOnStart = false;
 
             try
             {
@@ -218,7 +218,7 @@ namespace NPCSystem.Tests
         {
             var managerObject = new GameObject(nameof(NPCDialogueManagerTests));
             var manager = managerObject.AddComponent<NPCDialogueManager>();
-            manager.initializeOnStart = false;
+            manager.InitializeOnStart = false;
 
             try
             {
@@ -239,7 +239,7 @@ namespace NPCSystem.Tests
         {
             var managerObject = new GameObject(nameof(NPCDialogueManagerTests));
             var manager = managerObject.AddComponent<NPCDialogueManager>();
-            manager.initializeOnStart = false;
+            manager.InitializeOnStart = false;
 
             try
             {
@@ -264,7 +264,7 @@ namespace NPCSystem.Tests
             manager.profiles = new[] { profile };
             manager.persistHistory = false;
             manager.enableRAG = false;
-            manager.initializeOnStart = false;
+            manager.InitializeOnStart = false;
 
             try
             {
@@ -293,7 +293,7 @@ namespace NPCSystem.Tests
             manager.profiles = new[] { profile };
             manager.persistHistory = true;
             manager.enableRAG = false;
-            manager.initializeOnStart = false;
+            manager.InitializeOnStart = false;
 
             try
             {
@@ -332,7 +332,7 @@ namespace NPCSystem.Tests
             manager.profiles = Array.Empty<NPCProfile>();
             manager.persistHistory = false;
             manager.enableRAG = false;
-            manager.initializeOnStart = false;
+            manager.InitializeOnStart = false;
 
             try
             {
@@ -356,7 +356,7 @@ namespace NPCSystem.Tests
             manager.profiles = new[] { profile };
             manager.persistHistory = false;
             manager.enableRAG = false;
-            manager.initializeOnStart = false;
+            manager.InitializeOnStart = false;
 
             try
             {

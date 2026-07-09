@@ -49,9 +49,9 @@ namespace NPCSystem.Tests
 
             var controller = NPCTestHelpers.RequireComponent<NPCSceneInitializationController>("NPCSceneInitialization");
 
-            Assert.That(controller.configureNetworkTransport, Is.False, "Scene initialization must not duplicate NPCNetworkBootstrap transport configuration in the Docker dedicated-server flow.");
-            Assert.That(controller.startNetworkingAfterInitialization, Is.False, "Scene initialization must not compete with bootstrap/batchmode startup authority.");
-            Assert.That(controller.networkBootstrap, Is.Not.Null, "Scene initialization should still reference bootstrap for validation/explicit workflows.");
+            Assert.That(controller.ConfigureNetworkTransport, Is.False, "Scene initialization must not duplicate NPCNetworkBootstrap transport configuration in the Docker dedicated-server flow.");
+            Assert.That(controller.StartNetworkingAfterInitialization, Is.False, "Scene initialization must not compete with bootstrap/batchmode startup authority.");
+            Assert.That(controller.NetworkBootstrap, Is.Not.Null, "Scene initialization should still reference bootstrap for validation/explicit workflows.");
         }
 
         static void AssertExecutionOrder<T>(int expectedOrder)

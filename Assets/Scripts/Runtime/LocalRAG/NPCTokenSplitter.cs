@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace NPCSystem
 {
@@ -9,7 +10,8 @@ namespace NPCSystem
     public class NPCTokenSplitter : NPCChunking
     {
         [Tooltip("number of tokens by which to split phrases into chunks")]
-        public int numTokens = 10;
+        [FormerlySerializedAs("NumTokens")]
+        public int NumTokens = 10;
 
         protected int DetermineEndIndex(
             string input,
@@ -53,9 +55,9 @@ namespace NPCSystem
                 return indices;
 
             int startIndex = 0;
-            for (int i = 0; i < tokens.Count; i += numTokens)
+            for (int i = 0; i < tokens.Count; i += NumTokens)
             {
-                int batchTokens = Math.Min(tokens.Count, i + numTokens) - i;
+                int batchTokens = Math.Min(tokens.Count, i + NumTokens) - i;
                 string detokenised = await search.Detokenize(tokens.GetRange(i, batchTokens));
                 int endIndex = DetermineEndIndex(input, detokenised, startIndex);
                 indices.Add((startIndex, endIndex));

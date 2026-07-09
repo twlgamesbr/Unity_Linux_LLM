@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 namespace NPCSystem
 {
@@ -28,43 +29,61 @@ namespace NPCSystem
 
         public InputActionAsset inputActions;
 
-        public string actionMapName = "Player";
+        [FormerlySerializedAs("ActionMapName")]
+        public string ActionMapName = "Player";
 
-        public string moveActionName = "Move";
+        [FormerlySerializedAs("MoveActionName")]
+        public string MoveActionName = "Move";
 
-        public string lookActionName = "Look";
+        [FormerlySerializedAs("LookActionName")]
+        public string LookActionName = "Look";
 
-        public string jumpActionName = "Jump";
+        [FormerlySerializedAs("JumpActionName")]
+        public string JumpActionName = "Jump";
 
-        public string sprintActionName = "Sprint";
+        [FormerlySerializedAs("SprintActionName")]
+        public string SprintActionName = "Sprint";
 
-        public float walkSpeed = 3.5f;
+        [FormerlySerializedAs("WalkSpeed")]
+        public float WalkSpeed = 3.5f;
 
-        public float sprintSpeed = 6.0f;
+        [FormerlySerializedAs("SprintSpeed")]
+        public float SprintSpeed = 6.0f;
 
-        public float rotationSpeed = 720f;
+        [FormerlySerializedAs("RotationSpeed")]
+        public float RotationSpeed = 720f;
 
-        public float jumpHeight = 1.25f;
+        [FormerlySerializedAs("JumpHeight")]
+        public float JumpHeight = 1.25f;
 
-        public float gravity = -24f;
+        [FormerlySerializedAs("Gravity")]
+        public float Gravity = -24f;
 
-        public float groundedStickVelocity = -2f;
+        [FormerlySerializedAs("GroundedStickVelocity")]
+        public float GroundedStickVelocity = -2f;
 
-        public bool driveMainCameraForOwner = true;
+        [FormerlySerializedAs("DriveMainCameraForOwner")]
+        public bool DriveMainCameraForOwner = true;
 
         public Vector3 cameraOffset = new Vector3(0f, 4.5f, -6f);
 
-        public float cameraFollowSharpness = 12f;
+        [FormerlySerializedAs("CameraFollowSharpness")]
+        public float CameraFollowSharpness = 12f;
 
-        public float lookYawSensitivity = 0.12f;
+        [FormerlySerializedAs("LookYawSensitivity")]
+        public float LookYawSensitivity = 0.12f;
 
-        public bool lockCursorForOwner = false;
+        [FormerlySerializedAs("LockCursorForOwner")]
+        public bool LockCursorForOwner = false;
 
-        public bool usePlayerInputCopy = true;
+        [FormerlySerializedAs("UsePlayerInputCopy")]
+        public bool UsePlayerInputCopy = true;
 
-        public bool allowKeyboardFallback = true;
+        [FormerlySerializedAs("AllowKeyboardFallback")]
+        public bool AllowKeyboardFallback = true;
 
-        public bool logSpawnDiagnostics = true;
+        [FormerlySerializedAs("LogSpawnDiagnostics")]
+        public bool LogSpawnDiagnostics = true;
 
         Vector2 _moveInput;
         Vector2 _lookInput;
@@ -106,7 +125,7 @@ namespace NPCSystem
 #if !UNITY_SERVER
                 EnableInput();
 #endif
-                if (logSpawnDiagnostics)
+                if (LogSpawnDiagnostics)
                 {
 #if !UNITY_SERVER
                     string resolvedMoveAction = _moveAction != null ? _moveAction.name : "missing";
@@ -122,13 +141,13 @@ namespace NPCSystem
                                 NetworkManager.Singleton != null
                                     ? NetworkManager.Singleton.LocalClientId
                                     : 0ul,
-                            ["actionMap"] = actionMapName,
+                            ["actionMap"] = ActionMapName,
                             ["moveAction"] = resolvedMoveAction,
                         }
                     );
                 }
 
-                if (lockCursorForOwner)
+                if (LockCursorForOwner)
                 {
                     Cursor.lockState = CursorLockMode.Locked;
                     Cursor.visible = false;
@@ -249,17 +268,17 @@ namespace NPCSystem
 #if !UNITY_SERVER
         void EnableInput()
         {
-            if (usePlayerInputCopy && playerInput != null)
+            if (UsePlayerInputCopy && playerInput != null)
             {
-                if (!string.IsNullOrWhiteSpace(actionMapName))
+                if (!string.IsNullOrWhiteSpace(ActionMapName))
                 {
-                    playerInput.defaultActionMap = actionMapName;
+                    playerInput.defaultActionMap = ActionMapName;
                 }
 
                 playerInput.ActivateInput();
-                if (!string.IsNullOrWhiteSpace(actionMapName))
+                if (!string.IsNullOrWhiteSpace(ActionMapName))
                 {
-                    playerInput.SwitchCurrentActionMap(actionMapName);
+                    playerInput.SwitchCurrentActionMap(ActionMapName);
                 }
 
                 if (playerInput.actions != null)
@@ -291,11 +310,11 @@ namespace NPCSystem
         {
             if (inputActions == null)
                 return;
-            InputActionMap map = inputActions.FindActionMap(actionMapName, false);
-            _moveAction = map?.FindAction(moveActionName, false);
-            _lookAction = map?.FindAction(lookActionName, false);
-            _jumpAction = map?.FindAction(jumpActionName, false);
-            _sprintAction = map?.FindAction(sprintActionName, false);
+            InputActionMap map = inputActions.FindActionMap(ActionMapName, false);
+            _moveAction = map?.FindAction(MoveActionName, false);
+            _lookAction = map?.FindAction(LookActionName, false);
+            _jumpAction = map?.FindAction(JumpActionName, false);
+            _sprintAction = map?.FindAction(SprintActionName, false);
         }
 
         void ReadInput()
@@ -306,7 +325,7 @@ namespace NPCSystem
                     : Vector2.zero;
             _lookInput = _lookAction != null ? _lookAction.ReadValue<Vector2>() : Vector2.zero;
 
-            if (allowKeyboardFallback && _moveInput.sqrMagnitude < 0.0001f)
+            if (AllowKeyboardFallback && _moveInput.sqrMagnitude < 0.0001f)
             {
                 Vector2 fallbackMove = Vector2.zero;
                 Keyboard keyboard = Keyboard.current;
@@ -341,13 +360,13 @@ namespace NPCSystem
             bool grounded = IsGrounded();
             if (grounded && _verticalVelocity < 0f)
             {
-                _verticalVelocity = groundedStickVelocity;
+                _verticalVelocity = GroundedStickVelocity;
             }
 
 #if !UNITY_SERVER
             if (grounded && _jumpAction != null && _jumpAction.WasPressedThisFrame())
             {
-                _verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
+                _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
                 if (animator != null)
                 {
                     animator.SetTrigger(JumpHash);
@@ -357,7 +376,7 @@ namespace NPCSystem
             bool sprinting =
                 (_sprintAction != null && _sprintAction.IsPressed())
                 || (
-                    allowKeyboardFallback
+                    AllowKeyboardFallback
                     && Keyboard.current != null
                     && (
                         Keyboard.current.leftShiftKey.isPressed
@@ -367,7 +386,7 @@ namespace NPCSystem
 #else
             bool sprinting = false;
 #endif
-            float targetSpeed = sprinting ? sprintSpeed : walkSpeed;
+            float targetSpeed = sprinting ? SprintSpeed : WalkSpeed;
             Vector3 planarMove = new Vector3(_moveInput.x, 0f, _moveInput.y);
             planarMove = Vector3.ClampMagnitude(planarMove, 1f);
 
@@ -382,12 +401,12 @@ namespace NPCSystem
                 transform.rotation = Quaternion.RotateTowards(
                     transform.rotation,
                     targetRotation,
-                    rotationSpeed * deltaTime
+                    RotationSpeed * deltaTime
                 );
                 planarMove = worldMove;
             }
 
-            _verticalVelocity += gravity * deltaTime;
+            _verticalVelocity += Gravity * deltaTime;
             Vector3 velocity = planarMove * targetSpeed + Vector3.up * _verticalVelocity;
             characterController.Move(velocity * deltaTime);
 #if !UNITY_SERVER
@@ -411,16 +430,16 @@ namespace NPCSystem
 
         void UpdateOwnerCamera(float deltaTime)
         {
-            if (!driveMainCameraForOwner)
+            if (!DriveMainCameraForOwner)
                 return;
             _mainCamera ??= Camera.main;
             if (_mainCamera == null || cameraFollowTarget == null)
                 return;
 
-            _yaw += _lookInput.x * lookYawSensitivity;
+            _yaw += _lookInput.x * LookYawSensitivity;
             Quaternion cameraYaw = Quaternion.Euler(0f, _yaw, 0f);
             Vector3 targetPosition = cameraFollowTarget.position + cameraYaw * cameraOffset;
-            float t = 1f - Mathf.Exp(-cameraFollowSharpness * deltaTime);
+            float t = 1f - Mathf.Exp(-CameraFollowSharpness * deltaTime);
             _mainCamera.transform.position = Vector3.Lerp(
                 _mainCamera.transform.position,
                 targetPosition,

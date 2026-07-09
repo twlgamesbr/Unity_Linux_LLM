@@ -21,7 +21,8 @@ namespace NPCSystem
         public GameObject ItemPrefab;
         [FormerlySerializedAs("ItemPrefabResourcesPath")]
         public string ItemPrefabResourcesPath = "Networking/NPCTransferableItem";
-        public string initialNpcSlug = "butler";
+        [FormerlySerializedAs("InitialNpcSlug")]
+        public string InitialNpcSlug = "butler";
         public Vector3 fallbackWorldPosition = new Vector3(0f, 1f, 4f);
 
         [SerializeField, ReadOnly]
@@ -65,9 +66,9 @@ namespace NPCSystem
                 ItemPrefab = Resources.Load<GameObject>(ItemPrefabResourcesPath.Trim());
             }
 
-            initialNpcSlug = string.IsNullOrWhiteSpace(initialNpcSlug)
+            InitialNpcSlug = string.IsNullOrWhiteSpace(InitialNpcSlug)
                 ? "butler"
-                : initialNpcSlug.Trim().ToLowerInvariant();
+                : InitialNpcSlug.Trim().ToLowerInvariant();
         }
 
         void RegisterCallbacks()
@@ -152,7 +153,7 @@ namespace NPCSystem
             NPCServerCharacter initialNpc = null;
             foreach (NPCServerCharacter npc in npcs)
             {
-                if (npc != null && npc.Slug == initialNpcSlug)
+                if (npc != null && npc.Slug == InitialNpcSlug)
                 {
                     initialNpc = npc;
                     break;
@@ -182,7 +183,7 @@ namespace NPCSystem
                     NPCFlowLogLevel.Info,
                     lastSpawnStatus,
                     source: nameof(NPCTransferableItemSpawner),
-                    data: new Dictionary<string, object> { ["initialNpcSlug"] = initialNpcSlug }
+                    data: new Dictionary<string, object> { ["InitialNpcSlug"] = InitialNpcSlug }
                 );
         }
     }

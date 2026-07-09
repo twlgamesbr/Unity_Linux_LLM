@@ -290,7 +290,7 @@ namespace NPCSystem.Tests
 
             try
             {
-                bridge.dialogueManager = manager;
+                bridge.DialogueManager = manager;
 
                 NPCProfile found = bridge.FindProfileBySlug("test-npc");
                 Assert.That(found, Is.SameAs(profile));

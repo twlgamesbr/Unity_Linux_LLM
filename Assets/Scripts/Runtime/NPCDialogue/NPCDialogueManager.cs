@@ -29,8 +29,8 @@ namespace NPCSystem
             "RAG Services",
             true,
             nameof(LocalRag),
-            nameof(ragEmbeddingPath),
-            nameof(useQdrantRag),
+            nameof(RagEmbeddingPath),
+            nameof(UseQdrantRag),
             nameof(QdrantRag)
         )]
         [SerializeField]
@@ -42,13 +42,14 @@ namespace NPCSystem
 
         [FilePath(true, "rag")]
         [SerializeField, HideProperty]
-        public string ragEmbeddingPath = "RAG/NPCDialogues.rag";
+        public string RagEmbeddingPath = "RAG/NPCDialogues.rag";
 
         [SerializeField, HideProperty]
-        public bool useQdrantRag = false;
+        [FormerlySerializedAs("useQdrantRag")]
+        public bool UseQdrantRag = false;
 
         [FormerlySerializedAs("qdrantRag")]
-        [SerializeField, HideProperty, ShowField(nameof(useQdrantRag))]
+        [SerializeField, HideProperty, ShowField(nameof(UseQdrantRag))]
         public QdrantRAGService QdrantRag;
 
         [FoldoutGroup("Game Systems", true, nameof(ActionPlanner), nameof(EvidenceState))]
@@ -74,46 +75,51 @@ namespace NPCSystem
         [FoldoutGroup(
             "LLM Configuration",
             true,
-            nameof(remoteHost),
-            nameof(remotePort),
-            nameof(remoteModel),
-            nameof(remoteEmbeddingHost),
-            nameof(remoteEmbeddingPort)
+            nameof(RemoteHost),
+            nameof(RemotePort),
+            nameof(RemoteModel),
+            nameof(RemoteEmbeddingHost),
+            nameof(RemoteEmbeddingPort)
         )]
         [SerializeField]
         EditorAttributes.Void llmConfigGroup;
 
         [HideProperty]
-        public string remoteHost = "localhost";
+        [FormerlySerializedAs("remoteHost")]
+        public string RemoteHost = "localhost";
 
         [ShowField(nameof(enableRemoteServer))]
         [HideProperty, Suffix("port")]
-        public int remotePort = 11435;
+        [FormerlySerializedAs("remotePort")]
+        public int RemotePort = 11435;
 
         [Dropdown(nameof(_cachedModelNames))]
         [HideProperty]
-        public string remoteModel = "llama-3.2-3b-instruct:q8_0";
+        [FormerlySerializedAs("remoteModel")]
+        public string RemoteModel = "llama-3.2-3b-instruct:q8_0";
 
         [SerializeField, HideInInspector]
         string[] _cachedModelNames = new string[] { "default-llm" };
 
         [ShowField(nameof(enableRemoteServer))]
         [HideProperty, Suffix("port")]
-        public string remoteEmbeddingHost = "localhost";
+        [FormerlySerializedAs("remoteEmbeddingHost")]
+        public string RemoteEmbeddingHost = "localhost";
 
         [ShowField(nameof(enableRemoteServer))]
         [HideProperty, Suffix("port")]
-        public int remoteEmbeddingPort = 8080;
+        [FormerlySerializedAs("remoteEmbeddingPort")]
+        public int RemoteEmbeddingPort = 8080;
 
         [FoldoutGroup(
             "Dialogue Settings",
             true,
             nameof(profiles),
-            nameof(persistHistory),
-            nameof(enableRAG),
-            nameof(rebuildRagFromKnowledgeIfMissing),
-            nameof(maxHistoryPerNPC),
-            nameof(initializeOnStart)
+            nameof(PersistHistory),
+            nameof(EnableRAG),
+            nameof(RebuildRagFromKnowledgeIfMissing),
+            nameof(MaxHistoryPerNPC),
+            nameof(InitializeOnStart)
         )]
         [SerializeField]
         EditorAttributes.Void dialogueSettingsGroup;
@@ -122,23 +128,28 @@ namespace NPCSystem
         public NPCProfile[] profiles = Array.Empty<NPCProfile>();
 
         [HideProperty]
-        public bool persistHistory = true;
+        [FormerlySerializedAs("persistHistory")]
+        public bool PersistHistory = true;
 
         [HideProperty]
-        public bool enableRAG = true;
+        [FormerlySerializedAs("enableRAG")]
+        public bool EnableRAG = true;
 
         [HideProperty]
-        public bool rebuildRagFromKnowledgeIfMissing = true;
+        [FormerlySerializedAs("rebuildRagFromKnowledgeIfMissing")]
+        public bool RebuildRagFromKnowledgeIfMissing = true;
 
         [Clamp(1, 200)]
         [HideProperty]
-        public int maxHistoryPerNPC = 20;
+        [FormerlySerializedAs("maxHistoryPerNPC")]
+        public int MaxHistoryPerNPC = 20;
 
         [Tooltip(
             "If true, dialogue systems initialize on Start. If false, they are initialized on-demand (e.g., after player login success)."
         )]
         [HideProperty]
-        public bool initializeOnStart = false;
+        [FormerlySerializedAs("initializeOnStart")]
+        public bool InitializeOnStart = false;
 
         [FoldoutGroup(
             "Events",
@@ -160,7 +171,7 @@ namespace NPCSystem
         [ReadOnly]
         [ShowInInspector]
         string DirectLocalAiEndpointPreview =>
-            $"http://{remoteHost}:{remotePort}/v1/chat/completions";
+            $"http://{RemoteHost}:{RemotePort}/v1/chat/completions";
 
         [ReadOnly]
         [ShowInInspector]
@@ -221,7 +232,7 @@ namespace NPCSystem
 
         void Start()
         {
-            if (initializeOnStart)
+            if (InitializeOnStart)
             {
                 _ = InitializeAsync();
             }
@@ -240,8 +251,8 @@ namespace NPCSystem
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
             if (
-                !string.IsNullOrWhiteSpace(remoteHost)
-                && (remoteHost == "localhost" || remoteHost == "127.0.0.1")
+                !string.IsNullOrWhiteSpace(RemoteHost)
+                && (RemoteHost == "localhost" || RemoteHost == "127.0.0.1")
             )
             {
                 try
@@ -249,19 +260,19 @@ namespace NPCSystem
                     Uri pageUri = new Uri(Application.absoluteURL);
                     if (pageUri.Host != "localhost" && pageUri.Host != "127.0.0.1")
                     {
-                        remoteHost = pageUri.Host;
+                        RemoteHost = pageUri.Host;
                     }
                 }
                 catch (Exception ex)
                 {
                     Debug.LogWarning(
-                        $"[NPCDialogueManager] Failed to dynamically resolve remoteHost: {ex.Message}"
+                        $"[NPCDialogueManager] Failed to dynamically resolve RemoteHost: {ex.Message}"
                     );
                 }
             }
             if (
-                !string.IsNullOrWhiteSpace(remoteEmbeddingHost)
-                && (remoteEmbeddingHost == "localhost" || remoteEmbeddingHost == "127.0.0.1")
+                !string.IsNullOrWhiteSpace(RemoteEmbeddingHost)
+                && (RemoteEmbeddingHost == "localhost" || RemoteEmbeddingHost == "127.0.0.1")
             )
             {
                 try
@@ -269,13 +280,13 @@ namespace NPCSystem
                     Uri pageUri = new Uri(Application.absoluteURL);
                     if (pageUri.Host != "localhost" && pageUri.Host != "127.0.0.1")
                     {
-                        remoteEmbeddingHost = pageUri.Host;
+                        RemoteEmbeddingHost = pageUri.Host;
                     }
                 }
                 catch (Exception ex)
                 {
                     Debug.LogWarning(
-                        $"[NPCDialogueManager] Failed to dynamically resolve remoteEmbeddingHost: {ex.Message}"
+                        $"[NPCDialogueManager] Failed to dynamically resolve RemoteEmbeddingHost: {ex.Message}"
                     );
                 }
             }
@@ -291,18 +302,18 @@ namespace NPCSystem
                 AutoAssignReferencesIfNeeded();
                 ValidateReferences();
                 BuildProfileIndex();
-                _historyService?.Initialize(SupabaseRepo, persistHistory, maxHistoryPerNPC);
+                _historyService?.Initialize(SupabaseRepo, PersistHistory, MaxHistoryPerNPC);
                 if (_historyService != null)
                     await _historyService.LoadAllHistoriesAsync(Profiles);
                 _retrievalService?.Initialize(
                     LocalRag,
-                    ragEmbeddingPath,
-                    enableRAG,
-                    useQdrantRag,
+                    RagEmbeddingPath,
+                    EnableRAG,
+                    UseQdrantRag,
                     QdrantRag,
-                    rebuildRagFromKnowledgeIfMissing,
-                    remoteEmbeddingHost,
-                    remoteEmbeddingPort
+                    RebuildRagFromKnowledgeIfMissing,
+                    RemoteEmbeddingHost,
+                    RemoteEmbeddingPort
                 );
                 if (_retrievalService != null)
                     await _retrievalService.LoadOrBuildIndexAsync(Profiles);
@@ -313,9 +324,9 @@ namespace NPCSystem
                     _retrievalService,
                     ActionPlanner,
                     EvidenceState,
-                    remoteHost,
-                    remotePort,
-                    remoteModel,
+                    RemoteHost,
+                    RemotePort,
+                    RemoteModel,
                     Profiles
                 );
 
@@ -348,7 +359,7 @@ namespace NPCSystem
                 LocalRag = FindAnyObjectByType<NPCLocalRAG>(FindObjectsInactive.Include);
             }
 
-            if (useQdrantRag && QdrantRag == null)
+            if (UseQdrantRag && QdrantRag == null)
             {
                 QdrantRag = FindAnyObjectByType<QdrantRAGService>(FindObjectsInactive.Include);
             }
@@ -405,9 +416,9 @@ namespace NPCSystem
 
             if (ChatClient != null)
             {
-                ChatClient.host = remoteHost;
-                ChatClient.port = remotePort;
-                ChatClient.model = remoteModel;
+                ChatClient.host = RemoteHost;
+                ChatClient.port = RemotePort;
+                ChatClient.model = RemoteModel;
                 Debug.Log(
                     $"[NPCDialogueManager] Synced ChatClient — host={ChatClient.host} port={ChatClient.port} model='{ChatClient.model}'"
                 );
@@ -446,7 +457,7 @@ namespace NPCSystem
         [Button("Fetch Models from LocalAI")]
         void FetchAvailableModelsFromLocalAI()
         {
-            string url = $"http://{remoteHost}:{remotePort}/v1/models";
+            string url = $"http://{RemoteHost}:{RemotePort}/v1/models";
             Debug.Log($"[NPC] Fetching models from {url}...");
 
             try

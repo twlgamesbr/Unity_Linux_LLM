@@ -15,18 +15,18 @@ namespace NPCSystem.Tests
             var unityTransport = NPCTestHelpers.RequireComponent<UnityTransport>("Network_Manager");
             var networkBootstrap = NPCTestHelpers.RequireComponent<NPCNetworkBootstrap>("Network_Manager");
 
-            Assert.That(networkBootstrap.networkManager, Is.SameAs(networkManager));
-            Assert.That(networkBootstrap.unityTransport, Is.SameAs(unityTransport));
-            Assert.That(networkBootstrap.playerPrefab, Is.Not.Null, "Network bootstrap must have Player Prefab assigned.");
-            Assert.That(networkBootstrap.serverNpcPrefab, Is.Not.Null, "Network bootstrap must have Server NPC Prefab assigned.");
-            Assert.That(networkBootstrap.transferableItemPrefab, Is.Not.Null, "Network bootstrap must have Transferable Item Prefab assigned.");
+            Assert.That(networkBootstrap.NetworkManager, Is.SameAs(networkManager));
+            Assert.That(networkBootstrap.UnityTransport, Is.SameAs(unityTransport));
+            Assert.That(networkBootstrap.PlayerPrefab, Is.Not.Null, "Network bootstrap must have Player Prefab assigned.");
+            Assert.That(networkBootstrap.ServerNpcPrefab, Is.Not.Null, "Network bootstrap must have Server NPC Prefab assigned.");
+            Assert.That(networkBootstrap.TransferableItemPrefab, Is.Not.Null, "Network bootstrap must have Transferable Item Prefab assigned.");
 
             var sceneInitialization = NPCTestHelpers.RequireComponent<NPCSceneInitializationController>("NPCSceneInitialization");
-            Assert.That(sceneInitialization.networkBootstrap, Is.SameAs(networkBootstrap));
-            Assert.That(sceneInitialization.dialogueManager, Is.Not.Null);
-            Assert.That(sceneInitialization.backendReadiness, Is.Not.Null);
-            Assert.That(sceneInitialization.networkBridge, Is.Not.Null);
-            Assert.That(sceneInitialization.smokeValidator, Is.Not.Null);
+            Assert.That(sceneInitialization.NetworkBootstrap, Is.SameAs(networkBootstrap));
+            Assert.That(sceneInitialization.DialogueManager, Is.Not.Null);
+            Assert.That(sceneInitialization.BackendReadiness, Is.Not.Null);
+            Assert.That(sceneInitialization.NetworkBridge, Is.Not.Null);
+            Assert.That(sceneInitialization.SmokeValidator, Is.Not.Null);
 
             NPCTestHelpers.RequireComponent<NPCFlowLogger>("NPCFlowLogger");
             NPCTestHelpers.RequireComponent<NetworkObject>("NPCDialogueRuntimeBridge");
@@ -37,8 +37,8 @@ namespace NPCSystem.Tests
             var authController = NPCTestHelpers.RequireComponent<AuthUIController>("AuthUI");
             NPCTestHelpers.RequireComponent<PlayerAuthService>("AuthUI");
             var authBridge = NPCTestHelpers.RequireComponent<AuthNetworkBridge>("AuthUI");
-            Assert.That(authBridge.authController, Is.SameAs(authController));
-            Assert.That(authBridge.networkBootstrap, Is.SameAs(networkBootstrap));
+            Assert.That(authBridge.AuthController, Is.SameAs(authController));
+            Assert.That(authBridge.NetworkBootstrap, Is.SameAs(networkBootstrap));
 #endif
         }
     }

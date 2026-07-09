@@ -3,6 +3,7 @@ using Unity.Collections;
 using Unity.Netcode;
 using Unity.Netcode.Components;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace NPCSystem
 {
@@ -19,14 +20,20 @@ namespace NPCSystem
         }
 
         [Header("Identity")]
-        public string itemId = "evidence-ledger";
-        public string displayName = "Evidence Ledger";
-        public string initialNpcHolderSlug = "butler";
+        [FormerlySerializedAs("itemId")]
+        public string ItemId = "evidence-ledger";
+        [FormerlySerializedAs("displayName")]
+        public string DisplayName = "Evidence Ledger";
+        [FormerlySerializedAs("initialNpcHolderSlug")]
+        public string InitialNpcHolderSlug = "butler";
 
         [Header("Follow")]
-        public Vector3 playerHoldOffset = new Vector3(0f, 1.1f, 0.8f);
-        public Vector3 npcHoldOffset = new Vector3(0.65f, 1.1f, 0f);
-        public float followSharpness = 20f;
+        [FormerlySerializedAs("playerHoldOffset")]
+        public Vector3 PlayerHoldOffset = new Vector3(0f, 1.1f, 0.8f);
+        [FormerlySerializedAs("npcHoldOffset")]
+        public Vector3 NpcHoldOffset = new Vector3(0.65f, 1.1f, 0f);
+        [FormerlySerializedAs("followSharpness")]
+        public float FollowSharpness = 20f;
 
         [HideInInspector]
         public readonly NetworkVariable<FixedString64Bytes> itemIdValue =
@@ -58,19 +65,19 @@ namespace NPCSystem
             );
 
         public string ItemId =>
-            (itemIdValue.Value.Length > 0) ? itemIdValue.Value.ToString() : itemId;
+            (itemIdValue.Value.Length > 0) ? itemIdValue.Value.ToString() : ItemId;
         public string DisplayName =>
-            (displayNameValue.Value.Length > 0) ? displayNameValue.Value.ToString() : displayName;
+            (displayNameValue.Value.Length > 0) ? displayNameValue.Value.ToString() : DisplayName;
         public bool IsHeldByPlayer => _holderType.Value == (int)HolderType.Player;
         public bool IsHeldByNpc => _holderType.Value == (int)HolderType.Npc;
 
         void Awake()
         {
-            itemId = NormalizeId(itemId, "evidence-ledger");
-            displayName = string.IsNullOrWhiteSpace(displayName)
+            ItemId = NormalizeId(ItemId, "evidence-ledger");
+            DisplayName = string.IsNullOrWhiteSpace(DisplayName)
                 ? "Evidence Ledger"
-                : displayName.Trim();
-            initialNpcHolderSlug = NormalizeId(initialNpcHolderSlug, "butler");
+                : DisplayName.Trim();
+            InitialNpcHolderSlug = NormalizeId(InitialNpcHolderSlug, "butler");
         }
 
         public override void OnNetworkSpawn()
@@ -79,8 +86,8 @@ namespace NPCSystem
 
             if (IsServer)
             {
-                itemIdValue.Value = new FixedString64Bytes(itemId);
-                displayNameValue.Value = new FixedString64Bytes(displayName);
+                itemIdValue.Value = new FixedString64Bytes(ItemId);
+                displayNameValue.Value = new FixedString64Bytes(DisplayName);
             }
 
             RefreshHierarchyName();
@@ -112,9 +119,9 @@ namespace NPCSystem
                 return;
             }
 
-            Vector3 offset = IsHeldByNpc ? npcHoldOffset : playerHoldOffset;
+            Vector3 offset = IsHeldByNpc ? NpcHoldOffset : PlayerHoldOffset;
             Vector3 targetPosition = target.position + target.rotation * offset;
-            float t = 1f - Mathf.Exp(-followSharpness * Time.deltaTime);
+            float t = 1f - Mathf.Exp(-FollowSharpness * Time.deltaTime);
             transform.position = Vector3.Lerp(transform.position, targetPosition, t);
         }
 
@@ -147,7 +154,7 @@ namespace NPCSystem
                 return;
             }
 
-            string normalizedNpcSlug = NormalizeId(npcSlug, initialNpcHolderSlug);
+            string normalizedNpcSlug = NormalizeId(npcSlug, InitialNpcHolderSlug);
             _holderType.Value = (int)HolderType.Npc;
             _npcHolderSlug.Value = new FixedString64Bytes(normalizedNpcSlug);
             if (!NetworkObject.IsOwnedByServer)
@@ -262,7 +269,7 @@ namespace NPCSystem
                     data: new Dictionary<string, object>
                     {
                         ["ownerClientId"] = ownerClientId,
-                        ["itemId"] = ItemId,
+                        ["ItemId"] = ItemId,
                         ["holderType"] = ((HolderType)_holderType.Value).ToString(),
                     }
                 );

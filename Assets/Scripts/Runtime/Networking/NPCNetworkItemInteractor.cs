@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace NPCSystem
 {
@@ -21,8 +22,10 @@ namespace NPCSystem
         public NPCPlayerInventory inventory;
 
         [Header("Range")]
-        public float pickupRange = 3f;
-        public float transferRange = 4f;
+        [FormerlySerializedAs("PickupRange")]
+        public float PickupRange = 3f;
+        [FormerlySerializedAs("TransferRange")]
+        public float TransferRange = 4f;
 
         void Awake()
         {
@@ -166,7 +169,7 @@ namespace NPCSystem
                 return null;
 
             NPCTransferableItem nearestItem = null;
-            float nearestDistance = pickupRange;
+            float nearestDistance = PickupRange;
             NPCTransferableItem[] items = FindObjectsByType<NPCTransferableItem>(
                 FindObjectsInactive.Include
             );
@@ -215,7 +218,7 @@ namespace NPCSystem
                 return null;
 
             NPCPlayerNetworkAvatar nearestPlayer = null;
-            float nearestDistance = transferRange;
+            float nearestDistance = TransferRange;
             NPCPlayerNetworkAvatar[] avatars = FindObjectsByType<NPCPlayerNetworkAvatar>(
                 FindObjectsInactive.Include
             );
@@ -245,7 +248,7 @@ namespace NPCSystem
                 return null;
 
             NPCServerCharacter nearestNpc = null;
-            float nearestDistance = transferRange;
+            float nearestDistance = TransferRange;
             NPCServerCharacter[] npcs = FindObjectsByType<NPCServerCharacter>(
                 FindObjectsInactive.Include
             );

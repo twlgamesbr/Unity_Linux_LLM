@@ -64,12 +64,12 @@ namespace NPCSystem.Tests
 
             try
             {
-                bootstrap.networkManager = networkManager;
-                bootstrap.unityTransport = unityTransport;
-                bootstrap.playerPrefab = playerPrefab;
-                bootstrap.serverNpcPrefab = serverNpcPrefab;
-                bootstrap.transferableItemPrefab = transferableItemPrefab;
-                bootstrap.transportConfig = new NPCTransportConfig
+                bootstrap.NetworkManager = networkManager;
+                bootstrap.UnityTransport = unityTransport;
+                bootstrap.PlayerPrefab = playerPrefab;
+                bootstrap.ServerNpcPrefab = serverNpcPrefab;
+                bootstrap.TransferableItemPrefab = transferableItemPrefab;
+                bootstrap.TransportConfig = new NPCTransportConfig
                 {
                     connectAddress = "10.0.0.25",
                     listenAddress = "0.0.0.0",
