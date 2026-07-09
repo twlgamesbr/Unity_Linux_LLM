@@ -97,7 +97,7 @@ def build_workflow_plan(
         "for structural ownership and implementation details."
     )
     if scenario == "localai-llmunity":
-        rationale += " This is especially important for LocalAI/LLMUnity transport, remote flags, and Qdrant wiring."
+        rationale += " This is especially important for LocalAI transport, remote flags, and Qdrant wiring."
     return {
         "pre_phase": {
             "strategy": "gladekit_mcp_first",

@@ -38,8 +38,6 @@ def classify_unity_region(path: Path) -> str:
         return "Samples"
     if "Runtime" in parts:
         return "Runtime"
-    if parts[:3] == ["Assets", "LLMUnity", "Scripts"]:
-        return "Runtime"
     if parts and parts[0] == "Packages":
         return "Package"
     return "Unknown"
@@ -52,8 +50,8 @@ def _discover(root: Path, pattern: str, config: CodebaseEmbedderConfig) -> list[
 def discover_project_files(config: CodebaseEmbedderConfig) -> ProjectFiles:
     root = Path(config.project_root)
     # Unity-generated and package-manager folders can dwarf first-party code and
-    # make agent queries noisy. v1 indexes project assets by default; embedded
-    # packages under Assets/ (such as Assets/LLMUnity) are still included.
+    # make agent queries noisy. v1 indexes project Assets/ for source code and
+    # a limited set of project-owned documentation files.
     assets_root = root / "Assets"
     csharp = _discover(assets_root, "*.cs", config) if assets_root.exists() else []
     asmdefs = _discover(assets_root, "*.asmdef", config) if assets_root.exists() else []
@@ -67,12 +65,16 @@ def discover_project_files(config: CodebaseEmbedderConfig) -> ProjectFiles:
 
 def _include_doc(rel: Path) -> bool:
     s = rel.as_posix()
+    # Exclude license/changelog/conduct noise
     if any(name in s.lower() for name in ["license", "changelog", "third party notices", "code_of_conduct"]):
+        return False
+    # Exclude Unity package docs (these drown project docs in volume — 900+ files)
+    if "/Packages/" in s and "/Documentation~/" in s:
         return False
     return (
         s.startswith("Assets/MysteryTemplates/")
         or s.startswith("Assets/StreamingAssets/")
-        or s.startswith("Assets/LLMUnity/Docs/")
         or s.endswith("README.md")
-        or "/Documentation~/" in s
+        or s.startswith("Documentation/")
+        or s.startswith("Backend/")
     )

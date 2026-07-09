@@ -15,7 +15,6 @@ MonoBehaviour:
   m_DefaultQualityLevel: Mobile
   m_QualityLevels:
   - Mobile
-  - PC
 --- !u!114 &-1222085478125843613
 MonoBehaviour:
   m_ObjectHideFlags: 3

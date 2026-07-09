@@ -15,4 +15,11 @@ MonoBehaviour:
   OptimizeCodeAfterStripping: 1
   RemoveEmbeddedDebugSymbols: 1
   MissingSubmoduleErrorHandling: 1
-  SubmodulesToStrip: []
+  SubmodulesToStrip:
+  - System.Xml
+  - System.Data
+  - System.Drawing
+  - System.IO.Compression
+  - System.Runtime.Serialization
+  - System.ComponentModel.DataAnnotations
+  - System.Data.SqlClient

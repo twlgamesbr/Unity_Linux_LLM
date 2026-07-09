@@ -1,0 +1,28 @@
+services:
+  codebase-watchdog:
+    build:
+      context: ..
+      dockerfile: docker_codebase_watchdog/Dockerfile
+    container_name: codebase-watchdog
+    # Host networking: the watcher sees localhost as the host machine,
+    # so it can reach Qdrant (localhost:6333) and LocalAI (localhost:8080)
+    # directly, no extra config.
+    network_mode: host
+    environment:
+      - QDRANT_URL=http://localhost:6333
+      - COLLECTION_NAME=unity_linux_llm_codebase_v1
+      - LOCALAI_BASE_URL=http://localhost:8080/v1
+      - EMBEDDING_MODEL=nomic-embed-text-v1.5
+      - PROJECT_SLUG=Unity_Linux_LLM
+      - WATCH_DEBOUNCE_SECONDS=1.5
+    # Bind-mount the project root so the watcher can read files and
+    # maintain the .codebase-index/ artifact cache.
+    volumes:
+      - ..:/workspace:ro
+    restart: unless-stopped
+    stop_grace_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

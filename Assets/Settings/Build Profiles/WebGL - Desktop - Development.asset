@@ -938,7 +938,7 @@ MonoBehaviour:
     - line: '|   webWasm2023: 1'
     - line: '|   webEnableSubmoduleStrippingCompatibility: 1'
     - line: '|   scriptingDefineSymbols:'
-    - line: '|     Standalone: GLADE_AI_NAVIGATION;GLADE_INPUT_SYSTEM;GLADE_UGUI;SENTIS_ANALYTICS_ENABLED;APP_UI_EDITOR_ONLY'
+    - line: '|     Standalone: GLADE_AI_NAVIGATION;GLADE_INPUT_SYSTEM;GLADE_UGUI'
     - line: '|     WebGL: '
     - line: '|   additionalCompilerArguments: {}'
     - line: '|   platformArchitecture: {}'
@@ -1109,4 +1109,3 @@ MonoBehaviour:
   m_DefaultQualityLevel: Mobile
   m_QualityLevels:
   - Mobile
-  - PC

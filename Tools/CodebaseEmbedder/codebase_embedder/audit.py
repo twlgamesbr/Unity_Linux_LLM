@@ -277,14 +277,14 @@ def _scenario_insights(smoke_queries: list[dict[str, Any]], scenario: str | None
             warnings.append(f"Prompt '{prompt}' surfaced non-runtime/documentation-first hit: {path}")
         if "QdrantRAGService.cs" in path:
             strengths.append("Qdrant/NPC retrieval prompt resolves to NPC runtime integration code.")
-        if "LLMClient.cs" in path or "LLMUnitySetup.cs" in path:
-            strengths.append("LLMUnity/LocalAI prompts resolve to runtime/backend-adjacent scripts.")
+        if "NPCLocalAIClient.cs" in path:
+            strengths.append("LocalAI prompts resolve to runtime backend client code.")
     recommendations: list[str]
     if scenario == "localai-llmunity":
         if not strengths:
-            warnings.append("LocalAI + LLMUnity scenario did not surface obvious runtime integration hotspots.")
+            warnings.append("LocalAI scenario did not surface obvious runtime integration hotspots.")
         recommendations = [
-            "Inspect runtime hits first: LLMClient/LLMUnitySetup/QdrantRAGService before touching editor utilities.",
+            "Inspect runtime hits first: NPCLocalAIClient/QdrantRAGService before touching editor utilities.",
             "Use asmdef boundaries to keep LocalAI backend changes inside Runtime assemblies unless the change is truly editor tooling.",
             "If documentation outranks runtime code for backend prompts, improve summaries or add explicit backend-focused records for those scripts.",
         ]

@@ -27,6 +27,7 @@ from .indexer import (
 )
 from .qdrant_store import QdrantStore
 from .records import IndexRecord, RelationRecord, utc_now, write_json, write_jsonl
+from .sparse import compute_sparse_vectors, SPARSE_VECTOR_NAME
 
 logger = logging.getLogger("codebase-watcher")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
@@ -97,10 +98,67 @@ class CodebaseWatcher:
         if self.running:
             return
         self.running = True
+
+        # Run a catch-up scan before accepting live events so we don't
+        # miss changes made while the watcher was down.
+        self._catch_up()
+
         handler = WatchdogHandler(self)
         self.observer.schedule(handler, str(self.project_root), recursive=True)
         self.observer.start()
         logger.info(f"Started monitoring workspace: {self.project_root}")
+
+    def _catch_up(self) -> None:
+        """Detect files changed while the watcher was stopped and queue them."""
+        art = self.config.artifact_dir
+        chunks_file = art / "chunks.jsonl"
+        if not chunks_file.exists():
+            logger.info("No local index found — skipping catch-up (full index will run on first change).")
+            return
+
+        # Collect paths we already have indexed
+        indexed_paths: set[str] = set()
+        for line in chunks_file.read_text(encoding="utf-8").splitlines():
+            if not line.strip():
+                continue
+            try:
+                obj = json.loads(line)
+                path = obj.get("payload", {}).get("path")
+                if path:
+                    indexed_paths.add(path)
+            except json.JSONDecodeError:
+                continue
+
+        # Scan current filesystem for relevant files
+        from .discovery import discover_project_files
+        files = discover_project_files(self.config)
+        current_paths: set[str] = set()
+        for path_list in (files.csharp, files.asmdefs, files.docs):
+            for p in path_list:
+                rel = p.relative_to(self.config.project_root).as_posix()
+                current_paths.add(rel)
+
+        # Detect new, modified, or deleted files
+        changed: list[Path] = []
+        root = Path(self.config.project_root)
+        for rel in current_paths:
+            if rel not in indexed_paths:
+                changed.append(root / rel)
+                logger.info(f"Catch-up: new file {rel}")
+
+        # Also detect deleted files (indexed but no longer on disk)
+        for rel in indexed_paths:
+            if rel not in current_paths:
+                p = root / rel
+                if not p.exists():
+                    changed.append(p)
+                    logger.info(f"Catch-up: deleted file {rel}")
+
+        if changed:
+            logger.info(f"Catch-up: {len(changed)} files changed while watcher was down, queuing...")
+            self._execute_incremental_update(changed)
+        else:
+            logger.info("Catch-up: no changes detected since last index.")
 
     def stop(self) -> None:
         if not self.running:
@@ -311,6 +369,9 @@ class CodebaseWatcher:
             new_chunks, emb, art, dim, batch_size=32, use_cache=True
         )
 
+        # Compute sparse vectors for code-keyword matching
+        sparse_vectors = compute_sparse_vectors([c.text for c in new_chunks])
+
         store = QdrantStore(self.config.qdrant_url, self.config.collection_name)
         store.ensure_collection(dim)
 
@@ -319,10 +380,10 @@ class CodebaseWatcher:
             logger.info(f"Deleting {len(deleted_point_ids)} outdated points from Qdrant...")
             store.delete(deleted_point_ids)
 
-        # 2. Upsert new points to Qdrant
+        # 2. Upsert new points to Qdrant (dense + sparse named vectors)
         if new_chunks:
             logger.info(f"Upserting {len(new_chunks)} updated points into Qdrant ({self.config.collection_name})...")
-            store.upsert(new_chunks, vectors)
+            store.upsert(new_chunks, vectors, sparse_vectors)
 
         logger.info("Incremental update and Qdrant synchronization complete.")
 

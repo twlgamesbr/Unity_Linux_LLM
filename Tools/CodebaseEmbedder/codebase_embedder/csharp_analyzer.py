@@ -23,7 +23,7 @@ _PURPOSE_KW = {
     "Service": "background service: provides runtime functionality for NPC dialogue systems, LLM integration, and remote backend requests",
     "Manager": "manager: coordinates NPC dialogue, LLM backend configuration, remote server host/port, and Qdrant-backed retrieval",
     "Agent": "LLM agent: dialogue selector/session agent that routes LLM requests and manages function-calling transport to the remote backend",
-    "Setup": "setup: configures LLMUnity connection, backend LocalAI URLs, local model paths, and remote server parameters",
+    "Setup": "setup: configures NPC runtime initialization, LocalAI client, and backend service readiness",
     "Bootstrapper": "bootstrap: initializes NPC dialogue system, auto-selects default NPC, and prewarms LLM and RAG connections",
     "Validator": "validator: smoke-tests NPC dialogue system health, verifies LLM connectivity, RAG backend, and integration checks",
     "RAG": "RAG retrieval: searches vector memory in Qdrant for context-relevant NPC knowledge embeddings and semantic queries",

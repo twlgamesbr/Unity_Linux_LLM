@@ -5,7 +5,7 @@ Use separate collections when one parsing or ranking strategy would otherwise de
 ## Stable Collection
 
 - Name:
-  `unity_linux_llm_codebase_v1`
+  `unity_linux_llm_codebase_experiment_v1`
 - Purpose:
   default project-wide collection for normal Unity coding queries
 

@@ -202,9 +202,11 @@ cd Tools/CodebaseEmbedder
 env UV_CACHE_DIR=/tmp/uv-cache UV_TOOL_DIR=/tmp/uv-tools uv run codebase-embedder status --root ../..
 env UV_CACHE_DIR=/tmp/uv-cache UV_TOOL_DIR=/tmp/uv-tools uv run codebase-embedder query --root ../.. --local "NPC dialogue architecture"
 env UV_CACHE_DIR=/tmp/uv-cache UV_TOOL_DIR=/tmp/uv-tools uv run codebase-embedder audit --root ../.. --scene Assets/Scenes/NPCDialoguePrototype1.unity --scenario localai-llmunity --local
+# Persistent watchdog (Docker):
+docker compose -f docker_codebase_watchdog/docker-compose.yml up -d
 ```
 
-If `uv` tries to use a read-only cache path in your session, keep the `/tmp` overrides.
+Use `/tmp` cache/tool dirs if the default `uv` cache location is read-only in the current session.
 
 ## Retrieval index state
 
@@ -218,6 +220,10 @@ The project now has a structural retrieval experiment loop in place for Unity co
 - The hierarchy profile also emits `namespace_summary` records for namespace-level aggregation
 - Comparison reports are written to `.codebase-index/collection-comparison-*.md`
 - The optimizer skill lives at `.agents/skills/unity-codebase-rag-optimizer/`
+- Indexed with named vectors (`dense` 768d Cosine + `code_keywords` sparse) for hybrid search
+- Sparse vectors use deterministic SHA-256 token hashing into 2M-dim space with TF normalization
+- Qdrant collection: HNSW (ef_construct=200), scalar int8 quantization, indexing_threshold=10000
+- Watchdog service available as `docker_codebase_watchdog/` for persistent file monitoring
 
 ## Testing
 

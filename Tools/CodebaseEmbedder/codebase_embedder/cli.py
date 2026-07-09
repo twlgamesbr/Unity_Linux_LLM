@@ -15,6 +15,7 @@ from .indexer import build_index, load_chunks
 from .qdrant_store import QdrantStore
 from .query import build_query_response, format_query_workflow, format_results, lexical_query, qdrant_query
 from .records import IndexRecord
+from .sparse import compute_sparse_vectors
 from .vector_cache import VectorCache
 
 
@@ -164,6 +165,8 @@ def cmd_index(args: argparse.Namespace) -> int:
         dim = emb.dimension()
     with timed_stage("embedding", timings):
         vectors, cache_stats = embed_records_with_cache(records, emb, cfg.artifact_dir, dim, batch_size=args.batch_size, use_cache=args.use_vector_cache)
+    with timed_stage("sparse_vectors", timings):
+        sparse_vectors = compute_sparse_vectors([r.text for r in records])
     with timed_stage("qdrant_collection", timings):
         store = QdrantStore(cfg.qdrant_url, cfg.collection_name)
         store.ensure_collection(dim)
@@ -171,8 +174,9 @@ def cmd_index(args: argparse.Namespace) -> int:
     for start in range(0, len(records), args.batch_size):
         batch = records[start:start + args.batch_size]
         batch_vectors = vectors[start:start + args.batch_size]
+        batch_sparse = sparse_vectors[start:start + args.batch_size]
         with timed_stage("qdrant_upsert", timings):
-            store.upsert(batch, batch_vectors)
+            store.upsert(batch, batch_vectors, batch_sparse)
         upserted_records += len(batch)
         print(f"Upserted {min(start + len(batch), len(records))}/{len(records)} records", flush=True)
     print(f"Upserted {len(records)} records into {cfg.collection_name}")

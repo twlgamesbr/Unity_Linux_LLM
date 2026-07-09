@@ -1,6 +1,6 @@
 # Unity_Linux_LLM — Agent Guidelines
 
-This repository is a Unity 6 NPC dialogue prototype built around LLMUnity, direct LocalAI HTTP calls, local `.rag` retrieval, optional Qdrant/Cognee integrations, and a small set of editor automation tools. These notes describe the project as it is currently wired in the repo and scene.
+This repository is a Unity 6 NPC dialogue prototype that uses direct LocalAI HTTP calls as its primary dialogue backend, with local `.rag` retrieval via LLMUnity, optional Qdrant/Cognee integrations, and a small set of editor automation tools. These notes describe the project as it is currently wired in the repo and scene.
 
 ---
 
@@ -260,6 +260,10 @@ Current retrieval state:
 - The hierarchy profile adds `namespace_summary` records for namespace-level aggregation
 - A dedicated optimizer skill exists at `.agents/skills/unity-codebase-rag-optimizer/`
 - Comparison reports are written under `.codebase-index/collection-comparison-*.md`
+- Indexed with named vectors (`dense` 768d Cosine + `code_keywords` sparse) for hybrid search
+- Sparse vectors use deterministic SHA-256 token hashing into 2M-dim space with TF normalization
+- Qdrant collection: HNSW (ef_construct=200), scalar int8 quantization, indexing_threshold=10000
+- Watchdog service available as `docker_codebase_watchdog/` for persistent file monitoring
 
 Useful commands:
 
@@ -268,6 +272,8 @@ cd Tools/CodebaseEmbedder
 env UV_CACHE_DIR=/tmp/uv-cache UV_TOOL_DIR=/tmp/uv-tools uv run codebase-embedder status --root ../..
 env UV_CACHE_DIR=/tmp/uv-cache UV_TOOL_DIR=/tmp/uv-tools uv run codebase-embedder query --root ../.. --local "<concept>"
 env UV_CACHE_DIR=/tmp/uv-cache UV_TOOL_DIR=/tmp/uv-tools uv run codebase-embedder audit --root ../.. --scene Assets/Scenes/NPCDialoguePrototype1.unity --scenario localai-llmunity --local
+# Persistent watchdog (Docker):
+docker compose -f docker_codebase_watchdog/docker-compose.yml up -d
 ```
 
 Use `/tmp` cache/tool dirs if the default `uv` cache location is read-only in the current session.
@@ -305,5 +311,5 @@ env UV_CACHE_DIR=/tmp/uv-cache UV_TOOL_DIR=/tmp/uv-tools uv run --extra test pyt
   - enabled in current runtime config
 - Do not claim Cognee or Qdrant are active unless `NPCDialogueManager` has them enabled in scene or code has been changed accordingly.
 - Do not claim `FunctionCallingAgent` is isolated onto `FunctionCallingLLM` without checking the actual scene reference.
-- Do not move runtime code into `Assets/LLMUnity/`; prefer extending `Assets/Scripts/Runtime/`.
 - Keep Runtime -> Editor assembly boundaries clean.
+- When creating new runtime code, prefer extending `Assets/Scripts/Runtime/` over other locations.

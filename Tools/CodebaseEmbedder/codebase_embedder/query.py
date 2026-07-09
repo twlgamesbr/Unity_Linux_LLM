@@ -17,6 +17,7 @@ from .query_support import (
     symbol_name_boost,
 )
 from .qdrant_store import QdrantStore
+from .sparse import compute_sparse_vector, SPARSE_VECTOR_NAME
 from .workflow import (
     QUERY_CLASS_BEHAVIOR,
     QUERY_CLASS_OWNERSHIP,
@@ -118,6 +119,7 @@ def qdrant_query(config: CodebaseEmbedderConfig, question: str, limit: int = 8) 
     coverage_intent = is_coverage_query(question)
     emb = EmbeddingClient(config.localai_base_url, config.embedding_model)
     vec = emb.embed([question])[0]
+    sparse_vec = compute_sparse_vector(question)
     candidate_limit = max(80 if structural else 50, limit * (20 if structural else 10))
     structural_filter = None
     if structural:
@@ -131,7 +133,8 @@ def qdrant_query(config: CodebaseEmbedderConfig, question: str, limit: int = 8) 
                 }
             ]
         }
-    candidates = QdrantStore(config.qdrant_url, config.collection_name).search(vec, limit=candidate_limit, query_filter=structural_filter)
+    store = QdrantStore(config.qdrant_url, config.collection_name)
+    candidates = store.search_hybrid(vec, sparse_vec, limit=candidate_limit, query_filter=structural_filter)
     terms = _query_terms(question)
     for item in candidates:
         payload = item.get("payload", {})
