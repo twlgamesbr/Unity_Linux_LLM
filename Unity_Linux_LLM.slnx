@@ -65,6 +65,7 @@
   <Project Path="Unity.TextMeshPro.csproj" />
   <Project Path="Unity.RenderPipelines.Core.Runtime.csproj" />
   <Project Path="Unity.Entities.Hybrid.Tests.csproj" />
+  <Project Path="NPCSystem.Runtime.csproj" />
   <Project Path="Unity.PlatformToolkit.Editor.csproj" />
   <Project Path="Unity.Serialization.csproj" />
   <Project Path="Unity.Numerics.Linear.Dense.csproj" />
@@ -72,7 +73,6 @@
   <Project Path="Unity.Entities.TestComponents.csproj" />
   <Project Path="NPCSystem.Tests.csproj" />
   <Project Path="Unity.2D.IK.Editor.csproj" />
-  <Project Path="NPCSystem.Runtime.csproj" />
   <Project Path="Unity.ResourceManager.Tests.csproj" />
   <Project Path="Unity.2D.Common.Editor.csproj" />
   <Project Path="ScriptablePacker.csproj" />

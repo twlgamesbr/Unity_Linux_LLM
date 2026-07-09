@@ -80,6 +80,7 @@ CREATE TABLE IF NOT EXISTS dialogue_sessions (
 CREATE TABLE IF NOT EXISTS dialogue_turns (
     turn_id bigserial PRIMARY KEY,
     session_id uuid REFERENCES dialogue_sessions(session_id) ON DELETE CASCADE,
+    player_id uuid REFERENCES auth.users(id),
     role text NOT NULL CHECK (role IN ('user', 'assistant', 'system')),
     content text NOT NULL,
     npc_mood_snapshot text,

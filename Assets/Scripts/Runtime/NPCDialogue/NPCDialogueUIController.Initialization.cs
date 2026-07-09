@@ -35,7 +35,7 @@ namespace NPCSystem
                 }
                 else
                 {
-                    if (networkBridge == null && dialogueManager == null)
+                    if (NetworkBridge == null && DialogueManager == null)
                     {
                         NPCFlowLogger
                             .FindOrCreate()
@@ -49,10 +49,10 @@ namespace NPCSystem
                         return;
                     }
 
-                    if (networkBridge != null)
-                        await networkBridge.InitializeAsync();
+                    if (NetworkBridge != null)
+                        await NetworkBridge.InitializeAsync();
                     else
-                        await dialogueManager.InitializeAsync();
+                        await DialogueManager.InitializeAsync();
                 }
 
                 BindRuntimeEvents();
@@ -75,10 +75,10 @@ namespace NPCSystem
             {
                 _readyForInput = true;
                 SetInputEnabled(true);
-                if (playerInput != null)
+                if (PlayerInput != null)
                 {
-                    playerInput.Select();
-                    playerInput.ActivateInputField();
+                    PlayerInput.Select();
+                    PlayerInput.ActivateInputField();
                 }
             }
 
@@ -96,13 +96,13 @@ namespace NPCSystem
         void PopulateDropdown()
         {
             NPCProfile[] availableProfiles =
-                networkBridge != null ? networkBridge.Profiles : dialogueManager.Profiles;
+                NetworkBridge != null ? NetworkBridge.Profiles : DialogueManager.Profiles;
             _profiles = availableProfiles.Where(profile => profile != null).ToList();
-            if (characterSelect == null)
+            if (CharacterSelect == null)
                 return;
 
-            characterSelect.ClearOptions();
-            characterSelect.AddOptions(
+            CharacterSelect.ClearOptions();
+            CharacterSelect.AddOptions(
                 _profiles.Select(profile => profile.GetDisplayName()).ToList()
             );
         }
@@ -110,8 +110,8 @@ namespace NPCSystem
         async System.Threading.Tasks.Task SyncDropdownToCurrentProfileAsync()
         {
             if (
-                (dialogueManager == null && networkBridge == null)
-                || characterSelect == null
+                (DialogueManager == null && NetworkBridge == null)
+                || CharacterSelect == null
                 || _profiles.Count == 0
             )
                 return;
@@ -119,7 +119,7 @@ namespace NPCSystem
             NPCProfile activeProfile = GetActiveProfile();
             if (activeProfile == null)
             {
-                characterSelect.SetValueWithoutNotify(0);
+                CharacterSelect.SetValueWithoutNotify(0);
                 await SelectProfileAsync(0);
                 return;
             }
@@ -127,7 +127,7 @@ namespace NPCSystem
             int index = _profiles.FindIndex(profile => profile == activeProfile);
             if (index < 0)
                 index = 0;
-            characterSelect.SetValueWithoutNotify(index);
+            CharacterSelect.SetValueWithoutNotify(index);
             UpdatePortrait(activeProfile);
             SetInputEnabled(true);
             _readyForInput = true;
@@ -135,9 +135,9 @@ namespace NPCSystem
 
         void DisableLegacyController()
         {
-            if (legacyKnowledgeBaseController != null)
+            if (LegacyKnowledgeBaseController != null)
             {
-                legacyKnowledgeBaseController.enabled = false;
+                LegacyKnowledgeBaseController.enabled = false;
             }
         }
     }

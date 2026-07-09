@@ -2,7 +2,7 @@ using System;
 
 namespace NPCSystem
 {
-    // ── Auth response DTOs ────────────────────────────────────────
+    // ── Auth response DTOs (kept for backward compat) ──────────────
 
     /// <summary>
     /// Response from a player registration request.
@@ -17,7 +17,8 @@ namespace NPCSystem
     }
 
     /// <summary>
-    /// Full auth session state, backed by Supabase Gotrue JWT tokens.
+    /// Full auth session state, backed by Supabase Gotrue JWT tokens
+    /// from the supabase-csharp SDK.
     /// </summary>
     [Serializable]
     public class PlayerAuthSessionResponse
@@ -34,59 +35,4 @@ namespace NPCSystem
 
     [Serializable]
     class PlayerAuthEmptyResponse { }
-
-    // ── Gotrue (Supabase Auth) internal DTOs ──────────────────────
-
-    [Serializable]
-    class GotrueSignupRequest
-    {
-        public string email;
-        public string password;
-    }
-
-    [Serializable]
-    class GotruePasswordGrantRequest
-    {
-        public string email;
-        public string password;
-    }
-
-    [Serializable]
-    class GotrueRefreshGrantRequest
-    {
-        public string refresh_token;
-    }
-
-    [Serializable]
-    class GotrueSessionResponse
-    {
-        public string access_token;
-        public string token_type;
-        public int expires_in;
-        public string refresh_token;
-        public GotrueUser user;
-    }
-
-    [Serializable]
-    class GotrueUserResponse
-    {
-        public string id;
-        public string email;
-        public string aud;
-        public string role;
-    }
-
-    [Serializable]
-    class GotrueUser
-    {
-        public string id;
-        public string email;
-    }
-
-    [Serializable]
-    class GotrueErrorResponse
-    {
-        public string msg;
-        public string error_description;
-    }
 }

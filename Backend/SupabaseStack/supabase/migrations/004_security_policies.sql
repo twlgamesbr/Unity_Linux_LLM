@@ -224,6 +224,48 @@ BEGIN
 END;
 $$;
 
+-- Find or create a dialogue session for a player+NPC combo
+CREATE OR REPLACE FUNCTION find_or_create_dialogue_session(p_player_id uuid, p_npc_slug text)
+RETURNS uuid
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = 'public'
+AS $$
+DECLARE
+    v_session_id uuid;
+BEGIN
+    -- Reopen the most recent open session for this player+NPC
+    SELECT session_id INTO v_session_id
+    FROM dialogue_sessions
+    WHERE user_id = p_player_id
+      AND npc_slug = p_npc_slug
+      AND ended_at IS NULL
+    ORDER BY started_at DESC
+    LIMIT 1;
+
+    -- Create a new session if none is open
+    IF v_session_id IS NULL THEN
+        INSERT INTO dialogue_sessions (user_id, npc_slug)
+        VALUES (p_player_id, p_npc_slug)
+        RETURNING session_id INTO v_session_id;
+    END IF;
+
+    RETURN v_session_id;
+END;
+$$;
+
+-- Close the active dialogue session for a player+NPC combo
+CREATE OR REPLACE FUNCTION close_dialogue_session(p_player_id uuid, p_npc_slug text)
+RETURNS void
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = 'public'
+AS $$
+BEGIN
+    UPDATE dialogue_sessions
+    SET ended_at = now()
+    WHERE user_id = p_player_id
+      AND npc_slug = p_npc_slug
+      AND ended_at IS NULL;
+END;
+$$;
+
 -- ============================================================
 -- GRANTS
 -- ============================================================
@@ -237,6 +279,8 @@ GRANT EXECUTE ON FUNCTION join_room TO authenticated;
 GRANT EXECUTE ON FUNCTION leave_room TO authenticated;
 GRANT EXECUTE ON FUNCTION record_dialogue_turn TO authenticated;
 GRANT EXECUTE ON FUNCTION set_online_status TO authenticated;
+GRANT EXECUTE ON FUNCTION find_or_create_dialogue_session TO authenticated;
+GRANT EXECUTE ON FUNCTION close_dialogue_session TO authenticated;
 
 -- Table SELECT (mutations go through RPC)
 GRANT SELECT ON player_profiles TO authenticated;

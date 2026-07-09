@@ -384,10 +384,10 @@ namespace NPCSystem.Tests
 
         static void AttachMinimalChatClient(GameObject managerObject, NPCDialogueManager manager)
         {
-            manager.chatClient = managerObject.AddComponent<NPCLocalAIClient>();
-            manager.chatClient.numRetries = 0;
-            manager.chatClient.host = "127.0.0.1";
-            manager.chatClient.port = 19999;
+            manager.ChatClient = managerObject.AddComponent<NPCLocalAIClient>();
+            manager.ChatClient.numRetries = 0;
+            manager.ChatClient.host = "127.0.0.1";
+            manager.ChatClient.port = 19999;
         }
     }
 }

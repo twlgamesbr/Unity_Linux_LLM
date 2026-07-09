@@ -1,18 +1,49 @@
 using System;
 using System.Globalization;
 using System.IO;
+using Newtonsoft.Json;
+using Supabase.Gotrue;
+using Supabase.Gotrue.Interfaces;
 using UnityEngine;
 
 namespace NPCSystem
 {
     /// <summary>
-    /// Persists <see cref="PlayerAuthSessionResponse"/> to disk for session restore across game restarts.
+    /// Persists <see cref="Supabase.Gotrue.Session"/> to disk for session restore,
+    /// implementing <see cref="IGotrueSessionPersistence{Session}"/> for the supabase-csharp SDK.
+    /// Also provides backward-compatible static helpers for <see cref="PlayerAuthSessionResponse"/>.
     /// </summary>
-    static class PlayerSessionStore
+    public class UnitySessionStore : IGotrueSessionPersistence<Session>
     {
         const string RelativePath = "NPCDialogue/player-auth-session.json";
 
-        public static PlayerAuthSessionResponse Load()
+        // ── IGotrueSessionPersistence<Session> ─────────────────────
+
+        public void SaveSession(Session session)
+        {
+            if (session == null)
+            {
+                DestroySession();
+                return;
+            }
+
+            string fullPath = GetFullPath();
+            string directory = Path.GetDirectoryName(fullPath);
+            if (!string.IsNullOrWhiteSpace(directory) && !Directory.Exists(directory))
+                Directory.CreateDirectory(directory);
+
+            string json = JsonConvert.SerializeObject(session, Formatting.Indented);
+            File.WriteAllText(fullPath, json);
+        }
+
+        public void DestroySession()
+        {
+            string fullPath = GetFullPath();
+            if (File.Exists(fullPath))
+                File.Delete(fullPath);
+        }
+
+        public Session LoadSession()
         {
             string fullPath = GetFullPath();
             if (!File.Exists(fullPath))
@@ -21,16 +52,11 @@ namespace NPCSystem
             try
             {
                 string json = File.ReadAllText(fullPath);
-                PlayerAuthSessionResponse session = JsonUtility.FromJson<PlayerAuthSessionResponse>(
-                    json
-                );
-                if (
-                    session == null
-                    || string.IsNullOrWhiteSpace(session.sessionToken)
-                    || IsExpired(session.expiresAtUtc)
-                )
+                var session = JsonConvert.DeserializeObject<Session>(json);
+
+                if (session == null || string.IsNullOrWhiteSpace(session.AccessToken))
                 {
-                    Clear();
+                    DestroySession();
                     return null;
                 }
 
@@ -38,36 +64,93 @@ namespace NPCSystem
             }
             catch
             {
-                Clear();
+                DestroySession();
                 return null;
             }
         }
 
-        public static void Save(PlayerAuthSessionResponse session)
+        // ── Backward-compat static helpers ────────────────────────
+
+        public static PlayerAuthSessionResponse ToAuthSession(Session session)
         {
-            if (session == null || string.IsNullOrWhiteSpace(session.sessionToken))
+            if (session == null)
+                return null;
+
+            string username = "unknown";
+            if (session.User != null && !string.IsNullOrWhiteSpace(session.User.Email))
+            {
+                int atIndex = session.User.Email.IndexOf('@');
+                username = atIndex > 0
+                    ? session.User.Email.Substring(0, atIndex)
+                    : session.User.Email;
+            }
+
+            return new PlayerAuthSessionResponse
+            {
+                sessionId = session.User?.Id ?? string.Empty,
+                playerId = session.User?.Id ?? string.Empty,
+                username = username,
+                sessionToken = session.AccessToken ?? string.Empty,
+                refreshToken = session.RefreshToken ?? string.Empty,
+                createdAtUtc = session.CreatedAt.ToString("O"),
+                expiresAtUtc = session.ExpiresAt().ToString("O"),
+                lastSeenAtUtc = DateTime.UtcNow.ToString("O"),
+            };
+        }
+
+        public static PlayerAuthSessionResponse Load()
+        {
+            var store = new UnitySessionStore();
+            var session = store.LoadSession();
+            return ToAuthSession(session);
+        }
+
+        public static void Save(PlayerAuthSessionResponse authSession)
+        {
+            if (authSession == null || string.IsNullOrWhiteSpace(authSession.sessionToken))
             {
                 Clear();
                 return;
             }
 
-            string fullPath = GetFullPath();
-            string directory = Path.GetDirectoryName(fullPath);
-            if (!string.IsNullOrWhiteSpace(directory) && !Directory.Exists(directory))
+            var session = new Session
             {
-                Directory.CreateDirectory(directory);
+                AccessToken = authSession.sessionToken,
+                RefreshToken = authSession.refreshToken ?? string.Empty,
+                TokenType = "bearer",
+                CreatedAt = DateTime.UtcNow,
+                User = new User
+                {
+                    Id = authSession.playerId,
+                    Email = $"{authSession.username}@npc-game.local",
+                },
+            };
+
+            if (!string.IsNullOrWhiteSpace(authSession.expiresAtUtc)
+                && DateTime.TryParse(
+                    authSession.expiresAtUtc,
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.AdjustToUniversal | DateTimeStyles.AssumeUniversal,
+                    out DateTime expiresAt
+                ))
+            {
+                session.ExpiresIn = (long)(expiresAt - DateTime.UtcNow).TotalSeconds;
+                if (session.ExpiresIn < 0)
+                    session.ExpiresIn = 0;
+            }
+            else
+            {
+                session.ExpiresIn = 3600;
             }
 
-            File.WriteAllText(fullPath, JsonUtility.ToJson(session, true));
+            var store = new UnitySessionStore();
+            store.SaveSession(session);
         }
 
         public static void Clear()
         {
-            string fullPath = GetFullPath();
-            if (File.Exists(fullPath))
-            {
-                File.Delete(fullPath);
-            }
+            var store = new UnitySessionStore();
+            store.DestroySession();
         }
 
         public static bool IsExpired(string expiresAtUtc)

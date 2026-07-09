@@ -1,11 +1,11 @@
 using System;
 using System.Globalization;
-using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using EditorAttributes;
+using Supabase;
+using Supabase.Gotrue;
+using Supabase.Gotrue.Interfaces;
 using UnityEngine;
-using UnityEngine.Networking;
 
 namespace NPCSystem
 {
@@ -13,7 +13,7 @@ namespace NPCSystem
     [DisallowMultipleComponent]
     public class PlayerAuthService : MonoBehaviour
     {
-        [Title("Player Auth Service — Supabase Gotrue")]
+        [Title("Player Auth Service — Supabase Gotrue (SDK)")]
         [FoldoutGroup(
             "Supabase Auth",
             true,
@@ -22,7 +22,7 @@ namespace NPCSystem
             nameof(restApiUrl)
         )]
         [HelpBox(
-            "Anon key is required for PostgREST access. The URL should point to your self-hosted Gotrue instance. For development, the default localhost:8091 is used. restApiUrl points to PostgREST for player profile creation.",
+            "supabaseUrl points to Gotrue. restApiUrl points to PostgREST. For development defaults: Gotrue on :8091, PostgREST on :8092.",
             MessageMode.Log
         )]
         [SerializeField]
@@ -106,14 +106,24 @@ namespace NPCSystem
         [SerializeField, HideProperty, ReadOnly]
         long lastAuthDurationMs;
 
+        // ── Runtime state ────────────────────────────────────────────
+
+        Supabase.Client _supabaseClient;
+        UnitySessionStore _sessionStore;
         bool _initialized;
 
         public PlayerAuthSessionResponse CurrentSession { get; private set; }
         public bool IsAuthenticated =>
             CurrentSession != null
             && !string.IsNullOrWhiteSpace(CurrentSession.sessionToken)
-            && !PlayerSessionStore.IsExpired(CurrentSession.expiresAtUtc);
+            && !UnitySessionStore.IsExpired(CurrentSession.expiresAtUtc);
         public string SupabaseUrl => supabaseUrl?.Trim() ?? string.Empty;
+
+        /// <summary>
+        /// Exposes the underlying supabase-csharp client so that other components
+        /// (e.g. <see cref="SupabaseDialogueRepository"/>) can use the SDK directly.
+        /// </summary>
+        public Supabase.Client SupabaseClient => _supabaseClient;
 
         [ShowInInspector]
         string SupabaseUrlPreview => supabaseUrl?.Trim() ?? string.Empty;
@@ -126,7 +136,7 @@ namespace NPCSystem
 
         [ShowInInspector]
         string BackendHealthPreview =>
-            $"{BuildGotrueUrl("health")} | timeout={Mathf.Max(1, Mathf.CeilToInt(requestTimeoutSeconds))}s";
+            $"{supabaseUrl} | timeout={Mathf.Max(1, Mathf.CeilToInt(requestTimeoutSeconds))}s";
 
         [Button("Validate Auth Service Settings")]
         void ValidateAuthServiceSettings()
@@ -184,39 +194,88 @@ namespace NPCSystem
                 }
             );
 
-            CurrentSession = PlayerSessionStore.Load();
-            _initialized = true;
-
-            if (CurrentSession == null)
+            try
             {
-                lastAuthStatus = "No stored auth session found.";
-                scope.Skipped(lastAuthStatus);
+                _sessionStore = new UnitySessionStore();
+
+                var options = new SupabaseOptions
+                {
+                    AutoRefreshToken = true,
+                    AutoConnectRealtime = false,
+                    SessionHandler = _sessionStore,
+                    AuthUrlFormat = "{0}",
+                    RestUrlFormat = restApiUrl,
+                };
+
+                _supabaseClient = new Supabase.Client(
+                    supabaseUrl.TrimEnd('/'),
+                    supabaseAnonKey,
+                    options
+                );
+
+                _supabaseClient.Auth.AddDebugListener((msg, ex) =>
+                {
+                    if (ex != null)
+                        Debug.Log($"[Supabase Auth] {msg}: {ex.Message}");
+                });
+
+                _supabaseClient.Auth.AddStateChangedListener(
+                    (Supabase.Gotrue.Interfaces.IGotrueClient<User, Session> sender, Constants.AuthState state) =>
+                    {
+                        OnAuthStateChanged(state);
+                    }
+                );
+
+                _supabaseClient.Auth.Options.AllowUnconfirmedUserSessions = true;
+
+                _supabaseClient.Auth.LoadSession();
+
+                await _supabaseClient.InitializeAsync();
+
+                _initialized = true;
+
+                if (_supabaseClient.Auth.CurrentSession != null)
+                {
+                    CurrentSession = UnitySessionStore.ToAuthSession(
+                        _supabaseClient.Auth.CurrentSession
+                    );
+                    lastAuthStatus =
+                        $"SDK initialized. Session active for {CurrentSession.username}.";
+                }
+                else
+                {
+                    lastAuthStatus = "SDK initialized. No active session.";
+                }
+
+                if (!validateStoredSessionOnStart)
+                {
+                    scope.Success(lastAuthStatus);
+                    return IsAuthenticated ? CurrentSession : null;
+                }
+
+                if (CurrentSession == null)
+                {
+                    scope.Skipped("No stored auth session found.");
+                    return null;
+                }
+
+                PlayerAuthSessionResponse restored = await TryRestoreStoredSessionAsync();
+                if (restored == null)
+                    scope.Warning("Stored auth session could not be restored.");
+                else
+                    scope.Success(
+                        $"Stored auth session restored for {restored.username}.",
+                        BuildSessionData(restored)
+                    );
+
+                return restored;
+            }
+            catch (Exception ex)
+            {
+                lastAuthStatus = $"SDK init failed: {ex.Message}";
+                scope.Error(ex, lastAuthStatus);
                 return null;
             }
-
-            if (!validateStoredSessionOnStart)
-            {
-                lastAuthStatus = IsAuthenticated
-                    ? $"Stored auth session loaded for {CurrentSession.username}."
-                    : "Stored auth session is not valid.";
-                scope.Success(lastAuthStatus, BuildSessionData(CurrentSession));
-                return IsAuthenticated ? CurrentSession : null;
-            }
-
-            PlayerAuthSessionResponse restored = await TryRestoreStoredSessionAsync();
-            if (restored == null)
-            {
-                scope.Warning("Stored auth session could not be restored.");
-            }
-            else
-            {
-                scope.Success(
-                    $"Stored auth session restored for {restored.username}.",
-                    BuildSessionData(restored)
-                );
-            }
-
-            return restored;
         }
 
         public async Task<PlayerAuthRegisterResponse> RegisterAsync(
@@ -225,41 +284,24 @@ namespace NPCSystem
         )
         {
             string email = EmailFromUsername(username?.Trim() ?? string.Empty);
-            string rawPassword = password ?? string.Empty;
 
-            // Step 1: signup via Gotrue
-            var signupBody = new GotrueSignupRequest { email = email, password = rawPassword };
-
-            GotrueSessionResponse signupResponse = await SendGotrueJsonAsync<GotrueSessionResponse>(
-                "signup",
-                UnityWebRequest.kHttpVerbPOST,
-                JsonUtility.ToJson(signupBody)
+            Session session = await _supabaseClient.Auth.SignUp(
+                email,
+                password ?? string.Empty,
+                null
             );
-            if (signupResponse?.user == null || string.IsNullOrWhiteSpace(signupResponse.user.id))
+
+            if (session?.User == null || string.IsNullOrWhiteSpace(session.User.Id))
                 throw new InvalidOperationException("Supabase signup returned no user.");
 
-            // Create player profile immediately using the signup session token,
-            // so a player_profiles row exists from the moment the user registers
-            if (!string.IsNullOrWhiteSpace(signupResponse.access_token))
-            {
-                string previousSessionToken = CurrentSession?.sessionToken;
-                CurrentSession = new PlayerAuthSessionResponse
-                {
-                    playerId = signupResponse.user.id,
-                    sessionToken = signupResponse.access_token,
-                    username = username?.Trim() ?? string.Empty,
-                };
-                await TryCreatePlayerProfileAsync(username?.Trim() ?? string.Empty);
-                CurrentSession =
-                    previousSessionToken != null
-                        ? new PlayerAuthSessionResponse { sessionToken = previousSessionToken }
-                        : null;
-            }
+            CurrentSession = UnitySessionStore.ToAuthSession(session);
+
+            await TryCreatePlayerProfileAsync(username?.Trim() ?? string.Empty);
 
             return new PlayerAuthRegisterResponse
             {
-                playerId = signupResponse.user.id,
-                email = signupResponse.user.email ?? email,
+                playerId = session.User.Id,
+                email = session.User.Email ?? email,
                 username = username?.Trim() ?? string.Empty,
                 createdAtUtc = DateTime.UtcNow.ToString("O"),
             };
@@ -267,63 +309,27 @@ namespace NPCSystem
 
         async Task TryCreatePlayerProfileAsync(string displayName)
         {
-            if (string.IsNullOrWhiteSpace(restApiUrl) || string.IsNullOrWhiteSpace(supabaseAnonKey))
+            if (_supabaseClient == null)
                 return;
-
-            string url = $"{restApiUrl.TrimEnd('/')}/rpc/create_or_update_player_profile";
-            var body = new System.Collections.Generic.Dictionary<string, object>
-            {
-                ["p_display_name"] = displayName?.Trim() ?? string.Empty,
-            };
-            string jsonBody = Newtonsoft.Json.JsonConvert.SerializeObject(body);
 
             try
             {
-                using var request = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST);
-                request.downloadHandler = new DownloadHandlerBuffer();
-                request.uploadHandler = new UploadHandlerRaw(
-                    System.Text.Encoding.UTF8.GetBytes(jsonBody)
-                );
-                request.SetRequestHeader("apikey", supabaseAnonKey);
-                request.SetRequestHeader("Content-Type", "application/json");
-                request.SetRequestHeader("Accept", "application/json");
-                if (!string.IsNullOrWhiteSpace(CurrentSession?.sessionToken))
-                    request.SetRequestHeader(
-                        "Authorization",
-                        $"Bearer {CurrentSession.sessionToken}"
+                await _supabaseClient.Rpc("create_or_update_player_profile", new
+                {
+                    p_display_name = displayName?.Trim() ?? string.Empty,
+                });
+
+                NPCFlowLogger
+                    .FindOrCreate()
+                    ?.Log(
+                        NPCFlowStage.ConfigurationValidation,
+                        NPCFlowStatus.Success,
+                        NPCFlowLogLevel.Debug,
+                        $"Player profile created/updated for '{displayName}'.",
+                        source: nameof(PlayerAuthService)
                     );
-                request.timeout = Mathf.Max(1, Mathf.CeilToInt(requestTimeoutSeconds));
-
-                var operation = request.SendWebRequest();
-                while (!operation.isDone)
-                    await Task.Yield();
-
-                if (request.responseCode >= 200 && request.responseCode < 300)
-                {
-                    NPCFlowLogger
-                        .FindOrCreate()
-                        ?.Log(
-                            NPCFlowStage.ConfigurationValidation,
-                            NPCFlowStatus.Success,
-                            NPCFlowLogLevel.Debug,
-                            $"Player profile created/updated for '{displayName}'.",
-                            source: nameof(PlayerAuthService)
-                        );
-                }
-                else
-                {
-                    NPCFlowLogger
-                        .FindOrCreate()
-                        ?.Log(
-                            NPCFlowStage.ConfigurationValidation,
-                            NPCFlowStatus.Warning,
-                            NPCFlowLogLevel.Warning,
-                            $"Player profile RPC returned HTTP {request.responseCode}: {request.downloadHandler?.text ?? request.error}",
-                            source: nameof(PlayerAuthService)
-                        );
-                }
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 NPCFlowLogger
                     .FindOrCreate()
@@ -344,78 +350,63 @@ namespace NPCSystem
         )
         {
             string email = EmailFromUsername(username?.Trim() ?? string.Empty);
-            PlayerAuthSessionResponse session = await LoginInternalAsync(
-                email,
-                password ?? string.Empty,
-                rememberMe
-            );
-            return session;
+
+            Session session = await _supabaseClient.Auth.SignIn(email, password ?? string.Empty);
+
+            if (session == null || string.IsNullOrWhiteSpace(session.AccessToken) || session.User == null)
+                throw new InvalidOperationException("Supabase login returned an invalid session.");
+
+            CurrentSession = UnitySessionStore.ToAuthSession(session);
+
+            if (rememberMe)
+                UnitySessionStore.Save(CurrentSession);
+            else
+                UnitySessionStore.Clear();
+
+            await TryCreatePlayerProfileAsync(username?.Trim() ?? string.Empty);
+
+            lastAuthStatus =
+                $"Login successful for '{username?.Trim()}'. Session expires at {CurrentSession.expiresAtUtc}.";
+            return CurrentSession;
         }
 
         public async Task<PlayerAuthSessionResponse> TryRestoreStoredSessionAsync()
         {
-            if (CurrentSession == null || string.IsNullOrWhiteSpace(CurrentSession.sessionToken))
-                return null;
-
-            if (PlayerSessionStore.IsExpired(CurrentSession.expiresAtUtc))
+            if (_supabaseClient?.Auth?.CurrentSession == null)
             {
-                // Try refresh before giving up
-                bool refreshed = await TryRefreshTokenAsync();
-                if (!refreshed)
-                {
-                    ClearLocalSession();
-                    return null;
-                }
-                return CurrentSession;
+                ClearLocalSession();
+                return null;
             }
 
-            // Validate the stored token
             try
             {
-                GotrueUserResponse user = await SendGotrueJsonAsync<GotrueUserResponse>(
-                    "user",
-                    UnityWebRequest.kHttpVerbGET,
-                    null,
-                    CurrentSession.sessionToken
-                );
-                if (user == null || string.IsNullOrWhiteSpace(user.id))
+                if (_supabaseClient.Auth.CurrentSession.Expired())
+                {
+                    await _supabaseClient.Auth.RefreshToken();
+                }
+
+                if (_supabaseClient.Auth.CurrentSession == null)
                 {
                     ClearLocalSession();
                     return null;
                 }
 
-                // Session is valid — update playerId if needed
-                CurrentSession.playerId = user.id;
-                PlayerSessionStore.Save(CurrentSession);
+                CurrentSession = UnitySessionStore.ToAuthSession(
+                    _supabaseClient.Auth.CurrentSession
+                );
 
-                // Update profile on session restore (last_login_at, is_online)
                 await TryCreatePlayerProfileAsync(CurrentSession.username);
                 return CurrentSession;
             }
             catch
             {
-                // Token might be expired — try refresh
-                bool refreshed = await TryRefreshTokenAsync();
-                if (!refreshed)
-                {
-                    ClearLocalSession();
-                    return null;
-                }
-
-                // Update profile on token refresh
-                await TryCreatePlayerProfileAsync(CurrentSession.username);
-                return CurrentSession;
+                ClearLocalSession();
+                return null;
             }
         }
 
         public async Task LogoutAsync()
         {
-            if (CurrentSession == null || string.IsNullOrWhiteSpace(CurrentSession.sessionToken))
-            {
-                ClearLocalSession();
-                return;
-            }
-
             using var scope = NPCFlowScope.Start(
                 NPCFlowLogger.FindOrCreate(),
                 NPCFlowStage.AuthSession,
@@ -424,13 +415,10 @@ namespace NPCSystem
             );
             try
             {
-                await SendGotrueJsonAsync<PlayerAuthEmptyResponse>(
-                    "logout",
-                    UnityWebRequest.kHttpVerbPOST,
-                    "{}",
-                    CurrentSession.sessionToken
-                );
-                lastAuthStatus = $"Logged out auth session for {CurrentSession.username}.";
+                if (_supabaseClient?.Auth != null)
+                    await _supabaseClient.Auth.SignOut();
+
+                lastAuthStatus = "Logged out auth session.";
                 scope.Success(lastAuthStatus);
             }
             catch (Exception ex)
@@ -443,241 +431,28 @@ namespace NPCSystem
             }
         }
 
-        // ── Internal auth helpers ─────────────────────────────────
+        // ── Internal ──────────────────────────────────────────────
 
-        async Task<PlayerAuthSessionResponse> LoginInternalAsync(
-            string email,
-            string password,
-            bool rememberMe
-        )
+        void OnAuthStateChanged(Constants.AuthState state)
         {
-            var body = new GotruePasswordGrantRequest { email = email, password = password };
-
-            GotrueSessionResponse gotrueSession = await SendGotrueJsonAsync<GotrueSessionResponse>(
-                "token?grant_type=password",
-                UnityWebRequest.kHttpVerbPOST,
-                JsonUtility.ToJson(body)
-            );
-            if (
-                gotrueSession == null
-                || string.IsNullOrWhiteSpace(gotrueSession.access_token)
-                || gotrueSession.user == null
-            )
-                throw new InvalidOperationException("Supabase login returned an invalid session.");
-
-            int expiresIn = Math.Max(gotrueSession.expires_in, 3600);
-            string username = UsernameFromEmail(gotrueSession.user.email);
-
-            var session = new PlayerAuthSessionResponse
+            if (_supabaseClient?.Auth?.CurrentSession != null)
             {
-                sessionId = gotrueSession.user.id,
-                playerId = gotrueSession.user.id,
-                username = username,
-                sessionToken = gotrueSession.access_token,
-                refreshToken = gotrueSession.refresh_token ?? string.Empty,
-                createdAtUtc = DateTime.UtcNow.ToString("O"),
-                expiresAtUtc = DateTime.UtcNow.AddSeconds(expiresIn).ToString("O"),
-                lastSeenAtUtc = DateTime.UtcNow.ToString("O"),
-            };
-
-            CurrentSession = session;
-            if (rememberMe)
-                PlayerSessionStore.Save(session);
+                CurrentSession = UnitySessionStore.ToAuthSession(
+                    _supabaseClient.Auth.CurrentSession
+                );
+                lastAuthStatus = $"Auth state changed: {state} for {CurrentSession.username}";
+            }
             else
-                PlayerSessionStore.Clear();
-
-            // Create/update player profile via PostgREST RPC
-            await TryCreatePlayerProfileAsync(username);
-
-            lastAuthStatus =
-                $"Login successful for '{username}'. Session expires at {session.expiresAtUtc}.";
-            return session;
-        }
-
-        async Task<bool> TryRefreshTokenAsync()
-        {
-            if (CurrentSession == null || string.IsNullOrWhiteSpace(CurrentSession.refreshToken))
-                return false;
-
-            try
             {
-                var body = new GotrueRefreshGrantRequest
-                {
-                    refresh_token = CurrentSession.refreshToken,
-                };
-
-                GotrueSessionResponse refreshed = await SendGotrueJsonAsync<GotrueSessionResponse>(
-                    "token?grant_type=refresh_token",
-                    UnityWebRequest.kHttpVerbPOST,
-                    JsonUtility.ToJson(body)
-                );
-                if (
-                    refreshed == null
-                    || string.IsNullOrWhiteSpace(refreshed.access_token)
-                    || refreshed.user == null
-                )
-                    return false;
-
-                int expiresIn = Math.Max(refreshed.expires_in, 3600);
-                string username = UsernameFromEmail(refreshed.user.email);
-
-                CurrentSession.playerId = refreshed.user.id;
-                CurrentSession.username = username;
-                CurrentSession.sessionToken = refreshed.access_token;
-                CurrentSession.refreshToken =
-                    refreshed.refresh_token ?? CurrentSession.refreshToken;
-                CurrentSession.expiresAtUtc = DateTime.UtcNow.AddSeconds(expiresIn).ToString("O");
-                CurrentSession.lastSeenAtUtc = DateTime.UtcNow.ToString("O");
-                PlayerSessionStore.Save(CurrentSession);
-
-                lastAuthStatus = $"Session refreshed for {username}.";
-                return true;
+                CurrentSession = null;
+                lastAuthStatus = $"Auth state changed: {state} (no session)";
             }
-            catch
-            {
-                return false;
-            }
-        }
-
-        // ── Gotrue HTTP layer ─────────────────────────────────────
-
-        async Task<TResponse> SendGotrueJsonAsync<TResponse>(
-            string route,
-            string method,
-            string jsonBody = null,
-            string bearerToken = null
-        )
-        {
-            string url = BuildGotrueUrl(route);
-            NPCFlowLogger logger = NPCFlowLogger.FindOrCreate();
-            int timeoutSeconds = Mathf.Max(1, Mathf.CeilToInt(requestTimeoutSeconds));
-            lastAuthRoute = route?.Trim() ?? string.Empty;
-            var data = new System.Collections.Generic.Dictionary<string, object>
-            {
-                ["route"] = route ?? string.Empty,
-                ["method"] = method ?? string.Empty,
-                ["url"] = url,
-                ["timeoutSeconds"] = timeoutSeconds,
-                ["hasJsonBody"] = !string.IsNullOrWhiteSpace(jsonBody),
-                ["hasBearerToken"] = !string.IsNullOrWhiteSpace(bearerToken),
-            };
-            using var scope = NPCFlowScope.Start(
-                logger,
-                NPCFlowStage.AuthRequest,
-                nameof(PlayerAuthService),
-                data: data
-            );
-            using var request = new UnityWebRequest(url, method);
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.timeout = timeoutSeconds;
-            request.SetRequestHeader("Accept", "application/json");
-            request.SetRequestHeader("apikey", supabaseAnonKey);
-
-            if (!string.IsNullOrWhiteSpace(jsonBody))
-            {
-                request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(jsonBody));
-                request.SetRequestHeader("Content-Type", "application/json");
-            }
-
-            if (!string.IsNullOrWhiteSpace(bearerToken))
-            {
-                request.SetRequestHeader("Authorization", $"Bearer {bearerToken}");
-            }
-
-            var operation = request.SendWebRequest();
-            while (!operation.isDone)
-            {
-                await Task.Yield();
-            }
-
-            if (
-                request.result == UnityWebRequest.Result.ConnectionError
-                || request.result == UnityWebRequest.Result.ProtocolError
-            )
-            {
-                string error = ParseGotrueError(
-                    request.downloadHandler.text,
-                    request.error,
-                    request.responseCode
-                );
-                lastAuthDurationMs = scope.ElapsedMilliseconds;
-                lastAuthStatus =
-                    $"Auth request failed: {route} -> HTTP {request.responseCode} {error}";
-                scope.Error(
-                    new InvalidOperationException(error),
-                    lastAuthStatus,
-                    new System.Collections.Generic.Dictionary<string, object>
-                    {
-                        ["responseCode"] = request.responseCode,
-                        ["responseText"] = request.downloadHandler.text ?? string.Empty,
-                    }
-                );
-                throw new InvalidOperationException(error);
-            }
-
-            // 204 No Content (e.g. logout) — return default
-            if (
-                request.responseCode == 204
-                || string.IsNullOrWhiteSpace(request.downloadHandler.text)
-            )
-            {
-                lastAuthDurationMs = scope.ElapsedMilliseconds;
-                lastAuthStatus = $"Auth request succeeded (HTTP {request.responseCode}): {route}";
-                scope.Success(lastAuthStatus);
-                return default;
-            }
-
-            string responseText = request.downloadHandler.text;
-            TResponse response = JsonUtility.FromJson<TResponse>(responseText);
-            if (response == null)
-            {
-                string error = "Auth server returned an unreadable response.";
-                lastAuthDurationMs = scope.ElapsedMilliseconds;
-                lastAuthStatus = $"{route} failed: {error}";
-                scope.Error(new InvalidOperationException(error), lastAuthStatus);
-                throw new InvalidOperationException(error);
-            }
-
-            lastAuthDurationMs = scope.ElapsedMilliseconds;
-            lastAuthStatus = $"Auth request succeeded: {route} (HTTP {request.responseCode})";
-            scope.Success(lastAuthStatus);
-
-            return response;
         }
 
         void ClearLocalSession()
         {
             CurrentSession = null;
-            PlayerSessionStore.Clear();
-        }
-
-        string BuildGotrueUrl(string route)
-        {
-            return $"{supabaseUrl.TrimEnd('/')}/{route.TrimStart('/')}";
-        }
-
-        static string ParseGotrueError(string responseText, string fallback, long statusCode)
-        {
-            if (!string.IsNullOrWhiteSpace(responseText))
-            {
-                GotrueErrorResponse err = JsonUtility.FromJson<GotrueErrorResponse>(responseText);
-                if (err != null)
-                {
-                    if (!string.IsNullOrWhiteSpace(err.error_description))
-                        return err.error_description;
-                    if (!string.IsNullOrWhiteSpace(err.msg))
-                        return err.msg;
-                }
-            }
-
-            if (statusCode == 401)
-                return "Invalid or expired session token.";
-            if (statusCode == 422)
-                return "Invalid email or password format.";
-            if (statusCode == 429)
-                return "Rate limited. Please wait and try again.";
-
-            return string.IsNullOrWhiteSpace(fallback) ? "Auth request failed." : fallback;
+            UnitySessionStore.Clear();
         }
 
         static string EmailFromUsername(string username)

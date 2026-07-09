@@ -1,35 +1,17 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 using EditorAttributes;
-using Newtonsoft.Json.Linq;
+using Supabase;
+using static Postgrest.Constants;
 using UnityEngine;
-using UnityEngine.Networking;
 
 namespace NPCSystem
 {
     [Serializable]
     public class SupabaseDialogueRepository : MonoBehaviour
     {
-        [Title("Supabase Dialogue Repository")]
-        [FoldoutGroup("Supabase REST", true, nameof(restUrl), nameof(anonKey))]
-        [HelpBox(
-            "Anon key is required for PostgREST. The REST URL is typically <supabase-url>/rest/v1/. For development, default localhost:8000 is used.",
-            MessageMode.Log
-        )]
-        [SerializeField]
-        EditorAttributes.Void restGroup;
-
-        [SerializeField, HideProperty]
-        [OnValueChanged(nameof(ValidateRepositorySettings))]
-        string restUrl = "http://localhost:8000";
-
-        [SerializeField, HideProperty]
-        [Required]
-        [OnValueChanged(nameof(ValidateRepositorySettings))]
-        string anonKey = "dev-local-anon-key";
-
+        [Title("Supabase Dialogue Repository (SDK)")]
         [FoldoutGroup("References", true, nameof(authService))]
         [SerializeField]
         EditorAttributes.Void referencesGroup;
@@ -64,28 +46,25 @@ namespace NPCSystem
         long lastOperationDurationMs;
 
         [ShowInInspector]
-        string IsConfiguredPreview => IsConfigured ? "Yes" : "No (check auth + REST URL)";
+        string IsConfiguredPreview => IsConfigured ? "Yes" : "No (check auth)";
 
         [Button("Validate Repository Settings")]
         void ValidateRepositorySettings()
         {
-            bool validUrl =
-                !string.IsNullOrWhiteSpace(restUrl)
-                && (restUrl.StartsWith("http://") || restUrl.StartsWith("https://"));
-            bool validKey = !string.IsNullOrWhiteSpace(anonKey);
-            bool validAuth = authService != null;
+            bool validAuth = authService != null && authService.SupabaseClient != null;
+            bool authed = authService != null && authService.IsAuthenticated;
 
             lastStatus =
-                validUrl && validKey && validAuth
+                validAuth && authed
                     ? "Repository settings look valid."
-                    : "Repository settings are incomplete. Check REST URL, anon key, and AuthService reference.";
+                    : "Repository settings are incomplete. Check AuthService reference and ensure authenticated.";
             lastOperation = "ValidateRepositorySettings";
 
             NPCFlowLogger
                 .FindOrCreate()
                 ?.Log(
                     NPCFlowStage.ConfigurationValidation,
-                    validUrl && validKey && validAuth
+                    validAuth && authed
                         ? NPCFlowStatus.Success
                         : NPCFlowStatus.Warning,
                     NPCFlowLogLevel.Info,
@@ -93,14 +72,15 @@ namespace NPCSystem
                     source: nameof(SupabaseDialogueRepository),
                     data: new Dictionary<string, object>
                     {
-                        ["restUrl"] = restUrl ?? string.Empty,
                         ["authAssigned"] = validAuth,
+                        ["isAuthenticated"] = authed,
                     }
                 );
         }
 
         string _lastSessionId;
         NPCFlowLogger _logger;
+        Supabase.Client _client;
 
         void Awake()
         {
@@ -109,28 +89,17 @@ namespace NPCSystem
 
         public bool IsConfigured =>
             authService != null
-            && authService.IsAuthenticated
-            && !string.IsNullOrWhiteSpace(restUrl)
-            && !string.IsNullOrWhiteSpace(anonKey);
+            && authService.SupabaseClient != null
+            && authService.IsAuthenticated;
 
-        string BearerToken => IsConfigured ? authService.CurrentSession.sessionToken : null;
-
-        static string ToJson(Dictionary<string, object> dict)
+        Supabase.Client GetClient()
         {
-            return JObject.FromObject(dict).ToString(Newtonsoft.Json.Formatting.None);
+            if (_client == null && authService != null)
+                _client = authService.SupabaseClient;
+            return _client;
         }
 
-        static JArray ParseJsonArray(string json)
-        {
-            return JArray.Parse(json);
-        }
-
-        static string UnescapeJsonString(string json)
-        {
-            return JToken.Parse(json).ToString();
-        }
-
-        // \u2500\u2500 Load \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+        // ── Load ──────────────────────────────────────────────────
 
         public async Task<List<DialogueEntry>> LoadHistoryAsync(string npcSlug)
         {
@@ -138,54 +107,38 @@ namespace NPCSystem
                 return null;
 
             lastOperation = $"LoadHistoryAsync({npcSlug})";
-            long startedAt = (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds;
+            long startedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
             try
             {
-                // 1. Find the most recent active session for this player+NPC
-                string sessionUrl =
-                    $"{restUrl.TrimEnd('/')}/rest/v1/rpc/find_or_create_dialogue_session";
-                var sessionBody = new Dictionary<string, object>
-                {
-                    ["p_player_id"] = authService.CurrentSession.playerId,
-                    ["p_npc_slug"] = npcSlug,
-                };
-                string sessionJson = ToJson(sessionBody);
+                var client = GetClient();
 
-                string sessionId = await PostRpcAndGetStringAsync(sessionUrl, sessionJson);
+                string sessionId = await client.Rpc<string>("find_or_create_dialogue_session", new
+                {
+                    p_player_id = authService.CurrentSession.playerId,
+                    p_npc_slug = npcSlug,
+                });
 
                 if (string.IsNullOrWhiteSpace(sessionId))
                     return null;
 
                 _lastSessionId = sessionId;
 
-                // 2. Load turns for this session
-                string turnsUrl =
-                    $"{restUrl.TrimEnd('/')}/rest/v1/dialogue_turns"
-                    + $"?session_id=eq.{sessionId}"
-                    + "&order=created_at.asc"
-                    + "&select=role,content,created_at";
+                var response = await client
+                    .From<DialogueTurnRecord>()
+                    .Filter("session_id", Operator.Equals, sessionId)
+                    .Order("created_at", Ordering.Ascending)
+                    .Get();
 
-                string turnsJson = await GetRestJsonAsync(turnsUrl);
-
-                if (string.IsNullOrWhiteSpace(turnsJson) || turnsJson == "[]")
-                    return new List<DialogueEntry>();
-
-                // Parse the JSON array of turns into DialogueEntries
-                JArray turns = ParseJsonArray(turnsJson);
-                var entries = new List<DialogueEntry>(turns.Count);
-                foreach (JToken turn in turns)
+                var entries = new List<DialogueEntry>();
+                if (response.Models != null)
                 {
-                    JObject obj = turn as JObject;
-                    if (obj == null)
-                        continue;
-
-                    string role = obj.Value<string>("role");
-                    string content = obj.Value<string>("content");
-                    if (string.IsNullOrWhiteSpace(role) || content == null)
-                        continue;
-
-                    entries.Add(new DialogueEntry(role, content));
+                    foreach (var turn in response.Models)
+                    {
+                        if (string.IsNullOrWhiteSpace(turn.Role) || turn.Content == null)
+                            continue;
+                        entries.Add(new DialogueEntry(turn.Role, turn.Content));
+                    }
                 }
 
                 lastStatus =
@@ -207,12 +160,11 @@ namespace NPCSystem
             finally
             {
                 lastOperationDurationMs =
-                    (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds
-                    - startedAt;
+                    DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startedAt;
             }
         }
 
-        // \u2500\u2500 Save \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+        // ── Save ──────────────────────────────────────────────────
 
         public async Task<bool> SaveTurnAsync(string npcSlug, string role, string content)
         {
@@ -220,40 +172,33 @@ namespace NPCSystem
                 return false;
 
             lastOperation = $"SaveTurnAsync({npcSlug}, {role})";
-            long startedAt = (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds;
+            long startedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
             try
             {
-                // Ensure session exists
+                var client = GetClient();
+
                 if (string.IsNullOrWhiteSpace(_lastSessionId))
                 {
-                    string sessionUrl =
-                        $"{restUrl.TrimEnd('/')}/rest/v1/rpc/find_or_create_dialogue_session";
-                    var sessionBody = new Dictionary<string, object>
+                    string sessionId = await client.Rpc<string>("find_or_create_dialogue_session", new
                     {
-                        ["p_player_id"] = authService.CurrentSession.playerId,
-                        ["p_npc_slug"] = npcSlug,
-                    };
-                    string sessionId = await PostRpcAndGetStringAsync(
-                        sessionUrl,
-                        ToJson(sessionBody)
-                    );
+                        p_player_id = authService.CurrentSession.playerId,
+                        p_npc_slug = npcSlug,
+                    });
                     if (string.IsNullOrWhiteSpace(sessionId))
                         return false;
                     _lastSessionId = sessionId;
                 }
 
-                // POST the turn
-                string turnsUrl = $"{restUrl.TrimEnd('/')}/rest/v1/dialogue_turns";
-                var turnBody = new Dictionary<string, object>
+                var turn = new DialogueTurnRecord
                 {
-                    ["session_id"] = _lastSessionId,
-                    ["player_id"] = authService.CurrentSession.playerId,
-                    ["role"] = role,
-                    ["content"] = content,
+                    SessionId = _lastSessionId,
+                    PlayerId = authService.CurrentSession.playerId,
+                    Role = role,
+                    Content = content,
                 };
 
-                await PostRestJsonAsync(turnsUrl, ToJson(turnBody));
+                await client.From<DialogueTurnRecord>().Insert(turn);
 
                 lastStatus = $"Saved {role} turn for NPC '{npcSlug}' (session {_lastSessionId}).";
                 Log(NPCFlowStage.HistoryPersist, NPCFlowStatus.Success, lastStatus);
@@ -268,12 +213,11 @@ namespace NPCSystem
             finally
             {
                 lastOperationDurationMs =
-                    (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds
-                    - startedAt;
+                    DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startedAt;
             }
         }
 
-        // \u2500\u2500 Delete \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+        // ── Delete ────────────────────────────────────────────────
 
         public async Task<bool> DeleteHistoryAsync(string npcSlug)
         {
@@ -281,17 +225,17 @@ namespace NPCSystem
                 return false;
 
             lastOperation = $"DeleteHistoryAsync({npcSlug})";
-            long startedAt = (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds;
+            long startedAt = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
             try
             {
-                string closeUrl = $"{restUrl.TrimEnd('/')}/rest/v1/rpc/close_dialogue_session";
-                var body = new Dictionary<string, object>
+                var client = GetClient();
+
+                await client.Rpc("close_dialogue_session", new
                 {
-                    ["p_player_id"] = authService.CurrentSession.playerId,
-                    ["p_npc_slug"] = npcSlug,
-                };
-                await PostRpcAsync(closeUrl, ToJson(body));
+                    p_player_id = authService.CurrentSession.playerId,
+                    p_npc_slug = npcSlug,
+                });
 
                 _lastSessionId = null;
                 lastStatus = $"History deleted for NPC '{npcSlug}'.";
@@ -307,122 +251,11 @@ namespace NPCSystem
             finally
             {
                 lastOperationDurationMs =
-                    (long)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds
-                    - startedAt;
+                    DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - startedAt;
             }
         }
 
-        // \u2500\u2500 HTTP helpers \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
-
-        async Task<string> GetRestJsonAsync(string url)
-        {
-            using var request = UnityWebRequest.Get(url);
-            request.SetRequestHeader("apikey", anonKey);
-            request.SetRequestHeader("Authorization", $"Bearer {BearerToken}");
-            request.SetRequestHeader("Accept", "application/json");
-            request.timeout = Mathf.Max(1, Mathf.CeilToInt(requestTimeoutSeconds));
-
-            var operation = request.SendWebRequest();
-            while (!operation.isDone)
-                await Task.Yield();
-
-            if (request.result == UnityWebRequest.Result.ConnectionError)
-                throw new InvalidOperationException($"GET {url}: {request.error}");
-
-            return request.downloadHandler.text;
-        }
-
-        async Task PostRestJsonAsync(string url, string jsonBody)
-        {
-            using var request = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST);
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(jsonBody));
-            request.SetRequestHeader("apikey", anonKey);
-            request.SetRequestHeader("Authorization", $"Bearer {BearerToken}");
-            request.SetRequestHeader("Content-Type", "application/json");
-            request.SetRequestHeader("Accept", "application/json");
-            request.timeout = Mathf.Max(1, Mathf.CeilToInt(requestTimeoutSeconds));
-
-            var operation = request.SendWebRequest();
-            while (!operation.isDone)
-                await Task.Yield();
-
-            if (request.result == UnityWebRequest.Result.ConnectionError)
-                throw new InvalidOperationException($"POST {url}: {request.error}");
-
-            // 201 Created or 204 No Content are both success for REST
-            if (request.responseCode < 200 || request.responseCode >= 300)
-            {
-                string errorText = !string.IsNullOrWhiteSpace(request.downloadHandler.text)
-                    ? request.downloadHandler.text
-                    : request.error;
-                throw new InvalidOperationException(
-                    $"POST {url} returned HTTP {request.responseCode}: {errorText}"
-                );
-            }
-        }
-
-        async Task<string> PostRpcAndGetStringAsync(string url, string jsonBody)
-        {
-            using var request = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST);
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(jsonBody));
-            request.SetRequestHeader("apikey", anonKey);
-            request.SetRequestHeader("Authorization", $"Bearer {BearerToken}");
-            request.SetRequestHeader("Content-Type", "application/json");
-            request.SetRequestHeader("Accept", "application/json");
-            request.timeout = Mathf.Max(1, Mathf.CeilToInt(requestTimeoutSeconds));
-
-            var operation = request.SendWebRequest();
-            while (!operation.isDone)
-                await Task.Yield();
-
-            if (request.result == UnityWebRequest.Result.ConnectionError)
-                throw new InvalidOperationException($"RPC {url}: {request.error}");
-
-            if (request.responseCode < 200 || request.responseCode >= 300)
-            {
-                string errorText = !string.IsNullOrWhiteSpace(request.downloadHandler.text)
-                    ? request.downloadHandler.text
-                    : request.error;
-                throw new InvalidOperationException(
-                    $"RPC {url} returned HTTP {request.responseCode}: {errorText}"
-                );
-            }
-
-            string text = request.downloadHandler.text?.Trim();
-            if (string.IsNullOrWhiteSpace(text))
-                return null;
-
-            // If response starts with ", treat as JSON string literal
-            if (text.StartsWith("\""))
-            {
-                return UnescapeJsonString(text);
-            }
-
-            return text;
-        }
-
-        async Task PostRpcAsync(string url, string jsonBody)
-        {
-            using var request = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST);
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(jsonBody));
-            request.SetRequestHeader("apikey", anonKey);
-            request.SetRequestHeader("Authorization", $"Bearer {BearerToken}");
-            request.SetRequestHeader("Content-Type", "application/json");
-            request.SetRequestHeader("Accept", "application/json");
-            request.timeout = Mathf.Max(1, Mathf.CeilToInt(requestTimeoutSeconds));
-
-            var operation = request.SendWebRequest();
-            while (!operation.isDone)
-                await Task.Yield();
-
-            if (request.result == UnityWebRequest.Result.ConnectionError)
-                throw new InvalidOperationException($"RPC {url}: {request.error}");
-        }
-
-        // \u2500\u2500 Logging \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+        // ── Logging ──────────────────────────────────────────────
 
         void Log(NPCFlowStage stage, NPCFlowStatus status, string message)
         {

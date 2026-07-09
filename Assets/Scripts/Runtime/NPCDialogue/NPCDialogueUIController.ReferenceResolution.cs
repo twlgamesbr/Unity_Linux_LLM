@@ -23,9 +23,9 @@ namespace NPCSystem
                 .FindOrCreate()
                 .Log(
                     NPCFlowStage.ConfigurationValidation,
-                    dialogueManager != null ? NPCFlowStatus.Success : NPCFlowStatus.Warning,
-                    dialogueManager != null ? NPCFlowLogLevel.Info : NPCFlowLogLevel.Warning,
-                    dialogueManager != null
+                    DialogueManager != null ? NPCFlowStatus.Success : NPCFlowStatus.Warning,
+                    DialogueManager != null ? NPCFlowLogLevel.Info : NPCFlowLogLevel.Warning,
+                    DialogueManager != null
                         ? "NPCDialogueManager is assigned."
                         : "NPCDialogueManager is NOT assigned — runtime will not function.",
                     source: nameof(NPCDialogueUIController)
@@ -34,31 +34,31 @@ namespace NPCSystem
 
         void ResolveReferences()
         {
-            if (dialogueManager == null)
+            if (DialogueManager == null)
             {
-                dialogueManager = GetComponent<NPCDialogueManager>();
-                if (dialogueManager == null)
+                DialogueManager = GetComponent<NPCDialogueManager>();
+                if (DialogueManager == null)
                 {
-                    dialogueManager = FindAnyObjectByType<NPCDialogueManager>(
+                    DialogueManager = FindAnyObjectByType<NPCDialogueManager>(
                         FindObjectsInactive.Include
                     );
                 }
             }
 
-            if (networkBridge == null)
+            if (NetworkBridge == null)
             {
-                networkBridge = GetComponent<NPCDialogueNetworkBridge>();
-                if (networkBridge == null)
+                NetworkBridge = GetComponent<NPCDialogueNetworkBridge>();
+                if (NetworkBridge == null)
                 {
-                    networkBridge = FindAnyObjectByType<NPCDialogueNetworkBridge>(
+                    NetworkBridge = FindAnyObjectByType<NPCDialogueNetworkBridge>(
                         FindObjectsInactive.Include
                     );
                 }
             }
 
-            if (legacyKnowledgeBaseController == null)
+            if (LegacyKnowledgeBaseController == null)
             {
-                legacyKnowledgeBaseController = FindObjectsByType<Behaviour>(
+                LegacyKnowledgeBaseController = FindObjectsByType<Behaviour>(
                         FindObjectsInactive.Include
                     )
                     .FirstOrDefault(behaviour =>
@@ -67,29 +67,29 @@ namespace NPCSystem
                     );
             }
 
-            characterSelect =
-                characterSelect != null
-                    ? characterSelect
-                    : FindComponent<TMP_Dropdown>("Canvas/Dropdown");
-            playerInput =
-                playerInput != null
-                    ? playerInput
-                    : FindComponent<TMP_InputField>("Canvas/PlayerInput");
-            aiText = aiText != null ? aiText : FindComponent<TMP_Text>("Canvas/AIImage/AIText");
-            stopButton =
-                stopButton != null ? stopButton : FindComponent<Button>("Canvas/StopButton");
+            CharacterSelect =
+                CharacterSelect != null
+                    ? CharacterSelect
+                    : FindComponent<TMP_Dropdown>(this, "Canvas/Dropdown");
+            PlayerInput =
+                PlayerInput != null
+                    ? PlayerInput
+                    : FindComponent<TMP_InputField>(this, "Canvas/PlayerInput");
+            AiText = AiText != null ? AiText : FindComponent<TMP_Text>(this, "Canvas/AIImage/AIText");
+            StopButton =
+                StopButton != null ? StopButton : FindComponent<Button>(this, "Canvas/StopButton");
 
-            butlerImage =
-                butlerImage != null ? butlerImage : FindComponent<RawImage>("Canvas/ButlerImage");
-            maidImage = maidImage != null ? maidImage : FindComponent<RawImage>("Canvas/MaidImage");
-            chefImage = chefImage != null ? chefImage : FindComponent<RawImage>("Canvas/ChefImage");
+            ButlerImage =
+                ButlerImage != null ? ButlerImage : FindComponent<RawImage>(this, "Canvas/ButlerImage");
+            MaidImage = MaidImage != null ? MaidImage : FindComponent<RawImage>(this, "Canvas/MaidImage");
+            ChefImage = ChefImage != null ? ChefImage : FindComponent<RawImage>(this, "Canvas/ChefImage");
 
-            notebookController =
-                notebookController != null
-                    ? notebookController
+            NotebookController =
+                NotebookController != null
+                    ? NotebookController
                     : FindAnyObjectByType<NotebookUIController>(FindObjectsInactive.Include);
-            exitButton =
-                exitButton != null ? exitButton : FindComponent<Button>("Canvas/ExitButton");
+            ExitButton =
+                ExitButton != null ? ExitButton : FindComponent<Button>(this, "Canvas/ExitButton");
         }
     }
 }

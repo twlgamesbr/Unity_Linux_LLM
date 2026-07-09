@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using EditorAttributes;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace NPCSystem
@@ -20,77 +21,90 @@ namespace NPCSystem
         [FoldoutGroup(
             "References",
             true,
-            nameof(dialogueManager),
-            nameof(networkBridge),
-            nameof(legacyKnowledgeBaseController)
+            nameof(DialogueManager),
+            nameof(NetworkBridge),
+            nameof(LegacyKnowledgeBaseController)
         )]
         [SerializeField]
         EditorAttributes.Void referencesGroup;
 
+        [FormerlySerializedAs("dialogueManager")]
         [SerializeField, HideProperty, Required]
-        public NPCDialogueManager dialogueManager;
+        public NPCDialogueManager DialogueManager;
 
+        [FormerlySerializedAs("networkBridge")]
         [SerializeField, HideProperty]
-        public NPCDialogueNetworkBridge networkBridge;
+        public NPCDialogueNetworkBridge NetworkBridge;
 
+        [FormerlySerializedAs("legacyKnowledgeBaseController")]
         [SerializeField, HideProperty]
-        public Behaviour legacyKnowledgeBaseController;
+        public Behaviour LegacyKnowledgeBaseController;
 
         [FoldoutGroup(
             "Dialogue UI",
             true,
-            nameof(characterSelect),
-            nameof(playerInput),
-            nameof(aiText),
-            nameof(stopButton)
+            nameof(CharacterSelect),
+            nameof(PlayerInput),
+            nameof(AiText),
+            nameof(StopButton)
         )]
         [SerializeField]
         EditorAttributes.Void dialogueUiGroup;
 
+        [FormerlySerializedAs("characterSelect")]
         [SerializeField, HideProperty, Required]
-        public TMP_Dropdown characterSelect;
+        public TMP_Dropdown CharacterSelect;
 
+        [FormerlySerializedAs("playerInput")]
         [SerializeField, HideProperty, Required]
-        public TMP_InputField playerInput;
+        public TMP_InputField PlayerInput;
 
+        [FormerlySerializedAs("aiText")]
         [SerializeField, HideProperty, Required]
-        public TMP_Text aiText;
+        public TMP_Text AiText;
 
+        [FormerlySerializedAs("stopButton")]
         [SerializeField, HideProperty]
-        public Button stopButton;
+        public Button StopButton;
 
-        [FoldoutGroup("Portraits", true, nameof(butlerImage), nameof(maidImage), nameof(chefImage))]
+        [FoldoutGroup("Portraits", true, nameof(ButlerImage), nameof(MaidImage), nameof(ChefImage))]
         [SerializeField]
         EditorAttributes.Void portraitsGroup;
 
+        [FormerlySerializedAs("butlerImage")]
         [SerializeField, HideProperty]
-        public RawImage butlerImage;
+        public RawImage ButlerImage;
 
+        [FormerlySerializedAs("maidImage")]
         [SerializeField, HideProperty]
-        public RawImage maidImage;
+        public RawImage MaidImage;
 
+        [FormerlySerializedAs("chefImage")]
         [SerializeField, HideProperty]
-        public RawImage chefImage;
+        public RawImage ChefImage;
 
-        [FoldoutGroup("Notebook / Panels", true, nameof(notebookController))]
+        [FoldoutGroup("Notebook / Panels", true, nameof(NotebookController))]
         [SerializeField]
         EditorAttributes.Void notebookGroup;
 
+        [FormerlySerializedAs("notebookController")]
         [SerializeField, HideProperty]
-        public NotebookUIController notebookController;
+        public NotebookUIController NotebookController;
 
-        [FoldoutGroup("Exit and Startup", true, nameof(exitButton), nameof(initializeOnStart))]
+        [FoldoutGroup("Exit and Startup", true, nameof(ExitButton), nameof(InitializeOnStart))]
         [SerializeField]
         EditorAttributes.Void exitStartupGroup;
 
+        [FormerlySerializedAs("exitButton")]
         [SerializeField, HideProperty]
-        public Button exitButton;
+        public Button ExitButton;
 
         [Tooltip(
             "If true, UI and dialogue systems initialize on Start. If false, they initialize deferred post-login."
         )]
+        [FormerlySerializedAs("initializeOnStart")]
         [SerializeField, HideProperty]
-        public bool initializeOnStart = false;
+        public bool InitializeOnStart = false;
 
         [Title("Runtime Status")]
         [ShowInInspector, ReadOnly]
@@ -100,7 +114,7 @@ namespace NPCSystem
         string ActiveSlugPreview => GetActiveProfile()?.GetNpcSlug() ?? "<none>";
 
         [ShowInInspector, ReadOnly]
-        bool HasDialogueManager => dialogueManager != null;
+        bool HasDialogueManager => DialogueManager != null;
 
         [ShowInInspector, ReadOnly]
         bool IsInitialized =>
@@ -120,215 +134,118 @@ namespace NPCSystem
             ResolveReferences();
         }
 
-        async void Start()
+        void Start()
         {
-            if (initializeOnStart)
+            if (InitializeOnStart)
             {
-                await InitializeOnDemandAsync();
-            }
-            else
-            {
-                GameObject gameplayCanvas = GetGameplayCanvas();
-                if (gameplayCanvas != null)
-                {
-                    gameplayCanvas.SetActive(false);
-                }
+                _ = InitializeOnDemandInternalAsync();
             }
         }
 
         void OnDestroy()
         {
-            NPCPlayerCharacterController.LocalInstance?.SetUIActive(false);
-            UnbindRuntimeEvents();
-            UnbindUiListeners();
+            if (DialogueManager != null && _listenersBound)
+            {
+                DialogueManager.OnNpcChanged.RemoveListener(HandleNpcChanged);
+                DialogueManager.OnResponseStart.RemoveListener(HandleResponseStart);
+                DialogueManager.OnResponseUpdated.RemoveListener(HandleResponseUpdated);
+                DialogueManager.OnResponseComplete.RemoveListener(HandleResponseComplete);
+                DialogueManager.OnError.RemoveListener(HandleError);
+                _listenersBound = false;
+            }
         }
 
         void OnDisable()
         {
-            NPCPlayerCharacterController.LocalInstance?.SetUIActive(false);
+            if (DialogueManager != null && _listenersBound)
+            {
+                DialogueManager.OnNpcChanged.RemoveListener(HandleNpcChanged);
+                DialogueManager.OnResponseStart.RemoveListener(HandleResponseStart);
+                DialogueManager.OnResponseUpdated.RemoveListener(HandleResponseUpdated);
+                DialogueManager.OnResponseComplete.RemoveListener(HandleResponseComplete);
+                DialogueManager.OnError.RemoveListener(HandleError);
+                _listenersBound = false;
+            }
         }
 
         // ── Public API ──────────────────────────────────────────────────
 
-        public System.Threading.Tasks.Task InitializeOnDemandAsync()
+        public void SetInputEnabled(bool enabled)
         {
-            _onDemandInitTask ??= InitializeOnDemandInternalAsync();
-            return _onDemandInitTask;
+            if (PlayerInput != null)
+                PlayerInput.interactable = enabled;
+            if (StopButton != null)
+                StopButton.interactable = enabled;
         }
 
-        public GameObject GetGameplayCanvas()
+        public void SetAIText(string text)
         {
-            if (characterSelect != null)
-            {
-                Canvas canvas = characterSelect.GetComponentInParent<Canvas>(true);
-                if (canvas != null)
-                {
-                    return canvas.gameObject;
-                }
-            }
-
-            var canvases = Resources.FindObjectsOfTypeAll<Canvas>();
-            foreach (var canvas in canvases)
-            {
-                if (canvas.gameObject.name == "Canvas" && canvas.gameObject.scene.isLoaded)
-                {
-                    return canvas.gameObject;
-                }
-            }
-            return GameObject.Find("Canvas");
+            if (AiText != null)
+                AiText.text = text;
         }
 
-        // ── UI Listener Binding ─────────────────────────────────────────
+        public NPCProfile GetActiveProfile()
+        {
+            return DialogueManager != null ? DialogueManager.currentProfile : null;
+        }
+
+        public void ToggleNotebook()
+        {
+            if (NotebookController != null)
+                NotebookController.ToggleNotebook();
+        }
+
+        public bool IsAnyPanelOpen()
+        {
+            return NotebookController != null && NotebookController.IsOpen;
+        }
+
+        // ── UI listeners ───────────────────────────────────────────────-
 
         void BindUiListeners()
         {
-            if (_listenersBound)
-                return;
-
-            if (characterSelect != null)
-                characterSelect.onValueChanged.AddListener(OnCharacterSelectionChanged);
-            if (playerInput != null)
-            {
-                playerInput.onSubmit.AddListener(OnInputFieldSubmit);
-                playerInput.onValueChanged.AddListener(OnValueChanged);
-            }
-            if (stopButton != null)
-                stopButton.onClick.AddListener(OnStopPressed);
-            if (exitButton != null)
-                exitButton.onClick.AddListener(OnExitPressed);
-            _listenersBound = true;
-        }
-
-        void UnbindUiListeners()
-        {
-            if (!_listenersBound)
-                return;
-
-            if (characterSelect != null)
-                characterSelect.onValueChanged.RemoveListener(OnCharacterSelectionChanged);
-            if (playerInput != null)
-            {
-                playerInput.onSubmit.RemoveListener(OnInputFieldSubmit);
-                playerInput.onValueChanged.RemoveListener(OnValueChanged);
-            }
-            if (stopButton != null)
-                stopButton.onClick.RemoveListener(OnStopPressed);
-            if (exitButton != null)
-                exitButton.onClick.RemoveListener(OnExitPressed);
-            _listenersBound = false;
-        }
-
-        // ── Runtime Event Binding ──────────────────────────────────────
-
-        void BindRuntimeEvents()
-        {
-            if (_managerBound)
-                return;
-
-            if (networkBridge != null)
-            {
-                networkBridge.OnResponseStart.AddListener(HandleResponseStart);
-                networkBridge.OnResponseUpdated.AddListener(SetAIText);
-                networkBridge.OnResponseComplete.AddListener(HandleResponseComplete);
-                networkBridge.OnNpcChanged.AddListener(HandleNpcChanged);
-                networkBridge.OnError.AddListener(HandleError);
-            }
-            else if (dialogueManager != null)
-            {
-                dialogueManager.OnResponseStart.AddListener(HandleResponseStart);
-                dialogueManager.OnResponseUpdated.AddListener(SetAIText);
-                dialogueManager.OnResponseComplete.AddListener(HandleResponseComplete);
-                dialogueManager.OnNpcChanged.AddListener(HandleNpcChanged);
-                dialogueManager.OnError.AddListener(HandleError);
-            }
-            else
-            {
-                return;
-            }
-
-            _managerBound = true;
-        }
-
-        void UnbindRuntimeEvents()
-        {
-            if (!_managerBound)
-                return;
-
-            if (networkBridge != null)
-            {
-                networkBridge.OnResponseStart.RemoveListener(HandleResponseStart);
-                networkBridge.OnResponseUpdated.RemoveListener(SetAIText);
-                networkBridge.OnResponseComplete.RemoveListener(HandleResponseComplete);
-                networkBridge.OnNpcChanged.RemoveListener(HandleNpcChanged);
-                networkBridge.OnError.RemoveListener(HandleError);
-            }
-
-            if (dialogueManager != null)
-            {
-                dialogueManager.OnResponseStart.RemoveListener(HandleResponseStart);
-                dialogueManager.OnResponseUpdated.RemoveListener(SetAIText);
-                dialogueManager.OnResponseComplete.RemoveListener(HandleResponseComplete);
-                dialogueManager.OnNpcChanged.RemoveListener(HandleNpcChanged);
-                dialogueManager.OnError.RemoveListener(HandleError);
-            }
-
-            _managerBound = false;
-        }
-
-        // ── Helpers ────────────────────────────────────────────────────
-
-        NPCProfile GetActiveProfile()
-        {
-            if (networkBridge != null)
-                return networkBridge.currentProfile;
-            if (dialogueManager != null)
-                return dialogueManager.currentProfile;
-            return null;
-        }
-
-        void SetInputEnabled(bool enabled)
-        {
-            if (playerInput != null)
-            {
-                playerInput.interactable = enabled && _readyForInput;
-            }
-        }
-
-        void SetAIText(string text)
-        {
-            if (aiText != null)
-                aiText.text = text;
-        }
-
-        void OnValueChanged(string text)
-        {
-            // NOP — callback required by InputSystem wiring, intentionally empty
+            if (CharacterSelect != null)
+                CharacterSelect.onValueChanged.AddListener(OnCharacterSelectionChanged);
+            if (PlayerInput != null)
+                PlayerInput.onSubmit.AddListener(OnInputFieldSubmit);
+            if (StopButton != null)
+                StopButton.onClick.AddListener(OnStopPressed);
+            if (ExitButton != null)
+                ExitButton.onClick.AddListener(OnExitPressed);
         }
 
         void OnExitPressed()
         {
-            NPCFlowLogger
-                .FindOrCreate()
-                .Log(
-                    NPCFlowStage.UIInput,
-                    NPCFlowStatus.Success,
-                    NPCFlowLogLevel.Info,
-                    "UI exit pressed. Exiting game/play mode.",
-                    source: nameof(NPCDialogueUIController)
-                );
+            if (NotebookController != null && NotebookController.IsOpen)
+            {
+                NotebookController.ToggleNotebook();
+                return;
+            }
 
-#if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
-#else
-            Application.Quit();
-#endif
+            _readyForInput = false;
+            SetInputEnabled(false);
+            SetAIText("Goodbye!");
         }
 
-        static T FindComponent<T>(string path)
-            where T : Component
+        // ── Internal helpers ───────────────────────────────────────────
+
+        void ClearTemporaryProfiles()
         {
-            GameObject go = GameObject.Find(path);
-            return go != null ? go.GetComponent<T>() : null;
+            _profiles.Clear();
+            if (CharacterSelect != null)
+                CharacterSelect.ClearOptions();
+        }
+
+        /// <summary>
+        /// Finds a component of type <typeparamref name="T"/> on this object or its children,
+        /// logging a warning if not found.
+        /// </summary>
+        static T FindComponent<T>(Component host, string label) where T : Component
+        {
+            var component = host.GetComponentInChildren<T>(includeInactive: true);
+            if (component == null)
+                Debug.LogWarning($"[{nameof(NPCDialogueUIController)}] {label} not found.");
+            return component;
         }
     }
 }

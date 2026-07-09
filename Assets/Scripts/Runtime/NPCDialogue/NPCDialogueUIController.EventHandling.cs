@@ -34,8 +34,8 @@ namespace NPCSystem
                         0
                     )
                 );
-            if (playerInput != null)
-                playerInput.interactable = false;
+            if (PlayerInput != null)
+                PlayerInput.interactable = false;
             SetAIText("...");
         }
 
@@ -60,8 +60,8 @@ namespace NPCSystem
                 );
             SetAIText(response);
             SetInputEnabled(true);
-            if (playerInput != null)
-                playerInput.text = "";
+            if (PlayerInput != null)
+                PlayerInput.text = "";
         }
 
         void HandleError(string error)
@@ -114,15 +114,15 @@ namespace NPCSystem
             }
 
             string npcSlug = _profiles[selection].GetNpcSlug();
-            if (networkBridge != null)
-                await networkBridge.RequestNpcSelectionAsync(npcSlug);
+            if (NetworkBridge != null)
+                await NetworkBridge.RequestNpcSelectionAsync(npcSlug);
             else
-                await dialogueManager.SwitchToNPCAsync(npcSlug);
+                await DialogueManager.SwitchToNPCAsync(npcSlug);
         }
 
         void UpdatePortrait(NPCProfile profile)
         {
-            RawImage[] portraits = new[] { butlerImage, maidImage, chefImage };
+            RawImage[] portraits = new[] { ButlerImage, MaidImage, ChefImage };
             if (profile == null)
             {
                 foreach (RawImage img in portraits)
@@ -145,8 +145,8 @@ namespace NPCSystem
                     || (slug == "chef" && i == 2)
                 )
                 {
-                    if (profile.portraitTexture != null)
-                        portraits[i].texture = profile.portraitTexture;
+                    if (profile.PortraitTexture != null)
+                        portraits[i].texture = profile.PortraitTexture;
                     portraits[i].CrossFadeAlpha(1f, 0.15f, true);
                 }
                 else
@@ -165,21 +165,21 @@ namespace NPCSystem
             if (message.Length == 0)
                 return;
 
-            if (playerInput != null)
-                playerInput.interactable = false;
+            if (PlayerInput != null)
+                PlayerInput.interactable = false;
 
-            if (networkBridge != null)
-                networkBridge.SubmitPlayerMessage(message);
+            if (NetworkBridge != null)
+                NetworkBridge.SubmitPlayerMessage(message);
             else
-                dialogueManager.SendMessage(message);
+                DialogueManager.SendMessage(message);
         }
 
         void OnStopPressed()
         {
-            if (networkBridge != null)
-                networkBridge.CancelActiveRequest();
+            if (NetworkBridge != null)
+                NetworkBridge.CancelActiveRequest();
             else
-                dialogueManager.CancelRequests();
+                DialogueManager.CancelRequests();
             SetAIText(string.Empty);
             SetInputEnabled(true);
         }

@@ -2,24 +2,28 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using EditorAttributes;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace NPCSystem
 {
     [DefaultExecutionOrder(500)]
     public class NPCDialogueSmokeValidator : MonoBehaviour
     {
-        [FoldoutGroup("References", true, nameof(dialogueManager), nameof(chatClient), nameof(localRag))]
+        [FoldoutGroup("References", true, nameof(DialogueManager), nameof(ChatClient), nameof(LocalRag))]
         [SerializeField]
         EditorAttributes.Void referencesGroup;
 
+        [FormerlySerializedAs("dialogueManager")]
         [SerializeField, HideProperty, Required]
-        public NPCDialogueManager dialogueManager;
+        public NPCDialogueManager DialogueManager;
 
+        [FormerlySerializedAs("chatClient")]
         [SerializeField, HideProperty, Required]
-        public NPCLocalAIClient chatClient;
+        public NPCLocalAIClient ChatClient;
 
+        [FormerlySerializedAs("localRag")]
         [SerializeField, HideProperty]
-        public NPCLocalRAG localRag;
+        public NPCLocalRAG LocalRag;
 
         [FoldoutGroup("Smoke Test Settings", true, nameof(validateOnStart), nameof(runFirstQuestionSmokeOnStart), nameof(smokeQuestion), nameof(smokeTimeoutSeconds))]
         [SerializeField]
@@ -41,7 +45,7 @@ namespace NPCSystem
         [Title("Runtime Status")]
         [ShowInInspector, ReadOnly]
         bool HasAllReferences =>
-            dialogueManager != null && chatClient != null;
+            DialogueManager != null && ChatClient != null;
 
         bool _responseCompleted;
         string _lastResponse = string.Empty;
@@ -52,7 +56,7 @@ namespace NPCSystem
 
             if (validateOnStart)
             {
-                if (dialogueManager != null && !dialogueManager.IsInitialized)
+                if (DialogueManager != null && !DialogueManager.IsInitialized)
                 {
                     NPCFlowLogger
                         .FindOrCreate()
@@ -83,25 +87,25 @@ namespace NPCSystem
 
             NPCFlowLogger logger = NPCFlowLogger.FindOrCreate();
             bool ok = true;
-            ok &= Require(logger, dialogueManager != null, "NPCDialogueManager is assigned.");
-            ok &= Require(logger, chatClient != null, "NPCLocalAIClient is assigned.");
-            ok &= Require(logger, localRag != null, "NPCLocalRAG is assigned.");
+            ok &= Require(logger, DialogueManager != null, "NPCDialogueManager is assigned.");
+            ok &= Require(logger, ChatClient != null, "NPCLocalAIClient is assigned.");
+            ok &= Require(logger, LocalRag != null, "NPCLocalRAG is assigned.");
 
-            if (dialogueManager != null)
+            if (DialogueManager != null)
             {
                 ok &= Require(
                     logger,
-                    dialogueManager.chatClient == chatClient,
-                    "NPCDialogueManager.chatClient points to the chat client."
+                    DialogueManager.ChatClient == ChatClient,
+                    "NPCDialogueManager.ChatClient points to the chat client."
                 );
                 ok &= Require(
                     logger,
-                    dialogueManager.localRag == localRag,
-                    "NPCDialogueManager.localRag points to the local RAG."
+                    DialogueManager.LocalRag == LocalRag,
+                    "NPCDialogueManager.LocalRag points to the local RAG."
                 );
                 ok &= Require(
                     logger,
-                    !string.IsNullOrWhiteSpace(dialogueManager.ragEmbeddingPath),
+                    !string.IsNullOrWhiteSpace(DialogueManager.ragEmbeddingPath),
                     "NPCDialogueManager.ragEmbeddingPath is set."
                 );
             }
@@ -135,7 +139,7 @@ namespace NPCSystem
             ResolveReferences();
             ValidateConfiguration();
 
-            if (dialogueManager == null)
+            if (DialogueManager == null)
             {
                 logger.Log(
                     NPCFlowStage.SmokeValidation,
@@ -149,17 +153,17 @@ namespace NPCSystem
                 return;
             }
 
-            await dialogueManager.InitializeAsync();
-            if (dialogueManager.currentProfile == null)
+            await DialogueManager.InitializeAsync();
+            if (DialogueManager.currentProfile == null)
             {
-                string defaultSlug = dialogueManager.GetDefaultProfileSlug();
+                string defaultSlug = DialogueManager.GetDefaultProfileSlug();
                 if (!string.IsNullOrWhiteSpace(defaultSlug))
                 {
-                    await dialogueManager.SwitchToNPCAsync(defaultSlug);
+                    await DialogueManager.SwitchToNPCAsync(defaultSlug);
                 }
             }
 
-            if (dialogueManager.currentProfile == null)
+            if (DialogueManager.currentProfile == null)
             {
                 logger.Log(
                     NPCFlowStage.SmokeValidation,
@@ -175,11 +179,11 @@ namespace NPCSystem
 
             _responseCompleted = false;
             _lastResponse = string.Empty;
-            dialogueManager.OnResponseComplete.AddListener(HandleSmokeResponseComplete);
+            DialogueManager.OnResponseComplete.AddListener(HandleSmokeResponseComplete);
 
             try
             {
-                dialogueManager.SendMessage(smokeQuestion);
+                DialogueManager.SendMessage(smokeQuestion);
                 float startTime = Time.realtimeSinceStartup;
                 while (
                     !_responseCompleted
@@ -200,7 +204,7 @@ namespace NPCSystem
                         data: new Dictionary<string, object>
                         {
                             ["timeoutSeconds"] = smokeTimeoutSeconds,
-                            ["npcSlug"] = dialogueManager.currentProfile.GetNpcSlug(),
+                            ["npcSlug"] = DialogueManager.currentProfile.GetNpcSlug(),
                         }
                     );
                     scope.Error(
@@ -209,7 +213,7 @@ namespace NPCSystem
                         new Dictionary<string, object>
                         {
                             ["timeoutSeconds"] = smokeTimeoutSeconds,
-                            ["npcSlug"] = dialogueManager.currentProfile.GetNpcSlug(),
+                            ["npcSlug"] = DialogueManager.currentProfile.GetNpcSlug(),
                         }
                     );
                     Application.Quit(1);
@@ -226,7 +230,7 @@ namespace NPCSystem
                         source: nameof(NPCDialogueSmokeValidator),
                         data: new Dictionary<string, object>
                         {
-                            ["npcSlug"] = dialogueManager.currentProfile.GetNpcSlug(),
+                            ["npcSlug"] = DialogueManager.currentProfile.GetNpcSlug(),
                         }
                     );
                     scope.Error(
@@ -234,7 +238,7 @@ namespace NPCSystem
                         "Smoke failed: NPC response was empty.",
                         new Dictionary<string, object>
                         {
-                            ["npcSlug"] = dialogueManager.currentProfile.GetNpcSlug(),
+                            ["npcSlug"] = DialogueManager.currentProfile.GetNpcSlug(),
                         }
                     );
                     Application.Quit(1);
@@ -242,7 +246,7 @@ namespace NPCSystem
                 }
 
                 string logMsg =
-                    $"Smoke test passed with {dialogueManager.currentProfile.GetDisplayName()}. Response: {_lastResponse}";
+                    $"Smoke test passed with {DialogueManager.currentProfile.GetDisplayName()}. Response: {_lastResponse}";
                 logger.Log(
                     NPCFlowStage.SmokeValidation,
                     NPCFlowStatus.Success,
@@ -256,7 +260,7 @@ namespace NPCSystem
                     NPCFlowTextSanitizer.MergeSummary(
                         new Dictionary<string, object>
                         {
-                            ["npcSlug"] = dialogueManager.currentProfile.GetNpcSlug(),
+                            ["npcSlug"] = DialogueManager.currentProfile.GetNpcSlug(),
                         },
                         "response",
                         _lastResponse,
@@ -272,22 +276,22 @@ namespace NPCSystem
             }
             finally
             {
-                dialogueManager.OnResponseComplete.RemoveListener(HandleSmokeResponseComplete);
+                DialogueManager.OnResponseComplete.RemoveListener(HandleSmokeResponseComplete);
             }
         }
 
         void ResolveReferences()
         {
-            if (dialogueManager == null)
-                dialogueManager = FindAnyObjectByType<NPCDialogueManager>(
+            if (DialogueManager == null)
+                DialogueManager = FindAnyObjectByType<NPCDialogueManager>(
                     FindObjectsInactive.Include
                 );
-            if (chatClient == null && dialogueManager != null)
-                chatClient = dialogueManager.chatClient;
-            if (chatClient == null)
-                chatClient = FindAnyObjectByType<NPCLocalAIClient>(FindObjectsInactive.Include);
-            if (localRag == null)
-                localRag = FindAnyObjectByType<NPCLocalRAG>(FindObjectsInactive.Include);
+            if (ChatClient == null && DialogueManager != null)
+                ChatClient = DialogueManager.ChatClient;
+            if (ChatClient == null)
+                ChatClient = FindAnyObjectByType<NPCLocalAIClient>(FindObjectsInactive.Include);
+            if (LocalRag == null)
+                LocalRag = FindAnyObjectByType<NPCLocalRAG>(FindObjectsInactive.Include);
         }
 
         void HandleSmokeResponseComplete(string npcName, string response)

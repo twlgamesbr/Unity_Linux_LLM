@@ -12,7 +12,7 @@ namespace NPCSystem
     [DefaultExecutionOrder(-1500)]
     public class NPCDialogueManager : MonoBehaviour
     {
-        [FoldoutGroup("Chat Client", true, nameof(chatClient))]
+        [FoldoutGroup("Chat Client", true, nameof(ChatClient))]
         [HelpBox(
             "All NPC dialogue goes through NPCLocalAIClient (HTTP to LocalAI). The local RAG (NPCLocalRAG) is an optional fallback when Qdrant is disabled.",
             MessageMode.Log,
@@ -21,22 +21,24 @@ namespace NPCSystem
         [SerializeField]
         EditorAttributes.Void chatClientGroup;
 
+        [FormerlySerializedAs("chatClient")]
         [SerializeField, HideProperty, Required]
-        public NPCLocalAIClient chatClient;
+        public NPCLocalAIClient ChatClient;
 
         [FoldoutGroup(
             "RAG Services",
             true,
-            nameof(localRag),
+            nameof(LocalRag),
             nameof(ragEmbeddingPath),
             nameof(useQdrantRag),
-            nameof(qdrantRag)
+            nameof(QdrantRag)
         )]
         [SerializeField]
         EditorAttributes.Void ragServicesGroup;
 
+        [FormerlySerializedAs("localRag")]
         [SerializeField, HideProperty]
-        public NPCLocalRAG localRag;
+        public NPCLocalRAG LocalRag;
 
         [FilePath(true, "rag")]
         [SerializeField, HideProperty]
@@ -45,25 +47,29 @@ namespace NPCSystem
         [SerializeField, HideProperty]
         public bool useQdrantRag = false;
 
+        [FormerlySerializedAs("qdrantRag")]
         [SerializeField, HideProperty, ShowField(nameof(useQdrantRag))]
-        public QdrantRAGService qdrantRag;
+        public QdrantRAGService QdrantRag;
 
-        [FoldoutGroup("Game Systems", true, nameof(actionPlanner), nameof(evidenceState))]
+        [FoldoutGroup("Game Systems", true, nameof(ActionPlanner), nameof(EvidenceState))]
         [SerializeField]
         EditorAttributes.Void gameSystemsGroup;
 
+        [FormerlySerializedAs("actionPlanner")]
         [SerializeField, HideProperty]
-        public NPCDialogueActionPlanner actionPlanner;
+        public NPCDialogueActionPlanner ActionPlanner;
 
+        [FormerlySerializedAs("evidenceState")]
         [SerializeField, HideProperty]
-        public NPCEvidenceState evidenceState;
+        public NPCEvidenceState EvidenceState;
 
-        [FoldoutGroup("Persistence", true, nameof(supabaseRepo))]
+        [FoldoutGroup("Persistence", true, nameof(SupabaseRepo))]
         [SerializeField]
         EditorAttributes.Void persistenceGroup;
 
+        [FormerlySerializedAs("supabaseRepo")]
         [SerializeField, HideProperty]
-        public SupabaseDialogueRepository supabaseRepo;
+        public SupabaseDialogueRepository SupabaseRepo;
 
         [FoldoutGroup(
             "LLM Configuration",
@@ -285,15 +291,15 @@ namespace NPCSystem
                 AutoAssignReferencesIfNeeded();
                 ValidateReferences();
                 BuildProfileIndex();
-                _historyService?.Initialize(supabaseRepo, persistHistory, maxHistoryPerNPC);
+                _historyService?.Initialize(SupabaseRepo, persistHistory, maxHistoryPerNPC);
                 if (_historyService != null)
                     await _historyService.LoadAllHistoriesAsync(Profiles);
                 _retrievalService?.Initialize(
-                    localRag,
+                    LocalRag,
                     ragEmbeddingPath,
                     enableRAG,
                     useQdrantRag,
-                    qdrantRag,
+                    QdrantRag,
                     rebuildRagFromKnowledgeIfMissing,
                     remoteEmbeddingHost,
                     remoteEmbeddingPort
@@ -302,11 +308,11 @@ namespace NPCSystem
                     await _retrievalService.LoadOrBuildIndexAsync(Profiles);
 
                 _sessionService?.Initialize(
-                    chatClient,
+                    ChatClient,
                     _historyService,
                     _retrievalService,
-                    actionPlanner,
-                    evidenceState,
+                    ActionPlanner,
+                    EvidenceState,
                     remoteHost,
                     remotePort,
                     remoteModel,
@@ -332,31 +338,31 @@ namespace NPCSystem
         [Button("Auto Assign Dialogue References")]
         void AutoAssignReferencesIfNeeded()
         {
-            if (chatClient == null)
+            if (ChatClient == null)
             {
-                chatClient = FindAnyObjectByType<NPCLocalAIClient>(FindObjectsInactive.Include);
+                ChatClient = FindAnyObjectByType<NPCLocalAIClient>(FindObjectsInactive.Include);
             }
 
-            if (localRag == null)
+            if (LocalRag == null)
             {
-                localRag = FindAnyObjectByType<NPCLocalRAG>(FindObjectsInactive.Include);
+                LocalRag = FindAnyObjectByType<NPCLocalRAG>(FindObjectsInactive.Include);
             }
 
-            if (useQdrantRag && qdrantRag == null)
+            if (useQdrantRag && QdrantRag == null)
             {
-                qdrantRag = FindAnyObjectByType<QdrantRAGService>(FindObjectsInactive.Include);
+                QdrantRag = FindAnyObjectByType<QdrantRAGService>(FindObjectsInactive.Include);
             }
 
-            if (actionPlanner == null)
+            if (ActionPlanner == null)
             {
-                actionPlanner = FindAnyObjectByType<NPCDialogueActionPlanner>(
+                ActionPlanner = FindAnyObjectByType<NPCDialogueActionPlanner>(
                     FindObjectsInactive.Include
                 );
             }
 
-            if (evidenceState == null)
+            if (EvidenceState == null)
             {
-                evidenceState = FindAnyObjectByType<NPCEvidenceState>(FindObjectsInactive.Include);
+                EvidenceState = FindAnyObjectByType<NPCEvidenceState>(FindObjectsInactive.Include);
             }
 
             if (_historyService == null)
@@ -397,13 +403,13 @@ namespace NPCSystem
                 _retrievalService.SyncEmbedderHost();
             }
 
-            if (chatClient != null)
+            if (ChatClient != null)
             {
-                chatClient.host = remoteHost;
-                chatClient.port = remotePort;
-                chatClient.model = remoteModel;
+                ChatClient.host = remoteHost;
+                ChatClient.port = remotePort;
+                ChatClient.model = remoteModel;
                 Debug.Log(
-                    $"[NPCDialogueManager] Synced chatClient — host={chatClient.host} port={chatClient.port} model='{chatClient.model}'"
+                    $"[NPCDialogueManager] Synced ChatClient — host={ChatClient.host} port={ChatClient.port} model='{ChatClient.model}'"
                 );
             }
         }
@@ -411,7 +417,7 @@ namespace NPCSystem
         [Button("Validate Dialogue References")]
         void ValidateReferences()
         {
-            if (chatClient == null)
+            if (ChatClient == null)
                 Logger.Log(
                     NPCFlowStage.ConfigurationValidation,
                     NPCFlowStatus.Error,
@@ -419,7 +425,7 @@ namespace NPCSystem
                     "NPCLocalAIClient reference not set!",
                     source: nameof(NPCDialogueManager)
                 );
-            if (localRag == null)
+            if (LocalRag == null)
                 Logger.Log(
                     NPCFlowStage.ConfigurationValidation,
                     NPCFlowStatus.Warning,
@@ -644,16 +650,16 @@ namespace NPCSystem
 
         public NPCEvidenceStateSnapshot CaptureEvidenceSnapshot()
         {
-            return evidenceState != null
-                ? evidenceState.CreateSnapshot()
+            return EvidenceState != null
+                ? EvidenceState.CreateSnapshot()
                 : new NPCEvidenceStateSnapshot();
         }
 
         public void ApplyEvidenceSnapshot(NPCEvidenceStateSnapshot snapshot)
         {
-            if (evidenceState == null)
+            if (EvidenceState == null)
                 return;
-            evidenceState.ApplySnapshot(snapshot);
+            EvidenceState.ApplySnapshot(snapshot);
         }
 
         public async void ClearHistory(string npcName)
@@ -690,9 +696,9 @@ namespace NPCSystem
                 return;
 
             // Discover optional service references without auto-adding or destroying scene components.
-            if (qdrantRag == null)
+            if (QdrantRag == null)
             {
-                qdrantRag = GetComponent<QdrantRAGService>();
+                QdrantRag = GetComponent<QdrantRAGService>();
             }
         }
 #endif
