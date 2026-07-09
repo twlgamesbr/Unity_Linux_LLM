@@ -4,10 +4,10 @@
 # via the host's LocalAI embedding endpoint.
 #
 # BUILD:
-#   cd <project-root> && docker build -t codebase-watchdog -f docker_codebase_watchdog/Dockerfile .
+#   cd <project-root> && docker build -t codebase-watchdog -f Backend/codebase-watchdog/Dockerfile .
 #
 # DEV QUICK START (bind-mount):
-#   docker compose -f docker_codebase_watchdog/docker-compose.yml up
+#   docker compose -f Backend/codebase-watchdog/docker-compose.yml up
 #
 # The container uses host networking so it reaches Qdrant (localhost:6333)
 # and LocalAI (localhost:8080) directly.
@@ -49,7 +49,7 @@ RUN /opt/venv/bin/pip install --no-cache-dir /tmp/embedder/ && \
 FROM base AS runtime
 
 COPY --from=deps /opt/venv /opt/venv
-COPY --chmod=755 docker_codebase_watchdog/entrypoint.sh /entrypoint.sh
+COPY --chmod=755 Backend/codebase-watchdog/entrypoint.sh /entrypoint.sh
 
 WORKDIR /workspace
 

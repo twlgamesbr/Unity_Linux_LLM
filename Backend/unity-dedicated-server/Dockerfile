@@ -1,20 +1,20 @@
 # NPC Dedicated Server — Dockerfile
 # This container runs the Unity IL2CPP dedicated server binary.
 # It does NOT bundle LocalAI — it connects to the host's LocalAI via
-# Docker host networking (localhost:8080 for embeddings, localhost:11435 for chat).
+# Docker host networking (localhost:8080).
 #
 # BUILD:
 #   1. Build the server in Unity: File → Build Settings → Server subtarget
-#      → output to Builds/Server3/
-#   2. cd <project-root> && docker build -t npc-server -f docker/Dockerfile .
+#      → output to Builds/Server/
+#   2. cd <project-root> && docker build -t npc-dedicated-server -f Backend/unity-dedicated-server/Dockerfile .
 #
 # DEV QUICK START (bind-mount instead of rebuild on every build):
-#   docker compose -f docker/docker-compose.yml up --build
+#   docker compose -f Backend/unity-dedicated-server/docker-compose.yml up --build
 #
 # Or with an explicit bind-mount override:
 #   docker run --rm --network host \
-#     -v /path/to/your/server/build:/server:ro \
-#     npc-server
+#     -v /path/to/your/server/build:/server:rw \
+#     npc-dedicated-server
 
 # --- Stage: base (Ubuntu 22.04 — glibc 2.35 ≥ binary's 2.34 requirement) ---
 FROM ubuntu:22.04 AS base
@@ -46,7 +46,7 @@ RUN chmod +x /server/*.x86_64 2>/dev/null; chown -R npc:npc /server/; true
 # --- Stage: runtime (switch to npc user) ---
 FROM base AS runtime
 
-COPY --chmod=755 docker_webgl_client/entrypoint.sh /entrypoint.sh
+COPY --chmod=755 Backend/unity-dedicated-server/entrypoint.sh /entrypoint.sh
 
 # Copy server files from the build stage (with correct ownership)
 COPY --from=with-build --chown=npc:npc /server /server

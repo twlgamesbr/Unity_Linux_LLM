@@ -50,6 +50,7 @@ def payload_aliases(payload: dict) -> str:
         "type": "type types class classes interface interfaces enum enums struct structs",
         "member": "member members method methods field fields function functions",
         "serialized_field": "field fields serialized serializefield member members",
+        "code_convention": "code convention pattern style phase4 formeryserializedas todo fixme hack xml doc documentation anti-pattern quality compliance rules conventions best-practice editorconfig naming camelcase pascalcase",
     }
     return aliases.get(record_type, "")
 
@@ -133,6 +134,7 @@ def select_results(results: list[dict], limit: int, structural: bool) -> list[di
         "type": 3,
         "member": 2,
         "serialized_field": 1,
+        "code_convention": 4,
     }
     type_counts: dict[str, int] = {}
     using_paths: set[str] = set()

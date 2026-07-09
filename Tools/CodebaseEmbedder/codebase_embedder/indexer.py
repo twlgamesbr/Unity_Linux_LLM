@@ -10,7 +10,7 @@ from .chunking import chunk_docs, records_to_embedding_chunks
 from .config import CodebaseEmbedderConfig
 from .coverage import load_coverage_report
 from .coverage_records import apply_coverage_to_records, build_coverage_summary_records
-from .csharp_analyzer import analyze_csharp_files
+from .csharp_analyzer import analyze_csharp_files, _convention_flags
 from .discovery import discover_project_files
 from .package_parser import parse_package_manifest
 from .records import IndexRecord, RelationRecord, utc_now, write_json, write_jsonl
@@ -39,6 +39,8 @@ def build_index(config: CodebaseEmbedderConfig, write_artifacts: bool = True) ->
         records.extend(_build_namespace_summary_records(symbol_records, config.project_slug))
     if config.collection_profile == "runtime":
         records.extend(_build_runtime_summary_records(records, config.project_slug))
+    # Always build code_convention records regardless of profile
+    records.extend(_build_convention_records(records, files.csharp, config.project_root, config.project_slug))
     if coverage_report is not None:
         apply_coverage_to_records(records, coverage_report)
         records.extend(build_coverage_summary_records(records, coverage_report, config.project_slug))
@@ -59,7 +61,7 @@ def build_index(config: CodebaseEmbedderConfig, write_artifacts: bool = True) ->
         art = config.artifact_dir
         write_json(art / "manifest.json", {"project": config.project_slug, "collection": config.collection_name, "indexed_at": utc_now(), "counts": counts})
         write_json(art / "asmdefs.json", [asdict(asm) for asm in assemblies])
-        write_jsonl(art / "symbols.jsonl", [r for r in records if r.record_type in {"type", "member", "serialized_field", "namespace", "using_directive", "file_overview", "namespace_summary", "runtime_summary", "coverage_summary"}])
+        write_jsonl(art / "symbols.jsonl", [r for r in records if r.record_type in {"type", "member", "serialized_field", "namespace", "using_directive", "file_overview", "namespace_summary", "runtime_summary", "coverage_summary", "code_convention"}])
         write_jsonl(art / "relations.jsonl", [asdict(r) for r in relations])
         write_jsonl(art / "chunks.jsonl", chunks)
         _write_report(art / "index-report.md", counts, records)
@@ -210,6 +212,77 @@ def _write_report(path: Path, counts: dict[str, int], records: list[IndexRecord]
     lines.extend(f"- {k}: {v}" for k, v in sorted(by_asm.items(), key=lambda pair: str(pair[0])))
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def _build_convention_records(
+    records: list[IndexRecord],
+    csharp_paths: list[Path],
+    project_root: Path,
+    project: str,
+) -> list[IndexRecord]:
+    """Build per-file code_convention records capturing convention compliance
+    metadata from Phases 4-7 of the code quality improvement plan:
+      - Phase 4: [FormerlySerializedAs] usage, [SerializeField] private pattern
+      - Phase 6: XML doc compliance (% documented public methods)
+      - Phase 7: anti-pattern detection (TODO/FIXME, hardcoded localhost)
+    """
+    out: list[IndexRecord] = []
+    path_to_overview = {}
+    for rec in records:
+        if rec.record_type == "file_overview" and rec.payload.get("path"):
+            path_to_overview[rec.payload["path"]] = rec
+
+    for path in csharp_paths:
+        rel = path.relative_to(project_root).as_posix() if path.is_absolute() else path.as_posix()
+        try:
+            text = path.read_text(encoding="utf-8", errors="ignore")
+        except Exception:
+            continue
+        flags = _convention_flags(text, "Runtime")  # region not critical for convention flags
+        overview = path_to_overview.get(rel)
+        if overview:
+            overview.payload.setdefault("has_xml_docs_on_public", flags["has_xml_docs_on_public"])
+            overview.payload.setdefault("todo_count", flags["todo_count"])
+            overview.payload.setdefault("has_hardcoded_localhost", flags["has_hardcoded_localhost"])
+            overview.payload.setdefault("has_formeryserializedas", flags["has_formeryserializedas"])
+            overview.payload.setdefault("public_methods_documented", flags["public_methods_documented"])
+            overview.payload.setdefault("public_methods_total", flags["public_methods_total"])
+
+        doc_rate = (
+            flags["public_methods_documented"] / max(flags["public_methods_total"], 1)
+        )
+
+        phase4_count = flags.get("phase4_direct_count", 0)
+        property_count = flags.get("property_wrapper_count", 0)
+
+        text_parts = [
+            f"Code convention {rel}",
+            f"Assembly {overview.payload.get('asmdef', '') if overview else ''}",
+            f"XML docs on public API: {'yes' if flags['has_xml_docs_on_public'] else 'no'} ({flags['public_methods_documented']}/{flags['public_methods_total']} methods documented)",
+            f"TODO/FIXME/HACK count: {flags['todo_count']}",
+            f"Hardcoded 'localhost' strings: {'yes' if flags['has_hardcoded_localhost'] else 'no'}",
+            f"[FormerlySerializedAs] usage: {'yes' if flags['has_formeryserializedas'] else 'no'}",
+            f"Phase 4 [SerializeField] private fields: {phase4_count} fields converted, {property_count} property wrappers",
+            f"Async yield pattern: {'yes' if flags['has_async_pattern'] else 'no'}",
+        ]
+        payload = {
+            "project": project,
+            "path": rel,
+            "asmdef": overview.payload.get("asmdef", "") if overview else "",
+            "unity_region": overview.payload.get("unity_region", "") if overview else "",
+            "symbol_kind": "code_convention",
+            **flags,
+            "phase4_converted_count": phase4_count,
+            "property_wrapper_count": property_count,
+            "xml_doc_rate": round(doc_rate, 3),
+        }
+        out.append(IndexRecord(
+            "code_convention",
+            f"code_convention:{rel}",
+            "\n".join(text_parts),
+            payload,
+        ))
+    return out
 
 
 def load_chunks(artifact_dir: Path) -> list[IndexRecord]:

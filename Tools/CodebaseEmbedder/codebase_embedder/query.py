@@ -45,6 +45,8 @@ STRUCTURAL_RECORD_BOOSTS = {
     "relation": 26.0,
     "type": 8.0,
     "member": 4.0,
+    "serialized_field": 2.0,
+    "code_convention": 34.0,
 }
 
 GENERIC_QUERY_STOPWORDS = {"script", "scripts", "handle", "handles", "handled", "manage", "manages", "managed"}
@@ -128,7 +130,7 @@ def qdrant_query(config: CodebaseEmbedderConfig, question: str, limit: int = 8) 
                 {
                     "key": "record_type",
                     "match": {
-                        "any": ["namespace", "namespace_summary", "runtime_summary", "using_directive", "file_overview", "assembly", "relation", "type", "member"]
+                        "any": ["namespace", "namespace_summary", "runtime_summary", "using_directive", "file_overview", "assembly", "relation", "type", "member", "code_convention", "serialized_field"]
                     },
                 }
             ]
@@ -211,6 +213,7 @@ def _owner_record_boost(payload: dict, owner_intent: bool) -> float:
         "type": 14.0,
         "file_overview": 12.0,
         "runtime_summary": 8.0,
+        "code_convention": 8.0,
         "namespace": 4.0,
         "assembly": 3.0,
         "member": -8.0,

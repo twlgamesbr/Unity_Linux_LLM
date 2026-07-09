@@ -54,6 +54,10 @@ namespace NPCSystem
 
         void Awake()
         {
+            // Initialize Datadog metrics early in the startup sequence.
+            // The Datadog Agent must be running on localhost:8125 (sidecar in Docker).
+            DatadogMetricsService.Initialize();
+
             NPCFlowLogger logger = NPCFlowLogger.FindOrCreate();
             if (DialogueManager == null)
             {
@@ -180,6 +184,11 @@ namespace NPCSystem
                 source: nameof(NPCDialogueBootstrapper),
                 npcSlug: npcKey
             );
+        }
+
+        void OnDestroy()
+        {
+            DatadogMetricsService.Shutdown();
         }
     }
 }

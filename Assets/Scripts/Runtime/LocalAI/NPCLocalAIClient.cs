@@ -88,6 +88,7 @@ namespace NPCSystem
 
             for (int attempt = 0; attempt <= numRetries; attempt++)
             {
+                var sw = System.Diagnostics.Stopwatch.StartNew();
                 try
                 {
                     string json = JsonUtility.ToJson(payload);
@@ -100,6 +101,14 @@ namespace NPCSystem
                             await Task.Delay(500 * (attempt + 1));
                             continue;
                         }
+
+                        // All retries exhausted
+                        sw.Stop();
+                        DatadogMetricsService.Increment("llm.request.error", tags: new[]
+                        {
+                            $"model:{modelName}",
+                            $"reason:empty_response",
+                        });
                         return string.Empty;
                     }
 
@@ -111,6 +120,18 @@ namespace NPCSystem
                         && response.choices[0].message != null
                     )
                     {
+                        sw.Stop();
+                        DatadogMetricsService.Timer("llm.request.duration", sw.ElapsedMilliseconds, tags: new[]
+                        {
+                            $"model:{modelName}",
+                            $"attempt:{attempt}",
+                        });
+                        DatadogMetricsService.Increment("llm.request.count", tags: new[]
+                        {
+                            $"model:{modelName}",
+                            $"status:success",
+                        });
+
                         string rawContent = response.choices[0].message.content ?? string.Empty;
                         rawContent = Regex
                             .Replace(rawContent, @"<think>.*?</think>", "", RegexOptions.Singleline)
@@ -118,14 +139,24 @@ namespace NPCSystem
                         return rawContent;
                     }
 
+                    sw.Stop();
+                    DatadogMetricsService.Increment("llm.request.error", tags: new[]
+                    {
+                        $"model:{modelName}",
+                        $"reason:unexpected_format",
+                    });
                     Debug.LogError($"[NPCLocalAIClient] Unexpected response format from {uri}");
                     return string.Empty;
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogError(
-                        $"[NPCLocalAIClient] Exception (attempt {attempt + 1}/{numRetries + 1}): {ex.Message}"
-                    );
+                    sw.Stop();
+                    DatadogMetricsService.Increment("llm.request.error", tags: new[]
+                    {
+                        $"model:{modelName}",
+                        $"reason:exception",
+                        $"attempt:{attempt}",
+                    });
                     if (attempt < numRetries)
                     {
                         await Task.Delay(500 * (attempt + 1));

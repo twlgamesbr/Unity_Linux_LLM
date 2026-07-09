@@ -12,11 +12,65 @@ from .roslyn_wrapper import parse_csharp_files_with_roslyn
 NS_RE = re.compile(r"\bnamespace\s+([A-Za-z_][A-Za-z0-9_.]*)")
 TYPE_RE = re.compile(r"(?:^|[;{}])\s*(?P<attrs>(?:\[[^\]]+\]\s*)*)(?P<mods>(?:(?:public|internal|private|protected|static|abstract|sealed|partial|readonly|unsafe|new)\s+)*)?(?P<kind>class|struct|interface|enum)\s+(?P<name>[A-Za-z_][A-Za-z0-9_]*)(?:\s*:\s*(?P<bases>[^\{]+))?", re.MULTILINE)
 METHOD_RE = re.compile(r"(?:^|[;{}])\s*(?P<attrs>(?:\[[^\]]+\]\s*)*)(?P<sig>(?:public|private|protected|internal|static|async|virtual|override|sealed|partial|extern|new)\s+[A-Za-z0-9_<>,\\.\?\[\]\s]+\s+(?P<name>[A-Za-z_][A-Za-z0-9_]*)\s*\([^;{}]*\))", re.MULTILINE)
-FIELD_RE = re.compile(r"(?:^|[;{}])\s*(?P<attrs>(?:\[[^\]]+\]\s*)*)(?P<mods>public|private|protected|internal)(?P<rest>[^;{}()=]+)\s+(?P<name>[A-Za-z_][A-Za-z0-9_]*)\s*(?:=[^;]*)?;", re.MULTILINE)
+FIELD_RE = re.compile(r"(?:^|[;{}])\s*(?P<attrs>(?:\[[^\]]+\]\s*)*)(?P<mods>(?:public|private|protected|internal)\s+)?(?P<rest>[^;{}()=]+)\s+(?P<name>[A-Za-z_][A-Za-z0-9_]*)\s*(?:=[^;]*)?;", re.MULTILINE)
 CALL_RE = re.compile(r"\b([A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)?)\s*\(")
 
 USING_RE = re.compile(r"^\s*using\s+([A-Za-z_][A-Za-z0-9_.]*)\s*;", re.MULTILINE)
 SUMMARY_RE = re.compile(r"///\s*<summary>\s*(.*?)\s*</summary>", re.DOTALL)
+
+# \[FormerlySerializedAs\("oldName"\)\] — extracts the old name parameter
+FORMERLY_SERIALIZED_AS_RE = re.compile(
+    r'\[FormerlySerializedAs\s*\(\s*"([^"]*)"\s*\)\s*\]'
+)
+TODO_RE = re.compile(r"\b(TODO|FIXME|HACK|XXX|WORKAROUND)\b")
+HARDCODED_LOCALHOST_RE = re.compile(r'"localhost"')
+BOOL_FLAG_PARAM_RE = re.compile(r"\bbool\s+\w+\s*(?:[,)=])")
+PHASE4_FIELD_RE = re.compile(
+    r'\[FormerlySerializedAs\s*\([^)]+\)\s*\]\s*(?:\n\s*)?\[SerializeField\]\s*(?:\n\s*)?(?:private\s+)?[\w<>\[\],?.\s]+\s+_\w+\s*;'
+)
+PROPERTY_WRAPPER_RE = re.compile(
+    r'public\s+[\w<>\[\],?.\s]+\s+[A-Z][A-Za-z0-9_]+\s*\{\s*get\s*=>\s*_\w+\s*;\s*set\s*=>\s*_\w+\s*(?:=\s*\w+)?\s*;\s*\}'
+)
+
+
+def _extract_formerlynamed(attrs_str: str) -> str | None:
+    """Extract the old-name argument from [FormerlySerializedAs("oldName")]."""
+    m = FORMERLY_SERIALIZED_AS_RE.search(attrs_str or "")
+    return m.group(1) if m else None
+
+
+def _convention_flags(text: str, region: str) -> dict[str, bool | int]:
+    """Analyze a file's text for project convention compliance flags."""
+    has_xml_comments = bool(SUMMARY_RE.search(text))
+    todo_count = len(TODO_RE.findall(text))
+    has_hardcoded_localhost = bool(HARDCODED_LOCALHOST_RE.search(text))
+    # Detect files that use conventions from AGENTS.md
+    has_formeryserializedas = bool(FORMERLY_SERIALIZED_AS_RE.search(text))
+    has_async_pattern = bool(re.search(r"await\s+(Task\.)", text))
+    # Phase 4 pattern: [FormerlySerializedAs] + [SerializeField] + private _camelCase
+    phase4_fields = list(PHASE4_FIELD_RE.finditer(text))
+    # Also detect the property wrapper: public Type PascalCase { get => _camelCase; ... }
+    property_wrappers = list(PROPERTY_WRAPPER_RE.finditer(text))
+    # Public XML doc coverage: count public members with and without XML docs
+    public_members = list(re.finditer(
+        r"(?:public|internal|protected)\s+(?:static|async|virtual|override|sealed|partial|new\s+)?(?!class\b|struct\b|enum\b|interface\b)[A-Za-z_][A-Za-z0-9_<>,\[\]\s]+\s+([A-Za-z_][A-Za-z0-9_]*)\s*\(", text
+    ))
+    doc_before = 0
+    for m in public_members:
+        preceding = text[: m.start()]
+        if SUMMARY_RE.search(preceding):
+            doc_before += 1
+    return {
+        "has_xml_docs_on_public": has_xml_comments,
+        "public_methods_documented": doc_before,
+        "public_methods_total": len(public_members),
+        "todo_count": todo_count,
+        "has_hardcoded_localhost": has_hardcoded_localhost,
+        "has_formeryserializedas": has_formeryserializedas,
+        "has_async_pattern": has_async_pattern,
+        "phase4_direct_count": len(phase4_fields),
+        "property_wrapper_count": len(property_wrappers),
+    }
 
 _PURPOSE_KW = {
     "Client": "LLM client: handles remote/local LLM requests, completions, tokenization, and embedding tasks over the LocalAI backend",
@@ -320,12 +374,22 @@ def analyze_csharp_files(root: Path, csharp_paths: list[Path], assemblies: list[
             records.append(IndexRecord("member", f"member:{fq}:{line_start}:{rel}", f"{sig}\n{rel}:{line_start}-{line_end}\nType {tname} in {ns}", payload))
             relations.append(RelationRecord("type-contains-member", f"{ns}.{tname}", fq, rel, {"asmdef": asm_name}))
 
-        # --- third pass: serialized field records ---
+        # --- third pass: serialized field records with convention awareness ---
         current_type = type_name_by_start.get(0, Path(path).stem) if type_positions else Path(path).stem
         current_ns = type_ns_by_start.get(0, root_ns) if type_positions else root_ns
+        # Detect Phase-4-style property wrappers: public Type PascalCase { get => _camelCase; ... }
+        CONVERTED_PROPERTY_RE = re.compile(
+            r"public\s+(?P<ptype>[\w<>\[\],?.\s]+)\s+(?P<prop>[A-Z][A-Za-z0-9_]+)\s*\{\s*get\s*=>\s*(?P<getter>_\w+)\s*;\s*set\s*=>\s*(?P=getter)(?:\s*=\s*\w+)?\s*;\s*\}"
+        )
+        property_wrappers: dict[str, str] = {}  # backing_field_name -> property_name
+        for prop_match in CONVERTED_PROPERTY_RE.finditer(text):
+            prop_name = prop_match.group("prop")
+            backing = prop_match.group("getter")
+            property_wrappers[backing] = prop_name
         for m in FIELD_RE.finditer(text):
             attrs = _attrs(m.group("attrs"))
-            is_serialized = "SerializeField" in attrs or m.group("mods") == "public"
+            mods = m.group("mods") or "private "
+            is_serialized = "SerializeField" in attrs or (mods and mods.strip() == "public")
             if not is_serialized:
                 continue
             name = m.group("name")
@@ -341,10 +405,26 @@ def analyze_csharp_files(root: Path, csharp_paths: list[Path], assemblies: list[
             else:
                 tname = current_type
                 ns = current_ns
+            old_name = _extract_formerlynamed(m.group("attrs") or "")
+            is_phase4 = bool(old_name) and "SerializeField" in attrs and name.startswith("_")
+            matching_property = property_wrappers.get(name, "")
+            convention_tags: list[str] = []
+            if is_phase4:
+                convention_tags.append("phase4-convert")
+            if matching_property:
+                convention_tags.append("phase4-property-wraps")
             payload = {"project": project, "path": rel, "relative_dir": str(Path(rel).parent), "unity_region": region,
                        "asmdef": asm_name, "namespace": ns, "type_name": tname, "member_name": name,
                        "symbol_kind": "field", "line_start": line, "line_end": line, "attributes": attrs,
-                       "signature": " ".join((m.group("mods") + m.group("rest") + " " + name).split())}
+                       "signature": " ".join((mods + (m.group("rest") or "") + " " + name).split())}
+            if old_name:
+                payload["old_serialized_name"] = old_name
+            if is_phase4:
+                payload["phase4_converted"] = True
+            if matching_property:
+                payload["phase4_property"] = matching_property
+            if convention_tags:
+                payload["convention_tags"] = convention_tags
             records.append(IndexRecord("serialized_field", f"serialized_field:{ns}.{tname}.{name}:{rel}", f"Serialized field {tname}.{name} in {rel}\nType {tname}, Namespace {ns}", payload))
 
         # --- fourth pass: call relations ---
