@@ -14,7 +14,7 @@ namespace NPCSystem
         public string host = "127.0.0.1";
         public int port = 8080;
         public string apiKey = "";
-        public string model = "default-llm";
+        public string model = "";
 
         [Header("Generation Parameters")]
         public float temperature = 0.2f;
@@ -54,7 +54,17 @@ namespace NPCSystem
         )
         {
             string uri = $"http://{host}:{port}/v1/chat/completions";
-            string modelName = string.IsNullOrWhiteSpace(model) ? "default-llm" : model.Trim();
+
+            // Validate model is explicitly set — Manager syncs this during init.
+            string modelName = string.IsNullOrWhiteSpace(model) ? "" : model.Trim();
+            if (string.IsNullOrWhiteSpace(modelName))
+            {
+                Debug.LogError("[NPCLocalAIClient] ChatAsync: model is not set. " +
+                    "NPCDialogueManager must sync its remoteModel to chatClient.model during initialization.");
+                return string.Empty;
+            }
+
+            Debug.Log($"[NPCLocalAIClient] Sending chat request — model='{modelName}' uri={uri} messages={messages?.Length ?? 0}");
 
             var payload = new NPCOpenAIChatRequest
             {
