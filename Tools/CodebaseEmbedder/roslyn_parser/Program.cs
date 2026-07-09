@@ -28,17 +28,24 @@ internal static class Program
     {
         if (args.Length < 2)
         {
-            Console.Error.WriteLine("Usage: CodebaseRoslynParser <projectRoot> <file1.cs> [<file2.cs> ...]");
+            Console.Error.WriteLine(
+                "Usage: CodebaseRoslynParser <projectRoot> <file1.cs> [<file2.cs> ...]"
+            );
             return 1;
         }
 
         var projectRoot = args[0];
-        var projectName = args.Length >= 2 && !args[1].EndsWith(".cs", StringComparison.OrdinalIgnoreCase)
-            ? args[1]
-            : "Unity_Linux_LLM";
+        var projectName =
+            args.Length >= 2 && !args[1].EndsWith(".cs", StringComparison.OrdinalIgnoreCase)
+                ? args[1]
+                : "Unity_Linux_LLM";
         var files = args.Skip(projectName == "Unity_Linux_LLM" ? 1 : 2).ToArray();
 
-        var options = new CSharpParseOptions(LanguageVersion.CSharp12, DocumentationMode.Parse, kind: SourceCodeKind.Regular);
+        var options = new CSharpParseOptions(
+            LanguageVersion.CSharp12,
+            DocumentationMode.Parse,
+            kind: SourceCodeKind.Regular
+        );
         var results = new List<object>();
 
         foreach (var file in files)
@@ -46,28 +53,39 @@ internal static class Program
             var sourceText = await File.ReadAllTextAsync(file).ConfigureAwait(false);
             var tree = CSharpSyntaxTree.ParseText(sourceText, options, path: file);
             var root = await tree.GetRootAsync().ConfigureAwait(false);
-            var relativePath = Path.GetRelativePath(projectRoot, file).Replace(Path.DirectorySeparatorChar, '/');
+            var relativePath = Path.GetRelativePath(projectRoot, file)
+                .Replace(Path.DirectorySeparatorChar, '/');
             results.AddRange(AnalyzeFile(projectRoot, relativePath, sourceText, root));
         }
 
-        var json = JsonSerializer.Serialize(results, new JsonSerializerOptions
-        {
-            WriteIndented = false,
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        });
+        var json = JsonSerializer.Serialize(
+            results,
+            new JsonSerializerOptions
+            {
+                WriteIndented = false,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+            }
+        );
         await Console.Out.WriteLineAsync(json).ConfigureAwait(false);
         return 0;
     }
 
-    private static IEnumerable<object> AnalyzeFile(string projectRoot, string relPath, string text, SyntaxNode root)
+    private static IEnumerable<object> AnalyzeFile(
+        string projectRoot,
+        string relPath,
+        string text,
+        SyntaxNode root
+    )
     {
-        var usings = root.DescendantNodes().OfType<UsingDirectiveSyntax>()
+        var usings = root.DescendantNodes()
+            .OfType<UsingDirectiveSyntax>()
             .Select(u => u.Name.ToString())
             .Distinct()
             .OrderBy(u => u)
             .ToList();
 
-        var declaredNamespaces = root.DescendantNodes().OfType<NamespaceDeclarationSyntax>()
+        var declaredNamespaces = root.DescendantNodes()
+            .OfType<NamespaceDeclarationSyntax>()
             .Select(n => n.Name.ToString())
             .Distinct()
             .OrderBy(n => n)
@@ -85,9 +103,20 @@ internal static class Program
             ["root_namespace"] = string.Empty,
             ["declared_namespaces"] = declaredNamespaces,
             ["using_directives"] = usings,
-            ["type_names"] = typeDeclarations.Select(t => t.Identifier.Text).Distinct().OrderBy(t => t).ToList(),
+            ["type_names"] = typeDeclarations
+                .Select(t => t.Identifier.Text)
+                .Distinct()
+                .OrderBy(t => t)
+                .ToList(),
             ["member_names"] = typeDeclarations
-                .SelectMany(t => t.Members.OfType<BaseMethodDeclarationSyntax>().Select(m => m is MethodDeclarationSyntax md ? md.Identifier.Text : m is ConstructorDeclarationSyntax cd ? cd.Identifier.Text : string.Empty))
+                .SelectMany(t =>
+                    t.Members.OfType<BaseMethodDeclarationSyntax>()
+                        .Select(m =>
+                            m is MethodDeclarationSyntax md ? md.Identifier.Text
+                            : m is ConstructorDeclarationSyntax cd ? cd.Identifier.Text
+                            : string.Empty
+                        )
+                )
                 .Where(n => !string.IsNullOrWhiteSpace(n))
                 .Distinct()
                 .OrderBy(n => n)
@@ -100,66 +129,100 @@ internal static class Program
         {
             RecordType = "file_overview",
             StableKey = $"file:{relPath}",
-            Text = string.Join("\n", new[]
-            {
-                $"File overview {relPath}",
-                $"Assembly -",
-                $"Region Runtime",
-                $"Namespaces: {string.Join(", ", declaredNamespaces)}",
-                $"Using directives: {string.Join(", ", usings)}",
-                $"Types: {string.Join(", ", typeDeclarations.Select(t => t.Identifier.Text).Distinct())}",
-                $"Members: {string.Join(", ", filePayload["member_names"] as List<string> ?? new())}"
-            }),
+            Text = string.Join(
+                "\n",
+                new[]
+                {
+                    $"File overview {relPath}",
+                    $"Assembly -",
+                    $"Region Runtime",
+                    $"Namespaces: {string.Join(", ", declaredNamespaces)}",
+                    $"Using directives: {string.Join(", ", usings)}",
+                    $"Types: {string.Join(", ", typeDeclarations.Select(t => t.Identifier.Text).Distinct())}",
+                    $"Members: {string.Join(", ", filePayload["member_names"] as List<string> ?? new())}",
+                }
+            ),
             Payload = filePayload,
         };
 
-        foreach (var namespaceDeclaration in root.DescendantNodes().OfType<NamespaceDeclarationSyntax>())
+        foreach (
+            var namespaceDeclaration in root.DescendantNodes().OfType<NamespaceDeclarationSyntax>()
+        )
         {
             var ns = namespaceDeclaration.Name.ToString();
-            var types = namespaceDeclaration.Members.OfType<TypeDeclarationSyntax>().Select(t => t.Identifier.Text).Distinct().OrderBy(t => t).ToList();
+            var types = namespaceDeclaration
+                .Members.OfType<TypeDeclarationSyntax>()
+                .Select(t => t.Identifier.Text)
+                .Distinct()
+                .OrderBy(t => t)
+                .ToList();
             var payload = new Dictionary<string, object>(filePayload)
             {
                 ["namespace"] = ns,
                 ["declared_type_names"] = types,
                 ["symbol_kind"] = "namespace",
-                ["line_start"] = namespaceDeclaration.GetLocation().GetLineSpan().StartLinePosition.Line + 1,
-                ["line_end"] = namespaceDeclaration.GetLocation().GetLineSpan().EndLinePosition.Line + 1,
+                ["line_start"] =
+                    namespaceDeclaration.GetLocation().GetLineSpan().StartLinePosition.Line + 1,
+                ["line_end"] =
+                    namespaceDeclaration.GetLocation().GetLineSpan().EndLinePosition.Line + 1,
             };
             yield return new FileRecord
             {
                 RecordType = "namespace",
                 StableKey = $"namespace:{ns}:{relPath}:{payload["line_start"]}",
-                Text = string.Join("\n", new[]
-                {
-                    $"Namespace {ns}",
-                    $"Path {relPath}",
-                    $"Assembly -",
-                    $"Region Runtime",
-                    $"Declared types: {string.Join(", ", types)}",
-                    $"Using directives: {string.Join(", ", usings)}"
-                }),
+                Text = string.Join(
+                    "\n",
+                    new[]
+                    {
+                        $"Namespace {ns}",
+                        $"Path {relPath}",
+                        $"Assembly -",
+                        $"Region Runtime",
+                        $"Declared types: {string.Join(", ", types)}",
+                        $"Using directives: {string.Join(", ", usings)}",
+                    }
+                ),
                 Payload = payload,
             };
         }
 
         foreach (var typeDeclaration in typeDeclarations)
         {
-            var ns = typeDeclaration.Ancestors().OfType<NamespaceDeclarationSyntax>().FirstOrDefault()?.Name.ToString() ?? string.Empty;
+            var ns =
+                typeDeclaration
+                    .Ancestors()
+                    .OfType<NamespaceDeclarationSyntax>()
+                    .FirstOrDefault()
+                    ?.Name.ToString()
+                ?? string.Empty;
             var typeName = typeDeclaration.Identifier.Text;
-            var baseTypes = typeDeclaration.BaseList?.Types.Select(bt => bt.Type.ToString()).ToList() ?? new List<string>();
-            var interfaces = typeDeclaration.BaseList?.Types
-                .Select(bt => bt.Type.ToString())
-                .Where(name => name.StartsWith("I") && name.Length > 1)
+            var baseTypes =
+                typeDeclaration.BaseList?.Types.Select(bt => bt.Type.ToString()).ToList()
+                ?? new List<string>();
+            var interfaces =
+                typeDeclaration
+                    .BaseList?.Types.Select(bt => bt.Type.ToString())
+                    .Where(name => name.StartsWith("I") && name.Length > 1)
+                    .Distinct()
+                    .OrderBy(n => n)
+                    .ToList()
+                ?? new List<string>();
+            var methodNames = typeDeclaration
+                .Members.OfType<MethodDeclarationSyntax>()
+                .Select(m => m.Identifier.Text)
                 .Distinct()
                 .OrderBy(n => n)
-                .ToList() ?? new List<string>();
-            var methodNames = typeDeclaration.Members.OfType<MethodDeclarationSyntax>().Select(m => m.Identifier.Text).Distinct().OrderBy(n => n).ToList();
+                .ToList();
             var summary = string.Empty;
             var trivia = typeDeclaration.GetLeadingTrivia().ToString();
             var summaryStart = trivia.IndexOf("<summary>", StringComparison.OrdinalIgnoreCase);
             if (summaryStart >= 0)
             {
-                var summaryEnd = trivia.IndexOf("</summary>", summaryStart, StringComparison.OrdinalIgnoreCase);
+                var summaryEnd = trivia.IndexOf(
+                    "</summary>",
+                    summaryStart,
+                    StringComparison.OrdinalIgnoreCase
+                );
                 if (summaryEnd >= 0)
                 {
                     summary = trivia[(summaryStart + 9)..summaryEnd].Trim();
@@ -171,9 +234,14 @@ internal static class Program
                 ["namespace"] = ns,
                 ["type_name"] = typeName,
                 ["symbol_kind"] = typeDeclaration.Keyword.Text,
-                ["line_start"] = typeDeclaration.GetLocation().GetLineSpan().StartLinePosition.Line + 1,
+                ["line_start"] =
+                    typeDeclaration.GetLocation().GetLineSpan().StartLinePosition.Line + 1,
                 ["line_end"] = typeDeclaration.GetLocation().GetLineSpan().EndLinePosition.Line + 1,
-                ["attributes"] = typeDeclaration.AttributeLists.SelectMany(a => a.Attributes).Select(a => a.Name.ToString()).Distinct().ToList(),
+                ["attributes"] = typeDeclaration
+                    .AttributeLists.SelectMany(a => a.Attributes)
+                    .Select(a => a.Name.ToString())
+                    .Distinct()
+                    .ToList(),
                 ["base_types"] = baseTypes,
                 ["interfaces"] = interfaces,
             };
@@ -184,7 +252,7 @@ internal static class Program
                 $"Namespace {ns}",
                 $"Path {relPath}",
                 $"Region Runtime",
-                $"Purpose: {(typeName.ToLowerInvariant().Contains("manager") ? "dialogue orchestration and transport" : typeDeclaration.Keyword.Text)}"
+                $"Purpose: {(typeName.ToLowerInvariant().Contains("manager") ? "dialogue orchestration and transport" : typeDeclaration.Keyword.Text)}",
             };
             if (!string.IsNullOrWhiteSpace(summary))
             {
@@ -195,7 +263,9 @@ internal static class Program
                 textParts.Add($"Methods: {string.Join(", ", methodNames)}");
             }
             textParts.Add($"Base types: {(baseTypes.Any() ? string.Join(", ", baseTypes) : "-")}");
-            textParts.Add($"Interfaces: {(interfaces.Any() ? string.Join(", ", interfaces) : "-")}");
+            textParts.Add(
+                $"Interfaces: {(interfaces.Any() ? string.Join(", ", interfaces) : "-")}"
+            );
 
             yield return new FileRecord
             {
@@ -213,7 +283,7 @@ internal static class Program
                     Source = ns,
                     Target = $"{ns}.{typeName}",
                     Path = relPath,
-                    Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty }
+                    Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty },
                 };
             }
             foreach (var baseType in baseTypes)
@@ -224,7 +294,7 @@ internal static class Program
                     Source = $"{ns}.{typeName}",
                     Target = baseType,
                     Path = relPath,
-                    Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty }
+                    Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty },
                 };
             }
             foreach (var iface in interfaces)
@@ -235,31 +305,60 @@ internal static class Program
                     Source = $"{ns}.{typeName}",
                     Target = iface,
                     Path = relPath,
-                    Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty }
+                    Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty },
                 };
             }
 
             foreach (var member in typeDeclaration.Members.OfType<MethodDeclarationSyntax>())
             {
                 var memberName = member.Identifier.Text;
-                var signature = member.Modifiers.ToString() + " " + member.ReturnType + " " + memberName + member.ParameterList;
+                var signature =
+                    member.Modifiers.ToString()
+                    + " "
+                    + member.ReturnType
+                    + " "
+                    + memberName
+                    + member.ParameterList;
                 var payloadMember = new Dictionary<string, object>(filePayload)
                 {
                     ["namespace"] = ns,
                     ["type_name"] = typeName,
                     ["member_name"] = memberName,
                     ["symbol_kind"] = "method",
-                    ["signature"] = string.Join(" ", signature.Split(new[] { ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)),
+                    ["signature"] = string.Join(
+                        " ",
+                        signature.Split(
+                            new[] { ' ', '\t', '\r', '\n' },
+                            StringSplitOptions.RemoveEmptyEntries
+                        )
+                    ),
                     ["line_start"] = member.GetLocation().GetLineSpan().StartLinePosition.Line + 1,
                     ["line_end"] = member.GetLocation().GetLineSpan().EndLinePosition.Line + 1,
-                    ["attributes"] = member.AttributeLists.SelectMany(a => a.Attributes).Select(a => a.Name.ToString()).Distinct().ToList(),
+                    ["attributes"] = member
+                        .AttributeLists.SelectMany(a => a.Attributes)
+                        .Select(a => a.Name.ToString())
+                        .Distinct()
+                        .ToList(),
                 };
-                var fq = string.IsNullOrEmpty(ns) ? $"{typeName}.{memberName}" : $"{ns}.{typeName}.{memberName}";
+                var fq = string.IsNullOrEmpty(ns)
+                    ? $"{typeName}.{memberName}"
+                    : $"{ns}.{typeName}.{memberName}";
                 yield return new FileRecord
                 {
                     RecordType = "member",
                     StableKey = $"member:{fq}:{payloadMember["line_start"]}:{relPath}",
-                    Text = payloadMember["signature"].ToString() + "\n" + relPath + ":" + payloadMember["line_start"] + "-" + payloadMember["line_end"] + "\nType " + typeName + " in " + ns,
+                    Text =
+                        payloadMember["signature"].ToString()
+                        + "\n"
+                        + relPath
+                        + ":"
+                        + payloadMember["line_start"]
+                        + "-"
+                        + payloadMember["line_end"]
+                        + "\nType "
+                        + typeName
+                        + " in "
+                        + ns,
                     Payload = payloadMember,
                 };
                 yield return new RelationRecord
@@ -268,14 +367,19 @@ internal static class Program
                     Source = string.IsNullOrEmpty(ns) ? typeName : $"{ns}.{typeName}",
                     Target = fq,
                     Path = relPath,
-                    Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty }
+                    Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty },
                 };
             }
 
             foreach (var field in typeDeclaration.Members.OfType<FieldDeclarationSyntax>())
             {
-                var isSerialized = field.AttributeLists.SelectMany(a => a.Attributes).Any(a => a.Name.ToString().EndsWith("SerializeField", StringComparison.OrdinalIgnoreCase))
-                    || field.Modifiers.Any(SyntaxKind.PublicKeyword);
+                var isSerialized =
+                    field
+                        .AttributeLists.SelectMany(a => a.Attributes)
+                        .Any(a =>
+                            a.Name.ToString()
+                                .EndsWith("SerializeField", StringComparison.OrdinalIgnoreCase)
+                        ) || field.Modifiers.Any(SyntaxKind.PublicKeyword);
                 if (!isSerialized)
                 {
                     continue;
@@ -292,20 +396,28 @@ internal static class Program
                         ["symbol_kind"] = "field",
                         ["line_start"] = line,
                         ["line_end"] = line,
-                        ["attributes"] = field.AttributeLists.SelectMany(a => a.Attributes).Select(a => a.Name.ToString()).Distinct().ToList(),
-                        ["signature"] = $"{field.Modifiers} {field.Declaration.Type} {fieldName}".Trim()
+                        ["attributes"] = field
+                            .AttributeLists.SelectMany(a => a.Attributes)
+                            .Select(a => a.Name.ToString())
+                            .Distinct()
+                            .ToList(),
+                        ["signature"] =
+                            $"{field.Modifiers} {field.Declaration.Type} {fieldName}".Trim(),
                     };
                     yield return new FileRecord
                     {
                         RecordType = "serialized_field",
                         StableKey = $"serialized_field:{ns}.{typeName}.{fieldName}:{relPath}",
-                        Text = $"Serialized field {typeName}.{fieldName} in {relPath}\nType {typeName}, Namespace {ns}",
+                        Text =
+                            $"Serialized field {typeName}.{fieldName} in {relPath}\nType {typeName}, Namespace {ns}",
                         Payload = payloadField,
                     };
                 }
             }
 
-            var callExpressions = typeDeclaration.DescendantNodes().OfType<InvocationExpressionSyntax>();
+            var callExpressions = typeDeclaration
+                .DescendantNodes()
+                .OfType<InvocationExpressionSyntax>();
             foreach (var call in callExpressions)
             {
                 var target = call.Expression.ToString();
@@ -313,7 +425,21 @@ internal static class Program
                 {
                     continue;
                 }
-                if (new[] { "if", "for", "foreach", "while", "switch", "catch", "using", "nameof", "typeof", "new" }.Contains(target))
+                if (
+                    new[]
+                    {
+                        "if",
+                        "for",
+                        "foreach",
+                        "while",
+                        "switch",
+                        "catch",
+                        "using",
+                        "nameof",
+                        "typeof",
+                        "new",
+                    }.Contains(target)
+                )
                 {
                     continue;
                 }
@@ -325,7 +451,11 @@ internal static class Program
                     Source = string.IsNullOrEmpty(ns) ? typeName : $"{ns}.{typeName}",
                     Target = target,
                     Path = relPath,
-                    Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty, ["line_start"] = line }
+                    Payload = new Dictionary<string, object>
+                    {
+                        ["asmdef"] = string.Empty,
+                        ["line_start"] = line,
+                    },
                 };
             }
         }

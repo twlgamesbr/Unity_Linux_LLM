@@ -387,9 +387,7 @@ namespace NPCSystem
             {
                 try
                 {
-                    List<float> embeddings = await _localRag.search.llmEmbedder.Embeddings(
-                        "ready"
-                    );
+                    List<float> embeddings = await _localRag.search.llmEmbedder.Embeddings("ready");
 
                     if (embeddings == null || embeddings.Count == 0)
                     {
@@ -442,9 +440,7 @@ namespace NPCSystem
                 NPCRAGImporter.MaxChunkCharacters
             );
 
-            if (
-                !NPCRAGMetadataStore.TryLoad(_ragEmbeddingPath, out NPCRAGMetadata actual)
-            )
+            if (!NPCRAGMetadataStore.TryLoad(_ragEmbeddingPath, out NPCRAGMetadata actual))
             {
                 reason = "metadata sidecar is missing or unreadable";
                 return false;

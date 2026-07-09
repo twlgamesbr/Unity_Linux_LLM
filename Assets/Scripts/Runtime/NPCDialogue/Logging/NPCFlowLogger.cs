@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using EditorAttributes;
-using Void = EditorAttributes.Void;
 using UnityEngine;
 
 namespace NPCSystem
@@ -38,7 +37,7 @@ namespace NPCSystem
 
         [FoldoutGroup("Cache Settings", true, nameof(maxInMemoryEvents))]
         [SerializeField]
-        private Void cacheSettingsGroup;
+        private EditorAttributes.Void cacheSettingsGroup;
 
         [SerializeField, HideProperty]
         public int maxInMemoryEvents = 500;
@@ -52,7 +51,7 @@ namespace NPCSystem
             nameof(maxLogDirectorySizeMB)
         )]
         [SerializeField]
-        private Void logFileStorageGroup;
+        private EditorAttributes.Void logFileStorageGroup;
 
         [SerializeField, HideProperty]
         public string relativeLogDirectory = "NPCDialogue/Logs";
