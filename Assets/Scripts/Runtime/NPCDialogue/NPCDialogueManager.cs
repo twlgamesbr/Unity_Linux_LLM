@@ -243,18 +243,66 @@ namespace NPCSystem
         }
 
         // ─── Configuration properties (backed by [SerializeField] private fields) ───
-        public string RemoteHost { get => _remoteHost; set => _remoteHost = value; }
-        public int RemotePort { get => _remotePort; set => _remotePort = value; }
-        public string RemoteModel { get => _remoteModel; set => _remoteModel = value; }
-        public string RemoteEmbeddingHost { get => _remoteEmbeddingHost; set => _remoteEmbeddingHost = value; }
-        public int RemoteEmbeddingPort { get => _remoteEmbeddingPort; set => _remoteEmbeddingPort = value; }
-        public string RagEmbeddingPath { get => _ragEmbeddingPath; set => _ragEmbeddingPath = value; }
-        public bool UseQdrantRag { get => _useQdrantRag; set => _useQdrantRag = value; }
-        public bool PersistHistory { get => _persistHistory; set => _persistHistory = value; }
-        public bool EnableRAG { get => _enableRAG; set => _enableRAG = value; }
-        public bool RebuildRagFromKnowledgeIfMissing { get => _rebuildRagFromKnowledgeIfMissing; set => _rebuildRagFromKnowledgeIfMissing = value; }
-        public int MaxHistoryPerNPC { get => _maxHistoryPerNPC; set => _maxHistoryPerNPC = value; }
-        public bool InitializeOnStart { get => _initializeOnStart; set => _initializeOnStart = value; }
+        public string RemoteHost
+        {
+            get => _remoteHost;
+            set => _remoteHost = value;
+        }
+        public int RemotePort
+        {
+            get => _remotePort;
+            set => _remotePort = value;
+        }
+        public string RemoteModel
+        {
+            get => _remoteModel;
+            set => _remoteModel = value;
+        }
+        public string RemoteEmbeddingHost
+        {
+            get => _remoteEmbeddingHost;
+            set => _remoteEmbeddingHost = value;
+        }
+        public int RemoteEmbeddingPort
+        {
+            get => _remoteEmbeddingPort;
+            set => _remoteEmbeddingPort = value;
+        }
+        public string RagEmbeddingPath
+        {
+            get => _ragEmbeddingPath;
+            set => _ragEmbeddingPath = value;
+        }
+        public bool UseQdrantRag
+        {
+            get => _useQdrantRag;
+            set => _useQdrantRag = value;
+        }
+        public bool PersistHistory
+        {
+            get => _persistHistory;
+            set => _persistHistory = value;
+        }
+        public bool EnableRAG
+        {
+            get => _enableRAG;
+            set => _enableRAG = value;
+        }
+        public bool RebuildRagFromKnowledgeIfMissing
+        {
+            get => _rebuildRagFromKnowledgeIfMissing;
+            set => _rebuildRagFromKnowledgeIfMissing = value;
+        }
+        public int MaxHistoryPerNPC
+        {
+            get => _maxHistoryPerNPC;
+            set => _maxHistoryPerNPC = value;
+        }
+        public bool InitializeOnStart
+        {
+            get => _initializeOnStart;
+            set => _initializeOnStart = value;
+        }
         public bool IsResponding => _sessionService != null && _sessionService.IsResponding;
         public bool IsInitialized =>
             _initializationTask != null && _initializationTask.IsCompletedSuccessfully;
@@ -280,10 +328,7 @@ namespace NPCSystem
         async Task InitializeInternalAsync()
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
-            if (
-                !string.IsNullOrWhiteSpace(RemoteHost)
-                && NPCFlowLogger.IsLocalHost(RemoteHost)
-            )
+            if (!string.IsNullOrWhiteSpace(RemoteHost) && NPCFlowLogger.IsLocalHost(RemoteHost))
             {
                 try
                 {

@@ -33,7 +33,13 @@ namespace NPCSystem.EditorUX
         [SerializeField, HideProperty]
         bool useQdrantDiagnostics = true;
 
-        [FoldoutGroup("LocalAI Settings", true, nameof(localAiHost), nameof(localAiPort), nameof(localAiModel))]
+        [FoldoutGroup(
+            "LocalAI Settings",
+            true,
+            nameof(localAiHost),
+            nameof(localAiPort),
+            nameof(localAiModel)
+        )]
         [SerializeField]
         private Void localAiGroup;
 
