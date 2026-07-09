@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using EditorAttributes;
-using Void = EditorAttributes.Void;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -13,7 +12,7 @@ namespace NPCSystem
     {
         [FoldoutGroup("Qdrant Endpoint", true, nameof(qdrantUrl), nameof(collectionName))]
         [SerializeField]
-        private Void qdrantEndpointGroup;
+        private EditorAttributes.Void qdrantEndpointGroup;
 
         [HelpBox(
             "Qdrant is the primary vector database for NPC knowledge. Uses NPCLocalAIEmbedder for query encoding.",
@@ -28,7 +27,7 @@ namespace NPCSystem
 
         [FoldoutGroup("Embedder", true, nameof(embedder))]
         [SerializeField]
-        private Void embedderGroup;
+        private EditorAttributes.Void embedderGroup;
 
         [HelpBox(
             "Assign the NPCLocalAIEmbedder used to encode queries before searching Qdrant.",

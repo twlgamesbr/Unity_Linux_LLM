@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using EditorAttributes;
-using Void = EditorAttributes.Void;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -17,11 +16,17 @@ namespace NPCSystem
             drawAbove: true
         )]
         [SerializeField]
-        Void _docsGroup;
+        EditorAttributes.Void _docsGroup;
 
-        [FoldoutGroup("References", true, nameof(dialogueManager), nameof(networkBridge), nameof(legacyKnowledgeBaseController))]
+        [FoldoutGroup(
+            "References",
+            true,
+            nameof(dialogueManager),
+            nameof(networkBridge),
+            nameof(legacyKnowledgeBaseController)
+        )]
         [SerializeField]
-        Void referencesGroup;
+        EditorAttributes.Void referencesGroup;
 
         [SerializeField, HideProperty, Required]
         public NPCDialogueManager dialogueManager;
@@ -32,9 +37,16 @@ namespace NPCSystem
         [SerializeField, HideProperty]
         public Behaviour legacyKnowledgeBaseController;
 
-        [FoldoutGroup("Dialogue UI", true, nameof(characterSelect), nameof(playerInput), nameof(aiText), nameof(stopButton))]
+        [FoldoutGroup(
+            "Dialogue UI",
+            true,
+            nameof(characterSelect),
+            nameof(playerInput),
+            nameof(aiText),
+            nameof(stopButton)
+        )]
         [SerializeField]
-        Void dialogueUiGroup;
+        EditorAttributes.Void dialogueUiGroup;
 
         [SerializeField, HideProperty, Required]
         public TMP_Dropdown characterSelect;
@@ -50,7 +62,7 @@ namespace NPCSystem
 
         [FoldoutGroup("Portraits", true, nameof(butlerImage), nameof(maidImage), nameof(chefImage))]
         [SerializeField]
-        Void portraitsGroup;
+        EditorAttributes.Void portraitsGroup;
 
         [SerializeField, HideProperty]
         public RawImage butlerImage;
@@ -63,14 +75,14 @@ namespace NPCSystem
 
         [FoldoutGroup("Notebook / Panels", true, nameof(notebookController))]
         [SerializeField]
-        Void notebookGroup;
+        EditorAttributes.Void notebookGroup;
 
         [SerializeField, HideProperty]
         public NotebookUIController notebookController;
 
         [FoldoutGroup("Exit and Startup", true, nameof(exitButton), nameof(initializeOnStart))]
         [SerializeField]
-        Void exitStartupGroup;
+        EditorAttributes.Void exitStartupGroup;
 
         [SerializeField, HideProperty]
         public Button exitButton;
@@ -92,7 +104,9 @@ namespace NPCSystem
         bool HasDialogueManager => dialogueManager != null;
 
         [ShowInInspector, ReadOnly]
-        bool IsInitialized => _onDemandInitTask != null && (_onDemandInitTask.IsCompletedSuccessfully || _managerBound);
+        bool IsInitialized =>
+            _onDemandInitTask != null
+            && (_onDemandInitTask.IsCompletedSuccessfully || _managerBound);
 
         private System.Threading.Tasks.Task _onDemandInitTask;
         bool _listenersBound;

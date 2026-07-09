@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using EditorAttributes;
-using Void = EditorAttributes.Void;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEngine;
+using Void = EditorAttributes.Void;
 
 namespace NPCSystem
 {

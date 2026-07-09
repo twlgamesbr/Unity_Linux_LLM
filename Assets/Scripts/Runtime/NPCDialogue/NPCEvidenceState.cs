@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using EditorAttributes;
-using Void = EditorAttributes.Void;
 using UnityEngine;
 
 namespace NPCSystem
@@ -86,7 +85,7 @@ namespace NPCSystem
             drawAbove: true
         )]
         [SerializeField]
-        Void _docsGroup;
+        EditorAttributes.Void _docsGroup;
 
         [Title("Runtime Status")]
         [ShowInInspector, ReadOnly]
@@ -105,16 +104,24 @@ namespace NPCSystem
             {
                 var keys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 if (npcMoodKeys != null)
-                    foreach (var k in npcMoodKeys) keys.Add(k);
+                    foreach (var k in npcMoodKeys)
+                        keys.Add(k);
                 if (npcTrustKeys != null)
-                    foreach (var k in npcTrustKeys) keys.Add(k);
+                    foreach (var k in npcTrustKeys)
+                        keys.Add(k);
                 return keys.Count > 0 ? string.Join(", ", keys.OrderBy(x => x)) : "<none>";
             }
         }
 
-        [FoldoutGroup("Investigation State", true, nameof(discoveredClues), nameof(obtainedItems), nameof(visitedLocations))]
+        [FoldoutGroup(
+            "Investigation State",
+            true,
+            nameof(discoveredClues),
+            nameof(obtainedItems),
+            nameof(visitedLocations)
+        )]
         [SerializeField]
-        Void investigationGroup;
+        EditorAttributes.Void investigationGroup;
 
         [SerializeField, HideProperty]
         public List<ClueEntry> discoveredClues = new List<ClueEntry>();
@@ -125,9 +132,16 @@ namespace NPCSystem
         [SerializeField, HideProperty]
         public List<string> visitedLocations = new List<string>();
 
-        [FoldoutGroup("NPC States (serialized backing)", true, nameof(npcMoodKeys), nameof(npcMoodValues), nameof(npcTrustKeys), nameof(npcTrustValues))]
+        [FoldoutGroup(
+            "NPC States (serialized backing)",
+            true,
+            nameof(npcMoodKeys),
+            nameof(npcMoodValues),
+            nameof(npcTrustKeys),
+            nameof(npcTrustValues)
+        )]
         [SerializeField]
-        Void npcStatesGroup;
+        EditorAttributes.Void npcStatesGroup;
 
         [SerializeField, HideProperty]
         public List<string> npcMoodKeys = new List<string>();

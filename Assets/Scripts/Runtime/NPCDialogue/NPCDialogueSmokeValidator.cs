@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using EditorAttributes;
-using Void = EditorAttributes.Void;
 using UnityEngine;
 
 namespace NPCSystem
@@ -11,7 +10,7 @@ namespace NPCSystem
     {
         [FoldoutGroup("References", true, nameof(dialogueManager), nameof(chatClient), nameof(localRag))]
         [SerializeField]
-        Void referencesGroup;
+        EditorAttributes.Void referencesGroup;
 
         [SerializeField, HideProperty, Required]
         public NPCDialogueManager dialogueManager;
@@ -24,7 +23,7 @@ namespace NPCSystem
 
         [FoldoutGroup("Smoke Test Settings", true, nameof(validateOnStart), nameof(runFirstQuestionSmokeOnStart), nameof(smokeQuestion), nameof(smokeTimeoutSeconds))]
         [SerializeField]
-        Void smokeSettingsGroup;
+        EditorAttributes.Void smokeSettingsGroup;
 
         [SerializeField, HideProperty]
         public bool validateOnStart = true;

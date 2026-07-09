@@ -32,7 +32,8 @@ namespace NPCSystem
             if (_camera == null)
             {
                 _camera = Camera.main;
-                if (_camera == null) return;
+                if (_camera == null)
+                    return;
             }
             transform.forward = _camera.transform.forward;
         }

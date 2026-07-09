@@ -4,7 +4,6 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using EditorAttributes;
-using Void = EditorAttributes.Void;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -182,13 +181,19 @@ namespace NPCSystem
     public class PlayerAuthService : MonoBehaviour
     {
         [Title("Player Auth Service — Supabase Gotrue")]
-        [FoldoutGroup("Supabase Auth", true, nameof(supabaseUrl), nameof(supabaseAnonKey), nameof(restApiUrl))]
+        [FoldoutGroup(
+            "Supabase Auth",
+            true,
+            nameof(supabaseUrl),
+            nameof(supabaseAnonKey),
+            nameof(restApiUrl)
+        )]
         [HelpBox(
             "Anon key is required for PostgREST access. The URL should point to your self-hosted Gotrue instance. For development, the default localhost:8091 is used. restApiUrl points to PostgREST for player profile creation.",
             MessageMode.Log
         )]
         [SerializeField]
-        Void supabaseAuthGroup;
+        EditorAttributes.Void supabaseAuthGroup;
 
         [SerializeField, HideProperty]
         string supabaseUrl = "http://localhost:8091";
@@ -234,9 +239,14 @@ namespace NPCSystem
         }
 #endif
 
-        [FoldoutGroup("Behaviour", true, nameof(requestTimeoutSeconds), nameof(validateStoredSessionOnStart))]
+        [FoldoutGroup(
+            "Behaviour",
+            true,
+            nameof(requestTimeoutSeconds),
+            nameof(validateStoredSessionOnStart)
+        )]
         [SerializeField]
-        Void behaviourGroup;
+        EditorAttributes.Void behaviourGroup;
 
         [SerializeField, HideProperty, Suffix("s")]
         float requestTimeoutSeconds = 15f;
@@ -244,9 +254,15 @@ namespace NPCSystem
         [SerializeField, HideProperty]
         bool validateStoredSessionOnStart = true;
 
-        [FoldoutGroup("Debug", true, nameof(lastAuthStatus), nameof(lastAuthRoute), nameof(lastAuthDurationMs))]
+        [FoldoutGroup(
+            "Debug",
+            true,
+            nameof(lastAuthStatus),
+            nameof(lastAuthRoute),
+            nameof(lastAuthDurationMs)
+        )]
         [SerializeField]
-        Void debugGroup;
+        EditorAttributes.Void debugGroup;
 
         [SerializeField, HideProperty, ReadOnly]
         string lastAuthStatus = "Idle";
@@ -401,9 +417,10 @@ namespace NPCSystem
                     username = username?.Trim() ?? string.Empty,
                 };
                 await TryCreatePlayerProfileAsync(username?.Trim() ?? string.Empty);
-                CurrentSession = previousSessionToken != null
-                    ? new PlayerAuthSessionResponse { sessionToken = previousSessionToken }
-                    : null;
+                CurrentSession =
+                    previousSessionToken != null
+                        ? new PlayerAuthSessionResponse { sessionToken = previousSessionToken }
+                        : null;
             }
 
             return new PlayerAuthRegisterResponse
@@ -431,12 +448,17 @@ namespace NPCSystem
             {
                 using var request = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST);
                 request.downloadHandler = new DownloadHandlerBuffer();
-                request.uploadHandler = new UploadHandlerRaw(System.Text.Encoding.UTF8.GetBytes(jsonBody));
+                request.uploadHandler = new UploadHandlerRaw(
+                    System.Text.Encoding.UTF8.GetBytes(jsonBody)
+                );
                 request.SetRequestHeader("apikey", supabaseAnonKey);
                 request.SetRequestHeader("Content-Type", "application/json");
                 request.SetRequestHeader("Accept", "application/json");
                 if (!string.IsNullOrWhiteSpace(CurrentSession?.sessionToken))
-                    request.SetRequestHeader("Authorization", $"Bearer {CurrentSession.sessionToken}");
+                    request.SetRequestHeader(
+                        "Authorization",
+                        $"Bearer {CurrentSession.sessionToken}"
+                    );
                 request.timeout = Mathf.Max(1, Mathf.CeilToInt(requestTimeoutSeconds));
 
                 var operation = request.SendWebRequest();
@@ -445,34 +467,40 @@ namespace NPCSystem
 
                 if (request.responseCode >= 200 && request.responseCode < 300)
                 {
-                    NPCFlowLogger.FindOrCreate()?.Log(
-                        NPCFlowStage.ConfigurationValidation,
-                        NPCFlowStatus.Success,
-                        NPCFlowLogLevel.Debug,
-                        $"Player profile created/updated for '{displayName}'.",
-                        source: nameof(PlayerAuthService)
-                    );
+                    NPCFlowLogger
+                        .FindOrCreate()
+                        ?.Log(
+                            NPCFlowStage.ConfigurationValidation,
+                            NPCFlowStatus.Success,
+                            NPCFlowLogLevel.Debug,
+                            $"Player profile created/updated for '{displayName}'.",
+                            source: nameof(PlayerAuthService)
+                        );
                 }
                 else
                 {
-                    NPCFlowLogger.FindOrCreate()?.Log(
-                        NPCFlowStage.ConfigurationValidation,
-                        NPCFlowStatus.Warning,
-                        NPCFlowLogLevel.Warning,
-                        $"Player profile RPC returned HTTP {request.responseCode}: {request.downloadHandler?.text ?? request.error}",
-                        source: nameof(PlayerAuthService)
-                    );
+                    NPCFlowLogger
+                        .FindOrCreate()
+                        ?.Log(
+                            NPCFlowStage.ConfigurationValidation,
+                            NPCFlowStatus.Warning,
+                            NPCFlowLogLevel.Warning,
+                            $"Player profile RPC returned HTTP {request.responseCode}: {request.downloadHandler?.text ?? request.error}",
+                            source: nameof(PlayerAuthService)
+                        );
                 }
             }
             catch (System.Exception ex)
             {
-                NPCFlowLogger.FindOrCreate()?.Log(
-                    NPCFlowStage.ConfigurationValidation,
-                    NPCFlowStatus.Warning,
-                    NPCFlowLogLevel.Warning,
-                    $"Player profile creation failed: {ex.Message}",
-                    source: nameof(PlayerAuthService)
-                );
+                NPCFlowLogger
+                    .FindOrCreate()
+                    ?.Log(
+                        NPCFlowStage.ConfigurationValidation,
+                        NPCFlowStatus.Warning,
+                        NPCFlowLogLevel.Warning,
+                        $"Player profile creation failed: {ex.Message}",
+                        source: nameof(PlayerAuthService)
+                    );
             }
         }
 
@@ -628,7 +656,8 @@ namespace NPCSystem
             // Create/update player profile via PostgREST RPC
             await TryCreatePlayerProfileAsync(username);
 
-            lastAuthStatus = $"Login successful for '{username}'. Session expires at {session.expiresAtUtc}.";
+            lastAuthStatus =
+                $"Login successful for '{username}'. Session expires at {session.expiresAtUtc}.";
             return session;
         }
 

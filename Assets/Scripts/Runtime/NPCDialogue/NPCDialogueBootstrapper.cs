@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using EditorAttributes;
-using Void = EditorAttributes.Void;
 using UnityEngine;
 
 namespace NPCSystem
@@ -10,14 +9,20 @@ namespace NPCSystem
     {
         [FoldoutGroup("References", true, nameof(dialogueManager))]
         [SerializeField]
-        Void referencesGroup;
+        EditorAttributes.Void referencesGroup;
 
         [SerializeField, HideProperty, Required]
         public NPCDialogueManager dialogueManager;
 
-        [FoldoutGroup("Startup Behaviour", true, nameof(autoSelectDefaultNPC), nameof(defaultNpcSlug), nameof(initializeOnStart))]
+        [FoldoutGroup(
+            "Startup Behaviour",
+            true,
+            nameof(autoSelectDefaultNPC),
+            nameof(defaultNpcSlug),
+            nameof(initializeOnStart)
+        )]
         [SerializeField]
-        Void startupGroup;
+        EditorAttributes.Void startupGroup;
 
         [SerializeField, HideProperty]
         public bool autoSelectDefaultNPC = true;

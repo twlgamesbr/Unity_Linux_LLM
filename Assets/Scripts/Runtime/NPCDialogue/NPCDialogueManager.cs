@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using EditorAttributes;
 using UnityEngine;
 using UnityEngine.Events;
-using Void = EditorAttributes.Void;
 
 namespace NPCSystem
 {
@@ -19,7 +18,7 @@ namespace NPCSystem
             drawAbove: true
         )]
         [SerializeField]
-        Void chatClientGroup;
+        EditorAttributes.Void chatClientGroup;
 
         [SerializeField, HideProperty, Required]
         public NPCLocalAIClient chatClient;
@@ -33,7 +32,7 @@ namespace NPCSystem
             nameof(qdrantRag)
         )]
         [SerializeField]
-        Void ragServicesGroup;
+        EditorAttributes.Void ragServicesGroup;
 
         [SerializeField, HideProperty]
         public NPCLocalRAG localRag;
@@ -50,7 +49,7 @@ namespace NPCSystem
 
         [FoldoutGroup("Game Systems", true, nameof(actionPlanner), nameof(evidenceState))]
         [SerializeField]
-        Void gameSystemsGroup;
+        EditorAttributes.Void gameSystemsGroup;
 
         [SerializeField, HideProperty]
         public NPCDialogueActionPlanner actionPlanner;
@@ -60,7 +59,7 @@ namespace NPCSystem
 
         [FoldoutGroup("Persistence", true, nameof(supabaseRepo))]
         [SerializeField]
-        Void persistenceGroup;
+        EditorAttributes.Void persistenceGroup;
 
         [SerializeField, HideProperty]
         public SupabaseDialogueRepository supabaseRepo;
@@ -75,7 +74,7 @@ namespace NPCSystem
             nameof(remoteEmbeddingPort)
         )]
         [SerializeField]
-        Void llmConfigGroup;
+        EditorAttributes.Void llmConfigGroup;
 
         [HideProperty]
         public string remoteHost = "localhost";
@@ -110,7 +109,7 @@ namespace NPCSystem
             nameof(initializeOnStart)
         )]
         [SerializeField]
-        Void dialogueSettingsGroup;
+        EditorAttributes.Void dialogueSettingsGroup;
 
         [HideProperty]
         public NPCProfile[] profiles = Array.Empty<NPCProfile>();
@@ -148,7 +147,7 @@ namespace NPCSystem
             MessageMode.Log
         )]
         [SerializeField]
-        Void eventsGroup;
+        EditorAttributes.Void eventsGroup;
 
         [Title("Runtime Status")]
         [ReadOnly]

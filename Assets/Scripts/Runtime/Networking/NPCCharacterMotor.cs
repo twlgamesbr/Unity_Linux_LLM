@@ -13,20 +13,37 @@ namespace NPCSystem
         CharacterController _controller;
 
         [Header("Movement")]
-        [SerializeField] float walkSpeed = 3.5f;
-        [SerializeField] float sprintSpeed = 6.0f;
-        [SerializeField] float rotationSpeed = 720f;
-        [SerializeField] float acceleration = 12f;
-        [SerializeField] float deceleration = 10f;
+        [SerializeField]
+        float walkSpeed = 3.5f;
+
+        [SerializeField]
+        float sprintSpeed = 6.0f;
+
+        [SerializeField]
+        float rotationSpeed = 720f;
+
+        [SerializeField]
+        float acceleration = 12f;
+
+        [SerializeField]
+        float deceleration = 10f;
 
         [Header("Jump / Gravity")]
-        [SerializeField] float jumpHeight = 1.25f;
-        [SerializeField] float gravity = -24f;
-        [SerializeField] float groundedStickVelocity = -2f;
+        [SerializeField]
+        float jumpHeight = 1.25f;
+
+        [SerializeField]
+        float gravity = -24f;
+
+        [SerializeField]
+        float groundedStickVelocity = -2f;
 
         [Header("Ground Check")]
-        [SerializeField] float groundCheckDistance = 0.15f;
-        [SerializeField] LayerMask groundLayers = ~0;
+        [SerializeField]
+        float groundCheckDistance = 0.15f;
+
+        [SerializeField]
+        LayerMask groundLayers = ~0;
 
         // \u2500\u2500\u2500 Runtime state \u2500\u2500\u2500
         Vector2 _moveInput;
@@ -41,16 +58,25 @@ namespace NPCSystem
         // \u2500\u2500\u2500 Public API \u2500\u2500\u2500
 
         /// <summary>Normalized movement input (-1..1 on each axis).</summary>
-        public Vector2 MoveInput { get => _moveInput; set => _moveInput = Vector2.ClampMagnitude(value, 1f); }
+        public Vector2 MoveInput
+        {
+            get => _moveInput;
+            set => _moveInput = Vector2.ClampMagnitude(value, 1f);
+        }
 
         /// <summary>Whether sprint is held.</summary>
-        public bool SprintInput { get => _sprintInput; set => _sprintInput = value; }
+        public bool SprintInput
+        {
+            get => _sprintInput;
+            set => _sprintInput = value;
+        }
 
         /// <summary>Call once per press to request a jump.</summary>
         public void RequestJump() => _jumpRequested = true;
 
         /// <summary>Current horizontal velocity magnitude.</summary>
-        public float CurrentSpeed => new Vector3(_currentVelocity.x, 0, _currentVelocity.z).magnitude;
+        public float CurrentSpeed =>
+            new Vector3(_currentVelocity.x, 0, _currentVelocity.z).magnitude;
 
         /// <summary>Normalized 0-1 speed ratio relative to the target speed.</summary>
         public float SpeedRatio => CurrentSpeed / TargetSpeed;
@@ -121,7 +147,11 @@ namespace NPCSystem
                     rotationSpeed * deltaTime
                 );
 
-                _currentSpeed = Mathf.MoveTowards(_currentSpeed, TargetSpeed, acceleration * deltaTime);
+                _currentSpeed = Mathf.MoveTowards(
+                    _currentSpeed,
+                    TargetSpeed,
+                    acceleration * deltaTime
+                );
                 _currentVelocity = transform.forward * _currentSpeed;
             }
             else
@@ -141,7 +171,13 @@ namespace NPCSystem
 
             // Additional raycast ground check for when the controller's built-in isGrounded is unreliable
             Vector3 origin = transform.position + Vector3.up * 0.1f;
-            return Physics.Raycast(origin, Vector3.down, groundCheckDistance, groundLayers, QueryTriggerInteraction.Ignore);
+            return Physics.Raycast(
+                origin,
+                Vector3.down,
+                groundCheckDistance,
+                groundLayers,
+                QueryTriggerInteraction.Ignore
+            );
         }
 
         Vector3 CameraRelativeDirection(Vector3 inputLocal)
@@ -163,7 +199,10 @@ namespace NPCSystem
             if (!Application.isPlaying)
                 return;
             Gizmos.color = _grounded ? Color.green : Color.red;
-            Gizmos.DrawRay(transform.position + Vector3.up * 0.1f, Vector3.down * groundCheckDistance);
+            Gizmos.DrawRay(
+                transform.position + Vector3.up * 0.1f,
+                Vector3.down * groundCheckDistance
+            );
         }
     }
 }

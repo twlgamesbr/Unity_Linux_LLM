@@ -2,7 +2,6 @@ using EditorAttributes;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Void = EditorAttributes.Void;
 
 namespace NPCSystem
 {
@@ -14,11 +13,11 @@ namespace NPCSystem
             drawAbove: true
         )]
         [SerializeField]
-        Void _docsGroup;
+        EditorAttributes.Void _docsGroup;
 
         [FoldoutGroup("References", true, nameof(dialogueManager), nameof(networkBridge))]
         [SerializeField]
-        Void referencesGroup;
+        EditorAttributes.Void referencesGroup;
 
         [SerializeField, HideProperty, Required]
         public NPCDialogueManager dialogueManager;
@@ -36,7 +35,7 @@ namespace NPCSystem
             nameof(submitButton)
         )]
         [SerializeField]
-        Void notebookButtonsGroup;
+        EditorAttributes.Void notebookButtonsGroup;
 
         [SerializeField, HideProperty, Required]
         public Button notesButton;
@@ -65,7 +64,7 @@ namespace NPCSystem
             nameof(failText)
         )]
         [SerializeField]
-        Void notebookPanelsGroup;
+        EditorAttributes.Void notebookPanelsGroup;
 
         [SerializeField, HideProperty, Required]
         public RawImage notebookImage;
@@ -90,7 +89,7 @@ namespace NPCSystem
 
         [FoldoutGroup("Dropdown Answers", true, nameof(answer1), nameof(answer2), nameof(answer3))]
         [SerializeField]
-        Void dropdownAnswersGroup;
+        EditorAttributes.Void dropdownAnswersGroup;
 
         [SerializeField, HideProperty]
         public TMP_Dropdown answer1;
@@ -103,7 +102,7 @@ namespace NPCSystem
 
         [FoldoutGroup("Notes Text", true, nameof(notesText1), nameof(notesText2))]
         [SerializeField]
-        Void notesTextGroup;
+        EditorAttributes.Void notesTextGroup;
 
         [SerializeField, HideProperty, Required]
         public TMP_Text notesText1;

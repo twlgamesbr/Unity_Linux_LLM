@@ -11,7 +11,8 @@ namespace NPCSystem
     public abstract class NPCChunking : NPCSearchPlugin
     {
         protected bool returnChunks = false;
-        protected Dictionary<string, List<int>> dataSplitToPhrases = new Dictionary<string, List<int>>();
+        protected Dictionary<string, List<int>> dataSplitToPhrases =
+            new Dictionary<string, List<int>>();
         protected Dictionary<int, int[]> phraseToSentences = new Dictionary<int, int[]>();
         protected Dictionary<int, int> sentenceToPhrase = new Dictionary<int, int>();
         protected Dictionary<int, int[]> hexToPhrase = new Dictionary<int, int[]>();
@@ -48,7 +49,8 @@ namespace NPCSystem
                 dataSplitToPhrases[group].Add(key);
 
             int hash = inputString.GetHashCode();
-            if (!hexToPhrase.TryGetValue(hash, out int[] entries)) entries = new int[0];
+            if (!hexToPhrase.TryGetValue(hash, out int[] entries))
+                entries = new int[0];
             List<int> matchingHash = new List<int>(entries);
             matchingHash.Add(key);
             hexToPhrase[hash] = matchingHash.ToArray();
@@ -57,7 +59,8 @@ namespace NPCSystem
 
         public override void Remove(int key)
         {
-            if (!phraseToSentences.TryGetValue(key, out int[] sentenceIds)) return;
+            if (!phraseToSentences.TryGetValue(key, out int[] sentenceIds))
+                return;
             int hash = Get(key).GetHashCode();
             phraseToSentences.Remove(key);
             foreach (int sentenceId in sentenceIds)
@@ -72,22 +75,26 @@ namespace NPCSystem
             {
                 List<int> updatedIds = phraseIds.ToList();
                 updatedIds.Remove(key);
-                if (updatedIds.Count == 0) hexToPhrase.Remove(hash);
-                else hexToPhrase[hash] = updatedIds.ToArray();
+                if (updatedIds.Count == 0)
+                    hexToPhrase.Remove(hash);
+                else
+                    hexToPhrase[hash] = updatedIds.ToArray();
             }
         }
 
         public override int Remove(string inputString, string group = "")
         {
             int hash = inputString.GetHashCode();
-            if (!hexToPhrase.TryGetValue(hash, out int[] entries)) return 0;
+            if (!hexToPhrase.TryGetValue(hash, out int[] entries))
+                return 0;
             List<int> removeIds = new List<int>();
             foreach (int key in entries)
             {
                 if (dataSplitToPhrases[group].Contains(key) && Get(key) == inputString)
                     removeIds.Add(key);
             }
-            foreach (int removeId in removeIds) Remove(removeId);
+            foreach (int removeId in removeIds)
+                Remove(removeId);
             return removeIds.Count;
         }
 
@@ -95,12 +102,13 @@ namespace NPCSystem
 
         public override int Count(string group)
         {
-            if (!dataSplitToPhrases.TryGetValue(group, out List<int> dataSplitPhrases)) return 0;
+            if (!dataSplitToPhrases.TryGetValue(group, out List<int> dataSplitPhrases))
+                return 0;
             return dataSplitPhrases.Count;
         }
 
-        public override async Task<int> IncrementalSearch(string queryString, string group = "")
-            => await search.IncrementalSearch(queryString, group);
+        public override async Task<int> IncrementalSearch(string queryString, string group = "") =>
+            await search.IncrementalSearch(queryString, group);
 
         public override ValueTuple<int[], float[], bool> IncrementalFetchKeys(int fetchKey, int k)
         {
@@ -120,29 +128,39 @@ namespace NPCSystem
                 for (int i = 0; i < resultKeys.Length; i++)
                 {
                     int phraseId = sentenceToPhrase[resultKeys[i]];
-                    if (phraseKeys.Contains(phraseId)) continue;
+                    if (phraseKeys.Contains(phraseId))
+                        continue;
                     phraseKeys.Add(phraseId);
                     distancesList.Add(distancesIter[i]);
-                    if (phraseKeys.Count == k) { done = true; break; }
+                    if (phraseKeys.Count == k)
+                    {
+                        done = true;
+                        break;
+                    }
                 }
-                if (completed) break;
+                if (completed)
+                    break;
             } while (!done);
 
-            if (completed) IncrementalSearchComplete(fetchKey);
+            if (completed)
+                IncrementalSearchComplete(fetchKey);
             return (phraseKeys.ToArray(), distancesList.ToArray(), completed);
         }
 
         public override ValueTuple<string[], float[], bool> IncrementalFetch(int fetchKey, int k)
         {
-            (int[] resultKeys, float[] distances, bool completed) = IncrementalFetchKeys(fetchKey, k);
+            (int[] resultKeys, float[] distances, bool completed) = IncrementalFetchKeys(
+                fetchKey,
+                k
+            );
             string[] results = new string[resultKeys.Length];
             for (int i = 0; i < resultKeys.Length; i++)
                 results[i] = returnChunks ? search.Get(resultKeys[i]) : Get(resultKeys[i]);
             return (results, distances, completed);
         }
 
-        public override void IncrementalSearchComplete(int fetchKey)
-            => search.IncrementalSearchComplete(fetchKey);
+        public override void IncrementalSearchComplete(int fetchKey) =>
+            search.IncrementalSearchComplete(fetchKey);
 
         public override void Clear()
         {
@@ -165,10 +183,22 @@ namespace NPCSystem
 
         protected override void LoadInternal(ZipArchive archive)
         {
-            dataSplitToPhrases = NPCArchiveSaver.Load<Dictionary<string, List<int>>>(archive, GetSavePath("dataSplitToPhrases"));
-            phraseToSentences = NPCArchiveSaver.Load<Dictionary<int, int[]>>(archive, GetSavePath("phraseToSentences"));
-            sentenceToPhrase = NPCArchiveSaver.Load<Dictionary<int, int>>(archive, GetSavePath("sentenceToPhrase"));
-            hexToPhrase = NPCArchiveSaver.Load<Dictionary<int, int[]>>(archive, GetSavePath("hexToPhrase"));
+            dataSplitToPhrases = NPCArchiveSaver.Load<Dictionary<string, List<int>>>(
+                archive,
+                GetSavePath("dataSplitToPhrases")
+            );
+            phraseToSentences = NPCArchiveSaver.Load<Dictionary<int, int[]>>(
+                archive,
+                GetSavePath("phraseToSentences")
+            );
+            sentenceToPhrase = NPCArchiveSaver.Load<Dictionary<int, int>>(
+                archive,
+                GetSavePath("sentenceToPhrase")
+            );
+            hexToPhrase = NPCArchiveSaver.Load<Dictionary<int, int[]>>(
+                archive,
+                GetSavePath("hexToPhrase")
+            );
             nextKey = NPCArchiveSaver.Load<int>(archive, GetSavePath("nextKey"));
         }
     }

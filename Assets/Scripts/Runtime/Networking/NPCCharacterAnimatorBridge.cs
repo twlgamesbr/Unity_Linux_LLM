@@ -20,12 +20,18 @@ namespace NPCSystem
         static readonly int MotionSpeedHash = Animator.StringToHash("MotionSpeed");
 
         [Header("References")]
-        [SerializeField] Animator animator;
-        [SerializeField] NPCCharacterMotor motor;
+        [SerializeField]
+        Animator animator;
+
+        [SerializeField]
+        NPCCharacterMotor motor;
 
         [Header("Tuning")]
-        [SerializeField] float moveXScale = 1f;
-        [SerializeField] float moveYScale = 1f;
+        [SerializeField]
+        float moveXScale = 1f;
+
+        [SerializeField]
+        float moveYScale = 1f;
 
         void Awake()
         {

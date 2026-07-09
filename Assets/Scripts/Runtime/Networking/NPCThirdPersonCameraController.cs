@@ -10,20 +10,37 @@ namespace NPCSystem
     public sealed class NPCThirdPersonCameraController : MonoBehaviour
     {
         [Header("Follow")]
-        [SerializeField] Transform followTarget;
-        [SerializeField] Vector3 cameraOffset = new Vector3(0f, 4.5f, -6f);
-        [SerializeField] float followSharpness = 12f;
-        [SerializeField] Vector3 lookTargetOffset = new Vector3(0f, 1.25f, 0f);
+        [SerializeField]
+        Transform followTarget;
+
+        [SerializeField]
+        Vector3 cameraOffset = new Vector3(0f, 4.5f, -6f);
+
+        [SerializeField]
+        float followSharpness = 12f;
+
+        [SerializeField]
+        Vector3 lookTargetOffset = new Vector3(0f, 1.25f, 0f);
 
         [Header("Look Sensitivity")]
-        [SerializeField] float yawSensitivity = 0.12f;
-        [SerializeField] float pitchSensitivity = 0.08f;
-        [SerializeField] float minPitch = -30f;
-        [SerializeField] float maxPitch = 60f;
-        [SerializeField] bool invertY = false;
+        [SerializeField]
+        float yawSensitivity = 0.12f;
+
+        [SerializeField]
+        float pitchSensitivity = 0.08f;
+
+        [SerializeField]
+        float minPitch = -30f;
+
+        [SerializeField]
+        float maxPitch = 60f;
+
+        [SerializeField]
+        bool invertY = false;
 
         [Header("Input Source")]
-        [SerializeField] NPCMultiplayerInputActions inputSource;
+        [SerializeField]
+        NPCMultiplayerInputActions inputSource;
 
         // \u2500\u2500\u2500 Runtime \u2500\u2500\u2500
         Camera _cam;
