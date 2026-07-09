@@ -7,7 +7,9 @@ namespace UnityEditor.EventSystems
     {
         public delegate BaseInputModule AddInputModuleComponentDelegate(GameObject gameObject);
 
-        public static void SetInputModuleComponentOverride(AddInputModuleComponentDelegate addInputModuleComponentOverride)
+        public static void SetInputModuleComponentOverride(
+            AddInputModuleComponentDelegate addInputModuleComponentOverride
+        )
         {
             m_AddInputModuleComponentOverride = addInputModuleComponentOverride;
         }
@@ -16,9 +18,9 @@ namespace UnityEditor.EventSystems
 
         public static BaseInputModule AddInputModule(GameObject gameObject)
         {
-            return m_AddInputModuleComponentOverride != null ?
-                m_AddInputModuleComponentOverride(gameObject) :
-                AddStandaloneInputModuleComponent(gameObject);
+            return m_AddInputModuleComponentOverride != null
+                ? m_AddInputModuleComponentOverride(gameObject)
+                : AddStandaloneInputModuleComponent(gameObject);
         }
 
         private static BaseInputModule AddStandaloneInputModuleComponent(GameObject gameObject)

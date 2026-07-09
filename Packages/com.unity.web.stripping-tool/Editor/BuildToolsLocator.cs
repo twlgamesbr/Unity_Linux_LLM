@@ -1,8 +1,8 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
-using UnityEngine;
+using System.IO;
 using UnityEditor;
+using UnityEngine;
 
 namespace Unity.Web.Stripping.Editor
 {
@@ -13,14 +13,17 @@ namespace Unity.Web.Stripping.Editor
     class BuildToolsLocator
     {
         // Same as IsWebBuildTargetSupported() but a bit more "user-friendly" language + can be altered for testing purposes
-        public static bool IsWebBuildSupportInstalled { get; internal set; } = IsWebBuildTargetSupported();
-        static internal bool IsWebBuildTargetSupported() =>
+        public static bool IsWebBuildSupportInstalled { get; internal set; } =
+            IsWebBuildTargetSupported();
+
+        internal static bool IsWebBuildTargetSupported() =>
             BuildPipeline.IsBuildTargetSupported(BuildTargetGroup.WebGL, BuildTarget.WebGL);
 
         /// <summary>
         /// The absolute path to the build tools, either in the Unity Web Platform PlaybackEngine module or embedded in the package.
         /// </summary>
-        public static string BuildToolsPath => Directory.Exists(PackageBuildToolsPath) ? PackageBuildToolsPath : UnityBuildToolsPath;
+        public static string BuildToolsPath =>
+            Directory.Exists(PackageBuildToolsPath) ? PackageBuildToolsPath : UnityBuildToolsPath;
 
         /// <summary>
         /// The absolute path to the build tools in Unity Editor.
@@ -59,7 +62,12 @@ namespace Unity.Web.Stripping.Editor
                 var buildToolsPath = BuildToolsPath;
                 var emscriptenFolder = Path.Combine(
                     buildToolsPath,
-                    CommandLineUtils.HostPlatformPick("emscripten-linux-x64", "emscripten-mac-x64", "emscripten-mac-arm64", "emscripten-win-x64")
+                    CommandLineUtils.HostPlatformPick(
+                        "emscripten-linux-x64",
+                        "emscripten-mac-x64",
+                        "emscripten-mac-arm64",
+                        "emscripten-win-x64"
+                    )
                 );
                 if (Directory.Exists(emscriptenFolder))
                     return emscriptenFolder;
@@ -79,7 +87,11 @@ namespace Unity.Web.Stripping.Editor
             {
                 if (string.IsNullOrEmpty(s_EmscriptenVersion))
                 {
-                    var emscriptenVersionFile = Path.Combine(EmscriptenSdkPath, "emscripten", "emscripten-version.txt");
+                    var emscriptenVersionFile = Path.Combine(
+                        EmscriptenSdkPath,
+                        "emscripten",
+                        "emscripten-version.txt"
+                    );
                     if (File.Exists(emscriptenVersionFile))
                         s_EmscriptenVersion = File.ReadAllText(emscriptenVersionFile).TrimEnd();
                 }
@@ -100,7 +112,12 @@ namespace Unity.Web.Stripping.Editor
 #if UNITY_6000_3_OR_NEWER
         public static string SevenZipPath => EditorApplication.sevenZipPath;
 #else
-        public static string SevenZipPath => Path.Combine(EditorApplication.applicationContentsPath, "Tools", CommandLineUtils.HostPlatformPick("7za", "7za", "7za", "7z.exe"));
+        public static string SevenZipPath =>
+            Path.Combine(
+                EditorApplication.applicationContentsPath,
+                "Tools",
+                CommandLineUtils.HostPlatformPick("7za", "7za", "7za", "7z.exe")
+            );
 #endif
 
         /// <summary>
@@ -110,7 +127,10 @@ namespace Unity.Web.Stripping.Editor
         /// <param name="useMultithreading">Set to true if multithreading support is enabled.</param>
         /// <param name="useWasm2023">Set to true if Wasm2023 features are enabled.</param>
         /// <returns>Paths to submodules definition files</returns>
-        public static List<string> GetSubmoduleDefinitionFilePaths(bool useMultithreading, bool useWasm2023)
+        public static List<string> GetSubmoduleDefinitionFilePaths(
+            bool useMultithreading,
+            bool useWasm2023
+        )
         {
             var paths = new List<string>();
             paths.Add(GetSubmoduleDefinitionFilePath(useMultithreading, useWasm2023));
@@ -125,7 +145,10 @@ namespace Unity.Web.Stripping.Editor
         /// <param name="useMultithreading">Set to true if multithreading support is enabled.</param>
         /// <param name="useWasm2023">Set to true if Wasm2023 features are enabled.</param>
         /// <returns>Path to submodules definition file</returns>
-        public static string GetSubmoduleDefinitionFilePath(bool useMultithreading, bool useWasm2023)
+        public static string GetSubmoduleDefinitionFilePath(
+            bool useMultithreading,
+            bool useWasm2023
+        )
         {
             var moduleFolderName = "modules";
             if (useMultithreading)
@@ -145,7 +168,11 @@ namespace Unity.Web.Stripping.Editor
         {
             var submoduleDefinitionPaths = new List<string>();
 
-            foreach (var path in Directory.GetFiles(Path.Combine(Utils.PackagePath, "SubmoduleDefinitions")))
+            foreach (
+                var path in Directory.GetFiles(
+                    Path.Combine(Utils.PackagePath, "SubmoduleDefinitions")
+                )
+            )
             {
                 // Only add .json files and skip .meta files
                 if (path.EndsWith(".json"))
@@ -164,23 +191,48 @@ namespace Unity.Web.Stripping.Editor
             // The Playback engine is most likely installed inside the Unity Editor folder.
             // On Windows: C:\unity_xxxx.x\Editor\Data\PlaybackEngines\WebGLSupport\BuildTools
             // On Mac /Applications/Unity.app/Contents/PlaybackEngines/WebGLSupport/BuildTools
-            var path = Path.Combine(EditorApplication.applicationContentsPath, "PlaybackEngines", "WebGLSupport", "BuildTools");
+            var path = Path.Combine(
+                EditorApplication.applicationContentsPath,
+                "PlaybackEngines",
+                "WebGLSupport",
+                "BuildTools"
+            );
 
             // Sometimes it is installed in a separate folder at the same level as the Unity Editor.
             if (!Directory.Exists(path))
             {
-                path = Path.GetFullPath(Path.Combine(EditorApplication.applicationPath, "..", "PlaybackEngines", "WebGLSupport", "BuildTools"));
+                path = Path.GetFullPath(
+                    Path.Combine(
+                        EditorApplication.applicationPath,
+                        "..",
+                        "PlaybackEngines",
+                        "WebGLSupport",
+                        "BuildTools"
+                    )
+                );
             }
 
             // Manual installs can have this path:
             if (!Directory.Exists(path))
             {
-                path = Path.GetFullPath(Path.Combine(EditorApplication.applicationPath, "..", "..", "..", "..", "WebGLSupport", "BuildTools"));
+                path = Path.GetFullPath(
+                    Path.Combine(
+                        EditorApplication.applicationPath,
+                        "..",
+                        "..",
+                        "..",
+                        "..",
+                        "WebGLSupport",
+                        "BuildTools"
+                    )
+                );
             }
 
             if (!Directory.Exists(path))
             {
-                Debug.LogError($"Can not find Web Platform build tools path for Unity installed in \"{EditorApplication.applicationPath}\"\nIs the Web Platform module not installed?");
+                Debug.LogError(
+                    $"Can not find Web Platform build tools path for Unity installed in \"{EditorApplication.applicationPath}\"\nIs the Web Platform module not installed?"
+                );
                 return "";
             }
 

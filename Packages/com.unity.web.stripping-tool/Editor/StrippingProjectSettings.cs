@@ -1,8 +1,8 @@
-using UnityEngine;
-using UnityEditor;
-using System.Linq;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using UnityEditor;
+using UnityEngine;
 
 namespace Unity.Web.Stripping.Editor
 {
@@ -38,9 +38,9 @@ namespace Unity.Web.Stripping.Editor
         /// <summary>
         /// Enables a submodule stripping pass after a build has completed using the currently active settings, if they're set.
         /// </summary>
-        public static bool StripAutomaticallyAfterBuild {
+        public static bool StripAutomaticallyAfterBuild
+        {
             get => s_StripAutomaticallyAfterBuild;
-
             set
             {
                 s_StripAutomaticallyAfterBuild = value;
@@ -49,11 +49,15 @@ namespace Unity.Web.Stripping.Editor
         }
         static bool s_StripAutomaticallyAfterBuild = false;
 
-        internal const string k_DefaultSettingsPath = "Assets/DefaultSubmoduleStrippingSettings.asset";
+        internal const string k_DefaultSettingsPath =
+            "Assets/DefaultSubmoduleStrippingSettings.asset";
+
         // allow changing the path for testing purposes
         internal static string DefaultSettingsPath { get; set; } = k_DefaultSettingsPath;
-        internal static readonly string k_AssetPathKey = $"{nameof(StrippingProjectSettings)}.{nameof(ActiveSettings)}.AssetPath";
-        internal static readonly string k_StripAutomaticallyAfterBuildKey = $"{nameof(StrippingProjectSettings)}.{nameof(StripAutomaticallyAfterBuild)}";
+        internal static readonly string k_AssetPathKey =
+            $"{nameof(StrippingProjectSettings)}.{nameof(ActiveSettings)}.AssetPath";
+        internal static readonly string k_StripAutomaticallyAfterBuildKey =
+            $"{nameof(StrippingProjectSettings)}.{nameof(StripAutomaticallyAfterBuild)}";
 
         // It seems codecov analysis cannot handle InitializeOnLoadMethod.
         // Make sure the functionality added in this method is covered by other ways.
@@ -67,14 +71,24 @@ namespace Unity.Web.Stripping.Editor
 
         internal static SubmoduleStrippingSettings[] FindSettings()
         {
-            return AssetDatabase.FindAssets($"t:{nameof(SubmoduleStrippingSettings)}")
-                .Select(path => AssetDatabase.LoadAssetAtPath<SubmoduleStrippingSettings>(AssetDatabase.GUIDToAssetPath(path)))
+            return AssetDatabase
+                .FindAssets($"t:{nameof(SubmoduleStrippingSettings)}")
+                .Select(path =>
+                    AssetDatabase.LoadAssetAtPath<SubmoduleStrippingSettings>(
+                        AssetDatabase.GUIDToAssetPath(path)
+                    )
+                )
                 .ToArray();
         }
 
-        const string k_SetAsActiveMenuItem = "Assets/" + SubmoduleStrippingSettings.RootMenuName + "/Set as Active Submodule Stripping Settings";
+        const string k_SetAsActiveMenuItem =
+            "Assets/"
+            + SubmoduleStrippingSettings.RootMenuName
+            + "/Set as Active Submodule Stripping Settings";
+
         [MenuItem(k_SetAsActiveMenuItem, true)]
-        internal static bool SetSelectedSettingsAsActiveSettings_Validate() => Selection.activeObject is SubmoduleStrippingSettings;
+        internal static bool SetSelectedSettingsAsActiveSettings_Validate() =>
+            Selection.activeObject is SubmoduleStrippingSettings;
 
         [MenuItem(k_SetAsActiveMenuItem)]
         internal static void SetSelectedSettingsAsActiveSettings()
@@ -86,7 +100,11 @@ namespace Unity.Web.Stripping.Editor
             }
         }
 
-        [MenuItem("Assets/" + SubmoduleStrippingSettings.RootMenuName + "/Reveal Active Submodule Stripping Settings")]
+        [MenuItem(
+            "Assets/"
+                + SubmoduleStrippingSettings.RootMenuName
+                + "/Reveal Active Submodule Stripping Settings"
+        )]
         internal static void ShowActiveSettings()
         {
             if (ActiveSettings != null)
@@ -103,7 +121,10 @@ namespace Unity.Web.Stripping.Editor
         internal static void LoadSettings()
         {
             // Set backing fields directly to avoid the property setter triggering SaveSettings().
-            s_StripAutomaticallyAfterBuild = PackageSettings.GetProjectSetting(k_StripAutomaticallyAfterBuildKey, s_StripAutomaticallyAfterBuild);
+            s_StripAutomaticallyAfterBuild = PackageSettings.GetProjectSetting(
+                k_StripAutomaticallyAfterBuildKey,
+                s_StripAutomaticallyAfterBuild
+            );
 
             // the rest is ActiveSettings handling
             var assetPath = PackageSettings.GetProjectSetting(k_AssetPathKey, string.Empty);
@@ -119,8 +140,14 @@ namespace Unity.Web.Stripping.Editor
 
         static void SaveSettings()
         {
-            PackageSettings.SetProjectSetting(k_AssetPathKey, AssetDatabase.GetAssetPath(ActiveSettings));
-            PackageSettings.SetProjectSetting(k_StripAutomaticallyAfterBuildKey, StripAutomaticallyAfterBuild);
+            PackageSettings.SetProjectSetting(
+                k_AssetPathKey,
+                AssetDatabase.GetAssetPath(ActiveSettings)
+            );
+            PackageSettings.SetProjectSetting(
+                k_StripAutomaticallyAfterBuildKey,
+                StripAutomaticallyAfterBuild
+            );
             PackageSettings.Save();
         }
 
@@ -134,7 +161,8 @@ namespace Unity.Web.Stripping.Editor
                 string[] deletedAssets,
                 string[] movedAssets,
                 string[] movedFromAssetPaths,
-                bool didDomainReload)
+                bool didDomainReload
+            )
             {
                 if (deletedAssets.Contains(DefaultSettingsPath) || FindSettings().Length > 0)
                     return;

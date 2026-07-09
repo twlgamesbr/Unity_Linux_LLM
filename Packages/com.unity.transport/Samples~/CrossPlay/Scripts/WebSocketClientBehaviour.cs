@@ -1,4 +1,3 @@
-using UnityEngine;
 using Unity.Networking.Transport;
 
 namespace Unity.Networking.Transport.Samples

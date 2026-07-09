@@ -32,7 +32,10 @@ namespace Unity.Web.Stripping.Editor
         /// </summary>
         /// <param name="serializedProperty">The serialized property to update.</param>
         /// <param name="hashSet">The new value as a string hash set</param>
-        public static void SetHashSetPropertyValue(SerializedProperty serializedProperty, HashSet<string> hashSet)
+        public static void SetHashSetPropertyValue(
+            SerializedProperty serializedProperty,
+            HashSet<string> hashSet
+        )
         {
             serializedProperty.ClearArray();
 

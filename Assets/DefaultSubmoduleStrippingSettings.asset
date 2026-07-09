@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Web.Stripping.Editor::Unity.Web.Stripping.Editor.SubmoduleStrippingSettings
   OptimizeCodeAfterStripping: 1
   RemoveEmbeddedDebugSymbols: 1
-  MissingSubmoduleErrorHandling: 0
+  MissingSubmoduleErrorHandling: 1
   SubmodulesToStrip: []

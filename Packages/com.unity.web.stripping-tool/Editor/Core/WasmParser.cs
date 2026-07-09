@@ -55,7 +55,15 @@ namespace Unity.Web.Stripping.Editor
             }
         }
 
-        private static readonly string[] DwarfSectionNames = new string[] { ".debug_loc", ".debug_line", ".debug_ranges", ".debug_str", ".debug_abbrev", ".debug_info" };
+        private static readonly string[] DwarfSectionNames = new string[]
+        {
+            ".debug_loc",
+            ".debug_line",
+            ".debug_ranges",
+            ".debug_str",
+            ".debug_abbrev",
+            ".debug_info",
+        };
     }
 
     /// <summary>
@@ -95,7 +103,12 @@ namespace Unity.Web.Stripping.Editor
         {
             try
             {
-                using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                using var stream = new FileStream(
+                    filePath,
+                    FileMode.Open,
+                    FileAccess.Read,
+                    FileShare.Read
+                );
                 return ParseWasmSectionSizes(stream);
             }
             catch (Exception)
@@ -111,7 +124,8 @@ namespace Unity.Web.Stripping.Editor
             {
                 uint b = reader.ReadByte();
                 n |= (b & 0x7Fu) << shift;
-                if ((b & 0x80u) == 0) return n;
+                if ((b & 0x80u) == 0)
+                    return n;
             }
             // LEB128 u32 should not be longer than 5 bytes
             throw new InvalidDataException("Invalid LEB128 sequence");
@@ -132,8 +146,10 @@ namespace Unity.Web.Stripping.Editor
             using var reader = new BinaryReader(stream, Encoding.UTF8, leaveOpen: true);
 
             // Check header of WebAssembly file
-            if (reader.ReadUInt32() != k_WebAssemblyMagicNumber ||
-                reader.ReadUInt32() != k_WebAssemblyVersion)
+            if (
+                reader.ReadUInt32() != k_WebAssemblyMagicNumber
+                || reader.ReadUInt32() != k_WebAssemblyVersion
+            )
                 return null;
 
             // Parse sections and measure their size
@@ -150,26 +166,55 @@ namespace Unity.Web.Stripping.Editor
                         // Custom section: payload starts with a name string
                         uint nameLen = ReadLEB128(reader);
                         if (stream.Position + nameLen > sectionEnd)
-                            throw new InvalidDataException("Custom section name length exceeds section boundary.");
+                            throw new InvalidDataException(
+                                "Custom section name length exceeds section boundary."
+                            );
                         string name = Encoding.UTF8.GetString(reader.ReadBytes((int)nameLen));
 
                         // There can be multiple sections with the same name.
                         // Accumulate the size of custom sections with same name.
-                        sizes.CustomSections[name] = sizes.CustomSections.GetValueOrDefault(name, 0L) + sectionSize;
+                        sizes.CustomSections[name] =
+                            sizes.CustomSections.GetValueOrDefault(name, 0L) + sectionSize;
                         break;
-                    case WasmSectionId.Type: sizes.Type = sectionSize; break;
-                    case WasmSectionId.Import: sizes.Import = sectionSize; break;
-                    case WasmSectionId.Function: sizes.Function = sectionSize; break;
-                    case WasmSectionId.Table: sizes.Table = sectionSize; break;
-                    case WasmSectionId.Memory: sizes.Memory = sectionSize; break;
-                    case WasmSectionId.Global: sizes.Global = sectionSize; break;
-                    case WasmSectionId.Export: sizes.Export = sectionSize; break;
-                    case WasmSectionId.Start: sizes.Start = sectionSize; break;
-                    case WasmSectionId.Element: sizes.Element = sectionSize; break;
-                    case WasmSectionId.Code: sizes.Code = sectionSize; break;
-                    case WasmSectionId.Data: sizes.Data = sectionSize; break;
-                    case WasmSectionId.DataCount: sizes.DataCount = sectionSize; break;
-                    case WasmSectionId.Tag: sizes.Tag = sectionSize; break;
+                    case WasmSectionId.Type:
+                        sizes.Type = sectionSize;
+                        break;
+                    case WasmSectionId.Import:
+                        sizes.Import = sectionSize;
+                        break;
+                    case WasmSectionId.Function:
+                        sizes.Function = sectionSize;
+                        break;
+                    case WasmSectionId.Table:
+                        sizes.Table = sectionSize;
+                        break;
+                    case WasmSectionId.Memory:
+                        sizes.Memory = sectionSize;
+                        break;
+                    case WasmSectionId.Global:
+                        sizes.Global = sectionSize;
+                        break;
+                    case WasmSectionId.Export:
+                        sizes.Export = sectionSize;
+                        break;
+                    case WasmSectionId.Start:
+                        sizes.Start = sectionSize;
+                        break;
+                    case WasmSectionId.Element:
+                        sizes.Element = sectionSize;
+                        break;
+                    case WasmSectionId.Code:
+                        sizes.Code = sectionSize;
+                        break;
+                    case WasmSectionId.Data:
+                        sizes.Data = sectionSize;
+                        break;
+                    case WasmSectionId.DataCount:
+                        sizes.DataCount = sectionSize;
+                        break;
+                    case WasmSectionId.Tag:
+                        sizes.Tag = sectionSize;
+                        break;
                 }
 
                 if (sectionEnd > stream.Length)

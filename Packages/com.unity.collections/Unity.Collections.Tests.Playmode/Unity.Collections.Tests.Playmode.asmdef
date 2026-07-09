@@ -1,5 +1,6 @@
 {
     "name": "Unity.Collections.Tests.Playmode",
+    "rootNamespace": "",
     "references": [
         "Unity.Entities",
         "Unity.Entities.Hybrid",
@@ -7,21 +8,22 @@
         "Unity.Collections",
         "Unity.Burst",
         "Unity.Jobs",
-        "Unity.Mathematics",
-        "Unity.Collections.BurstCompatibilityGen"
-    ],
-    "optionalUnityReferences": [
-        "TestAssemblies"
+        "Unity.Collections.BurstCompatibilityGen",
+        "UnityEngine.TestRunner",
+        "UnityEditor.TestRunner"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": true,
-    "defineConstraints": [
-        "UNITY_DOTS_DEBUG"
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
     ],
-    "versionDefines": []
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_DOTS_DEBUG",
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
 }
-

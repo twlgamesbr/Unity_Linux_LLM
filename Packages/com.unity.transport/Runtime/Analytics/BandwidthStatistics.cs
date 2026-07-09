@@ -112,9 +112,11 @@ namespace Unity.Networking.Transport.Analytics
             {
                 Mean = (data.TotalBytes * k_BitsPerByte) / math.max(1.0f, timeDelta),
                 Current = BytesToKilobits(data.PeriodBytes),
-                Minimum = timeDelta >= k_PeriodLength ? BytesToKilobits(data.MinimumPeriodBytes) : 0.0f,
-                Maximum = timeDelta >= k_PeriodLength ? BytesToKilobits(data.MaximumPeriodBytes) : 0.0f,
-                MaximumBurst = data.MaximumBurst
+                Minimum =
+                    timeDelta >= k_PeriodLength ? BytesToKilobits(data.MinimumPeriodBytes) : 0.0f,
+                Maximum =
+                    timeDelta >= k_PeriodLength ? BytesToKilobits(data.MaximumPeriodBytes) : 0.0f,
+                MaximumBurst = data.MaximumBurst,
             };
         }
 
@@ -175,7 +177,9 @@ namespace Unity.Networking.Transport.Analytics
         private void CheckIsCreated()
         {
             if (!IsCreated)
-                throw new ObjectDisposedException("BandwidthMonitor is not created or has been disposed.");
+                throw new ObjectDisposedException(
+                    "BandwidthMonitor is not created or has been disposed."
+                );
         }
 
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]
@@ -184,7 +188,9 @@ namespace Unity.Networking.Transport.Analytics
             if (time < 0)
                 throw new ArgumentException("New sample time cannot be negative.");
             if (time < m_InternalData.Value.StartTime)
-                throw new ArgumentException("New sample time cannot be before the monitor start time.");
+                throw new ArgumentException(
+                    "New sample time cannot be before the monitor start time."
+                );
             if (time < m_InternalData.Value.LastSampleTime)
                 throw new ArgumentException("New sample times must be monotonically increasing.");
         }
