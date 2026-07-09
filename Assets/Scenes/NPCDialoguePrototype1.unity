@@ -9390,22 +9390,22 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   dialogueManager: {fileID: 1778380623}
   sessionManager: {fileID: 1471440991}
-  onNPCChanged:
+  OnNpcChanged:
     m_PersistentCalls:
       m_Calls: []
-  onResponseStart:
+  OnResponseStart:
     m_PersistentCalls:
       m_Calls: []
-  onResponseUpdated:
+  OnResponseUpdated:
     m_PersistentCalls:
       m_Calls: []
-  onResponseComplete:
+  OnResponseComplete:
     m_PersistentCalls:
       m_Calls: []
-  onError:
+  OnError:
     m_PersistentCalls:
       m_Calls: []
-  onNotebookStateChanged:
+  OnNotebookStateChanged:
     m_PersistentCalls:
       m_Calls: []
   lastRoutingStatus: Idle
@@ -10931,19 +10931,19 @@ MonoBehaviour:
   maxHistoryPerNPC: 20
   initializeOnStart: 0
   lastBackendStatus: LocalAI response received for player 'deco'.
-  onNPCChanged:
+  OnNpcChanged:
     m_PersistentCalls:
       m_Calls: []
-  onResponseStart:
+  OnResponseStart:
     m_PersistentCalls:
       m_Calls: []
-  onResponseUpdated:
+  OnResponseUpdated:
     m_PersistentCalls:
       m_Calls: []
-  onResponseComplete:
+  OnResponseComplete:
     m_PersistentCalls:
       m_Calls: []
-  onError:
+  OnError:
     m_PersistentCalls:
       m_Calls: []
 --- !u!4 &1778380624

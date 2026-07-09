@@ -19,7 +19,9 @@ namespace NPCSystem.Tests
                 string endpoint = service.BuildSearchEndpoint();
                 Assert.That(
                     endpoint,
-                    Is.EqualTo("http://localhost:6333/collections/unity_linux_llm_codebase_v1/points/search")
+                    Is.EqualTo(
+                        "http://localhost:6333/collections/unity_linux_llm_codebase_v1/points/search"
+                    )
                 );
             }
             finally
@@ -79,7 +81,9 @@ namespace NPCSystem.Tests
                 string endpoint = service.BuildSearchEndpoint();
                 Assert.That(
                     endpoint,
-                    Is.EqualTo("http://localhost:6333/collections/unity_linux_llm_codebase_v1/points/search")
+                    Is.EqualTo(
+                        "http://localhost:6333/collections/unity_linux_llm_codebase_v1/points/search"
+                    )
                 );
                 Assert.That(endpoint, Does.Not.Contain("//collections"));
             }
