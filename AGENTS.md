@@ -13,10 +13,11 @@ This document is the single source of truth for every LLM agent working on this 
 | [3. Scene Wiring (Current)](#3-scene-wiring-current) | What's actually in the active scene |
 | [4. Backend Services](#4-backend-services) | LocalAI, Supabase, Qdrant, Cognee |
 | [5. Codebase Embedder](#5-codebase-embedder) | Qdrant indexing, querying, profiles |
-| [6. Testing](#6-testing) | Test files, patterns, coverage |
-| [7. Networking & Auth](#7-networking--auth) | Transport config, startup modes, auth flow |
-| [8. Editor Tooling](#8-editor-tooling) | GladeKit MCP, NPCFactory, automation |
-| [9. Safety Gates](#9-safety-gates) | What requires explicit approval |
+| [6. Datadog Monitoring](#6-datadog-monitoring) | Metrics, log collection, dashboards |
+| [7. Testing](#7-testing) | Test files, patterns, coverage |
+| [8. Networking & Auth](#8-networking--auth) | Transport config, startup modes, auth flow |
+| [9. Editor Tooling](#9-editor-tooling) | GladeKit MCP, NPCFactory, automation |
+| [10. Safety Gates](#10-safety-gates) | What requires explicit approval |
 
 ---
 
@@ -330,7 +331,107 @@ env UV_CACHE_DIR=/tmp/uv-cache UV_TOOL_DIR=/tmp/uv-tools uv run ...
 
 ---
 
-## 6. Testing
+## 6. Datadog Monitoring
+
+### 6.1 Architecture
+
+```
+Unity Dedicated Server ──┬── DogStatsD (UDP 8125) ──▶ Datadog Agent ──▶ us5.datadoghq.com
+                          │
+NPCDialogueManager ───────┤  Custom metrics:
+NPCDialogueSessionService ─┤  • llm.request.*         (duration, count, error)
+QdrantRAGService ─────────┤  • dialogue.manager.*    (initialize, npc.switch)
+AuthNetworkBridge ────────┤  • dialogue.session.*    (turn duration, count, error)
+NPCNetworkBootstrap ──────┤  • dialogue.localai.*    (request duration, count)
+                          │  • qdrant.search.*       (duration, count, error, result_count)
+                          │  • auth.login.*          (count)
+                          │  • network.*             (server, client, mode)
+                          │
+Docker Containers ──── stdout/stderr ──▶ json-file → Log tailing
+                          │
+All services ──────── APM traces ──▶ DD Agent (port 8126)
+```
+
+### 6.2 Datadog Agent
+
+A single host-level Datadog Agent runs via `docker compose` in `Backend/datadog-host/`:
+
+```yaml
+container_name: dd-agent
+image: gcr.io/datadoghq/agent:latest
+network_mode: host
+```
+
+| Setting | Value |
+|---------|-------|
+| Site | `us5.datadoghq.com` |
+| Env | `production` (configurable via `DD_ENV`) |
+| Tags | `project:unity-linux-llm`, `team:npc-platform` |
+| API Key | `Backend/.env` → `DD_API_KEY` |
+| DogStatsD | Port `8125/udp` (non-local traffic enabled) |
+| APM | Port `8126/tcp` (non-local traffic enabled) |
+| Logs | `container_collect_all: true` |
+| Process | `process_agent_enabled: true` |
+
+**Integration configs** at `Backend/datadog-host/conf.d/`:
+
+| Integration | File | What it monitors |
+|-------------|------|-----------------|
+| `localai.d/` | `conf.yaml` | LLM metrics + log parsing |
+| `qdrant.d/` | `conf.yaml` | Collection points, search latency |
+| `nginx.d/` | `conf.yaml` | Access/error log parsing |
+| `unity.d/` | `conf.yaml` | DogStatsD (auto-discovered) |
+
+### 6.3 Custom DogStatsD Metrics (from Unity)
+
+Emitted by `DatadogMetricsService.cs` — a lightweight .NET Standard 2.0 client
+at `Assets/Scripts/Runtime/Monitoring/DatadogMetricsService.cs`.
+
+**Initialization:** `NPCDialogueBootstrapper.Awake()` calls `DatadogMetricsService.Initialize()`
+(default: `127.0.0.1:8125`). Shutdown in `OnDestroy()`.
+
+| Unity Script | Metrics | Key Tags |
+|-------------|---------|----------|
+| `NPCLocalAIClient` | `llm.request.duration`, `llm.request.count`, `llm.request.error` | model, status, reason |
+| `NPCDialogueManager` | `dialogue.manager.initialize.duration`, `dialogue.manager.initialize.count`, `dialogue.npc.switch.count` | profile_count, use_qdrant, npc |
+| `NPCDialogueSessionService` | `dialogue.session.turn.duration`, `dialogue.session.turn.count`, `dialogue.session.error`, `dialogue.localai.request.duration`, `dialogue.localai.request.count` | npc, action_type, model |
+| `QdrantRAGService` | `qdrant.search.duration`, `qdrant.search.count`, `qdrant.search.error`, `qdrant.search.result_count` | limit, reason, collection |
+| `AuthNetworkBridge` | `auth.login.count` | mode |
+| `NPCNetworkBootstrap` | `network.server.started`, `network.client.connected`, `network.client.disconnected`, `network.mode.start` | mode, listen_port |
+
+### 6.4 Importing the Dashboard
+
+The comprehensive dashboard is at `Backend/datadog-host/dashboard.json`.
+
+To import:
+1. Open Datadog → Dashboards → New Dashboard → Import Dashboard JSON
+2. Paste `dashboard.json` contents
+3. Save as "NPC Platform — Unity Linux LLM"
+
+**Widget groups:**
+- 🚀 **Service Overview** — Container resource usage, health checks
+- 🤖 **LLM / LocalAI** — Request latency (avg/p95/p99), throughput, error rate
+- 💬 **Dialogue System** — Turn volume, duration, errors, most active NPCs
+- 🗄️ **Qdrant Vector DB** — Search latency, throughput, result counts, collection size
+- 🔐 **Auth & Network** — Login volume, server starts, client connections
+- 🖥️ **Linux Host OS** — CPU, memory, disk I/O, network traffic, GPU, disk space
+
+### 6.5 Docker Compose Sidecars
+
+Each backend service's `docker-compose.yml` also includes a Datadog Agent sidecar
+for isolated monitoring when running stacks independently:
+
+- `Backend/unity-dedicated-server/docker-compose.yml` — `datadog-agent-unity-server`
+- `Backend/webgl-client/docker-compose.yml` — `datadog-agent-webgl`
+- `Backend/codebase-watchdog/docker-compose.yml` — `datadog-agent-watchdog`
+- `Backend/supabase-stack/docker-compose.yml` — `datadog-agent`
+
+**Note:** In production, use ONE host-level agent (preferred). Sidecars are for
+development/testing isolation.
+
+---
+
+## 7. Testing
 
 ### 6.1 Test Suite (23 files, 149 tests)
 

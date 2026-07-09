@@ -31,6 +31,10 @@ PHASE4_FIELD_RE = re.compile(
 PROPERTY_WRAPPER_RE = re.compile(
     r'public\s+[\w<>\[\],?.\s]+\s+[A-Z][A-Za-z0-9_]+\s*\{\s*get\s*=>\s*_\w+\s*;\s*set\s*=>\s*_\w+\s*(?:=\s*\w+)?\s*;\s*\}'
 )
+# Phase-4-style property wrappers: public Type PascalCase { get => _camelCase; set => _camelCase = value; }
+CONVERTED_PROPERTY_RE = re.compile(
+    r"public\s+(?P<ptype>[\w<>\[\],?.\s]+)\s+(?P<prop>[A-Z][A-Za-z0-9_]+)\s*\{\s*get\s*=>\s*(?P<getter>_\w+)\s*;\s*set\s*=>\s*(?P=getter)(?:\s*=\s*\w+)?\s*;\s*\}"
+)
 
 
 def _extract_formerlynamed(attrs_str: str) -> str | None:
@@ -164,6 +168,56 @@ def analyze_csharp_files(root: Path, csharp_paths: list[Path], assemblies: list[
                 if path.startswith(prefix + "/") or path == prefix:
                     rel.payload.setdefault("asmdef", asm.name)
                     break
+
+        # --- Roslyn+regex merge: enrich Roslyn serialized_field records with convention data ---
+        path_to_text: dict[str, str] = {}
+        for fp in csharp_paths:
+            try:
+                abs_str = fp.as_posix()
+                path_to_text[abs_str] = fp.read_text(encoding="utf-8", errors="ignore")
+                # Also index by relative path for Roslyn records that use relative paths
+                try:
+                    rel_str = fp.relative_to(root).as_posix()
+                    path_to_text[rel_str] = path_to_text[abs_str]
+                except ValueError:
+                    pass
+            except Exception:
+                pass
+        for rec in records:
+            if rec.record_type != "serialized_field":
+                continue
+            fp = rec.payload.get("path", "")
+            raw = path_to_text.get(fp)
+            if not raw:
+                continue
+            name = rec.payload.get("member_name", "")
+            # Find the field declaration in raw text to extract FormerlySerializedAs
+            for m in FIELD_RE.finditer(raw):
+                if m.group("name") != name:
+                    continue
+                attrs = _attrs(m.group("attrs"))
+                old_name = _extract_formerlynamed(m.group("attrs") or "")
+                is_phase4 = bool(old_name) and "SerializeField" in attrs and name.startswith("_")
+                # Find property wrapper for this backing field
+                prop_name = ""
+                for pm in CONVERTED_PROPERTY_RE.finditer(raw):
+                    if pm.group("getter") == name:
+                        prop_name = pm.group("prop")
+                        break
+                tags: list[str] = []
+                if is_phase4:
+                    tags.append("phase4-convert")
+                if prop_name:
+                    tags.append("phase4-property-wraps")
+                if old_name:
+                    rec.payload.setdefault("old_serialized_name", old_name)
+                if is_phase4:
+                    rec.payload.setdefault("phase4_converted", True)
+                if prop_name:
+                    rec.payload.setdefault("phase4_property", prop_name)
+                rec.payload.setdefault("convention_tags", tags)
+                break
+
         return records, relations
     except Exception as exc:  # pragma: no cover
         print(f"Roslyn parser unavailable or failed: {exc}", file=sys.stderr)
@@ -377,10 +431,7 @@ def analyze_csharp_files(root: Path, csharp_paths: list[Path], assemblies: list[
         # --- third pass: serialized field records with convention awareness ---
         current_type = type_name_by_start.get(0, Path(path).stem) if type_positions else Path(path).stem
         current_ns = type_ns_by_start.get(0, root_ns) if type_positions else root_ns
-        # Detect Phase-4-style property wrappers: public Type PascalCase { get => _camelCase; ... }
-        CONVERTED_PROPERTY_RE = re.compile(
-            r"public\s+(?P<ptype>[\w<>\[\],?.\s]+)\s+(?P<prop>[A-Z][A-Za-z0-9_]+)\s*\{\s*get\s*=>\s*(?P<getter>_\w+)\s*;\s*set\s*=>\s*(?P=getter)(?:\s*=\s*\w+)?\s*;\s*\}"
-        )
+        # Detect Phase-4-style property wrappers (CONVERTED_PROPERTY_RE defined at module level)
         property_wrappers: dict[str, str] = {}  # backing_field_name -> property_name
         for prop_match in CONVERTED_PROPERTY_RE.finditer(text):
             prop_name = prop_match.group("prop")

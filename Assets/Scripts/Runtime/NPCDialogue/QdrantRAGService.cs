@@ -172,6 +172,7 @@ namespace NPCSystem
             if (string.IsNullOrWhiteSpace(query))
                 return new List<string>();
 
+            var searchSw = System.Diagnostics.Stopwatch.StartNew();
             string endpoint = BuildSearchEndpoint();
 
             var searchPayload = new Dictionary<string, object>
@@ -189,6 +190,11 @@ namespace NPCSystem
                     Debug.LogError(
                         "[QdrantRAGService] No NPCLocalAIEmbedder found for query encoding."
                     );
+                    searchSw.Stop();
+                    DatadogMetricsService.Increment("qdrant.search.error", tags: new[]
+                    {
+                        "reason:no_embedder",
+                    });
                     return new List<string>();
                 }
             }
@@ -203,6 +209,12 @@ namespace NPCSystem
                 Debug.LogError(
                     $"[QdrantRAGService] Embedding failed: {ex.Message}"
                 );
+                searchSw.Stop();
+                DatadogMetricsService.Increment("qdrant.search.error", tags: new[]
+                {
+                    "reason:embedding_failed",
+                    $"exception:{ex.GetType().Name}",
+                });
                 return new List<string>();
             }
 
@@ -223,6 +235,12 @@ namespace NPCSystem
                 Debug.LogWarning(
                     $"[QdrantRAGService] Search failed: {request.error}\n{request.downloadHandler.text}"
                 );
+                searchSw.Stop();
+                DatadogMetricsService.Increment("qdrant.search.error", tags: new[]
+                {
+                    "reason:http_error",
+                    $"http_result:{request.result}",
+                });
                 return new List<string>();
             }
 
@@ -231,13 +249,36 @@ namespace NPCSystem
                 var searchResult = JsonUtility.FromJson<QdrantSearchResult>(
                     $"{{\"result\":{request.downloadHandler.text}}}"
                 );
-                return ExtractPayloadTexts(searchResult);
+                List<string> results = ExtractPayloadTexts(searchResult);
+                searchSw.Stop();
+
+                DatadogMetricsService.Timer("qdrant.search.duration", searchSw.ElapsedMilliseconds, tags: new[]
+                {
+                    $"limit:{limit}",
+                    $"result_count:{results.Count}",
+                });
+                DatadogMetricsService.Increment("qdrant.search.count", tags: new[]
+                {
+                    $"result_count:{results.Count}",
+                });
+                DatadogMetricsService.Gauge("qdrant.search.result_count", results.Count, tags: new[]
+                {
+                    $"collection:{_collectionName}",
+                });
+
+                return results;
             }
             catch (Exception ex)
             {
                 Debug.LogWarning(
                     $"[QdrantRAGService] Search parse error: {ex.Message}\n{request.downloadHandler.text}"
                 );
+                searchSw.Stop();
+                DatadogMetricsService.Increment("qdrant.search.error", tags: new[]
+                {
+                    "reason:parse_error",
+                    $"exception:{ex.GetType().Name}",
+                });
                 return new List<string>();
             }
         }

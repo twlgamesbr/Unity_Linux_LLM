@@ -1,0 +1,465 @@
+{
+  "title": "NPC Platform — Unity Linux LLM",
+  "description": "Comprehensive monitoring dashboard for the NPC Platform: Unity dedicated server, LocalAI LLM inference, Qdrant vector DB, Supabase backend, WebGL client, and Linux host.",
+  "layout_type": "free",
+  "template_variables": [
+    {
+      "name": "env",
+      "prefix": "env",
+      "default": "production"
+    },
+    {
+      "name": "service",
+      "prefix": "service",
+      "default": "unity-dedicated-server"
+    }
+  ],
+  "widgets": [
+    {
+      "definition": {
+        "type": "group",
+        "layout_type": "structured",
+        "title": "🚀 Service Overview",
+        "widgets": [
+          {
+            "definition": {
+              "type": "toplist",
+              "title": "Containers by Memory",
+              "requests": [
+                {
+                  "q": "top(avg:docker.container.mem.usage{$env} by {container_name}, 10, 'avg', 'desc')"
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "type": "toplist",
+              "title": "Containers by CPU",
+              "requests": [
+                {
+                  "q": "top(avg:docker.container.cpu.usage{$env} by {container_name}, 10, 'avg', 'desc')"
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "type": "check_status",
+              "title": "Container Health",
+              "check": "docker.container.health",
+              "group_by": ["container_name"],
+              "tags": ["$env"]
+            }
+          }
+        ]
+      },
+      "layout": { "x": 0, "y": 0, "width": 12, "height": 8 }
+    },
+    {
+      "definition": {
+        "type": "group",
+        "layout_type": "structured",
+        "title": "🤖 LLM / LocalAI",
+        "widgets": [
+          {
+            "definition": {
+              "type": "timeseries",
+              "title": "Request Duration (avg, p95, p99)",
+              "requests": [
+                {
+                  "q": "avg:llm.request.duration{$env,$service} by {model}",
+                  "display_type": "line",
+                  "style": {"palette": "green", "line_type": "solid", "line_width": "normal"}
+                },
+                {
+                  "q": "p95:llm.request.duration{$env,$service} by {model}",
+                  "display_type": "line",
+                  "style": {"palette": "yellow", "line_type": "dashed", "line_width": "thin"}
+                },
+                {
+                  "q": "p99:llm.request.duration{$env,$service} by {model}",
+                  "display_type": "line",
+                  "style": {"palette": "red", "line_type": "dashed", "line_width": "thin"}
+                }
+              ],
+              "yaxis": {"scale": "linear", "min": "auto", "max": "auto"}
+            }
+          },
+          {
+            "definition": {
+              "type": "timeseries",
+              "title": "Request Count & Errors",
+              "requests": [
+                {
+                  "q": "per_second(sum:llm.request.count{$env,$service} by {status})",
+                  "display_type": "bars",
+                  "style": {"palette": "green"}
+                },
+                {
+                  "q": "per_second(sum:llm.request.error{$env,$service} by {reason})",
+                  "display_type": "bars",
+                  "style": {"palette": "red"}
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "type": "query_value",
+              "title": "Total Requests",
+              "requests": [
+                {
+                  "q": "sum:llm.request.count{$env,$service}",
+                  "aggregator": "sum"
+                }
+              ],
+              "autoscale": true
+            }
+          },
+          {
+            "definition": {
+              "type": "query_value",
+              "title": "Error Rate",
+              "requests": [
+                {
+                  "q": "sum:llm.request.error{$env,$service} / sum:llm.request.count{$env,$service} * 100",
+                  "aggregator": "avg"
+                }
+              ],
+              "autoscale": true,
+              "custom_unit": "%"
+            }
+          }
+        ]
+      },
+      "layout": { "x": 0, "y": 9, "width": 12, "height": 12 }
+    },
+    {
+      "definition": {
+        "type": "group",
+        "layout_type": "structured",
+        "title": "💬 Dialogue System",
+        "widgets": [
+          {
+            "definition": {
+              "type": "timeseries",
+              "title": "Dialogue Turns per Second",
+              "requests": [
+                {
+                  "q": "per_second(sum:dialogue.session.turn.count{$env,$service} by {npc,action_type})",
+                  "display_type": "bars",
+                  "style": {"palette": "blue"}
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "type": "timeseries",
+              "title": "Dialogue Turn Duration (avg)",
+              "requests": [
+                {
+                  "q": "avg:dialogue.session.turn.duration{$env,$service} by {npc}",
+                  "display_type": "line",
+                  "style": {"palette": "purple"}
+                }
+              ],
+              "yaxis": {"scale": "linear", "unit": "millisecond"}
+            }
+          },
+          {
+            "definition": {
+              "type": "query_value",
+              "title": "Dialogue Errors",
+              "requests": [
+                {
+                  "q": "sum:dialogue.session.error{$env,$service}",
+                  "aggregator": "sum"
+                }
+              ],
+              "autoscale": true
+            }
+          },
+          {
+            "definition": {
+              "type": "toplist",
+              "title": "Most Active NPCs",
+              "requests": [
+                {
+                  "q": "top(sum:dialogue.session.turn.count{$env,$service} by {npc}, 10, 'sum', 'desc')"
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "layout": { "x": 0, "y": 22, "width": 12, "height": 12 }
+    },
+    {
+      "definition": {
+        "type": "group",
+        "layout_type": "structured",
+        "title": "🗄️ Qdrant Vector DB",
+        "widgets": [
+          {
+            "definition": {
+              "type": "timeseries",
+              "title": "Search Duration (avg, p95)",
+              "requests": [
+                {
+                  "q": "avg:qdrant.search.duration{$env,$service} by {limit}",
+                  "display_type": "line",
+                  "style": {"palette": "green"}
+                },
+                {
+                  "q": "p95:qdrant.search.duration{$env,$service} by {limit}",
+                  "display_type": "line",
+                  "style": {"palette": "yellow", "line_type": "dashed"}
+                }
+              ],
+              "yaxis": {"unit": "millisecond"}
+            }
+          },
+          {
+            "definition": {
+              "type": "timeseries",
+              "title": "Searches & Errors",
+              "requests": [
+                {
+                  "q": "per_second(sum:qdrant.search.count{$env,$service})",
+                  "display_type": "bars",
+                  "style": {"palette": "blue"}
+                },
+                {
+                  "q": "per_second(sum:qdrant.search.error{$env,$service} by {reason})",
+                  "display_type": "bars",
+                  "style": {"palette": "red"}
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "type": "timeseries",
+              "title": "Result Count (avg)",
+              "requests": [
+                {
+                  "q": "avg:qdrant.search.result_count{$env,$service}",
+                  "display_type": "line"
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "type": "query_value",
+              "title": "Qdrant Collection Points",
+              "requests": [
+                {
+                  "q": "avg:qdrant.collection.points{$env}",
+                  "aggregator": "avg"
+                }
+              ],
+              "autoscale": true
+            }
+          }
+        ]
+      },
+      "layout": { "x": 0, "y": 35, "width": 12, "height": 12 }
+    },
+    {
+      "definition": {
+        "type": "group",
+        "layout_type": "structured",
+        "title": "🔐 Auth & Network",
+        "widgets": [
+          {
+            "definition": {
+              "type": "timeseries",
+              "title": "Logins per Second",
+              "requests": [
+                {
+                  "q": "per_second(sum:auth.login.count{$env,$service} by {mode})",
+                  "display_type": "bars",
+                  "style": {"palette": "green"}
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "type": "change",
+              "title": "Server Started",
+              "requests": [
+                {
+                  "q": "sum:network.server.started{$env,$service}",
+                  "change_type": "absolute",
+                  "order_dir": "desc",
+                  "compare_to": "hour",
+                  "increase_good": true
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "type": "timeseries",
+              "title": "Client Connections",
+              "requests": [
+                {
+                  "q": "per_second(sum:network.client.connected{$env,$service})",
+                  "display_type": "bars",
+                  "style": {"palette": "green"}
+                },
+                {
+                  "q": "per_second(sum:network.client.disconnected{$env,$service})",
+                  "display_type": "bars",
+                  "style": {"palette": "red"}
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "type": "query_value",
+              "title": "Active Connections (net)",
+              "requests": [
+                {
+                  "q": "sum:network.client.connected{$env,$service} - sum:network.client.disconnected{$env,$service}",
+                  "aggregator": "sum"
+                }
+              ],
+              "autoscale": true
+            }
+          }
+        ]
+      },
+      "layout": { "x": 0, "y": 48, "width": 12, "height": 10 }
+    },
+    {
+      "definition": {
+        "type": "group",
+        "layout_type": "structured",
+        "title": "🖥️ Linux Host OS",
+        "widgets": [
+          {
+            "definition": {
+              "type": "timeseries",
+              "title": "CPU Usage",
+              "requests": [
+                {
+                  "q": "avg:system.cpu.user{$env}",
+                  "display_type": "line"
+                },
+                {
+                  "q": "avg:system.cpu.system{$env}",
+                  "display_type": "line"
+                },
+                {
+                  "q": "avg:system.cpu.iowait{$env}",
+                  "display_type": "line"
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "type": "timeseries",
+              "title": "Memory Usage",
+              "requests": [
+                {
+                  "q": "avg:system.mem.used{$env}",
+                  "display_type": "line"
+                },
+                {
+                  "q": "avg:system.mem.total{$env}",
+                  "display_type": "line",
+                  "style": {"palette": "grey", "line_type": "dashed"}
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "type": "timeseries",
+              "title": "Disk I/O",
+              "requests": [
+                {
+                  "q": "avg:system.io.rkb_s{$env}",
+                  "display_type": "line",
+                  "style": {"palette": "blue"}
+                },
+                {
+                  "q": "avg:system.io.wkb_s{$env}",
+                  "display_type": "line",
+                  "style": {"palette": "orange"}
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "type": "timeseries",
+              "title": "Network Traffic",
+              "requests": [
+                {
+                  "q": "avg:system.net.bytes_rcvd{$env}",
+                  "display_type": "line",
+                  "style": {"palette": "green"}
+                },
+                {
+                  "q": "avg:system.net.bytes_sent{$env}",
+                  "display_type": "line",
+                  "style": {"palette": "purple"}
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "type": "timeseries",
+              "title": "GPU Utilization (NVIDIA)",
+              "requests": [
+                {
+                  "q": "avg:nvidia_smi.utilization.gpu{$env}",
+                  "display_type": "line",
+                  "style": {"palette": "green"}
+                },
+                {
+                  "q": "avg:nvidia_smi.memory.used{$env}",
+                  "display_type": "line",
+                  "style": {"palette": "blue"}
+                }
+              ]
+            }
+          },
+          {
+            "definition": {
+              "type": "timeseries",
+              "title": "Disk Space",
+              "requests": [
+                {
+                  "q": "avg:system.disk.total{$env}",
+                  "display_type": "line",
+                  "style": {"palette": "grey", "line_type": "dashed"}
+                },
+                {
+                  "q": "avg:system.disk.used{$env}",
+                  "display_type": "line",
+                  "style": {"palette": "red"}
+                },
+                {
+                  "q": "avg:system.disk.free{$env}",
+                  "display_type": "line",
+                  "style": {"palette": "green"}
+                }
+              ]
+            }
+          }
+        ]
+      },
+      "layout": { "x": 0, "y": 59, "width": 12, "height": 16 }
+    }
+  ]
+}

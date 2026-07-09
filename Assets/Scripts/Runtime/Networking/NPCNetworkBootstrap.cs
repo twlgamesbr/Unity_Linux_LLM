@@ -229,6 +229,12 @@ namespace NPCSystem
                     + $"clientBindPort={UnityTransport.ConnectionData.ClientBindPort}",
                 source: nameof(NPCNetworkBootstrap)
             );
+
+            DatadogMetricsService.Increment("network.server.started", tags: new[]
+            {
+                $"listen_port:{UnityTransport.ConnectionData.Port}",
+                $"transport:{UnityTransport.Protocol?.ToString() ?? "unknown"}",
+            });
         }
 
         void HandleClientConnected(ulong clientId)
@@ -244,6 +250,12 @@ namespace NPCSystem
                 source: nameof(NPCNetworkBootstrap),
                 data: new Dictionary<string, object> { ["clientId"] = clientId }
             );
+
+            DatadogMetricsService.Increment("network.client.connected", tags: new[]
+            {
+                $"is_server:{NetworkManager.IsServer}",
+                $"is_client:{NetworkManager.IsClient}",
+            });
         }
 
         void HandleClientDisconnected(ulong clientId)
@@ -265,6 +277,11 @@ namespace NPCSystem
                     ["disconnectReason"] = disconnectReason ?? string.Empty,
                 }
             );
+
+            DatadogMetricsService.Increment("network.client.disconnected", tags: new[]
+            {
+                $"reason:{(!string.IsNullOrEmpty(disconnectReason) ? "explicit" : "unknown")}",
+            });
         }
 
         public bool StartConfiguredMode()
@@ -325,10 +342,13 @@ namespace NPCSystem
             switch (TransportConfig.autoStartMode)
             {
                 case NPCNetworkAutoStartMode.Client:
+                    DatadogMetricsService.Increment("network.mode.start", tags: new[] { "mode:client" });
                     return NetworkManager.StartClient();
                 case NPCNetworkAutoStartMode.Host:
+                    DatadogMetricsService.Increment("network.mode.start", tags: new[] { "mode:host" });
                     return NetworkManager.StartHost();
                 case NPCNetworkAutoStartMode.Server:
+                    DatadogMetricsService.Increment("network.mode.start", tags: new[] { "mode:server" });
                     return NetworkManager.StartServer();
                 default:
                     return false;

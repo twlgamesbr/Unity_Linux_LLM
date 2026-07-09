@@ -1,0 +1,32 @@
+## Nginx access + error log collection for the WebGL client.
+## The nginx container outputs logs via Docker's json-file driver.
+## This config enables structured parsing of the combined log format.
+init_config:
+
+instances:
+  ## Nginx status/metrics check (requires nginx_status module)
+  - nginx_status_url: http://localhost:8085/nginx_status
+    tags:
+      - service:webgl-client
+      - container:npc-webgl-client
+
+logs:
+  ## Parse nginx access logs from Docker container stdout
+  - type: docker
+    source: nginx
+    service: webgl-client
+    sourcecategory: http_web_access
+    log_processing_rules:
+      - type: multi_line
+        name: new_log_start_with_date
+        pattern: \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}
+
+  ## Parse nginx error logs from Docker container stdout
+  - type: docker
+    source: nginx
+    service: webgl-client
+    sourcecategory: http_web_error
+    log_processing_rules:
+      - type: multi_line
+        name: new_error_start
+        pattern: ^\d{4}/\d{2}/\d{2}

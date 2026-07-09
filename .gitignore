@@ -48,6 +48,11 @@ Thumbs.db
 ExportedObj/
 .consulo/
 
+# Environment files with secrets (API keys, tokens)
+.env
+.env.*
+!.env.example
+
 # Unity profiler captures, project auditor reports, auto-generated schemas
 ProfilerCaptures/
 Project_Auditor/

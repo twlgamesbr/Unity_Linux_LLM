@@ -226,6 +226,11 @@ namespace NPCSystem
 
             CloseAuthUI();
 
+            DatadogMetricsService.Increment("auth.login.count", tags: new[]
+            {
+                $"mode:{resolvedMode.ToString().ToLowerInvariant()}",
+            });
+
             _logger?.Log(
                 NPCFlowStage.UIInput,
                 NPCFlowStatus.Success,

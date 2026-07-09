@@ -1,0 +1,20 @@
+## Unity Dedicated Server monitoring.
+## Custom DogStatsD metrics are emitted directly by the Unity server
+## via DatadogMetricsService (UDP port 8125). This integration config
+## tailes the Unity Player.log for structured log parsing.
+init_config:
+
+instances:
+  ## The Datadog Agent auto-discovers DogStatsD metrics — no instance config needed.
+  ## This section is a placeholder for future Unity-specific integration checks.
+
+logs:
+  ## Tail Unity's Player.log from the dedicated server container
+  - type: docker
+    source: csharp
+    service: unity-dedicated-server
+    sourcecategory: game_server
+    log_processing_rules:
+      - type: multi_line
+        name: unity_log_start
+        pattern: ^\(Filename: 

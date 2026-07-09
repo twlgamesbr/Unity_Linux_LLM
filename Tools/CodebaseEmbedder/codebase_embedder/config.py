@@ -15,7 +15,7 @@ class CodebaseEmbedderConfig:
     project_root: Path | str = Path.cwd()
     project_slug: str = "Unity_Linux_LLM"
     qdrant_url: str = "http://localhost:6333"
-    collection_name: str = "unity_linux_llm_codebase_v1"
+    collection_name: str = "unity_linux_llm_codebase_v2"
     localai_base_url: str = "http://localhost:8080/v1"
     embedding_model: str = "nomic-embed-text-v1.5"
     artifact_dir_name: str = ".codebase-index"

@@ -1,0 +1,51 @@
+services:
+  # ─────────────────────────────────────────────────
+  # Datadog Agent — single host-level agent that
+  # monitors everything: Linux OS, Docker containers,
+  # custom DogStatsD metrics from Unity, APM traces,
+  # and all service logs.
+  #
+  # The agent auto-discovers Docker containers and
+  # collects their stdout/stderr logs. Custom
+  # integration configs in conf.d/ enable structured
+  # log parsing and enhanced metrics.
+  #
+  # Requires DD_API_KEY set in Backend/.env
+  # Site: us5.datadoghq.com
+  # ─────────────────────────────────────────────────
+  datadog-agent:
+    container_name: dd-agent
+    image: gcr.io/datadoghq/agent:latest
+    pid: host
+    network_mode: host
+    environment:
+      - DD_API_KEY=${DD_API_KEY:?err}
+      - DD_SITE=${DD_SITE:-us5.datadoghq.com}
+      - DD_ENV=${DD_ENV:-production}
+      - DD_TAGS=project:unity-linux-llm env:${DD_ENV:-production} team:npc-platform
+      - DD_APM_ENABLED=true
+      - DD_APM_NON_LOCAL_TRAFFIC=true
+      - DD_LOGS_ENABLED=true
+      - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true
+      - DD_PROCESS_AGENT_ENABLED=true
+      - DD_DOGSTATSD_NON_LOCAL_TRAFFIC=true
+      - DD_DOGSTATSD_STATS=true
+      - DD_DOGSTATSD_ORIGIN_DETECTION=true
+      - DD_LOG_LEVEL=info
+    volumes:
+      # Docker control socket for container discovery
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      # Host proc/cgroup for system metrics (CPU, memory, disk, network)
+      - /proc/:/host/proc/:ro
+      - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+      # Docker container logs for tailing
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      # Custom integration configs (nginx, unity, postgres, etc.)
+      - ./conf.d:/etc/datadog-agent/conf.d:ro
+    restart: unless-stopped
+    stop_grace_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"

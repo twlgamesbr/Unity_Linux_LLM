@@ -372,6 +372,7 @@ namespace NPCSystem
                 NPCFlowStage.SceneBootstrap,
                 source: nameof(NPCDialogueManager)
             );
+            var initSw = System.Diagnostics.Stopwatch.StartNew();
             try
             {
                 AutoAssignReferencesIfNeeded();
@@ -412,10 +413,32 @@ namespace NPCSystem
                     _sessionService.OnError += OnSessionError;
                 }
 
+                initSw.Stop();
+                DatadogMetricsService.Timer("dialogue.manager.initialize.duration", initSw.ElapsedMilliseconds, tags: new[]
+                {
+                    $"profile_count:{Profiles.Length}",
+                    $"use_qdrant:{UseQdrantRag}",
+                });
+                DatadogMetricsService.Increment("dialogue.manager.initialize.count", tags: new[]
+                {
+                    "status:success",
+                });
+
                 scope.Success("Initialization complete.");
             }
             catch (Exception ex)
             {
+                initSw.Stop();
+                DatadogMetricsService.Timer("dialogue.manager.initialize.duration", initSw.ElapsedMilliseconds, tags: new[]
+                {
+                    $"profile_count:{Profiles.Length}",
+                    $"use_qdrant:{UseQdrantRag}",
+                });
+                DatadogMetricsService.Increment("dialogue.manager.initialize.count", tags: new[]
+                {
+                    "status:failed",
+                });
+
                 scope.Error(ex, "Initialization failed.");
                 throw;
             }
@@ -657,6 +680,12 @@ namespace NPCSystem
                 $"Switched to NPC: {profile.GetDisplayName()}",
                 new Dictionary<string, object> { ["npcSlug"] = profile.GetNpcSlug() }
             );
+
+            DatadogMetricsService.Increment("dialogue.npc.switch.count", tags: new[]
+            {
+                $"npc:{profile.GetNpcSlug()}",
+                $"display_name:{profile.GetDisplayName()}",
+            });
 
             OnNpcChanged?.Invoke(profile.GetDisplayName());
         }

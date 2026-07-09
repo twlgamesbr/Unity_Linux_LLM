@@ -1,0 +1,32 @@
+## Qdrant vector database monitoring.
+## Collects metrics from Qdrant's built-in Prometheus endpoint.
+init_config:
+
+instances:
+  - openmetrics_endpoint: http://localhost:6333/metrics
+    tags:
+      - service:qdrant
+      - team:npc-platform
+      - env:${DD_ENV:-production}
+    metrics:
+      ## Collection-level metrics
+      - qdrant_collection_points_total: qdrant.collection.points
+      - qdrant_collection_vectors_total: qdrant.collection.vectors
+      ## Request metrics
+      - qdrant_grpc_requests_total: qdrant.grpc.requests.total
+      - qdrant_rest_requests_total: qdrant.rest.requests.total
+      - qdrant_search_duration_ms: qdrant.search.duration.ms
+      - qdrant_update_duration_ms: qdrant.update.duration.ms
+      ## Segment/performance
+      - qdrant_segments_total: qdrant.segments.total
+      - qdrant_optimizer_errors_total: qdrant.optimizer.errors.total
+      - qdrant_optimizer_cpu_seconds_total: qdrant.optimizer.cpu.seconds
+      ## Memory
+      - qdrant_mapped_memory_bytes: qdrant.memory.mapped.bytes
+      - qdrant_actual_memory_bytes: qdrant.memory.actual.bytes
+
+logs:
+  - type: docker
+    source: qdrant
+    service: qdrant
+    sourcecategory: vector_database

@@ -149,6 +149,8 @@ namespace NPCSystem
                 npcSlug: slug
             );
 
+            var turnSw = System.Diagnostics.Stopwatch.StartNew();
+
             try
             {
                 string prompt = await BuildRAGPromptAsync(respondingProfile, playerMessage, reqId);
@@ -212,6 +214,19 @@ namespace NPCSystem
                     }
                 }
 
+                turnSw.Stop();
+                DatadogMetricsService.Timer("dialogue.session.turn.duration", turnSw.ElapsedMilliseconds, tags: new[]
+                {
+                    $"npc:{slug}",
+                    $"action_type:{actionPlan.actionType}",
+                    $"has_response:{(string.IsNullOrEmpty(dialogueMessage) ? "false" : "true")}",
+                });
+                DatadogMetricsService.Increment("dialogue.session.turn.count", tags: new[]
+                {
+                    $"npc:{slug}",
+                    $"action_type:{actionPlan.actionType}",
+                });
+
                 OnResponseComplete?.Invoke(respondingProfile.GetDisplayName(), dialogueMessage);
 
                 var logData = new Dictionary<string, object>
@@ -225,6 +240,13 @@ namespace NPCSystem
             }
             catch (Exception ex)
             {
+                turnSw.Stop();
+                DatadogMetricsService.Increment("dialogue.session.error", tags: new[]
+                {
+                    $"npc:{slug}",
+                    $"exception:{ex.GetType().Name}",
+                });
+
                 logger.Log(
                     NPCFlowStage.DialogueGeneration,
                     NPCFlowStatus.Error,
@@ -326,6 +348,9 @@ namespace NPCSystem
 
             messages.Add(new NPCOpenAIMessage { role = "user", content = playerMessage });
 
+            var localAiSw = System.Diagnostics.Stopwatch.StartNew();
+            bool requestSucceeded = false;
+
             if (_chatClient != null)
             {
                 Debug.Log(
@@ -336,6 +361,7 @@ namespace NPCSystem
                     profile != null ? profile.temperature : (float?)null,
                     modelOverride: ResolvedModelName
                 );
+                requestSucceeded = !string.IsNullOrEmpty(dialogueMessage);
             }
 
             if (dialogueMessage != null)
@@ -350,6 +376,20 @@ namespace NPCSystem
                     )
                     .Trim();
             }
+
+            localAiSw.Stop();
+            DatadogMetricsService.Timer("dialogue.localai.request.duration", localAiSw.ElapsedMilliseconds, tags: new[]
+            {
+                $"npc:{slug}",
+                $"model:{ResolvedModelName}",
+                $"status:{(requestSucceeded ? "success" : "empty")}",
+            });
+            DatadogMetricsService.Increment("dialogue.localai.request.count", tags: new[]
+            {
+                $"npc:{slug}",
+                $"model:{ResolvedModelName}",
+                $"status:{(requestSucceeded ? "success" : "empty")}",
+            });
 
             scope.Success(
                 "LocalAI response received.",
