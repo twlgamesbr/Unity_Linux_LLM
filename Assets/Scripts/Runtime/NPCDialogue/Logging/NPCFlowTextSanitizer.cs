@@ -8,6 +8,8 @@ namespace NPCSystem
 {
     public static class NPCFlowTextSanitizer
     {
+        static readonly SHA256 Sha256 = SHA256.Create();
+
         public static Dictionary<string, object> SummarizeText(
             string text,
             bool includeSnippet,
@@ -73,16 +75,13 @@ namespace NPCSystem
 
         static string Sha256Hex(string value)
         {
-            using (SHA256 sha256 = SHA256.Create())
+            byte[] bytes = Sha256.ComputeHash(Encoding.UTF8.GetBytes(value ?? string.Empty));
+            StringBuilder builder = new StringBuilder(bytes.Length * 2);
+            foreach (byte b in bytes)
             {
-                byte[] bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(value ?? string.Empty));
-                StringBuilder builder = new StringBuilder(bytes.Length * 2);
-                foreach (byte b in bytes)
-                {
-                    builder.Append(b.ToString("x2"));
-                }
-                return builder.ToString();
+                builder.Append(b.ToString("x2"));
             }
+            return builder.ToString();
         }
     }
 }

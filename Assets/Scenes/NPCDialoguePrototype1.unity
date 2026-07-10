@@ -1358,7 +1358,7 @@ MonoBehaviour:
   NetworkManager: {fileID: 1161870791}
   NetworkBootstrap: {fileID: 774187519}
   DialogueManager: {fileID: 1778380623}
-  NpcPrefab: {fileID: 0}
+  NpcPrefab: {fileID: 6903247061848355748, guid: 3adc01a49d3d92f3eb81281b65e4b9c9, type: 3}
   NpcPrefabResourcesPath: Networking/NPCServerCharacter
   spawnOrigin: {x: -4, y: 1, z: 6}
   spawnSpacing: {x: 2.75, y: 0, z: 2.5}
@@ -1386,13 +1386,12 @@ MonoBehaviour:
   requireAuthBackend: 1
   requireLocalAiBackend: 1
   failInitializationOnRequiredBackendFailure: 1
-  lastReadinessStatus: References assigned. auth=http://localhost:8091/auth/v1/health
-    localai=http://127.0.0.1:8080/v1/models
+  lastReadinessStatus: Required multiplayer dialogue backends are reachable.
   lastAuthBackendStatus: AuthBackend reachable via http://localhost:8091/auth/v1/health
     (HTTP 404).
   lastLocalAiBackendStatus: LocalAI reachable via http://127.0.0.1:8080/v1/models
     (HTTP 200).
-  lastProbeDurationMs: 21
+  lastProbeDurationMs: 29
 --- !u!114 &276694095
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1406,7 +1405,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCTransferableItemSpawner
   NetworkManager: {fileID: 1161870791}
-  ItemPrefab: {fileID: 0}
+  ItemPrefab: {fileID: 7291902954840310053, guid: a38d0f6a35d285b58a8264207005b243, type: 3}
   ItemPrefabResourcesPath: Networking/NPCTransferableItem
   InitialNpcSlug: butler
   fallbackWorldPosition: {x: 0, y: 1, z: 4}
@@ -8779,7 +8778,7 @@ MonoBehaviour:
   restApiUrl: http://localhost:8092
   requestTimeoutSeconds: 15
   validateStoredSessionOnStart: 1
-  lastAuthStatus: No stored auth session found.
+  lastAuthStatus: SDK initialized. No active session.
   lastAuthRoute: 
   lastAuthDurationMs: 0
 --- !u!114 &1351714797
@@ -11409,7 +11408,7 @@ MonoBehaviour:
   _qdrantUrl: http://localhost:6333
   _collectionName: unity_linux_llm_codebase_v2
   _embedder: {fileID: 1778380633}
-  inspectorStatus: 'Logged Qdrant configuration: http://localhost:6333/collections/unity_linux_llm_codebase_v1/points/search'
+  inspectorStatus: Qdrant is reachable but empty (no points).
 --- !u!114 &1778380629
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -18,17 +18,30 @@ services:
     image: gcr.io/datadoghq/agent:latest
     pid: host
     network_mode: host
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
     environment:
       - DD_API_KEY=${DD_API_KEY:?err}
       - DD_APP_KEY=${DD_APP_KEY:?err}
       - DD_SITE=${DD_SITE:-us5.datadoghq.com}
       - DD_ENV=${DD_ENV:-production}
       - DD_TAGS=project:unity-linux-llm env:${DD_ENV:-production} team:npc-platform
+      # APM & Tracing
       - DD_APM_ENABLED=true
       - DD_APM_NON_LOCAL_TRAFFIC=true
+      # GPU Monitoring
+      - DD_GPU_ENABLED=true
+      # Logs
       - DD_LOGS_ENABLED=true
       - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true
+      # Process
       - DD_PROCESS_AGENT_ENABLED=true
+      # DogStatsD
       - DD_DOGSTATSD_NON_LOCAL_TRAFFIC=true
       - DD_DOGSTATSD_STATS=true
       - DD_DOGSTATSD_ORIGIN_DETECTION=true
@@ -43,6 +56,12 @@ services:
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       # Custom integration configs (nginx, unity, postgres, etc.)
       - ./conf.d:/etc/datadog-agent/conf.d:ro
+      # NVIDIA GPU monitoring (NVML access)
+      - /dev/nvidia0:/dev/nvidia0:ro
+      - /dev/nvidia1:/dev/nvidia1:ro
+      - /dev/nvidiactl:/dev/nvidiactl:ro
+      - /dev/nvidia-modeset:/dev/nvidia-modeset:ro
+      - /usr/lib/x86_64-linux-gnu/libnvidia-ml.so:/usr/lib/x86_64-linux-gnu/libnvidia-ml.so:ro
     restart: unless-stopped
     stop_grace_period: 30s
     logging:

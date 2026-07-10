@@ -27,6 +27,7 @@ namespace NPCSystem
         {
             _activeClientId = clientId;
             _activeRequestId = request.requestId;
+            _persistentClientTarget = RpcTarget.Single(clientId, RpcTargetUse.Persistent);
             await WaitForResolvedPlayerNameAsync(clientId);
             ApplySessionStateToManager(clientId);
             LogRoutingEvent(

@@ -188,9 +188,8 @@ namespace NPCSystem
                     source = source ?? string.Empty,
                     requestId = requestId ?? string.Empty,
                     npcSlug = npcSlug ?? string.Empty,
-                    conversationId = npcSlug ?? string.Empty,
                     durationMs = durationMs ?? 0,
-                    data = data ?? new Dictionary<string, object>(),
+                    data = data,
                 }
             );
         }
@@ -202,7 +201,6 @@ namespace NPCSystem
 
             try
             {
-                ApplyPlatformLoggingOverrides();
                 PrepareEvent(flowEvent);
                 AddToRingBuffer(flowEvent);
                 if (logToUnityConsole)
@@ -325,6 +323,13 @@ namespace NPCSystem
         public void Flush()
         {
             EnsureLogPath();
+            Log(
+                NPCFlowStage.SceneBootstrap,
+                NPCFlowStatus.Success,
+                NPCFlowLogLevel.Debug,
+                "Flush triggered.",
+                source: nameof(NPCFlowLogger)
+            );
         }
 
         public Dictionary<string, object> SummarizeText(string prefix, string text)
@@ -353,17 +358,6 @@ namespace NPCSystem
             return platform != RuntimePlatform.WebGLPlayer;
         }
 
-        /// <summary>
-        /// Returns true when <paramref name="host"/> is a loopback address
-        /// (localhost or 127.0.0.1). Used by WebGL URL-resolution logic across
-        /// multiple auth and dialogue components.
-        /// </summary>
-        public static bool IsLocalHost(string host)
-        {
-            return string.Equals(host, "localhost", StringComparison.OrdinalIgnoreCase)
-                   || string.Equals(host, "127.0.0.1", StringComparison.Ordinal);
-        }
-
         void PrepareEvent(NPCFlowEvent flowEvent)
         {
             flowEvent.schemaVersion = flowEvent.schemaVersion <= 0 ? 1 : flowEvent.schemaVersion;
@@ -374,10 +368,7 @@ namespace NPCSystem
             flowEvent.source = flowEvent.source ?? string.Empty;
             flowEvent.requestId = flowEvent.requestId ?? string.Empty;
             flowEvent.npcSlug = flowEvent.npcSlug ?? string.Empty;
-            if (string.IsNullOrWhiteSpace(flowEvent.conversationId))
-                flowEvent.conversationId = flowEvent.npcSlug;
             flowEvent.message = flowEvent.message ?? string.Empty;
-            flowEvent.data ??= new Dictionary<string, object>();
         }
 
         void AddToRingBuffer(NPCFlowEvent flowEvent)
@@ -415,9 +406,6 @@ namespace NPCSystem
             try
             {
                 EnsureLogPath();
-                string directory = Path.GetDirectoryName(_currentLogPath);
-                if (!string.IsNullOrWhiteSpace(directory))
-                    Directory.CreateDirectory(directory);
                 File.AppendAllText(_currentLogPath, flowEvent.ToJson() + Environment.NewLine);
             }
             catch (Exception ex)
@@ -449,6 +437,9 @@ namespace NPCSystem
             _currentLogPath = Path.Combine(directory, $"npc-flow-{SessionId}.jsonl")
                 .Replace('\\', '/');
 
+            if (!string.IsNullOrWhiteSpace(directory))
+                Directory.CreateDirectory(directory);
+
             if (!_cleanupRun)
             {
                 _cleanupRun = true;
@@ -464,52 +455,50 @@ namespace NPCSystem
                     return;
 
                 int deletedCount = 0;
-                long totalBytes = 0;
                 var logFiles = new List<System.IO.FileInfo>();
 
                 foreach (string filePath in Directory.GetFiles(directory, "npc-flow-*.jsonl"))
                 {
-                    var fi = new System.IO.FileInfo(filePath);
-                    totalBytes += fi.Length;
-                    logFiles.Add(fi);
+                    logFiles.Add(new System.IO.FileInfo(filePath));
                 }
+
+                if (logFiles.Count == 0)
+                    return;
 
                 // Phase 1: delete files older than maxLogDays
                 DateTime cutoff = DateTime.UtcNow.AddDays(-Math.Max(1, maxLogDays));
-                foreach (var fi in logFiles)
+                for (int i = logFiles.Count - 1; i >= 0; i--)
                 {
-                    if (fi.LastWriteTimeUtc < cutoff)
+                    if (logFiles[i].LastWriteTimeUtc < cutoff)
                     {
                         try
                         {
-                            fi.Delete();
+                            logFiles[i].Delete();
+                            logFiles.RemoveAt(i);
                             deletedCount++;
                         }
                         catch
-                        { /* best effort */
-                        }
+                        { /* best effort */ }
                     }
                 }
 
                 // Phase 2: if still over size limit, delete oldest until under
-                if (maxLogDirectorySizeMB > 0)
+                if (maxLogDirectorySizeMB > 0 && logFiles.Count > 0)
                 {
                     long maxBytes = (long)maxLogDirectorySizeMB * 1024L * 1024L;
                     long currentBytes = 0;
-                    var remaining = new List<System.IO.FileInfo>();
-                    foreach (string filePath in Directory.GetFiles(directory, "npc-flow-*.jsonl"))
+                    foreach (var fi in logFiles)
                     {
-                        var fi = new System.IO.FileInfo(filePath);
-                        currentBytes += fi.Length;
-                        remaining.Add(fi);
+                        if (fi.Exists)
+                            currentBytes += fi.Length;
                     }
 
                     if (currentBytes > maxBytes)
                     {
-                        remaining.Sort((a, b) => a.LastWriteTimeUtc.CompareTo(b.LastWriteTimeUtc));
-                        foreach (var fi in remaining)
+                        logFiles.Sort((a, b) => a.LastWriteTimeUtc.CompareTo(b.LastWriteTimeUtc));
+                        foreach (var fi in logFiles)
                         {
-                            if (currentBytes <= maxBytes)
+                            if (currentBytes <= maxBytes || !fi.Exists)
                                 break;
                             try
                             {
@@ -519,8 +508,7 @@ namespace NPCSystem
                                 deletedCount++;
                             }
                             catch
-                            { /* best effort */
-                            }
+                            { /* best effort */ }
                         }
                     }
                 }
@@ -569,7 +557,7 @@ namespace NPCSystem
                 status = status,
                 level = level,
                 message = message ?? string.Empty,
-                data = data ?? new Dictionary<string, object>(),
+                data = data,
             };
 
             try

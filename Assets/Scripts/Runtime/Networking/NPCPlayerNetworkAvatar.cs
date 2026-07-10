@@ -7,35 +7,6 @@ namespace NPCSystem
     public class NPCPlayerNetworkAvatar : NetworkBehaviour
     {
         /// <summary>
-        /// Register string serialization with NGO so NetworkVariable<string> works
-        /// without requiring source-generator codegen.
-        /// </summary>
-        static NPCPlayerNetworkAvatar()
-        {
-            UserNetworkVariableSerialization<string>.WriteValue = (
-                FastBufferWriter writer,
-                in string value
-            ) =>
-            {
-                writer.WriteValueSafe(value);
-            };
-            UserNetworkVariableSerialization<string>.ReadValue = (
-                FastBufferReader reader,
-                out string value
-            ) =>
-            {
-                reader.ReadValueSafe(out value);
-            };
-            UserNetworkVariableSerialization<string>.DuplicateValue = (
-                in string value,
-                ref string duplicatedValue
-            ) =>
-            {
-                duplicatedValue = value;
-            };
-        }
-
-        /// <summary>
         /// Server-authoritative player display name, synced to all clients.
         /// NPCs read this to customize dialogue responses.
         /// </summary>
@@ -140,6 +111,8 @@ namespace NPCSystem
         [Rpc(SendTo.Server)]
         void RegisterPlayerNameServerRpc(string name, RpcParams rpcParams = default)
         {
+            if (!IsServer) return;
+
             NPCFlowLogger
                 .FindOrCreate()
                 ?.Log(

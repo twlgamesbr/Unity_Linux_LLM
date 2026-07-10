@@ -222,7 +222,7 @@ namespace NPCSystem
                 try
                 {
                     Uri uri = new Uri(Application.absoluteURL);
-                    if (!NPCFlowLogger.IsLocalHost(uri.Host))
+                    if (!NPCNetworkUtils.IsLocalHost(uri.Host))
                     {
                         _hostAddress = uri.Host;
                     }

@@ -328,12 +328,12 @@ namespace NPCSystem
         async Task InitializeInternalAsync()
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
-            if (!string.IsNullOrWhiteSpace(RemoteHost) && NPCFlowLogger.IsLocalHost(RemoteHost))
+            if (!string.IsNullOrWhiteSpace(RemoteHost) && NPCNetworkUtils.IsLocalHost(RemoteHost))
             {
                 try
                 {
                     Uri pageUri = new Uri(Application.absoluteURL);
-                    if (!NPCFlowLogger.IsLocalHost(pageUri.Host))
+                    if (!NPCNetworkUtils.IsLocalHost(pageUri.Host))
                     {
                         RemoteHost = pageUri.Host;
                     }
@@ -347,13 +347,13 @@ namespace NPCSystem
             }
             if (
                 !string.IsNullOrWhiteSpace(RemoteEmbeddingHost)
-                && NPCFlowLogger.IsLocalHost(RemoteEmbeddingHost)
+                && NPCNetworkUtils.IsLocalHost(RemoteEmbeddingHost)
             )
             {
                 try
                 {
                     Uri pageUri = new Uri(Application.absoluteURL);
-                    if (!NPCFlowLogger.IsLocalHost(pageUri.Host))
+                    if (!NPCNetworkUtils.IsLocalHost(pageUri.Host))
                     {
                         RemoteEmbeddingHost = pageUri.Host;
                     }

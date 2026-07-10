@@ -99,8 +99,7 @@ namespace NPCSystem
                 );
                 SendResponseCompleteToClient(clientId, payload);
                 SendNotebookStateToClient(clientId, BuildNotebookStateMessage());
-                _activeClientId = null;
-                _activeRequestId = string.Empty;
+                ClearActiveClient();
                 TryProcessNextQueuedRequest();
                 return;
             }
@@ -130,8 +129,7 @@ namespace NPCSystem
                     $"Relaying dialogue error to requesting client: {error}"
                 );
                 SendErrorToClient(clientId, error);
-                _activeClientId = null;
-                _activeRequestId = string.Empty;
+                ClearActiveClient();
                 TryProcessNextQueuedRequest();
                 return;
             }

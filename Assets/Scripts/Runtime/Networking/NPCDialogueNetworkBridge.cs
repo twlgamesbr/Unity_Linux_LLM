@@ -53,6 +53,7 @@ namespace NPCSystem
         string _localSelectedNpcSlug = string.Empty;
         bool _eventsBound;
         bool _disconnectCallbackRegistered;
+        RpcTarget? _persistentClientTarget;
         readonly Queue<PendingDialogueRequest> _pendingRequests =
             new Queue<PendingDialogueRequest>();
 
@@ -287,8 +288,7 @@ namespace NPCSystem
             if (_activeClientId.HasValue && _activeClientId.Value == clientId)
             {
                 _dialogueManager?.CancelRequests();
-                _activeClientId = null;
-                _activeRequestId = string.Empty;
+                ClearActiveClient();
                 TryProcessNextQueuedRequest();
             }
         }
@@ -301,7 +301,14 @@ namespace NPCSystem
             RpcParams rpcParams = default
         )
         {
-            _ = HandleNpcSelectionServerAsync(selection, rpcParams.Receive.SenderClientId);
+            if (!IsServer) return;
+            FireAndForget(
+                () => HandleNpcSelectionServerAsync(
+                    selection,
+                    rpcParams.Receive.SenderClientId
+                ),
+                nameof(RequestNpcSelectionServerRpc)
+            );
         }
 
         async Task HandleNpcSelectionServerAsync(
@@ -366,7 +373,14 @@ namespace NPCSystem
             RpcParams rpcParams = default
         )
         {
-            _ = HandleSubmitDialogueServerAsync(request, rpcParams.Receive.SenderClientId);
+            if (!IsServer) return;
+            FireAndForget(
+                () => HandleSubmitDialogueServerAsync(
+                    request,
+                    rpcParams.Receive.SenderClientId
+                ),
+                nameof(SubmitDialogueServerRpc)
+            );
         }
 
         async Task HandleSubmitDialogueServerAsync(
@@ -418,14 +432,14 @@ namespace NPCSystem
         [Rpc(SendTo.Server)]
         void CancelActiveRequestServerRpc(RpcParams rpcParams = default)
         {
+            if (!IsServer) return;
             if (
                 _activeClientId.HasValue
                 && _activeClientId.Value == rpcParams.Receive.SenderClientId
             )
             {
                 _dialogueManager?.CancelRequests();
-                _activeClientId = null;
-                _activeRequestId = string.Empty;
+                ClearActiveClient();
                 TryProcessNextQueuedRequest();
                 return;
             }
@@ -445,19 +459,19 @@ namespace NPCSystem
                 content = string.Empty,
             };
             payload.SanitizeInPlace();
-            ReceiveNpcChangedClientRpc(payload, RpcTarget.Single(clientId, RpcTargetUse.Temp));
+            ReceiveNpcChangedClientRpc(payload, GetClientTarget(clientId));
         }
 
         void SendResponseStartToClient(ulong clientId, NPCDialogueResponseMessage payload)
         {
             payload.SanitizeInPlace();
-            ReceiveResponseStartClientRpc(payload, RpcTarget.Single(clientId, RpcTargetUse.Temp));
+            ReceiveResponseStartClientRpc(payload, GetClientTarget(clientId));
         }
 
         void SendResponseUpdatedToClient(ulong clientId, NPCDialogueResponseMessage payload)
         {
             payload.SanitizeInPlace();
-            ReceiveResponseUpdatedClientRpc(payload, RpcTarget.Single(clientId, RpcTargetUse.Temp));
+            ReceiveResponseUpdatedClientRpc(payload, GetClientTarget(clientId));
         }
 
         void SendResponseCompleteToClient(ulong clientId, NPCDialogueResponseMessage payload)
@@ -465,7 +479,7 @@ namespace NPCSystem
             payload.SanitizeInPlace();
             ReceiveResponseCompleteClientRpc(
                 payload,
-                RpcTarget.Single(clientId, RpcTargetUse.Temp)
+                GetClientTarget(clientId)
             );
         }
 
@@ -489,13 +503,13 @@ namespace NPCSystem
                         ["error"] = normalizedError,
                     }
                 );
-            ReceiveErrorClientRpc(normalizedError, RpcTarget.Single(clientId, RpcTargetUse.Temp));
+            ReceiveErrorClientRpc(normalizedError, GetClientTarget(clientId));
         }
 
         void SendNotebookStateToClient(ulong clientId, NPCNotebookStateMessage payload)
         {
             payload.SanitizeInPlace();
-            ReceiveNotebookStateClientRpc(payload, RpcTarget.Single(clientId, RpcTargetUse.Temp));
+            ReceiveNotebookStateClientRpc(payload, GetClientTarget(clientId));
         }
 
         // ── Client RPC Receivers ────────────────────────────────────────
@@ -612,6 +626,25 @@ namespace NPCSystem
                                 : string.Empty,
                     }
                 );
+        }
+
+        /// <summary>
+        /// Fire-and-forget wrapper that logs unhandled exceptions from async
+        /// ServerRPC handler tasks. Prevents silent exception swallowing
+        /// caused by the discard operator on async void / Task-returning calls.
+        /// </summary>
+        static async void FireAndForget(Func<Task> taskFactory, string operationName)
+        {
+            try
+            {
+                await taskFactory();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(
+                    $"[{nameof(NPCDialogueNetworkBridge)}] {operationName} threw: {ex}"
+                );
+            }
         }
     }
 }

@@ -22,7 +22,7 @@ namespace NPCSystem
         public long durationMs;
 
         [JsonProperty("data")]
-        public Dictionary<string, object> data { get; set; } = new Dictionary<string, object>();
+        public Dictionary<string, object> data { get; set; }
 
         public string ToJson()
         {

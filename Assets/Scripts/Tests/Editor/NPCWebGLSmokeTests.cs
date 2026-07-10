@@ -55,12 +55,12 @@ namespace NPCSystem.Tests
         public void IsLocalHost_DetectsLoopback()
         {
             // Shared utility used by WebGL URL-resolution across 3 files.
-            Assert.That(NPCFlowLogger.IsLocalHost("localhost"), Is.True);
-            Assert.That(NPCFlowLogger.IsLocalHost("127.0.0.1"), Is.True);
-            Assert.That(NPCFlowLogger.IsLocalHost("LOCALHOST"), Is.True, "Case-insensitive");
-            Assert.That(NPCFlowLogger.IsLocalHost("192.168.1.1"), Is.False);
-            Assert.That(NPCFlowLogger.IsLocalHost(null), Is.False);
-            Assert.That(NPCFlowLogger.IsLocalHost(""), Is.False);
+            Assert.That(NPCNetworkUtils.IsLocalHost("localhost"), Is.True);
+            Assert.That(NPCNetworkUtils.IsLocalHost("127.0.0.1"), Is.True);
+            Assert.That(NPCNetworkUtils.IsLocalHost("LOCALHOST"), Is.True, "Case-insensitive");
+            Assert.That(NPCNetworkUtils.IsLocalHost("192.168.1.1"), Is.False);
+            Assert.That(NPCNetworkUtils.IsLocalHost(null), Is.False);
+            Assert.That(NPCNetworkUtils.IsLocalHost(""), Is.False);
         }
 
         [Test]

@@ -4,8 +4,9 @@
 init_config:
 
 instances:
-  ## Nginx status/metrics check (requires nginx_status module)
+  ## Nginx status/metrics check (requires stub_status module)
   - nginx_status_url: http://localhost:8085/nginx_status
+    use_stub_status: true
     tags:
       - service:webgl-client
       - team:npc-platform

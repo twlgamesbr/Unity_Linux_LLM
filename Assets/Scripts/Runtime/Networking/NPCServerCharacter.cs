@@ -7,31 +7,6 @@ namespace NPCSystem
     [RequireComponent(typeof(NetworkObject))]
     public sealed class NPCServerCharacter : NetworkBehaviour
     {
-        static NPCServerCharacter()
-        {
-            UserNetworkVariableSerialization<string>.WriteValue = (
-                FastBufferWriter writer,
-                in string value
-            ) =>
-            {
-                writer.WriteValueSafe(value);
-            };
-            UserNetworkVariableSerialization<string>.ReadValue = (
-                FastBufferReader reader,
-                out string value
-            ) =>
-            {
-                reader.ReadValueSafe(out value);
-            };
-            UserNetworkVariableSerialization<string>.DuplicateValue = (
-                in string value,
-                ref string duplicatedValue
-            ) =>
-            {
-                duplicatedValue = value;
-            };
-        }
-
         public readonly NetworkVariable<string> npcSlug = new NetworkVariable<string>(
             string.Empty,
             NetworkVariableReadPermission.Everyone,

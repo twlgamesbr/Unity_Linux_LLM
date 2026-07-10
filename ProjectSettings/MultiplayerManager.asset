@@ -7,6 +7,7 @@ MultiplayerManager:
   m_StrippingTypes:
     1: []
     2:
+    - UnityEngine.UI:UnityEngine.UI:Outline
     - UnityEngine.UI:UnityEngine.UI:PositionAsUV1
     - UnityEngine.UI:UnityEngine.EventSystems:TouchInputModule
     - UnityEngine.UI:UnityEngine.UI:Toggle
@@ -45,6 +46,7 @@ MultiplayerManager:
     - UnityEngine.AudioModule:UnityEngine:AudioEchoFilter
     - UnityEngine.UI:UnityEngine.EventSystems:PhysicsRaycaster
     - UnityEngine.UI:UnityEngine.EventSystems:BaseInputModule
+    - Unity.RenderPipelines.Core.Editor.Tests:UnityEngine.Rendering.Tests:RemoveComponent/AdditionalApple
     - UnityEngine.UI:UnityEngine.UI:Dropdown/DropdownItem
     - UnityEngine.CoreModule:UnityEngine:LightProbeGroup
     - UnityEngine.UI:UnityEngine.UI:HorizontalOrVerticalLayoutGroup
@@ -67,11 +69,13 @@ MultiplayerManager:
     - UnityEngine.UI:UnityEngine.UI:VerticalLayoutGroup
     - UnityEngine.UI:UnityEngine.UI:Mask
     - UnityEngine.AudioModule:UnityEngine:AudioListener
+    - Unity.RenderPipelines.Core.Editor.Tests:UnityEngine.Rendering.Tests:RemoveComponent/AdditionalBanana
     - UnityEngine.CoreModule:UnityEngine:BillboardRenderer
     - UnityEngine.UI:UnityEngine.UI:Button
     - UnityEngine.UI:UnityEngine.UI:RaycastReceiver
     - UnityEngine.UI:UnityEngine.UI:LayoutElement
     - UnityEngine.UI:UnityEngine.EventSystems:Physics2DRaycaster
+    - Unity.RenderPipelines.Core.Editor.Tests:UnityEngine.Rendering.Tests:RemoveComponent/AdditionalBananaColor
     - UnityEngine.AudioModule:UnityEngine:AudioDistortionFilter
     - UnityEngine.CoreModule:UnityEngine:SkinnedMeshRenderer
     - UnityEngine.UI:UnityEngine.UI:Graphic
@@ -81,8 +85,9 @@ MultiplayerManager:
     - UnityEngine.AudioModule:UnityEngine:AudioReverbFilter
     - UnityEngine.AudioModule:UnityEngine:AudioChorusFilter
     - UnityEngine.UI:UnityEngine.EventSystems:EventTrigger
+    - Unity.RenderPipelines.Core.Editor.Tests:UnityEngine.Rendering.Tests:RemoveComponent/FruitBasket
     - UnityEngine.VFXModule:UnityEngine.VFX:VFXRenderer
     - UnityEngine.CoreModule:UnityEngine:LineRenderer
-    - UnityEngine.UI:UnityEngine.UI:Outline
+    - Unity.RenderPipelines.Core.Editor.Tests:UnityEngine.Rendering.Tests:RemoveComponent/WaterMelon
     - Unity.RenderPipelines.Universal.Runtime:UnityEngine.Rendering.Universal:UniversalAdditionalLightData
     - UnityEngine.UI:UnityEngine.UI:ScrollRect

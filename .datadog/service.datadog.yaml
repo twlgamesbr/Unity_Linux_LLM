@@ -1,0 +1,159 @@
+# Service Catalog — NPC Platform
+# See https://docs.datadoghq.com/service_catalog/
+schema-version: v2
+dd-service:
+  - name: unity-dedicated-server
+    display-name: Unity Dedicated Server
+    description: "Unity Netcode for GameObjects dedicated server — hosts NPC dialogue sessions, player auth, and game state."
+    team: npc-platform
+    application: NPC System
+    tags:
+      - project:unity-linux-llm
+      - tier:core
+      - env:production
+    links:
+      - name: Repository
+        type: repo
+        url: https://github.com/twlgamesbr/Unity_Linux_LLM
+      - name: AGENTS.md
+        type: docs
+        url: https://github.com/twlgamesbr/Unity_Linux_LLM/blob/main/AGENTS.md
+    contacts:
+      - name: "#npc-platform-slack"
+        type: slack
+        url: https://your-org.slack.com/archives/npc-platform
+
+  - name: localai
+    display-name: LocalAI
+    description: "LocalAI LLM inference server — runs llama-3.1-8b, qwen2.5-1.5b, and embedding models for NPC dialogue generation."
+    team: npc-platform
+    application: NPC System
+    tags:
+      - project:unity-linux-llm
+      - tier:core
+      - env:production
+    links:
+      - name: Repository
+        type: repo
+        url: https://github.com/twlgamesbr/Unity_Linux_LLM
+      - name: LocalAI Docs
+        type: docs
+        url: https://localai.io/
+    contacts:
+      - name: "#npc-platform-slack"
+        type: slack
+        url: https://your-org.slack.com/archives/npc-platform
+
+  - name: localai-proxy
+    display-name: LocalAI Trace Proxy
+    description: "FastAPI proxy between Unity and LocalAI — instruments all LLM requests with Datadog APM traces and LLM Observability."
+    team: npc-platform
+    application: NPC System
+    tags:
+      - project:unity-linux-llm
+      - tier:observability
+      - env:production
+    links:
+      - name: Source
+        type: repo
+        url: https://github.com/twlgamesbr/Unity_Linux_LLM/blob/main/Backend/localai-proxy/main.py
+    contacts:
+      - name: "#npc-platform-slack"
+        type: slack
+        url: https://your-org.slack.com/archives/npc-platform
+
+  - name: qdrant
+    display-name: Qdrant Vector DB
+    description: "Qdrant vector database — stores NPC knowledge embeddings and codebase embeddings for RAG-powered dialogue."
+    team: npc-platform
+    application: NPC System
+    tags:
+      - project:unity-linux-llm
+      - tier:core
+      - env:production
+    links:
+      - name: Repository
+        type: repo
+        url: https://github.com/twlgamesbr/Unity_Linux_LLM
+      - name: Qdrant Docs
+        type: docs
+        url: https://qdrant.tech/documentation/
+    contacts:
+      - name: "#npc-platform-slack"
+        type: slack
+        url: https://your-org.slack.com/archives/npc-platform
+
+  - name: webgl-client
+    display-name: WebGL Client (NGINX)
+    description: "NGINX web server — serves the Unity WebGL build to browsers, proxies WebSocket connections to the dedicated server."
+    team: npc-platform
+    application: NPC System
+    tags:
+      - project:unity-linux-llm
+      - tier:frontend
+      - env:production
+    links:
+      - name: Repository
+        type: repo
+        url: https://github.com/twlgamesbr/Unity_Linux_LLM
+    contacts:
+      - name: "#npc-platform-slack"
+        type: slack
+        url: https://your-org.slack.com/archives/npc-platform
+
+  - name: supabase
+    display-name: Supabase Backend
+    description: "Supabase stack — Gotrue auth, PostgREST API, PostgreSQL database for player accounts and dialogue persistence."
+    team: npc-platform
+    application: NPC System
+    tags:
+      - project:unity-linux-llm
+      - tier:backend
+      - env:production
+    links:
+      - name: Repository
+        type: repo
+        url: https://github.com/twlgamesbr/Unity_Linux_LLM
+      - name: Supabase Docs
+        type: docs
+        url: https://supabase.com/docs
+    contacts:
+      - name: "#npc-platform-slack"
+        type: slack
+        url: https://your-org.slack.com/archives/npc-platform
+
+  - name: codebase-watchdog
+    display-name: Codebase Watchdog
+    description: "Python-based codebase indexer — watches for file changes and re-embeds code into Qdrant for LLM context."
+    team: npc-platform
+    application: NPC System
+    tags:
+      - project:unity-linux-llm
+      - tier:tooling
+      - env:development
+    links:
+      - name: Repository
+        type: repo
+        url: https://github.com/twlgamesbr/Unity_Linux_LLM
+    contacts:
+      - name: "#npc-platform-slack"
+        type: slack
+        url: https://your-org.slack.com/archives/npc-platform
+
+  - name: dd-agent
+    display-name: Datadog Agent
+    description: "Host-level Datadog Agent — collects metrics, logs, and APM traces from all containers. Runs in network_mode:host."
+    team: npc-platform
+    application: Observability
+    tags:
+      - project:unity-linux-llm
+      - tier:observability
+      - env:production
+    links:
+      - name: Repository
+        type: repo
+        url: https://github.com/twlgamesbr/Unity_Linux_LLM
+    contacts:
+      - name: "#npc-platform-slack"
+        type: slack
+        url: https://your-org.slack.com/archives/npc-platform

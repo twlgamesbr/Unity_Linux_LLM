@@ -1,0 +1,28 @@
+services:
+  localai-proxy:
+    build: .
+    container_name: localai-proxy
+    network_mode: host
+    environment:
+      - LOCALAI_BASE_URL=http://localhost:8080
+      - DD_SERVICE=localai-proxy
+      - DD_ENV=${DD_ENV:-production}
+      - DD_SITE=${DD_SITE:-us5.datadoghq.com}
+      - DD_AGENT_HOST=localhost
+      - DD_TRACE_AGENT_URL=http://localhost:8126
+      - DD_LLM_OBS_ENABLED=true
+      - DD_API_KEY=${DD_API_KEY:?err}
+    restart: unless-stopped
+    stop_grace_period: 10s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ─────────────────────────────────────────────────
+  # Monitoring: see Backend/datadog-host/docker-compose.yml
+  # for the single host-level Datadog Agent. The proxy
+  # emits APM traces to localhost:8126 and metrics to
+  # localhost:8125 (DogStatsD).
+  # ─────────────────────────────────────────────────
