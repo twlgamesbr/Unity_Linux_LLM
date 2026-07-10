@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace NPCSystem.Tests
 {
@@ -263,6 +264,10 @@ namespace NPCSystem.Tests
 
             try
             {
+                LogAssert.Expect(
+                    LogType.Error,
+                    "[NPCLocalAIEmbedder] Unexpected response format from http://localhost:8080/v1/embeddings"
+                );
                 string result = service.SearchMemoryAsync("test query", 5, null, null).GetAwaiter().GetResult();
                 Assert.That(result, Is.Empty);
             }

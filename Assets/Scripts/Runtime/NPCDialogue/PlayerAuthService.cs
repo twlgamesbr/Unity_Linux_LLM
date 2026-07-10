@@ -1,11 +1,15 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 using EditorAttributes;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Supabase;
 using Supabase.Gotrue;
 using Supabase.Gotrue.Interfaces;
 using UnityEngine;
+using UnityEngine.Networking;
 
 namespace NPCSystem
 {
@@ -184,7 +188,31 @@ namespace NPCSystem
 
 #if UNITY_WEBGL && !UNITY_EDITOR
             ResolveWebGLUrls();
-#endif
+            _sessionStore = new UnitySessionStore();
+            CurrentSession = UnitySessionStore.Load();
+            _initialized = true;
+
+            if (CurrentSession != null && !UnitySessionStore.IsExpired(CurrentSession.expiresAtUtc))
+            {
+                lastAuthStatus = $"Session restored for {CurrentSession.username}.";
+                return CurrentSession;
+            }
+
+            if (CurrentSession != null && UnitySessionStore.IsExpired(CurrentSession.expiresAtUtc))
+            {
+                // Try refresh
+                PlayerAuthSessionResponse refreshed = await TryRefreshSessionWebGLAsync();
+                if (refreshed != null)
+                {
+                    lastAuthStatus = $"Session refreshed for {refreshed.username}.";
+                    return refreshed;
+                }
+            }
+
+            ClearLocalSession();
+            lastAuthStatus = "No active session.";
+            return null;
+#else
 
             using var scope = NPCFlowScope.Start(
                 NPCFlowLogger.FindOrCreate(),
@@ -279,6 +307,7 @@ namespace NPCSystem
                 scope.Error(ex, lastAuthStatus);
                 return null;
             }
+#endif
         }
 
         public async Task<PlayerAuthRegisterResponse> RegisterAsync(
@@ -286,6 +315,9 @@ namespace NPCSystem
             string password
         )
         {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            return await RegisterWebGLAsync(username, password);
+#else
             string email = EmailFromUsername(username?.Trim() ?? string.Empty);
 
             Session session = await _supabaseClient.Auth.SignUp(
@@ -308,7 +340,65 @@ namespace NPCSystem
                 username = username?.Trim() ?? string.Empty,
                 createdAtUtc = DateTime.UtcNow.ToString("O"),
             };
+#endif
         }
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+        async Task<PlayerAuthRegisterResponse> RegisterWebGLAsync(
+            string username,
+            string password
+        )
+        {
+            string email = EmailFromUsername(username?.Trim() ?? string.Empty);
+            string url = ResolveWebGLProxyUrl(supabaseUrl, "/auth/signup");
+
+            using var req = new UnityWebRequest(url, "POST");
+            byte[] body = System.Text.Encoding.UTF8.GetBytes(
+                JsonConvert.SerializeObject(new { email, password })
+            );
+            req.uploadHandler = new UploadHandlerRaw(body);
+            req.downloadHandler = new DownloadHandlerBuffer();
+            req.SetRequestHeader("Content-Type", "application/json");
+            req.SetRequestHeader("apikey", supabaseAnonKey);
+
+            await SendWebRequestAsync(req);
+
+            string json = req.downloadHandler.text;
+            var result = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+
+            string userId = result?.GetValueOrDefault("id")?.ToString()
+                ?? throw new InvalidOperationException("Signup returned no user ID.");
+
+            string accessToken = result?.GetValueOrDefault("access_token")?.ToString() ?? string.Empty;
+            string refreshToken = result?.GetValueOrDefault("refresh_token")?.ToString() ?? string.Empty;
+            long expiresIn = 3600L;
+            if (result?.TryGetValue("expires_in", out var expVal) == true)
+                long.TryParse(expVal?.ToString(), out expiresIn);
+
+            var session = new PlayerAuthSessionResponse
+            {
+                playerId = userId,
+                username = username?.Trim() ?? string.Empty,
+                sessionToken = accessToken,
+                refreshToken = refreshToken,
+                expiresAtUtc = DateTime.UtcNow.AddSeconds(expiresIn).ToString("O"),
+                createdAtUtc = DateTime.UtcNow.ToString("O"),
+            };
+
+            CurrentSession = session;
+            UnitySessionStore.Save(session);
+            lastAuthStatus = $"Registered and signed in as '{username?.Trim()}'.";
+
+            await TryCreatePlayerProfileWebGLAsync(username?.Trim() ?? string.Empty);
+            return new PlayerAuthRegisterResponse
+            {
+                playerId = userId,
+                email = email,
+                username = username?.Trim() ?? string.Empty,
+                createdAtUtc = session.createdAtUtc,
+            };
+        }
+#endif
 
         async Task TryCreatePlayerProfileAsync(string displayName)
         {
@@ -346,12 +436,159 @@ namespace NPCSystem
             }
         }
 
+#if UNITY_WEBGL && !UNITY_EDITOR
+        async Task<PlayerAuthSessionResponse> LoginWebGLAsync(
+            string username,
+            string password,
+            bool rememberMe
+        )
+        {
+            string email = EmailFromUsername(username?.Trim() ?? string.Empty);
+            string url = ResolveWebGLProxyUrl(supabaseUrl, "/auth/token?grant_type=password");
+
+            using var req = new UnityWebRequest(url, "POST");
+            byte[] body = System.Text.Encoding.UTF8.GetBytes(
+                JsonConvert.SerializeObject(new { email, password })
+            );
+            req.uploadHandler = new UploadHandlerRaw(body);
+            req.downloadHandler = new DownloadHandlerBuffer();
+            req.SetRequestHeader("Content-Type", "application/json");
+            req.SetRequestHeader("apikey", supabaseAnonKey);
+
+            await SendWebRequestAsync(req);
+
+            string json = req.downloadHandler.text;
+            var result = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+
+            string accessToken = result?.GetValueOrDefault("access_token")?.ToString()
+                ?? throw new InvalidOperationException("Login returned no access token.");
+            string refreshToken = result?.GetValueOrDefault("refresh_token")?.ToString() ?? string.Empty;
+            long expiresIn = 3600L;
+            if (result?.TryGetValue("expires_in", out var expVal) == true)
+                long.TryParse(expVal?.ToString(), out expiresIn);
+
+            // Extract user info from nested "user" object
+            string userId = string.Empty;
+            if (result?.TryGetValue("user", out var userObj) == true && userObj is JObject userJObj)
+            {
+                userId = userJObj.Value<string>("id") ?? string.Empty;
+            }
+            if (string.IsNullOrWhiteSpace(userId))
+                throw new InvalidOperationException("Login returned no user ID.");
+
+            var session = new PlayerAuthSessionResponse
+            {
+                playerId = userId,
+                username = username?.Trim() ?? string.Empty,
+                sessionToken = accessToken,
+                refreshToken = refreshToken,
+                expiresAtUtc = DateTime.UtcNow.AddSeconds(expiresIn).ToString("O"),
+                createdAtUtc = DateTime.UtcNow.ToString("O"),
+            };
+
+            CurrentSession = session;
+            if (rememberMe)
+                UnitySessionStore.Save(session);
+            else
+                UnitySessionStore.Clear();
+
+            await TryCreatePlayerProfileWebGLAsync(username?.Trim() ?? string.Empty);
+
+            lastAuthStatus =
+                $"Login successful for '{username?.Trim()}'. Session expires at {session.expiresAtUtc}.";
+            return session;
+        }
+
+        async Task TryCreatePlayerProfileWebGLAsync(string displayName)
+        {
+            if (string.IsNullOrWhiteSpace(displayName))
+                return;
+
+            try
+            {
+                string url = ResolveWebGLProxyUrl(restApiUrl, "/rpc/create_or_update_player_profile");
+                using var req = new UnityWebRequest(url, "POST");
+                byte[] body = System.Text.Encoding.UTF8.GetBytes(
+                    JsonConvert.SerializeObject(new { p_display_name = displayName?.Trim() ?? string.Empty })
+                );
+                req.uploadHandler = new UploadHandlerRaw(body);
+                req.downloadHandler = new DownloadHandlerBuffer();
+                req.SetRequestHeader("Content-Type", "application/json");
+                req.SetRequestHeader("apikey", supabaseAnonKey);
+                if (CurrentSession != null)
+                    req.SetRequestHeader("Authorization", $"Bearer {CurrentSession.sessionToken}");
+
+                await SendWebRequestAsync(req);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"[PlayerAuthService] WebGL profile creation: {ex.Message}");
+            }
+        }
+
+        async Task SendWebRequestAsync(UnityWebRequest req)
+        {
+            req.timeout = Mathf.Max(1, Mathf.CeilToInt(requestTimeoutSeconds));
+            var tcs = new TaskCompletionSource<bool>();
+
+            var op = req.SendWebRequest();
+            op.completed += _ =>
+            {
+                if (req.result == UnityWebRequest.Result.ConnectionError
+                    || req.result == UnityWebRequest.Result.ProtocolError)
+                {
+                    string errorBody = req.downloadHandler?.text ?? string.Empty;
+                    string msg = $"[{req.method}] {req.url} → {req.responseCode}: {req.error}";
+                    if (!string.IsNullOrWhiteSpace(errorBody))
+                        msg += $"\n{errorBody}";
+                    tcs.TrySetException(new InvalidOperationException(msg));
+                }
+                else
+                {
+                    tcs.TrySetResult(true);
+                }
+            };
+
+            await tcs.Task;
+        }
+
+        string ResolveWebGLProxyUrl(string originalUrl, string path)
+        {
+            // Re-map the backend URL to go through the nginx proxy
+            try
+            {
+                var uri = new Uri(originalUrl);
+                string host = "localhost";
+                int port = 8085;
+
+#if !UNITY_EDITOR
+                try
+                {
+                    Uri pageUri = new Uri(Application.absoluteURL);
+                    host = pageUri.Host;
+                    if (!NPCNetworkUtils.IsLocalHost(host))
+                        port = pageUri.Port;
+                }
+                catch { /* use fallback defaults */ }
+#endif
+                return $"http://{host}:{port}{path}";
+            }
+            catch
+            {
+                return $"http://localhost:8085{path}";
+            }
+        }
+#endif
+
         public async Task<PlayerAuthSessionResponse> LoginAsync(
             string username,
             string password,
             bool rememberMe
         )
         {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            return await LoginWebGLAsync(username, password, rememberMe);
+#else
             string email = EmailFromUsername(username?.Trim() ?? string.Empty);
 
             Session session = await _supabaseClient.Auth.SignIn(email, password ?? string.Empty);
@@ -372,10 +609,14 @@ namespace NPCSystem
             lastAuthStatus =
                 $"Login successful for '{username?.Trim()}'. Session expires at {CurrentSession.expiresAtUtc}.";
             return CurrentSession;
+#endif
         }
 
         public async Task<PlayerAuthSessionResponse> TryRestoreStoredSessionAsync()
         {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            return await TryRestoreWebGLAsync();
+#else
             if (_supabaseClient?.Auth?.CurrentSession == null)
             {
                 ClearLocalSession();
@@ -408,10 +649,80 @@ namespace NPCSystem
                 ClearLocalSession();
                 return null;
             }
+#endif
         }
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+        async Task<PlayerAuthSessionResponse> TryRestoreWebGLAsync()
+        {
+            CurrentSession = UnitySessionStore.Load();
+            if (CurrentSession == null)
+                return null;
+
+            if (UnitySessionStore.IsExpired(CurrentSession.expiresAtUtc))
+            {
+                // Try refresh token
+                PlayerAuthSessionResponse refreshed = await TryRefreshSessionWebGLAsync();
+                if (refreshed == null)
+                {
+                    ClearLocalSession();
+                    return null;
+                }
+                return refreshed;
+            }
+
+            return CurrentSession;
+        }
+
+        async Task<PlayerAuthSessionResponse> TryRefreshSessionWebGLAsync()
+        {
+            if (CurrentSession == null || string.IsNullOrWhiteSpace(CurrentSession.refreshToken))
+                return null;
+
+            try
+            {
+                string url = ResolveWebGLProxyUrl(supabaseUrl, "/auth/token?grant_type=refresh_token");
+                using var req = new UnityWebRequest(url, "POST");
+                byte[] body = System.Text.Encoding.UTF8.GetBytes(
+                    JsonConvert.SerializeObject(new { refresh_token = CurrentSession.refreshToken })
+                );
+                req.uploadHandler = new UploadHandlerRaw(body);
+                req.downloadHandler = new DownloadHandlerBuffer();
+                req.SetRequestHeader("Content-Type", "application/json");
+                req.SetRequestHeader("apikey", supabaseAnonKey);
+
+                await SendWebRequestAsync(req);
+
+                string json = req.downloadHandler.text;
+                var result = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+
+                string accessToken = result?.GetValueOrDefault("access_token")?.ToString();
+                string newRefreshToken = result?.GetValueOrDefault("refresh_token")?.ToString();
+                long expiresIn = 3600L;
+                if (result?.TryGetValue("expires_in", out var expVal) == true)
+                    long.TryParse(expVal?.ToString(), out expiresIn);
+
+                if (string.IsNullOrWhiteSpace(accessToken))
+                    return null;
+
+                CurrentSession.sessionToken = accessToken;
+                CurrentSession.refreshToken = newRefreshToken ?? CurrentSession.refreshToken;
+                CurrentSession.expiresAtUtc = DateTime.UtcNow.AddSeconds(expiresIn).ToString("O");
+                UnitySessionStore.Save(CurrentSession);
+                return CurrentSession;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+#endif
 
         public async Task LogoutAsync()
         {
+#if UNITY_WEBGL && !UNITY_EDITOR
+            await LogoutWebGLAsync();
+#else
             using var scope = NPCFlowScope.Start(
                 NPCFlowLogger.FindOrCreate(),
                 NPCFlowStage.AuthSession,
@@ -435,7 +746,34 @@ namespace NPCSystem
                 ClearLocalSession();
                 DisconnectRealtime();
             }
+#endif
         }
+
+#if UNITY_WEBGL && !UNITY_EDITOR
+        async Task LogoutWebGLAsync()
+        {
+            try
+            {
+                if (CurrentSession != null && !string.IsNullOrWhiteSpace(CurrentSession.sessionToken))
+                {
+                    string url = ResolveWebGLProxyUrl(supabaseUrl, "/auth/logout");
+                    using var req = new UnityWebRequest(url, "POST");
+                    req.downloadHandler = new DownloadHandlerBuffer();
+                    req.SetRequestHeader("Authorization", $"Bearer {CurrentSession.sessionToken}");
+                    req.SetRequestHeader("apikey", supabaseAnonKey);
+                    await SendWebRequestAsync(req);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"[PlayerAuthService] WebGL logout: {ex.Message}");
+            }
+            finally
+            {
+                ClearLocalSession();
+            }
+        }
+#endif
 
         // ── Internal ──────────────────────────────────────────────
 

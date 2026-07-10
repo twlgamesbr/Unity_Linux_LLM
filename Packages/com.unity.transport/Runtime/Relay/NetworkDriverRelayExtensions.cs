@@ -1,4 +1,7 @@
 using System;
+using UnityEngine;
+
+using Unity.Networking.Transport;
 
 namespace Unity.Networking.Transport.Relay
 {

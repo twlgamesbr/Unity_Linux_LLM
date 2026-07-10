@@ -1,5 +1,7 @@
 using System;
+using Unity.Collections;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Unity.Networking.Transport
 {

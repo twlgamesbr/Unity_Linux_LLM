@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
@@ -8,6 +9,7 @@ using Unity.Mathematics;
 using Unity.Networking.Transport.Analytics;
 using Unity.Networking.Transport.Error;
 using Unity.Networking.Transport.Relay;
+using Unity.Networking.Transport.TLS;
 using Unity.Networking.Transport.Utilities;
 using UnityEngine;
 using BurstRuntime = Unity.Burst.BurstRuntime;

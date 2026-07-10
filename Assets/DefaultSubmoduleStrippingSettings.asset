@@ -18,8 +18,3 @@ MonoBehaviour:
   SubmodulesToStrip:
   - System.Xml
   - System.Data
-  - System.Drawing
-  - System.IO.Compression
-  - System.Runtime.Serialization
-  - System.ComponentModel.DataAnnotations
-  - System.Data.SqlClient

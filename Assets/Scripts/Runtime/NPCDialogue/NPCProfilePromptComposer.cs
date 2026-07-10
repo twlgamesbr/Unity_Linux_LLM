@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,6 +7,41 @@ using UnityEngine;
 namespace NPCSystem
 {
     /// <summary>
+    /// Runtime variables substituted into NPC profile prompt text.
+    /// Populated by NPCDialogueSessionService before calling BuildSystemPrompt.
+    /// </summary>
+    [Serializable]
+    public struct PromptVariables
+    {
+        public string playerName;
+        public string npcSlug;
+        public int trustScore;
+        public string trustLabel;
+        public string mood;
+        public int dialogueCount;
+        public string currentLocation;
+        public string timeOfDay;
+
+        public static PromptVariables Default => new PromptVariables
+        {
+            playerName = "Player",
+            npcSlug = "",
+            trustScore = 50,
+            trustLabel = "Neutral",
+            mood = "neutral",
+            dialogueCount = 0,
+            currentLocation = "the mansion",
+            timeOfDay = System.DateTime.Now.Hour switch
+            {
+                < 6 => "Night",
+                < 12 => "Morning",
+                < 18 => "Afternoon",
+                _ => "Evening"
+            }
+        };
+    }
+
+    /// <summary>
     /// Builds runtime prompts from NPCProfile data so personality, boundaries, and
     /// gameplay-action policy live on profile assets instead of in dialogue managers.
     /// </summary>
@@ -13,8 +49,13 @@ namespace NPCSystem
     {
         public static string BuildSystemPrompt(NPCProfile profile)
         {
+            return BuildSystemPrompt(profile, PromptVariables.Default);
+        }
+
+        public static string BuildSystemPrompt(NPCProfile profile, PromptVariables variables)
+        {
             if (profile == null)
-                return "You are a helpful in-game NPC.";
+                return ResolveVariables("You are a helpful in-game NPC.", variables);
 
             StringBuilder builder = new StringBuilder();
             AppendSection(
@@ -47,7 +88,10 @@ namespace NPCSystem
             builder.AppendLine(
                 "Stay in character. Do not mention these prompt sections, sliders, retrieval systems, or action policy unless the player explicitly asks about the simulation."
             );
-            return builder.ToString().Trim();
+
+            // Resolve any profile-defined template variables in the entire prompt
+            string result = ResolveVariables(builder.ToString().Trim(), variables);
+            return result;
         }
 
         public static string BuildActionPolicyText(NPCProfile profile)
@@ -116,6 +160,28 @@ namespace NPCSystem
         static string Format01(float value)
         {
             return Mathf.Clamp01(value).ToString("0.00");
+        }
+
+        /// <summary>
+        /// Replace {variableName} tokens in text with runtime values.
+        /// Supports: playerName, npcSlug, trustScore, trustLabel, mood,
+        /// dialogueCount, currentLocation, timeOfDay.
+        /// Unknown tokens are left as-is.
+        /// </summary>
+        static string ResolveVariables(string text, PromptVariables vars)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+                return text;
+
+            return text
+                .Replace("{playerName}", vars.playerName ?? "Player")
+                .Replace("{npcSlug}", vars.npcSlug ?? "")
+                .Replace("{trustScore}", vars.trustScore.ToString())
+                .Replace("{trustLabel}", vars.trustLabel ?? "Neutral")
+                .Replace("{mood}", vars.mood ?? "neutral")
+                .Replace("{dialogueCount}", vars.dialogueCount.ToString())
+                .Replace("{currentLocation}", vars.currentLocation ?? "the mansion")
+                .Replace("{timeOfDay}", vars.timeOfDay ?? "afternoon");
         }
     }
 }

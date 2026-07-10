@@ -1,3 +1,5 @@
+using Unity.Collections;
+
 namespace Unity.Networking.Transport
 {
     internal static class SHA256

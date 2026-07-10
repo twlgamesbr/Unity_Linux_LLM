@@ -11,6 +11,7 @@ using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.AddressableAssets.Settings.GroupSchemas;
 using UnityEditor.Build.Content;
 using UnityEditor.Build.Pipeline;
+using UnityEditor.Build.Pipeline.Utilities;
 using UnityEditor.TestTools;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
@@ -511,7 +512,11 @@ namespace UnityEditor.AddressableAssets.Tests
             foreach (var p in paths)
             {
                 if(Path.GetFileNameWithoutExtension(p).EndsWith("catalog"))
+#if ENABLE_JSON_CATALOG
+                    return ContentCatalogData.LoadFromFile(p).CreateCustomLocator();
+#else
                     return ContentCatalogData.LoadFromFile(p, true).CreateCustomLocator();
+#endif
             }
             return null;
         }
@@ -1546,4 +1551,3 @@ namespace UnityEditor.AddressableAssets.Tests
         public class ContentUpdateTestsLinux : ContentUpdateTests { }
     }
 }
-

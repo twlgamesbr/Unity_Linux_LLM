@@ -1,5 +1,6 @@
 #if !UNITY_WEBGL || UNITY_EDITOR
 using System;
+using System.Collections.Generic;
 using Unity.Baselib.LowLevel;
 using Unity.Burst;
 using Unity.Collections;

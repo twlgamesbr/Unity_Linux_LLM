@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace Unity.Networking.Transport.Analytics

@@ -335,31 +335,44 @@ namespace NPCSystem
 
             // Build conversation history messages
             List<NPCOpenAIMessage> messages = new List<NPCOpenAIMessage>();
-            string sysPrompt = NPCProfilePromptComposer.BuildSystemPrompt(profile);
+
+            // Gather runtime variables for template substitution in profile prompts
+            string playerName = ResolveActivePlayerName();
+            PromptVariables promptVars = PromptVariables.Default;
+            promptVars.playerName = !string.IsNullOrEmpty(playerName) ? playerName : "Player";
+            promptVars.npcSlug = slug;
+
+            if (_contextService != null && profile != null)
+            {
+                try
+                {
+                    var playerCtx = await _contextService.GetOrLoadContextAsync(slug);
+                    promptVars.trustScore = playerCtx.TrustScore;
+                    promptVars.trustLabel = playerCtx.TrustLabel;
+                    promptVars.mood = playerCtx.CurrentMood;
+                    promptVars.dialogueCount = playerCtx.DialogueCount;
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogWarning(
+                        $"[NPCDialogueSessionService] Failed to load context for prompt vars: {ex.Message}"
+                    );
+                }
+            }
+
+            string sysPrompt = NPCProfilePromptComposer.BuildSystemPrompt(profile, promptVars);
             if (string.IsNullOrWhiteSpace(sysPrompt))
                 sysPrompt = "You are a helpful assistant.";
-
-            // Inject the authenticated player name so NPCs can personalise responses
-            string playerName = ResolveActivePlayerName();
-            if (
-                !string.IsNullOrEmpty(playerName)
-                && !string.Equals(playerName, "Player", StringComparison.OrdinalIgnoreCase)
-            )
-            {
-                sysPrompt +=
-                    $"\n\nThe player who is speaking to you is named '{playerName}'. This is a factual part of the current conversation context. If the player asks what their name is, answer that their name is '{playerName}'. Address them by name naturally when appropriate.";
-            }
 
             // Inject enriched player context (trust, mood, clues, items, locations)
             if (_contextService != null && profile != null)
             {
-                string npcSlug = profile.GetNpcSlug();
                 try
                 {
-                    var playerCtx = await _contextService.GetOrLoadContextAsync(npcSlug);
+                    var playerCtx = await _contextService.GetOrLoadContextAsync(slug);
                     if (playerCtx.HasContext)
                     {
-                        sysPrompt += "\n\n" + playerCtx.BuildPromptBlock(npcSlug);
+                        sysPrompt += "\n\n" + playerCtx.BuildPromptBlock(slug);
                     }
                 }
                 catch (Exception ex)

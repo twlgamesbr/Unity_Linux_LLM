@@ -226,6 +226,17 @@ namespace NPCSystem
             try
             {
                 List<float> queryVector = await _embedder.Embeddings(query);
+                if (queryVector.Count == 0)
+                {
+                    searchSw.Stop();
+                    searchSpan.SetTag("status", "empty_embedding");
+                    DatadogMetricsService.Increment(
+                        "qdrant.search.error",
+                        tags: new[] { "reason:empty_embedding" }
+                    );
+                    return new List<string>();
+                }
+
                 searchPayload["vector"] = queryVector;
             }
             catch (Exception ex)
@@ -241,35 +252,21 @@ namespace NPCSystem
             }
 
             string searchJson = JsonConvert.SerializeObject(searchPayload);
-
-            using var request = new UnityWebRequest(endpoint, "POST");
-            byte[] bytes = Encoding.UTF8.GetBytes(searchJson);
-            request.uploadHandler = new UploadHandlerRaw(bytes);
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.SetRequestHeader("Content-Type", "application/json");
-
-            await request.SendWebRequest();
-
-            if (request.result != UnityWebRequest.Result.Success)
+            string responseText = await SendSearchRequestAsync(endpoint, searchJson);
+            if (string.IsNullOrWhiteSpace(responseText))
             {
-                Debug.LogWarning(
-                    $"[QdrantRAGService] Search failed: {request.error}\n{request.downloadHandler.text}"
-                );
                 searchSw.Stop();
                 searchSpan.SetTag("status", "http_error");
-                searchSpan.SetTag("http_result", request.result.ToString());
                 DatadogMetricsService.Increment(
                     "qdrant.search.error",
-                    tags: new[] { "reason:http_error", $"http_result:{request.result}" }
+                    tags: new[] { "reason:http_error" }
                 );
                 return new List<string>();
             }
 
             try
             {
-                var searchResult = JsonUtility.FromJson<QdrantSearchResult>(
-                    $"{{\"result\":{request.downloadHandler.text}}}"
-                );
+                var searchResult = JsonUtility.FromJson<QdrantSearchResult>(responseText);
                 List<string> results = ExtractPayloadTexts(searchResult);
                 searchSw.Stop();
 
@@ -295,7 +292,7 @@ namespace NPCSystem
             catch (Exception ex)
             {
                 Debug.LogWarning(
-                    $"[QdrantRAGService] Search parse error: {ex.Message}\n{request.downloadHandler.text}"
+                    $"[QdrantRAGService] Search parse error: {ex.Message}\n{responseText}"
                 );
                 searchSw.Stop();
                 searchSpan.SetError(ex.Message);

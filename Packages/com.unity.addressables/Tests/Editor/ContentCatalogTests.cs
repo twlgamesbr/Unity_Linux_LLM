@@ -2,11 +2,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using UnityEngine;
+using UnityEngine.AddressableAssets.Initialization;
 using UnityEngine.AddressableAssets.ResourceLocators;
+using UnityEngine.AddressableAssets.Utility;
 using UnityEngine.ResourceManagement.ResourceLocations;
 using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.ResourceManagement.Util;
@@ -14,6 +17,7 @@ using UnityEngine.TestTools;
 
 namespace UnityEditor.AddressableAssets.Tests
 {
+    using Debug = UnityEngine.Debug;
     using Random = UnityEngine.Random;
 
     public class ContentCatalogTests

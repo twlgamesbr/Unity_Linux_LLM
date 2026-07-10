@@ -1,6 +1,19 @@
+using System;
+using System.Collections;
 using NUnit.Framework;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.RegularExpressions;
 #if UNITY_EDITOR
+using UnityEditor.AddressableAssets.Settings;
+using UnityEditor.AddressableAssets.Settings.GroupSchemas;
 #endif
+using UnityEngine.AddressableAssets.Initialization;
+using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.ResourceManagement.ResourceLocations;
+using UnityEngine.ResourceManagement.ResourceProviders;
+using UnityEngine.TestTools;
+using UnityEngine.AddressableAssets.ResourceLocators;
 
 namespace UnityEngine.AddressableAssets.ResourceProviders.Tests
 {

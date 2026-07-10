@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using Unity.Assertions;
+using Unity.IO.LowLevel.Unsafe;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 

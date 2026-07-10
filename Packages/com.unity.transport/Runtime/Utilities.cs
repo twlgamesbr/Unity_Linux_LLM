@@ -5,6 +5,8 @@ using Unity.Baselib.LowLevel;
 using Unity.Burst;
 using Unity.Collections;
 
+using Random = Unity.Mathematics.Random;
+
 namespace Unity.Networking.Transport.Utilities
 {
     /// <summary>

@@ -1,8 +1,11 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Xml;
 using System.Xml.Linq;
 using UnityEditor;
+using UnityEngine;
 
 namespace Unity.Networking.Editor
 {

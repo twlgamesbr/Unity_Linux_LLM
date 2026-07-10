@@ -6,6 +6,7 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Jobs;
 using Unity.Networking.Transport.Utilities;
+using UnityEngine;
 
 namespace Unity.Networking.Transport
 {
