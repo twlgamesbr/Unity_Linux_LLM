@@ -65,6 +65,9 @@
     "dotnet.defaultSolution": "Unity_Linux_LLM.slnx",
     "datadog.ust.environment.setup.focusedName": "production",
     "datadog.ust.service.setup.linkedNames": [
-        "localai-proxy"
+        "localai-proxy",
+        "node",
+        "supa-storage",
+        "supabase/postgres-meta"
     ]
 }

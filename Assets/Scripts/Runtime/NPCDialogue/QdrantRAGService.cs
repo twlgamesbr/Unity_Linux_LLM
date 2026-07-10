@@ -183,6 +183,18 @@ namespace NPCSystem
             if (string.IsNullOrWhiteSpace(query))
                 return new List<string>();
 
+            using var searchSpan = DatadogTracer.StartSpan(
+                "qdrant.search",
+                service: "unity-dedicated-server",
+                resource: $"{_collectionName}.search",
+                type: "vector_db",
+                tags: new[]
+                {
+                    $"collection:{_collectionName}",
+                    $"limit:{limit}",
+                }
+            );
+
             var searchSw = System.Diagnostics.Stopwatch.StartNew();
             string endpoint = BuildSearchEndpoint();
 
@@ -202,6 +214,7 @@ namespace NPCSystem
                         "[QdrantRAGService] No NPCLocalAIEmbedder found for query encoding."
                     );
                     searchSw.Stop();
+                    searchSpan.SetTag("status", "error_no_embedder");
                     DatadogMetricsService.Increment(
                         "qdrant.search.error",
                         tags: new[] { "reason:no_embedder" }
@@ -219,6 +232,7 @@ namespace NPCSystem
             {
                 Debug.LogError($"[QdrantRAGService] Embedding failed: {ex.Message}");
                 searchSw.Stop();
+                searchSpan.SetError(ex.Message);
                 DatadogMetricsService.Increment(
                     "qdrant.search.error",
                     tags: new[] { "reason:embedding_failed", $"exception:{ex.GetType().Name}" }
@@ -242,6 +256,8 @@ namespace NPCSystem
                     $"[QdrantRAGService] Search failed: {request.error}\n{request.downloadHandler.text}"
                 );
                 searchSw.Stop();
+                searchSpan.SetTag("status", "http_error");
+                searchSpan.SetTag("http_result", request.result.ToString());
                 DatadogMetricsService.Increment(
                     "qdrant.search.error",
                     tags: new[] { "reason:http_error", $"http_result:{request.result}" }
@@ -257,6 +273,8 @@ namespace NPCSystem
                 List<string> results = ExtractPayloadTexts(searchResult);
                 searchSw.Stop();
 
+                searchSpan.SetTag("result_count", results.Count.ToString());
+                searchSpan.SetTag("status", "success");
                 DatadogMetricsService.Timer(
                     "qdrant.search.duration",
                     searchSw.ElapsedMilliseconds,
@@ -280,6 +298,7 @@ namespace NPCSystem
                     $"[QdrantRAGService] Search parse error: {ex.Message}\n{request.downloadHandler.text}"
                 );
                 searchSw.Stop();
+                searchSpan.SetError(ex.Message);
                 DatadogMetricsService.Increment(
                     "qdrant.search.error",
                     tags: new[] { "reason:parse_error", $"exception:{ex.GetType().Name}" }

@@ -149,6 +149,18 @@ namespace NPCSystem
                 npcSlug: slug
             );
 
+            using var turnSpan = DatadogTracer.StartSpan(
+                "dialogue.turn",
+                service: "unity-dedicated-server",
+                resource: $"NPC/{slug}",
+                type: "dialogue",
+                tags: new[]
+                {
+                    $"npc:{slug}",
+                    $"request_id:{reqId}",
+                }
+            );
+
             var turnSw = System.Diagnostics.Stopwatch.StartNew();
 
             try
@@ -215,6 +227,9 @@ namespace NPCSystem
                 }
 
                 turnSw.Stop();
+                turnSpan.SetTag("action_type", actionPlan.actionType.ToString());
+                turnSpan.SetTag("has_response", string.IsNullOrEmpty(dialogueMessage) ? "false" : "true");
+                turnSpan.SetTag("status", "success");
                 DatadogMetricsService.Timer("dialogue.session.turn.duration", turnSw.ElapsedMilliseconds, tags: new[]
                 {
                     $"npc:{slug}",
@@ -241,6 +256,7 @@ namespace NPCSystem
             catch (Exception ex)
             {
                 turnSw.Stop();
+                turnSpan.SetError(ex.Message);
                 DatadogMetricsService.Increment("dialogue.session.error", tags: new[]
                 {
                     $"npc:{slug}",
@@ -349,6 +365,17 @@ namespace NPCSystem
             messages.Add(new NPCOpenAIMessage { role = "user", content = playerMessage });
 
             var localAiSw = System.Diagnostics.Stopwatch.StartNew();
+            using var localAiSpan = DatadogTracer.StartSpan(
+                "dialogue.localai.request",
+                service: "unity-dedicated-server",
+                resource: $"LocalAI/{ResolvedModelName}",
+                type: "llm",
+                tags: new[]
+                {
+                    $"npc:{slug}",
+                    $"model:{ResolvedModelName}",
+                }
+            );
             bool requestSucceeded = false;
 
             if (_chatClient != null)
@@ -378,6 +405,7 @@ namespace NPCSystem
             }
 
             localAiSw.Stop();
+            localAiSpan.SetTag("status", requestSucceeded ? "success" : "empty");
             DatadogMetricsService.Timer("dialogue.localai.request.duration", localAiSw.ElapsedMilliseconds, tags: new[]
             {
                 $"npc:{slug}",

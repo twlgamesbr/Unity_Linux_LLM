@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -88,6 +89,18 @@ namespace NPCSystem
 
             for (int attempt = 0; attempt <= numRetries; attempt++)
             {
+                using var llmSpan = DatadogTracer.StartSpan(
+                    "llm.chat",
+                    service: "unity-dedicated-server",
+                    resource: $"LocalAI/{modelName}",
+                    type: "llm",
+                    tags: new[]
+                    {
+                        $"model:{modelName}",
+                        $"attempt:{attempt}",
+                    }
+                );
+
                 var sw = System.Diagnostics.Stopwatch.StartNew();
                 try
                 {
@@ -98,12 +111,14 @@ namespace NPCSystem
                     {
                         if (attempt < numRetries)
                         {
+                            llmSpan.Dispose();
                             await Task.Delay(500 * (attempt + 1));
                             continue;
                         }
 
                         // All retries exhausted
                         sw.Stop();
+                        llmSpan.SetError("Empty response after all retries");
                         DatadogMetricsService.Increment(
                             "llm.request.error",
                             tags: new[] { $"model:{modelName}", $"reason:empty_response" }
@@ -120,6 +135,7 @@ namespace NPCSystem
                     )
                     {
                         sw.Stop();
+                        llmSpan.SetTag("status", "success");
                         DatadogMetricsService.Timer(
                             "llm.request.duration",
                             sw.ElapsedMilliseconds,
@@ -138,6 +154,7 @@ namespace NPCSystem
                     }
 
                     sw.Stop();
+                    llmSpan.SetTag("status", "unexpected_format");
                     DatadogMetricsService.Increment(
                         "llm.request.error",
                         tags: new[] { $"model:{modelName}", $"reason:unexpected_format" }
@@ -148,6 +165,7 @@ namespace NPCSystem
                 catch (Exception ex)
                 {
                     sw.Stop();
+                    llmSpan.SetError(ex.Message);
                     DatadogMetricsService.Increment(
                         "llm.request.error",
                         tags: new[]

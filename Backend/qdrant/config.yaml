@@ -1,0 +1,19 @@
+# Qdrant configuration — single-node for local development.
+# Persists to /mnt/data/Projects_SSD/qdrant_storage/ via bind mount.
+
+storage:
+  optimizers:
+    default_segment_number: 2
+    memmap_threshold_kb: 20000
+    flush_interval_sec: 5
+
+  snapshots_path: /qdrant/storage/snapshots
+
+service:
+  grpc_port: 6333
+  http_port: 6333
+  enable_cors: true
+  cors_domain: "*"
+
+log:
+  level: INFO

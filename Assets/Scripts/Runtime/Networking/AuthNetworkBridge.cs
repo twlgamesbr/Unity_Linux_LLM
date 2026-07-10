@@ -201,6 +201,17 @@ namespace NPCSystem
 
         async void HandleAuthSuccess(string username)
         {
+            using var authSpan = DatadogTracer.StartSpan(
+                "auth.login",
+                service: "unity-dedicated-server",
+                resource: "PlayerAuth",
+                type: "auth",
+                tags: new[]
+                {
+                    $"player_name:{username?.Trim() ?? "unknown"}",
+                }
+            );
+
 #if UNITY_WEBGL && !UNITY_EDITOR
             if (
                 string.IsNullOrWhiteSpace(_hostAddress)
@@ -223,6 +234,8 @@ namespace NPCSystem
             _authenticatedPlayerName = username?.Trim() ?? "";
             ActivePlayerName = _authenticatedPlayerName;
             ResolvedNetworkStartupMode resolvedMode = ResolveStartupMode();
+
+            authSpan.SetTag("mode", resolvedMode.ToString().ToLowerInvariant());
 
             CloseAuthUI();
 

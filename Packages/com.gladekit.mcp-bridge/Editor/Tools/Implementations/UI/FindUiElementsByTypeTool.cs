@@ -1,4 +1,13 @@
 #if GLADE_UGUI
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEditor;
+using System.Text;
+using System;
+using System.Globalization;
+using UnityEngine.UI;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
 namespace GladeAgenticAI.Core.Tools.Implementations.UI
 {
     public class FindUiElementsByTypeTool : ITool
@@ -27,7 +36,7 @@ namespace GladeAgenticAI.Core.Tools.Implementations.UI
             switch (elementType.ToLower())
             {
                 case "button":
-                    var buttons = Object.FindObjectsByType<Button>(FindObjectsSortMode.None);
+                    var buttons = UnityEngine.Object.FindObjectsByType<Button>(FindObjectsSortMode.None);
                     foreach (var btn in buttons)
                     {
                         if (btn.gameObject.scene == activeScene && (filterCanvas == null || IsInCanvas(btn.gameObject, filterCanvas)))
@@ -35,7 +44,7 @@ namespace GladeAgenticAI.Core.Tools.Implementations.UI
                     }
                     break;
                 case "text":
-                    var texts = Object.FindObjectsByType<Text>(FindObjectsSortMode.None);
+                    var texts = UnityEngine.Object.FindObjectsByType<Text>(FindObjectsSortMode.None);
                     foreach (var txt in texts)
                     {
                         if (txt.gameObject.scene == activeScene && (filterCanvas == null || IsInCanvas(txt.gameObject, filterCanvas)))
@@ -43,7 +52,7 @@ namespace GladeAgenticAI.Core.Tools.Implementations.UI
                     }
                     break;
                 case "image":
-                    var images = Object.FindObjectsByType<Image>(FindObjectsSortMode.None);
+                    var images = UnityEngine.Object.FindObjectsByType<Image>(FindObjectsSortMode.None);
                     foreach (var img in images)
                     {
                         if (img.gameObject.scene == activeScene && (filterCanvas == null || IsInCanvas(img.gameObject, filterCanvas)))
@@ -51,7 +60,7 @@ namespace GladeAgenticAI.Core.Tools.Implementations.UI
                     }
                     break;
                 case "slider":
-                    var sliders = Object.FindObjectsByType<Slider>(FindObjectsSortMode.None);
+                    var sliders = UnityEngine.Object.FindObjectsByType<Slider>(FindObjectsSortMode.None);
                     foreach (var sld in sliders)
                     {
                         if (sld.gameObject.scene == activeScene && (filterCanvas == null || IsInCanvas(sld.gameObject, filterCanvas)))
@@ -59,7 +68,7 @@ namespace GladeAgenticAI.Core.Tools.Implementations.UI
                     }
                     break;
                 case "toggle":
-                    var toggles = Object.FindObjectsByType<Toggle>(FindObjectsSortMode.None);
+                    var toggles = UnityEngine.Object.FindObjectsByType<Toggle>(FindObjectsSortMode.None);
                     foreach (var tgl in toggles)
                     {
                         if (tgl.gameObject.scene == activeScene && (filterCanvas == null || IsInCanvas(tgl.gameObject, filterCanvas)))
@@ -67,7 +76,7 @@ namespace GladeAgenticAI.Core.Tools.Implementations.UI
                     }
                     break;
                 case "dropdown":
-                    var dropdowns = Object.FindObjectsByType<Dropdown>(FindObjectsSortMode.None);
+                    var dropdowns = UnityEngine.Object.FindObjectsByType<Dropdown>(FindObjectsSortMode.None);
                     foreach (var dd in dropdowns)
                     {
                         if (dd.gameObject.scene == activeScene && (filterCanvas == null || IsInCanvas(dd.gameObject, filterCanvas)))
@@ -78,7 +87,7 @@ namespace GladeAgenticAI.Core.Tools.Implementations.UI
                     var tmpDropdownType = System.Type.GetType("TMPro.TMP_Dropdown, Unity.TextMeshPro");
                     if (tmpDropdownType != null)
                     {
-                        var tmpDropdowns = Object.FindObjectsByType(tmpDropdownType, FindObjectsSortMode.None);
+                        var tmpDropdowns = UnityEngine.Object.FindObjectsByType(tmpDropdownType, FindObjectsSortMode.None);
                         foreach (Component dd in tmpDropdowns)
                         {
                             if (dd.gameObject.scene == activeScene && (filterCanvas == null || IsInCanvas(dd.gameObject, filterCanvas)))
@@ -87,7 +96,7 @@ namespace GladeAgenticAI.Core.Tools.Implementations.UI
                     }
                     break;
                 case "inputfield":
-                    var inputFields = Object.FindObjectsByType<InputField>(FindObjectsSortMode.None);
+                    var inputFields = UnityEngine.Object.FindObjectsByType<InputField>(FindObjectsSortMode.None);
                     foreach (var ifield in inputFields)
                     {
                         if (ifield.gameObject.scene == activeScene && (filterCanvas == null || IsInCanvas(ifield.gameObject, filterCanvas)))
@@ -98,7 +107,7 @@ namespace GladeAgenticAI.Core.Tools.Implementations.UI
                     var tmpInputFieldType = System.Type.GetType("TMPro.TMP_InputField, Unity.TextMeshPro");
                     if (tmpInputFieldType != null)
                     {
-                        var tmpInputFields = Object.FindObjectsByType(tmpInputFieldType, FindObjectsSortMode.None);
+                        var tmpInputFields = UnityEngine.Object.FindObjectsByType(tmpInputFieldType, FindObjectsSortMode.None);
                         foreach (Component ifield in tmpInputFields)
                         {
                             if (ifield.gameObject.scene == activeScene && (filterCanvas == null || IsInCanvas(ifield.gameObject, filterCanvas)))
@@ -107,7 +116,7 @@ namespace GladeAgenticAI.Core.Tools.Implementations.UI
                     }
                     break;
                 case "scrollrect":
-                    var scrollRects = Object.FindObjectsByType<ScrollRect>(FindObjectsSortMode.None);
+                    var scrollRects = UnityEngine.Object.FindObjectsByType<ScrollRect>(FindObjectsSortMode.None);
                     foreach (var sr in scrollRects)
                     {
                         if (sr.gameObject.scene == activeScene && (filterCanvas == null || IsInCanvas(sr.gameObject, filterCanvas)))
@@ -115,7 +124,7 @@ namespace GladeAgenticAI.Core.Tools.Implementations.UI
                     }
                     break;
                 case "scrollbar":
-                    var scrollbars = Object.FindObjectsByType<Scrollbar>(FindObjectsSortMode.None);
+                    var scrollbars = UnityEngine.Object.FindObjectsByType<Scrollbar>(FindObjectsSortMode.None);
                     foreach (var scrollbar in scrollbars)
                     {
                         if (scrollbar.gameObject.scene == activeScene && (filterCanvas == null || IsInCanvas(scrollbar.gameObject, filterCanvas)))
@@ -123,7 +132,7 @@ namespace GladeAgenticAI.Core.Tools.Implementations.UI
                     }
                     break;
                 case "rawimage":
-                    var rawImages = Object.FindObjectsByType<RawImage>(FindObjectsSortMode.None);
+                    var rawImages = UnityEngine.Object.FindObjectsByType<RawImage>(FindObjectsSortMode.None);
                     foreach (var ri in rawImages)
                     {
                         if (ri.gameObject.scene == activeScene && (filterCanvas == null || IsInCanvas(ri.gameObject, filterCanvas)))
@@ -131,7 +140,7 @@ namespace GladeAgenticAI.Core.Tools.Implementations.UI
                     }
                     break;
                 case "canvasgroup":
-                    var canvasGroups = Object.FindObjectsByType<CanvasGroup>(FindObjectsSortMode.None);
+                    var canvasGroups = UnityEngine.Object.FindObjectsByType<CanvasGroup>(FindObjectsSortMode.None);
                     foreach (var cg in canvasGroups)
                     {
                         if (cg.gameObject.scene == activeScene && (filterCanvas == null || IsInCanvas(cg.gameObject, filterCanvas)))
@@ -139,7 +148,7 @@ namespace GladeAgenticAI.Core.Tools.Implementations.UI
                     }
                     break;
                 case "horizontallayoutgroup":
-                    var hLayouts = Object.FindObjectsByType<HorizontalLayoutGroup>(FindObjectsSortMode.None);
+                    var hLayouts = UnityEngine.Object.FindObjectsByType<HorizontalLayoutGroup>(FindObjectsSortMode.None);
                     foreach (var hlg in hLayouts)
                     {
                         if (hlg.gameObject.scene == activeScene && (filterCanvas == null || IsInCanvas(hlg.gameObject, filterCanvas)))
@@ -147,7 +156,7 @@ namespace GladeAgenticAI.Core.Tools.Implementations.UI
                     }
                     break;
                 case "verticallayoutgroup":
-                    var vLayouts = Object.FindObjectsByType<VerticalLayoutGroup>(FindObjectsSortMode.None);
+                    var vLayouts = UnityEngine.Object.FindObjectsByType<VerticalLayoutGroup>(FindObjectsSortMode.None);
                     foreach (var vlg in vLayouts)
                     {
                         if (vlg.gameObject.scene == activeScene && (filterCanvas == null || IsInCanvas(vlg.gameObject, filterCanvas)))
@@ -155,7 +164,7 @@ namespace GladeAgenticAI.Core.Tools.Implementations.UI
                     }
                     break;
                 case "gridlayoutgroup":
-                    var gridLayouts = Object.FindObjectsByType<GridLayoutGroup>(FindObjectsSortMode.None);
+                    var gridLayouts = UnityEngine.Object.FindObjectsByType<GridLayoutGroup>(FindObjectsSortMode.None);
                     foreach (var glg in gridLayouts)
                     {
                         if (glg.gameObject.scene == activeScene && (filterCanvas == null || IsInCanvas(glg.gameObject, filterCanvas)))
@@ -163,7 +172,7 @@ namespace GladeAgenticAI.Core.Tools.Implementations.UI
                     }
                     break;
                 case "canvas":
-                    var canvases = Object.FindObjectsByType<Canvas>(FindObjectsSortMode.None);
+                    var canvases = UnityEngine.Object.FindObjectsByType<Canvas>(FindObjectsSortMode.None);
                     foreach (var canvas in canvases)
                     {
                         if (canvas.gameObject.scene == activeScene)
@@ -171,7 +180,7 @@ namespace GladeAgenticAI.Core.Tools.Implementations.UI
                     }
                     break;
                 case "eventsystem":
-                    var eventSystems = Object.FindObjectsByType<EventSystem>(FindObjectsSortMode.None);
+                    var eventSystems = UnityEngine.Object.FindObjectsByType<EventSystem>(FindObjectsSortMode.None);
                     foreach (var es in eventSystems)
                     {
                         if (es.gameObject.scene == activeScene)

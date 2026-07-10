@@ -1,4 +1,12 @@
 #if GLADE_UGUI
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEditor;
+using System.Text;
+using System;
+using System.Globalization;
+using UnityEngine.UI;
+using UnityEngine.Events;
 namespace GladeAgenticAI.Core.Tools.Implementations.UI
 {
     public class ListUiHierarchyTool : ITool
@@ -7,7 +15,7 @@ namespace GladeAgenticAI.Core.Tools.Implementations.UI
 
         public string Execute(Dictionary<string, object> args)
         {
-            var canvases = Object.FindObjectsByType<Canvas>(FindObjectsSortMode.None);
+            var canvases = UnityEngine.Object.FindObjectsByType<Canvas>(FindObjectsSortMode.None);
             var sb = new StringBuilder();
             sb.Append("{\"success\":true,\"canvases\":[");
 

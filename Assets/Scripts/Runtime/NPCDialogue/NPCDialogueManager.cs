@@ -372,6 +372,17 @@ namespace NPCSystem
                 NPCFlowStage.SceneBootstrap,
                 source: nameof(NPCDialogueManager)
             );
+            using var initSpan = DatadogTracer.StartSpan(
+                "dialogue.manager.initialize",
+                service: "unity-dedicated-server",
+                resource: "InitializeDialogue",
+                type: "system",
+                tags: new[]
+                {
+                    $"profile_count:{Profiles.Length}",
+                    $"use_qdrant:{UseQdrantRag}",
+                }
+            );
             var initSw = System.Diagnostics.Stopwatch.StartNew();
             try
             {
@@ -414,6 +425,7 @@ namespace NPCSystem
                 }
 
                 initSw.Stop();
+                initSpan.SetTag("status", "success");
                 DatadogMetricsService.Timer("dialogue.manager.initialize.duration", initSw.ElapsedMilliseconds, tags: new[]
                 {
                     $"profile_count:{Profiles.Length}",
@@ -429,6 +441,7 @@ namespace NPCSystem
             catch (Exception ex)
             {
                 initSw.Stop();
+                initSpan.SetError(ex.Message);
                 DatadogMetricsService.Timer("dialogue.manager.initialize.duration", initSw.ElapsedMilliseconds, tags: new[]
                 {
                     $"profile_count:{Profiles.Length}",

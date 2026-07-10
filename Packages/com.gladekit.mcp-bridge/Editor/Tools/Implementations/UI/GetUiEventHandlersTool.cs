@@ -1,4 +1,12 @@
 #if GLADE_UGUI
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEditor;
+using System.Text;
+using System;
+using System.Globalization;
+using UnityEngine.UI;
+using UnityEngine.Events;
 namespace GladeAgenticAI.Core.Tools.Implementations.UI
 {
     public class GetUiEventHandlersTool : ITool

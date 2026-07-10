@@ -295,6 +295,18 @@ namespace NPCSystem
         {
             ResolveReferences();
 
+            using var netSpan = DatadogTracer.StartSpan(
+                "network.start",
+                service: "unity-dedicated-server",
+                resource: TransportConfig.autoStartMode.ToString(),
+                type: "networking",
+                tags: new[]
+                {
+                    $"mode:{TransportConfig.autoStartMode}",
+                    $"port:{TransportConfig.port}",
+                }
+            );
+
             if (NetworkManager == null)
             {
                 NPCFlowLogger
@@ -353,20 +365,30 @@ namespace NPCSystem
                         "network.mode.start",
                         tags: new[] { "mode:client" }
                     );
-                    return NetworkManager.StartClient();
+                    bool clientStarted = NetworkManager.StartClient();
+                    netSpan.SetTag("started", clientStarted.ToString());
+                    netSpan.SetTag("status", clientStarted ? "success" : "failed");
+                    return clientStarted;
                 case NPCNetworkAutoStartMode.Host:
                     DatadogMetricsService.Increment(
                         "network.mode.start",
                         tags: new[] { "mode:host" }
                     );
-                    return NetworkManager.StartHost();
+                    bool hostStarted = NetworkManager.StartHost();
+                    netSpan.SetTag("started", hostStarted.ToString());
+                    netSpan.SetTag("status", hostStarted ? "success" : "failed");
+                    return hostStarted;
                 case NPCNetworkAutoStartMode.Server:
                     DatadogMetricsService.Increment(
                         "network.mode.start",
                         tags: new[] { "mode:server" }
                     );
-                    return NetworkManager.StartServer();
+                    bool serverStarted = NetworkManager.StartServer();
+                    netSpan.SetTag("started", serverStarted.ToString());
+                    netSpan.SetTag("status", serverStarted ? "success" : "failed");
+                    return serverStarted;
                 default:
+                    netSpan.SetTag("status", "unknown_mode");
                     return false;
             }
         }

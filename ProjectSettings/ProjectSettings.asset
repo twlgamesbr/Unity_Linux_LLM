@@ -839,7 +839,7 @@ PlayerSettings:
   webWasm2023: 1
   webEnableSubmoduleStrippingCompatibility: 1
   scriptingDefineSymbols:
-    Standalone: 
+    Standalone: GLADE_AI_NAVIGATION;GLADE_INPUT_SYSTEM;GLADE_UGUI
     WebGL: 
   additionalCompilerArguments: {}
   platformArchitecture: {}
@@ -943,7 +943,7 @@ PlayerSettings:
   hmiCpuConfiguration: 
   hmiLogStartupTiming: 0
   qnxGraphicConfPath: 
-  apiCompatibilityLevel: 2
+  apiCompatibilityLevel: 0
   captureStartupLogs: {}
   activeInputHandler: 1
   windowsGamepadBackendHint: 0

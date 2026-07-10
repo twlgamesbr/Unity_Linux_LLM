@@ -1,4 +1,9 @@
 #if ENABLE_LEGACY_INPUT_MANAGER
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEditor;
+using System;
+using System.Globalization;
 namespace GladeAgenticAI.Core.Tools.Implementations.InputLegacy
 {
     public class ListLegacyInputAxesTool : ITool

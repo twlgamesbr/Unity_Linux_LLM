@@ -430,6 +430,29 @@ They were removed because multiple agents in `network_mode: host` conflict on po
 8125/8126. If you need per-stack agents for development isolation, assign each a
 unique port mapping instead of host networking.
 
+### 6.6 APM Trace Spans (from Unity)
+
+Because Unity uses IL2CPP/Mono, the standard Datadog .NET Tracer cannot hook into
+its runtime. Instead, `DatadogTraceService.cs` (`Assets/Scripts/Runtime/Monitoring/`)
+sends manual APM spans directly to the Trace Agent HTTP API (port 8126).
+
+**Initialization:** `NPCDialogueBootstrapper.Awake()` calls `DatadogTracer.Initialize()`
+alongside `DatadogMetricsService.Initialize()`. Shutdown in `OnDestroy()`.
+
+| Unity Script | Span Name | Type | Key Tags |
+|-------------|-----------|------|----------|
+| `NPCLocalAIClient` | `llm.chat` | `llm` | model, attempt, status |
+| `NPCDialogueManager` | `dialogue.manager.initialize` | `system` | profile_count, use_qdrant, status |
+| `NPCDialogueSessionService` | `dialogue.turn` | `dialogue` | npc, request_id, action_type, has_response, status |
+| `NPCDialogueSessionService` | `dialogue.localai.request` | `llm` | npc, model, status |
+| `QdrantRAGService` | `qdrant.search` | `vector_db` | collection, limit, result_count, status |
+| `AuthNetworkBridge` | `auth.login` | `auth` | player_name, mode |
+| `NPCNetworkBootstrap` | `network.start` | `networking` | mode, port, started, status |
+
+**Span lifecycle:** `using (var span = DatadogTracer.StartSpan(...))` → auto-finishes
+on `Dispose()`. Spans are batched by trace_id and flushed every 5 seconds (or when
+the batch reaches 50 spans). Set `span.SetError(message)` to mark failures.
+
 ---
 
 ## 7. Testing

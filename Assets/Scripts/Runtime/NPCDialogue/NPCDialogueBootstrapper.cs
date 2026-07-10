@@ -54,9 +54,11 @@ namespace NPCSystem
 
         void Awake()
         {
-            // Initialize Datadog metrics early in the startup sequence.
-            // The Datadog Agent must be running on localhost:8125 (sidecar in Docker).
+            // Initialize Datadog metrics and APM tracing early in the startup
+            // sequence. The Datadog Agent (dd-agent) must be running on the
+            // host with DogStatsD (8125) and Trace Agent (8126) ports open.
             DatadogMetricsService.Initialize();
+            DatadogTracer.Initialize();
 
             NPCFlowLogger logger = NPCFlowLogger.FindOrCreate();
             if (DialogueManager == null)
@@ -189,6 +191,7 @@ namespace NPCSystem
         void OnDestroy()
         {
             DatadogMetricsService.Shutdown();
+            DatadogTracer.Shutdown();
         }
     }
 }

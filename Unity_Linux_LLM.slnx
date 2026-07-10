@@ -111,7 +111,6 @@
   <Project Path="Unity.UnifiedRayTracing.Runtime.csproj" />
   <Project Path="Unity.RenderPipelines.Core.Editor.Tests.csproj" />
   <Project Path="Unity.TestTools.CodeCoverage.Editor.OpenCover.Mono.Reflection.csproj" />
-  <Project Path="Unity.CharacterController.RuntimeTests.csproj" />
   <Project Path="Unity.Multiplayer.Tools.DependencyInjection.UIElements.csproj" />
   <Project Path="Unity.Numerics.Linear.Solvers.Lowlevel.csproj" />
   <Project Path="UnityEditor.UI.EditorTests.csproj" />
