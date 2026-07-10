@@ -30,16 +30,31 @@ namespace UnityEngine.ResourceManagement.Tests
         {
 #if ENABLE_CACHING
             Assert.Zero(m_ResourceManager.OperationCacheCount);
-            var provType = typeof(InstanceProvider);
-            var loc1 = new TestResourceLocation("asset1", "asset1", provType.FullName, typeof(GameObject));
+            var provType = typeof(ResourceManager);
+            var loc1 = new TestResourceLocation(
+                "asset1",
+                "asset1",
+                provType.FullName,
+                typeof(GameObject)
+            );
             var key1 = new LocationCacheKey(loc1, typeof(GameObject));
             var opType = typeof(TestOperation);
-            m_ResourceManager.CreateOperation<TestOperation>(opType, opType.GetHashCode(), key1, null);
+            m_ResourceManager.CreateOperation<TestOperation>(
+                opType,
+                opType.GetHashCode(),
+                key1,
+                null
+            );
 
             Assert.AreEqual(1, m_ResourceManager.CachedOperationCount());
             Assert.IsTrue(m_ResourceManager.IsOperationCached(key1));
 
-            var loc2 = new TestResourceLocation("asset2", "asset2", provType.FullName, typeof(GameObject));
+            var loc2 = new TestResourceLocation(
+                "asset2",
+                "asset2",
+                provType.FullName,
+                typeof(GameObject)
+            );
             var key2 = new LocationCacheKey(loc2, typeof(GameObject));
             Assert.IsFalse(m_ResourceManager.IsOperationCached(key2));
 
@@ -48,7 +63,6 @@ namespace UnityEngine.ResourceManagement.Tests
             Assert.Ignore("Caching not enabled.");
 #endif
         }
-
 
         [Test]
         public void LocationCacheKey_Equals_ReturnsExpectedValue()
@@ -59,41 +73,60 @@ namespace UnityEngine.ResourceManagement.Tests
             var t = typeof(GameObject);
             {
                 //everything same, should return true
-                var k1 = new LocationCacheKey(new TestResourceLocation("loc1", "x", "p", t, d1, d2), t);
-                var k2 = new LocationCacheKey(new TestResourceLocation("loc1", "x", "p", t, d1, d2), t);
+                var k1 = new LocationCacheKey(
+                    new TestResourceLocation("loc1", "x", "p", t, d1, d2),
+                    t
+                );
+                var k2 = new LocationCacheKey(
+                    new TestResourceLocation("loc1", "x", "p", t, d1, d2),
+                    t
+                );
                 Assert.IsTrue(k1.Equals(k2));
             }
 
             {
                 //dependencies different, should return false
-                var k1 = new LocationCacheKey(new TestResourceLocation("loc1", "x", "p", t, d1, d2), t);
-                var k2 = new LocationCacheKey(new TestResourceLocation("loc1", "x", "p", t, d1, d2, d3), t);
+                var k1 = new LocationCacheKey(
+                    new TestResourceLocation("loc1", "x", "p", t, d1, d2),
+                    t
+                );
+                var k2 = new LocationCacheKey(
+                    new TestResourceLocation("loc1", "x", "p", t, d1, d2, d3),
+                    t
+                );
                 Assert.IsFalse(k1.Equals(k2));
             }
-
 
             {
                 //dependencies same, ids different should return false
-                var k1 = new LocationCacheKey(new TestResourceLocation("loc1", "x", "p", t, d1, d2), t);
-                var k2 = new LocationCacheKey(new TestResourceLocation("loc1", "x2", "p", t, d1, d2), t);
+                var k1 = new LocationCacheKey(
+                    new TestResourceLocation("loc1", "x", "p", t, d1, d2),
+                    t
+                );
+                var k2 = new LocationCacheKey(
+                    new TestResourceLocation("loc1", "x2", "p", t, d1, d2),
+                    t
+                );
                 Assert.IsFalse(k1.Equals(k2));
             }
-
-
         }
 
         class TestOperation : AsyncOperationBase<GameObject>, ICachable
         {
-            protected override void Execute()
-            {
-            }
+            protected override void Execute() { }
 
             public IOperationCacheKey Key { get; set; }
         }
 
         class TestResourceLocation : IResourceLocation
         {
-            public TestResourceLocation(string name, string id, string providerId, Type t, params IResourceLocation[] dependencies)
+            public TestResourceLocation(
+                string name,
+                string id,
+                string providerId,
+                Type t,
+                params IResourceLocation[] dependencies
+            )
             {
                 PrimaryKey = name;
                 InternalId = id;
@@ -153,9 +186,8 @@ namespace UnityEngine.ResourceManagement.Tests
 
         class ResourceLocatonTestSub : ResourceLocationBase
         {
-            public ResourceLocatonTestSub(string n, string id, string pr, Type t) : base(n, id, pr, t)
-            {
-            }
+            public ResourceLocatonTestSub(string n, string id, string pr, Type t)
+                : base(n, id, pr, t) { }
         }
 
         [Test]

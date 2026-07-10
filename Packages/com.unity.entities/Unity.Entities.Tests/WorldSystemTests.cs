@@ -3,6 +3,7 @@ using NUnit.Framework;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
+using UnityEngine.TestTools;
 
 namespace Unity.Entities.Tests
 {
@@ -10,14 +11,13 @@ namespace Unity.Entities.Tests
     {
         partial class EmptyTestSystem : SystemBase
         {
-            protected override void OnUpdate() {}
+            protected override void OnUpdate() { }
         }
 
-        partial struct EmptyTestISystem : ISystem
-        {
-        }
+        partial struct EmptyTestISystem : ISystem { }
 
-        static void CheckManagedSystemExists<T>(World world, T system) where T : SystemBase
+        static void CheckManagedSystemExists<T>(World world, T system)
+            where T : SystemBase
         {
             Assert.AreEqual(system, world.GetExistingSystemManaged<T>());
             Assert.AreEqual(1, world.Systems.Count);
@@ -25,7 +25,8 @@ namespace Unity.Entities.Tests
             Assert.AreEqual(SystemHandle.Null, world.Unmanaged.ExecutingSystem);
         }
 
-        static void CheckUnmanagedSystemExists<T>(World world, SystemHandle system) where T : unmanaged, ISystem
+        static void CheckUnmanagedSystemExists<T>(World world, SystemHandle system)
+            where T : unmanaged, ISystem
         {
             Assert.AreEqual(system, world.GetExistingSystem<T>());
             var systems = world.Unmanaged.GetAllUnmanagedSystems(Allocator.Temp);
@@ -33,14 +34,17 @@ namespace Unity.Entities.Tests
             Assert.AreEqual(system, systems[0]);
             Assert.AreEqual(SystemHandle.Null, world.Unmanaged.ExecutingSystem);
         }
-        static void CheckManagedSystemEmpty<T>(World world) where T : SystemBase
+
+        static void CheckManagedSystemEmpty<T>(World world)
+            where T : SystemBase
         {
             Assert.AreEqual(null, world.GetExistingSystemManaged<T>());
             Assert.AreEqual(0, world.Systems.Count);
             Assert.AreEqual(SystemHandle.Null, world.Unmanaged.ExecutingSystem);
         }
 
-        static void CheckUnmanagedSystemEmpty<T>(World world) where T : unmanaged, ISystem
+        static void CheckUnmanagedSystemEmpty<T>(World world)
+            where T : unmanaged, ISystem
         {
             Assert.AreEqual(SystemHandle.Null, world.GetExistingSystem<T>());
             Assert.AreEqual(0, world.Unmanaged.GetAllUnmanagedSystems(Allocator.Temp).Length);
@@ -77,11 +81,25 @@ namespace Unity.Entities.Tests
                 Assert.AreEqual(world.GetExistingSystemManaged<EmptyTestSystem>(), system);
                 Assert.AreEqual(world.GetExistingSystem<EmptyTestSystem>(), system.SystemHandle);
 
-                using var systemQuery = world.EntityManager.CreateEntityQuery(typeof(SystemInstance));
+                using var systemQuery = world.EntityManager.CreateEntityQuery(
+                    typeof(SystemInstance)
+                );
                 Assert.That(systemQuery.CalculateEntityCount(), Is.EqualTo(1));
-                using (var systemEntities = systemQuery.ToEntityArray(world.UpdateAllocator.ToAllocator))
+                using (
+                    var systemEntities = systemQuery.ToEntityArray(
+                        world.UpdateAllocator.ToAllocator
+                    )
+                )
                 {
-                    Assert.That((IntPtr)world.EntityManager.GetComponentData<SystemInstance>(system.SystemHandle.m_Entity).state, Is.EqualTo((IntPtr)system.CheckedState()));
+                    Assert.That(
+                        (IntPtr)
+                            world
+                                .EntityManager.GetComponentData<SystemInstance>(
+                                    system.SystemHandle.m_Entity
+                                )
+                                .state,
+                        Is.EqualTo((IntPtr)system.CheckedState())
+                    );
                     Assert.That(systemEntities[0], Is.EqualTo(system.SystemHandle.m_Entity));
                 }
 
@@ -96,15 +114,29 @@ namespace Unity.Entities.Tests
             using (var world = new World("WorldX"))
             {
                 SystemHandle system = world.GetOrCreateSystem<EmptyTestSystem>();
-                Assert.AreEqual(world.GetExistingSystemManaged<EmptyTestSystem>().SystemHandle, system);
+                Assert.AreEqual(
+                    world.GetExistingSystemManaged<EmptyTestSystem>().SystemHandle,
+                    system
+                );
                 Assert.AreEqual(world.GetExistingSystem<EmptyTestSystem>(), system);
 
-                using var systemQuery = world.EntityManager.CreateEntityQuery(typeof(SystemInstance));
+                using var systemQuery = world.EntityManager.CreateEntityQuery(
+                    typeof(SystemInstance)
+                );
                 Assert.That(systemQuery.CalculateEntityCount(), Is.EqualTo(1));
-                using (var systemEntities = systemQuery.ToEntityArray(world.UpdateAllocator.ToAllocator))
+                using (
+                    var systemEntities = systemQuery.ToEntityArray(
+                        world.UpdateAllocator.ToAllocator
+                    )
+                )
                 {
-                    Assert.That((IntPtr)world.EntityManager.GetComponentData<SystemInstance>(system.m_Entity).state,
-                        Is.EqualTo((IntPtr)world.Unmanaged.ResolveSystemState(system)));
+                    Assert.That(
+                        (IntPtr)
+                            world
+                                .EntityManager.GetComponentData<SystemInstance>(system.m_Entity)
+                                .state,
+                        Is.EqualTo((IntPtr)world.Unmanaged.ResolveSystemState(system))
+                    );
                     Assert.That(systemEntities[0], Is.EqualTo(system.m_Entity));
                 }
 
@@ -119,15 +151,29 @@ namespace Unity.Entities.Tests
             using (var world = new World("WorldX"))
             {
                 SystemHandle system = world.GetOrCreateSystem(typeof(EmptyTestSystem));
-                Assert.AreEqual(world.GetExistingSystemManaged<EmptyTestSystem>().SystemHandle, system);
+                Assert.AreEqual(
+                    world.GetExistingSystemManaged<EmptyTestSystem>().SystemHandle,
+                    system
+                );
                 Assert.AreEqual(world.GetExistingSystem<EmptyTestSystem>(), system);
 
-                using var systemQuery = world.EntityManager.CreateEntityQuery(typeof(SystemInstance));
+                using var systemQuery = world.EntityManager.CreateEntityQuery(
+                    typeof(SystemInstance)
+                );
                 Assert.That(systemQuery.CalculateEntityCount(), Is.EqualTo(1));
-                using (var systemEntities = systemQuery.ToEntityArray(world.UpdateAllocator.ToAllocator))
+                using (
+                    var systemEntities = systemQuery.ToEntityArray(
+                        world.UpdateAllocator.ToAllocator
+                    )
+                )
                 {
-                    Assert.That((IntPtr)world.EntityManager.GetComponentData<SystemInstance>(system.m_Entity).state,
-                        Is.EqualTo((IntPtr)world.Unmanaged.ResolveSystemState(system)));
+                    Assert.That(
+                        (IntPtr)
+                            world
+                                .EntityManager.GetComponentData<SystemInstance>(system.m_Entity)
+                                .state,
+                        Is.EqualTo((IntPtr)world.Unmanaged.ResolveSystemState(system))
+                    );
                     Assert.That(systemEntities[0], Is.EqualTo(system.m_Entity));
                 }
 
@@ -143,14 +189,24 @@ namespace Unity.Entities.Tests
             {
                 SystemHandle system = world.GetOrCreateSystem<EmptyTestISystem>();
                 Assert.AreEqual(world.GetExistingSystem<EmptyTestISystem>(), system);
-                Assert.AreEqual(world.Unmanaged.GetExistingUnmanagedSystem<EmptyTestISystem>(), system);
+                Assert.AreEqual(
+                    world.Unmanaged.GetExistingUnmanagedSystem<EmptyTestISystem>(),
+                    system
+                );
 
-                using var systemQuery = world.EntityManager.CreateEntityQuery(typeof(SystemInstance));
-                using var systemEntities = systemQuery.ToEntityArray(world.UpdateAllocator.ToAllocator);
+                using var systemQuery = world.EntityManager.CreateEntityQuery(
+                    typeof(SystemInstance)
+                );
+                using var systemEntities = systemQuery.ToEntityArray(
+                    world.UpdateAllocator.ToAllocator
+                );
                 Assert.That(systemQuery.CalculateEntityCount(), Is.EqualTo(1));
 
-                Assert.That((IntPtr)world.EntityManager.GetComponentData<SystemInstance>(system.m_Entity).state,
-                    Is.EqualTo((IntPtr)world.Unmanaged.ResolveSystemState(system)));
+                Assert.That(
+                    (IntPtr)
+                        world.EntityManager.GetComponentData<SystemInstance>(system.m_Entity).state,
+                    Is.EqualTo((IntPtr)world.Unmanaged.ResolveSystemState(system))
+                );
                 Assert.That(systemEntities[0], Is.EqualTo(system.m_Entity));
 
                 world.DestroySystem(system);
@@ -165,14 +221,24 @@ namespace Unity.Entities.Tests
             {
                 SystemHandle system = world.GetOrCreateSystem(typeof(EmptyTestISystem));
                 Assert.AreEqual(world.GetExistingSystem<EmptyTestISystem>(), system);
-                Assert.AreEqual(world.Unmanaged.GetExistingUnmanagedSystem<EmptyTestISystem>(), system);
+                Assert.AreEqual(
+                    world.Unmanaged.GetExistingUnmanagedSystem<EmptyTestISystem>(),
+                    system
+                );
 
-                using var systemQuery = world.EntityManager.CreateEntityQuery(typeof(SystemInstance));
-                using var systemEntities = systemQuery.ToEntityArray(world.UpdateAllocator.ToAllocator);
+                using var systemQuery = world.EntityManager.CreateEntityQuery(
+                    typeof(SystemInstance)
+                );
+                using var systemEntities = systemQuery.ToEntityArray(
+                    world.UpdateAllocator.ToAllocator
+                );
                 Assert.That(systemQuery.CalculateEntityCount(), Is.EqualTo(1));
 
-                Assert.That((IntPtr)world.EntityManager.GetComponentData<SystemInstance>(system.m_Entity).state,
-                    Is.EqualTo((IntPtr)world.Unmanaged.ResolveSystemState(system)));
+                Assert.That(
+                    (IntPtr)
+                        world.EntityManager.GetComponentData<SystemInstance>(system.m_Entity).state,
+                    Is.EqualTo((IntPtr)world.Unmanaged.ResolveSystemState(system))
+                );
                 Assert.That(systemEntities[0], Is.EqualTo(system.m_Entity));
 
                 world.DestroySystem(system);
@@ -187,7 +253,9 @@ namespace Unity.Entities.Tests
             {
                 EmptyTestSystem system = world.GetOrCreateSystemManaged<EmptyTestSystem>();
 
-                using var systemQuery = world.EntityManager.CreateEntityQuery(typeof(SystemInstance));
+                using var systemQuery = world.EntityManager.CreateEntityQuery(
+                    typeof(SystemInstance)
+                );
                 Assert.That(systemQuery.CalculateEntityCount(), Is.EqualTo(1));
 
                 world.DestroyAllSystemsAndLogException(out bool errorsWhileDestroyingSystems);
@@ -206,7 +274,9 @@ namespace Unity.Entities.Tests
             {
                 SystemHandle system = world.GetOrCreateSystem<EmptyTestISystem>();
 
-                using var systemQuery = world.EntityManager.CreateEntityQuery(typeof(SystemInstance));
+                using var systemQuery = world.EntityManager.CreateEntityQuery(
+                    typeof(SystemInstance)
+                );
                 Assert.That(systemQuery.CalculateEntityCount(), Is.EqualTo(1));
 
                 world.DestroyAllSystemsAndLogException(out bool errorsWhileDestroyingSystems);
@@ -226,7 +296,9 @@ namespace Unity.Entities.Tests
                 world.CreateSystemManaged<EmptyTestSystem>();
                 world.CreateSystemManaged<EmptyTestSystem>();
 
-                using var systemQuery = world.EntityManager.CreateEntityQuery(typeof(SystemInstance));
+                using var systemQuery = world.EntityManager.CreateEntityQuery(
+                    typeof(SystemInstance)
+                );
                 Assert.That(systemQuery.CalculateEntityCount(), Is.EqualTo(2));
 
                 world.DestroyAllSystemsAndLogException(out bool errorsWhileDestroyingSystems);
@@ -243,7 +315,9 @@ namespace Unity.Entities.Tests
                 world.CreateSystem<EmptyTestISystem>();
                 world.CreateSystem<EmptyTestISystem>();
 
-                using var systemQuery = world.EntityManager.CreateEntityQuery(typeof(SystemInstance));
+                using var systemQuery = world.EntityManager.CreateEntityQuery(
+                    typeof(SystemInstance)
+                );
                 Assert.That(systemQuery.CalculateEntityCount(), Is.EqualTo(2));
 
                 world.DestroyAllSystemsAndLogException(out bool errorsWhileDestroyingSystems);
@@ -291,8 +365,12 @@ namespace Unity.Entities.Tests
             var unmanagedWorld = world.Unmanaged;
             world.Dispose();
 
-            Assert.Throws<ObjectDisposedException>(() => world.GetExistingSystemManaged<EmptyTestSystem>());
-            Assert.Throws<ObjectDisposedException>(() => unmanagedWorld.GetExistingUnmanagedSystem<EmptyTestISystem>());
+            Assert.Throws<ObjectDisposedException>(() =>
+                world.GetExistingSystemManaged<EmptyTestSystem>()
+            );
+            Assert.Throws<ObjectDisposedException>(() =>
+                unmanagedWorld.GetExistingUnmanagedSystem<EmptyTestISystem>()
+            );
         }
 
         partial class SystemThrowingInOnCreateIsRemovedSystem : SystemBase
@@ -307,7 +385,10 @@ namespace Unity.Entities.Tests
                 UnityEngine.Debug.LogError("Should never be called");
             }
 
-            protected override void OnUpdate() {UnityEngine.Debug.LogError("Should never be called"); }
+            protected override void OnUpdate()
+            {
+                UnityEngine.Debug.LogError("Should never be called");
+            }
         }
 
         [Test]
@@ -316,7 +397,9 @@ namespace Unity.Entities.Tests
         {
             using (var world = new World("WorldX"))
             {
-                Assert.Throws<AssertionException>(() => world.GetOrCreateSystemManaged<SystemThrowingInOnCreateIsRemovedSystem>());
+                Assert.Throws<AssertionException>(() =>
+                    world.GetOrCreateSystemManaged<SystemThrowingInOnCreateIsRemovedSystem>()
+                );
                 // throwing during OnCreateManager does not add the manager to the behaviour manager list
                 CheckManagedSystemEmpty<SystemThrowingInOnCreateIsRemovedSystem>(world);
             }
@@ -325,18 +408,29 @@ namespace Unity.Entities.Tests
         [BurstCompile]
         partial struct SystemThrowingInOnCreateIsRemovedISystem : ISystem
         {
-            [BurstCompile( CompileSynchronously = true)]
+            [BurstCompile(CompileSynchronously = true)]
             public void OnCreate(ref SystemState state)
             {
                 throw new AssertionException("");
             }
-            public void OnDestroy(ref SystemState state) { UnityEngine.Debug.LogError("Should never be called"); }
-            public void OnUpdate(ref SystemState state) { UnityEngine.Debug.LogError("Should never be called"); }
+
+            public void OnDestroy(ref SystemState state)
+            {
+                UnityEngine.Debug.LogError("Should never be called");
+            }
+
+            public void OnUpdate(ref SystemState state)
+            {
+                UnityEngine.Debug.LogError("Should never be called");
+            }
         }
 
         [Test]
 #if !UNITY_WEBGL
-        [ConditionalIgnore("IgnoreForCoverage", "Fails randonly when ran with code coverage enabled")]
+        [ConditionalIgnore(
+            "IgnoreForCoverage",
+            "Fails randonly when ran with code coverage enabled"
+        )]
 #endif
         [TestRequiresDotsDebugOrCollectionChecks("Test requires system safety checks")]
         public void ISystemThrowingInOnCreateIsRemoved()
@@ -345,9 +439,13 @@ namespace Unity.Entities.Tests
             {
                 // Flexible on what exception is thrown because burst might change it
                 if (IsBurstEnabled())
-                    Assert.Throws<InvalidOperationException>(() => world.CreateSystem<SystemThrowingInOnCreateIsRemovedISystem>());
+                    Assert.Throws<InvalidOperationException>(() =>
+                        world.CreateSystem<SystemThrowingInOnCreateIsRemovedISystem>()
+                    );
                 else
-                    Assert.Throws<AssertionException>(() => world.CreateSystem<SystemThrowingInOnCreateIsRemovedISystem>());
+                    Assert.Throws<AssertionException>(() =>
+                        world.CreateSystem<SystemThrowingInOnCreateIsRemovedISystem>()
+                    );
 
                 // throwing during OnCreateManager does not add the manager to the behaviour manager list
                 CheckUnmanagedSystemEmpty<SystemThrowingInOnCreateIsRemovedISystem>(world);
@@ -358,10 +456,13 @@ namespace Unity.Entities.Tests
         {
             protected override void OnCreate()
             {
-                Assert.AreEqual(this, World.GetOrCreateSystemManaged<SystemIsAccessibleDuringOnCreateSystem>());
+                Assert.AreEqual(
+                    this,
+                    World.GetOrCreateSystemManaged<SystemIsAccessibleDuringOnCreateSystem>()
+                );
             }
 
-            protected override void OnUpdate() {}
+            protected override void OnUpdate() { }
         }
 
         [Test]
@@ -376,18 +477,25 @@ namespace Unity.Entities.Tests
 
         partial struct SystemIsAccessibleDuringOnCreateISystem : ISystem
         {
-            unsafe public void OnCreate(ref SystemState state)
+            public unsafe void OnCreate(ref SystemState state)
             {
-                var systemFind = state.World.GetExistingSystem<SystemIsAccessibleDuringOnCreateISystem>();
-                var systemCreate = state.World.GetOrCreateSystem<SystemIsAccessibleDuringOnCreateISystem>();
-                Assert.IsTrue(UnsafeUtility.AddressOf(ref this) == state.WorldUnmanaged.ResolveSystemState(systemFind)->m_SystemPtr);
-                Assert.IsTrue(UnsafeUtility.AddressOf(ref this) == state.WorldUnmanaged.ResolveSystemState(systemCreate)->m_SystemPtr);
+                var systemFind =
+                    state.World.GetExistingSystem<SystemIsAccessibleDuringOnCreateISystem>();
+                var systemCreate =
+                    state.World.GetOrCreateSystem<SystemIsAccessibleDuringOnCreateISystem>();
+                Assert.IsTrue(
+                    UnsafeUtility.AddressOf(ref this)
+                        == state.WorldUnmanaged.ResolveSystemState(systemFind)->m_SystemPtr
+                );
+                Assert.IsTrue(
+                    UnsafeUtility.AddressOf(ref this)
+                        == state.WorldUnmanaged.ResolveSystemState(systemCreate)->m_SystemPtr
+                );
 
                 Assert.AreEqual(state.SystemHandle, systemFind);
                 Assert.AreEqual(state.SystemHandle, systemCreate);
             }
-
-            }
+        }
 
         [Test]
         public void ISystemIsAccessibleDuringOnCreate()
@@ -485,7 +593,9 @@ namespace Unity.Entities.Tests
                 CheckManagedSystemEmpty<CantDestroyDuringSystemExecution>(world);
 
                 if (world.Unmanaged.ExecutingSystem != SystemHandle.Null)
-                    throw new ArgumentException("Boinboing " + world.Unmanaged.ExecutingSystem.m_WorldSeqNo);
+                    throw new ArgumentException(
+                        "Boinboing " + world.Unmanaged.ExecutingSystem.m_WorldSeqNo
+                    );
                 world.Dispose();
             }
         }
@@ -581,15 +691,24 @@ namespace Unity.Entities.Tests
                 unmanagedTypes.Add(TypeManager.GetSystemTypeIndex(badSystem));
                 unmanagedTypes.Add(TypeManager.GetSystemTypeIndex<EmptyTestISystem>());
 
-                var unmanagedSystemHandles =
-                    world.GetOrCreateSystemsAndLogException(unmanagedTypes, unmanagedTypes.Length, Allocator.Temp);
+                var unmanagedSystemHandles = world.GetOrCreateSystemsAndLogException(
+                    unmanagedTypes,
+                    unmanagedTypes.Length,
+                    Allocator.Temp
+                );
 
                 Assert.AreEqual(2, unmanagedSystemHandles.Length);
                 Assert.AreEqual(SystemHandle.Null, unmanagedSystemHandles[0]);
-                Assert.AreEqual(SystemHandle.Null, world.Unmanaged.GetExistingUnmanagedSystem(badSystem));
+                Assert.AreEqual(
+                    SystemHandle.Null,
+                    world.Unmanaged.GetExistingUnmanagedSystem(badSystem)
+                );
 
                 // Other systems are unaffected
-                Assert.AreEqual(typeof(EmptyTestISystem), world.Unmanaged.GetTypeOfSystem(unmanagedSystemHandles[1]));
+                Assert.AreEqual(
+                    typeof(EmptyTestISystem),
+                    world.Unmanaged.GetTypeOfSystem(unmanagedSystemHandles[1])
+                );
                 unmanagedSystemHandles[1].Update(world.Unmanaged);
 
                 unmanagedSystemHandles.Dispose();

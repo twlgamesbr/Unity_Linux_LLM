@@ -15,6 +15,7 @@ namespace UnityEngine.InputSystem.WebGL
     static class WebGLSupport
     {
         private const string InterfaceName = "WebGL";
+
         public static void Initialize()
         {
             // We only turn gamepads with the "standard" mapping into actual Gamepads.
@@ -22,16 +23,26 @@ namespace UnityEngine.InputSystem.WebGL
                 matches: new InputDeviceMatcher()
                     .WithInterface(InterfaceName)
                     .WithDeviceClass("Gamepad")
-                    .WithCapability("mapping", "standard"));
+                    .WithCapability("mapping", "standard")
+            );
 
             InputSystem.onFindLayoutForDevice += OnFindLayoutForDevice;
         }
 
-        internal static string OnFindLayoutForDevice(ref InputDeviceDescription description,
-            string matchedLayout, InputDeviceExecuteCommandDelegate executeCommandDelegate)
+        internal static string OnFindLayoutForDevice(
+            ref InputDeviceDescription description,
+            string matchedLayout,
+            InputDeviceExecuteCommandDelegate executeCommandDelegate
+        )
         {
             // If the device isn't a WebGL device, we're not interested.
-            if (string.Compare(description.interfaceName, InterfaceName, StringComparison.InvariantCultureIgnoreCase) != 0)
+            if (
+                string.Compare(
+                    description.interfaceName,
+                    InterfaceName,
+                    StringComparison.InvariantCultureIgnoreCase
+                ) != 0
+            )
                 return null;
 
             // If it was matched by the standard mapping, we don't need to fall back to generating a layout.
@@ -40,9 +51,16 @@ namespace UnityEngine.InputSystem.WebGL
 
             var deviceMatcher = InputDeviceMatcher.FromDeviceDescription(description);
 
-            var layout = new WebGLLayoutBuilder {capabilities = WebGLDeviceCapabilities.FromJson(description.capabilities)};
-            InputSystem.RegisterLayoutBuilder(() => layout.Build(),
-                description.product, "Joystick", deviceMatcher);
+            var layout = new WebGLLayoutBuilder
+            {
+                capabilities = WebGLDeviceCapabilities.FromJson(description.capabilities),
+            };
+            InputSystem.RegisterLayoutBuilder(
+                () => layout.Build(),
+                description.product,
+                "Joystick",
+                deviceMatcher
+            );
 
             return description.product;
         }
@@ -58,7 +76,7 @@ namespace UnityEngine.InputSystem.WebGL
                 {
                     type = typeof(WebGLJoystick),
                     extendsLayout = "Joystick",
-                    stateFormat = new FourCC('H', 'T', 'M', 'L')
+                    stateFormat = new FourCC('H', 'T', 'M', 'L'),
                 };
 
                 // Best guess: Treat first two axes as stick
@@ -66,19 +84,22 @@ namespace UnityEngine.InputSystem.WebGL
                 if (capabilities.numAxes >= 2)
                 {
                     var stickName = "Stick";
-                    builder.AddControl(stickName)
+                    builder
+                        .AddControl(stickName)
                         .WithLayout("Stick")
                         .WithByteOffset(offset)
                         .WithSizeInBits(64)
                         .WithFormat(InputStateBlock.FormatFloat);
 
-                    builder.AddControl(stickName + "/x")
+                    builder
+                        .AddControl(stickName + "/x")
                         .WithLayout("Axis")
                         .WithByteOffset(offset)
                         .WithSizeInBits(32)
                         .WithFormat(InputStateBlock.FormatFloat);
 
-                    builder.AddControl(stickName + "/y")
+                    builder
+                        .AddControl(stickName + "/y")
                         .WithLayout("Axis")
                         .WithByteOffset(offset + 4)
                         .WithParameters("invert")
@@ -86,28 +107,32 @@ namespace UnityEngine.InputSystem.WebGL
                         .WithFormat(InputStateBlock.FormatFloat);
 
                     //Need to handle Up/Down/Left/Right
-                    builder.AddControl(stickName + "/up")
+                    builder
+                        .AddControl(stickName + "/up")
                         .WithLayout("Button")
                         .WithParameters("clamp=1,clampMin=-1,clampMax=0,invert")
                         .WithByteOffset(offset + 4)
                         .WithSizeInBits(32)
                         .WithFormat(InputStateBlock.FormatFloat);
 
-                    builder.AddControl(stickName + "/down")
+                    builder
+                        .AddControl(stickName + "/down")
                         .WithLayout("Button")
                         .WithParameters("clamp=1,clampMin=0,clampMax=1")
                         .WithByteOffset(offset + 4)
                         .WithSizeInBits(32)
                         .WithFormat(InputStateBlock.FormatFloat);
 
-                    builder.AddControl(stickName + "/left")
+                    builder
+                        .AddControl(stickName + "/left")
                         .WithLayout("Button")
                         .WithParameters("clamp=1,clampMin=-1,clampMax=0,invert")
                         .WithByteOffset(offset)
                         .WithSizeInBits(32)
                         .WithFormat(InputStateBlock.FormatFloat);
 
-                    builder.AddControl(stickName + "/right")
+                    builder
+                        .AddControl(stickName + "/right")
                         .WithLayout("Button")
                         .WithParameters("clamp=1,clampMin=0,clampMax=1")
                         .WithByteOffset(offset)
@@ -119,7 +144,8 @@ namespace UnityEngine.InputSystem.WebGL
 
                 for (var axis = 2; axis < capabilities.numAxes; axis++)
                 {
-                    builder.AddControl($"Axis {axis - 1}")
+                    builder
+                        .AddControl($"Axis {axis - 1}")
                         .WithLayout("Axis")
                         .WithByteOffset(offset)
                         .WithSizeInBits(32)
@@ -131,7 +157,8 @@ namespace UnityEngine.InputSystem.WebGL
 
                 for (var button = 0; button < capabilities.numButtons; button++)
                 {
-                    builder.AddControl($"Button {button + 1}")
+                    builder
+                        .AddControl($"Button {button + 1}")
                         .WithLayout("Button")
                         .WithByteOffset(offset)
                         .WithSizeInBits(32)
@@ -139,7 +166,8 @@ namespace UnityEngine.InputSystem.WebGL
                     offset += 4;
                 }
 
-                builder.AddControl("Trigger")
+                builder
+                    .AddControl("Trigger")
                     .WithLayout("AnyKey")
                     .WithByteOffset(buttonStartOffset)
                     .IsSynthetic(true)

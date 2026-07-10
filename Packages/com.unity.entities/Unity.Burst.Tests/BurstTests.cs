@@ -1,10 +1,11 @@
 using System;
+using NUnit.Framework;
+using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Jobs;
-using Unity.Burst;
-using NUnit.Framework;
+using UnityEngine.TestTools;
 using static Unity.Burst.CompilerServices.Aliasing;
 
 public class BurstTestFixture
@@ -35,7 +36,6 @@ public class BurstTestFixture
         RwdAllocator.Rewind();
     }
 }
-
 
 [BurstCompile]
 public class BurstTests : BurstTestFixture
@@ -112,24 +112,32 @@ public class BurstTests : BurstTestFixture
     [BurstCompile(CompileSynchronously = true)]
     struct MallocTestJob : IJob
     {
-        unsafe public void Execute()
+        public unsafe void Execute()
         {
-            void* allocated = Memory.Unmanaged.Allocate(UnsafeUtility.SizeOf<int>() * 100, 4, Allocator.Persistent);
+            void* allocated = Memory.Unmanaged.Allocate(
+                UnsafeUtility.SizeOf<int>() * 100,
+                4,
+                Allocator.Persistent
+            );
             Memory.Unmanaged.Free(allocated, Allocator.Persistent);
         }
     }
-    
+
     [BurstCompile(CompileSynchronously = true)]
     struct MallocWithMemLabelTestJob : IJob
     {
         public MemoryLabel label;
-        
+
         public unsafe void Execute()
         {
-            void* allocated = Memory.Unmanaged.Allocate(UnsafeUtility.SizeOf<int>() * 100, 4, label);
+            void* allocated = Memory.Unmanaged.Allocate(
+                UnsafeUtility.SizeOf<int>() * 100,
+                4,
+                label
+            );
             Memory.Unmanaged.Free(allocated, label);
         }
-    }    
+    }
 
     [Test]
     public void MallocTest()
@@ -139,7 +147,7 @@ public class BurstTests : BurstTestFixture
 
         var labelJobData = new MallocWithMemLabelTestJob()
         {
-            label = new MemoryLabel(nameof(BurstTests), "Test Allocations")
+            label = new MemoryLabel(nameof(BurstTests), "Test Allocations"),
         };
         labelJobData.Run();
     }
@@ -148,6 +156,7 @@ public class BurstTests : BurstTestFixture
     struct ListCapacityJob : IJob
     {
         public NativeList<int> list;
+
         public void Execute()
         {
             list.Capacity = 100;
@@ -157,7 +166,10 @@ public class BurstTests : BurstTestFixture
     [Test]
     public void ListCapacityJobTest()
     {
-        var jobData = new ListCapacityJob() { list = new NativeList<int>(RwdAllocator.ToAllocator) };
+        var jobData = new ListCapacityJob()
+        {
+            list = new NativeList<int>(RwdAllocator.ToAllocator),
+        };
         jobData.Run();
 
         Assert.IsTrue(jobData.list.Capacity >= 100);
@@ -184,7 +196,10 @@ public class BurstTests : BurstTestFixture
         ref var allocator = ref allocatorHelper.Allocator;
         allocator.Initialize(128 * 1024, true);
 
-        var jobData = new NativeListAssignValue() { list = new NativeList<int>(allocator.ToAllocator) };
+        var jobData = new NativeListAssignValue()
+        {
+            list = new NativeList<int>(allocator.ToAllocator),
+        };
         jobData.list.Add(5);
         jobData.list.Add(42);
 
@@ -213,7 +228,10 @@ public class BurstTests : BurstTestFixture
     [Test]
     public void AddValue()
     {
-        var jobData = new NativeListAddValue() { list = new NativeList<int>(1, Allocator.Persistent) };
+        var jobData = new NativeListAddValue()
+        {
+            list = new NativeList<int>(1, Allocator.Persistent),
+        };
 
         jobData.list.Add(-1);
 
@@ -340,6 +358,7 @@ public class BurstTests : BurstTestFixture
         public int Payload;
 
         public static implicit operator Data(int i) => new Data { Payload = i };
+
         public static implicit operator int(Data d) => d.Payload;
     }
 
@@ -371,7 +390,9 @@ public class BurstTests : BurstTestFixture
         buffer.Add(13);
         buffer.Add(-4);
 
-        var d = BurstCompiler.CompileFunctionPointer<MinInDynamicBufferDelegate>(MinInDynamicBuffer);
+        var d = BurstCompiler.CompileFunctionPointer<MinInDynamicBufferDelegate>(
+            MinInDynamicBuffer
+        );
 
         Assert.AreEqual(-4, d.Invoke(in buffer));
     }
@@ -393,14 +414,15 @@ public class BurstTests : BurstTestFixture
 
 #if UNITY_EDITOR
     [BurstCompile(CompileSynchronously = true)]
-    unsafe public static void DoThing(void* val)
+    public static unsafe void DoThing(void* val)
     {
         throw new ArgumentException();
     }
-    unsafe public delegate void FunPtr(void* val);
+
+    public unsafe delegate void FunPtr(void* val);
 
     [Test]
-    unsafe public void FunctionPointerExceptions()
+    public unsafe void FunctionPointerExceptions()
     {
         var func = BurstCompiler.CompileFunctionPointer<FunPtr>(DoThing).Invoke;
 
@@ -418,8 +440,10 @@ public class BurstTests : BurstTestFixture
     }
 
     [Test]
-    [Ignore("This currently fails in Unity 2020.3. Burst team claims that this is fixed in 2022.1. Once it is fixed we can further reduce the amount of BurstCompiler.CompileFunctionPointer code we use")]
-    unsafe public void DirectCallExceptions()
+    [Ignore(
+        "This currently fails in Unity 2020.3. Burst team claims that this is fixed in 2022.1. Once it is fixed we can further reduce the amount of BurstCompiler.CompileFunctionPointer code we use"
+    )]
+    public unsafe void DirectCallExceptions()
     {
         bool didCatch = false;
         try

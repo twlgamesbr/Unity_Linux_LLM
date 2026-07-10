@@ -18,7 +18,6 @@
   <Project Path="Unity.Collections.Tests.csproj" />
   <Project Path="Unity.PerformanceTesting.Editor.csproj" />
   <Project Path="EditorAttributes.csproj" />
-  <Project Path="AttributesSamples.csproj" />
   <Project Path="Unity.Netcode.Runtime.Tests.csproj" />
   <Project Path="Unity.Burst.csproj" />
   <Project Path="Unity.VisualScripting.Flow.Editor.csproj" />

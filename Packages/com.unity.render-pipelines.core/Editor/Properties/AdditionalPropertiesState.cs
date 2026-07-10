@@ -8,7 +8,7 @@ namespace UnityEditor.Rendering
     public abstract class AdditionalPropertiesStateBase<TState>
         where TState : struct, IConvertible
     {
-        HashSet<Editor> m_Editors = new ();
+        HashSet<Editor> m_Editors = new();
 
         /// <summary>Get or set the state given the mask.</summary>
         /// <param name="mask">The filtering mask</param>
@@ -47,9 +47,8 @@ namespace UnityEditor.Rendering
         /// Resets the animation associated with the given mask to a default state with the animated value set to 1.0 and the target value set to 0.0.
         /// </summary>
         /// <param name="mask">The state mask used to retrieve the associated animation.</param>
-        protected internal void ResetAnimation(TState mask)
-        {
-        }
+        protected internal void ResetAnimation(TState mask) { }
+
         /// <summary>
         /// Register an editor for this set of additional properties.
         /// </summary>
@@ -80,12 +79,15 @@ namespace UnityEditor.Rendering
         /// </summary>
         protected internal EditorPrefBoolFlags<TState> m_State;
 
-
         /// <summary>Constructor will create the key to store in the EditorPref the state given generic type passed.</summary>
         /// <param name="defaultValue">If key did not exist, it will be created with this value for initialization.</param>
         /// <param name="prefix">[Optional] Prefix scope of the key (Default is CoreRP)</param>
         /// <param name="stateId">[Optional] Postfix used to differentiate between different keys (Default is UI_AP_State)</param>
-        public AdditionalPropertiesState(TState defaultValue, string prefix = "CoreRP", string stateId = "UI_AP_State")
+        public AdditionalPropertiesState(
+            TState defaultValue,
+            string prefix = "CoreRP",
+            string stateId = "UI_AP_State"
+        )
         {
             string key = $"{prefix}:{typeof(TTarget).Name}:{typeof(TState).Name}:{stateId}";
             m_State = new EditorPrefBoolFlags<TState>(key);
@@ -145,7 +147,10 @@ namespace UnityEditor.Rendering
         /// <param name="index">The index of the flag to be removed.</param>
         public void RemoveFlagAtIndex(int index)
         {
-            m_State.rawValue = ExpandedStateList<TTarget>.RightShiftOnceFromIndexToMSB(index, m_State.rawValue);
+            m_State.rawValue = ExpandedStateList<TTarget>.RightShiftOnceFromIndexToMSB(
+                index,
+                m_State.rawValue
+            );
         }
     }
 }

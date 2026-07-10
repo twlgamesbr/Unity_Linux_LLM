@@ -34,7 +34,8 @@ namespace Unity.Networking.Transport
         internal ConnectionList CreateConnectionList() => tcp.CreateConnectionList();
 
         /// <inheritdoc/>
-        public int Initialize(ref NetworkSettings settings, ref int packetPadding) => tcp.Initialize(ref settings, ref packetPadding);
+        public int Initialize(ref NetworkSettings settings, ref int packetPadding) =>
+            tcp.Initialize(ref settings, ref packetPadding);
 
         /// <inheritdoc/>
         public int Bind(NetworkEndpoint endpoint) => tcp.Bind(endpoint);
@@ -43,10 +44,12 @@ namespace Unity.Networking.Transport
         public int Listen() => tcp.Listen();
 
         /// <inheritdoc/>
-        public JobHandle ScheduleReceive(ref ReceiveJobArguments arguments, JobHandle dep) => tcp.ScheduleReceive(ref arguments, dep);
+        public JobHandle ScheduleReceive(ref ReceiveJobArguments arguments, JobHandle dep) =>
+            tcp.ScheduleReceive(ref arguments, dep);
 
         /// <inheritdoc/>
-        public JobHandle ScheduleSend(ref SendJobArguments arguments, JobHandle dep) => tcp.ScheduleSend(ref arguments, dep);
+        public JobHandle ScheduleSend(ref SendJobArguments arguments, JobHandle dep) =>
+            tcp.ScheduleSend(ref arguments, dep);
     }
 }
 
@@ -54,7 +57,6 @@ namespace Unity.Networking.Transport
 
 using System;
 using System.Runtime.InteropServices;
-
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Networking.Transport.Relay;
@@ -153,7 +155,10 @@ namespace Unity.Networking.Transport
                     }
                 }
 
-                return hostname.StartsWith("127.") || hostname.StartsWith("localhost") || hostname.StartsWith("[::1]")
+                return
+                    hostname.StartsWith("127.")
+                    || hostname.StartsWith("localhost")
+                    || hostname.StartsWith("[::1]")
                     ? NetworkEndpoint.LoopbackIpv4
                     : NetworkEndpoint.AnyIpv4;
             }
@@ -168,7 +173,10 @@ namespace Unity.Networking.Transport
             packetPadding += 14;
 
             var secureHostname = new FixedString512Bytes();
-            if (settings.TryGet<RelayNetworkParameter>(out var relayParams) && relayParams.ServerData.IsSecure != 0)
+            if (
+                settings.TryGet<RelayNetworkParameter>(out var relayParams)
+                && relayParams.ServerData.IsSecure != 0
+            )
                 secureHostname.CopyFrom(relayParams.ServerData.HostString);
 
             // Shouldn't be required for normal use cases but is provided as an out in case the user
@@ -179,13 +187,18 @@ namespace Unity.Networking.Transport
 
             var state = new InternalData
             {
-                ConnectTimeoutMS = networkConfiguration.connectTimeoutMS * networkConfiguration.maxConnectAttempts,
+                ConnectTimeoutMS =
+                    networkConfiguration.connectTimeoutMS * networkConfiguration.maxConnectAttempts,
                 SecureHostname = secureHostname,
                 Path = settings.GetWebSocketParameters().Path,
             };
             m_InternalData = new NativeReference<InternalData>(state, Allocator.Persistent);
 
-            m_ConnectionMap = new ConnectionDataMap<ConnectionData>(1, default, Allocator.Persistent);
+            m_ConnectionMap = new ConnectionDataMap<ConnectionData>(
+                1,
+                default,
+                Allocator.Persistent
+            );
             return 0;
         }
 
@@ -268,7 +281,9 @@ namespace Unity.Networking.Transport
                             var url = GetServerURL(connectionId);
 
                             // For testing purposes.
-                            Debug.Log(FixedString.Format("Unity Transport: Connecting to {0}.", url));
+                            Debug.Log(
+                                FixedString.Format("Unity Transport: Connecting to {0}.", url)
+                            );
 
                             WebSocket.Create(socket, (IntPtr)url.GetUnsafePtr(), url.Length);
 
@@ -284,15 +299,24 @@ namespace Unity.Networking.Transport
                         }
                         else if (status < 0)
                         {
-                            ConnectionList.StartDisconnecting(ref connectionId, Error.DisconnectReason.MaxConnectionAttempts);
+                            ConnectionList.StartDisconnecting(
+                                ref connectionId,
+                                Error.DisconnectReason.MaxConnectionAttempts
+                            );
                             Abort(ref connectionId, ref connectionData);
                             continue;
                         }
 
                         // Disconnect if we've reached the maximum connection timeout.
-                        if (Time - connectionData.ConnectStartTime >= InternalData.Value.ConnectTimeoutMS)
+                        if (
+                            Time - connectionData.ConnectStartTime
+                            >= InternalData.Value.ConnectTimeoutMS
+                        )
                         {
-                            ConnectionList.StartDisconnecting(ref connectionId, Error.DisconnectReason.MaxConnectionAttempts);
+                            ConnectionList.StartDisconnecting(
+                                ref connectionId,
+                                Error.DisconnectReason.MaxConnectionAttempts
+                            );
                             Abort(ref connectionId, ref connectionData);
                             continue;
                         }
@@ -319,7 +343,12 @@ namespace Unity.Networking.Transport
                         if (!ReceiveQueue.EnqueuePacket(out var packetProcessor))
                             break;
 
-                        nbytes = WebSocket.Recv(connectionData.Socket, (IntPtr)(byte*)packetProcessor.GetUnsafePayloadPtr() + packetProcessor.Offset, packetProcessor.BytesAvailableAtEnd);
+                        nbytes = WebSocket.Recv(
+                            connectionData.Socket,
+                            (IntPtr)(byte*)packetProcessor.GetUnsafePayloadPtr()
+                                + packetProcessor.Offset,
+                            packetProcessor.BytesAvailableAtEnd
+                        );
                         if (nbytes > 0)
                         {
                             packetProcessor.ConnectionRef = connectionId;
@@ -336,7 +365,10 @@ namespace Unity.Networking.Transport
                     if (nbytes < 0)
                     {
                         // Disconnect
-                        ConnectionList.StartDisconnecting(ref connectionId, Error.DisconnectReason.ClosedByRemote);
+                        ConnectionList.StartDisconnecting(
+                            ref connectionId,
+                            Error.DisconnectReason.ClosedByRemote
+                        );
                         Abort(ref connectionId, ref connectionData);
                         continue;
                     }
@@ -421,11 +453,19 @@ namespace Unity.Networking.Transport
 
                     var connectionData = ConnectionMap[connectionId];
 
-                    var nbytes = WebSocket.Send(connectionData.Socket, (IntPtr)(byte*)packetProcessor.GetUnsafePayloadPtr() + packetProcessor.Offset, packetProcessor.Length);
+                    var nbytes = WebSocket.Send(
+                        connectionData.Socket,
+                        (IntPtr)(byte*)packetProcessor.GetUnsafePayloadPtr()
+                            + packetProcessor.Offset,
+                        packetProcessor.Length
+                    );
                     if (nbytes != packetProcessor.Length)
                     {
                         // Disconnect
-                        ConnectionList.StartDisconnecting(ref connectionId, Error.DisconnectReason.ClosedByRemote);
+                        ConnectionList.StartDisconnecting(
+                            ref connectionId,
+                            Error.DisconnectReason.ClosedByRemote
+                        );
                         Abort(ref connectionId, ref connectionData);
                         continue;
                     }

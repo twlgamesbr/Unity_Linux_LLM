@@ -2,8 +2,9 @@ using System;
 using NUnit.Framework;
 using Unity.Burst;
 using Unity.Collections.LowLevel.Unsafe;
-using Unity.Jobs;
 using Unity.Entities;
+using Unity.Jobs;
+using UnityEngine.TestTools;
 
 [BurstCompile]
 public unsafe class BurstDelegateTest
@@ -58,7 +59,7 @@ public unsafe class BurstDelegateTest
         public int* Blah;
         public FunctionPointer<DoThingDelegate> FunctionPointer;
 
-        unsafe public void Execute()
+        public unsafe void Execute()
         {
             FunctionPointer.Invoke(ref *Blah);
         }
@@ -70,7 +71,9 @@ public unsafe class BurstDelegateTest
 #endif
     public void CompileMissingBurstCompile()
     {
-        Assert.Throws<InvalidOperationException>(() => BurstCompiler.CompileFunctionPointer<DoThingDelegate>(DoThingMissingBurstCompile));
+        Assert.Throws<InvalidOperationException>(() =>
+            BurstCompiler.CompileFunctionPointer<DoThingDelegate>(DoThingMissingBurstCompile)
+        );
     }
 
     [BurstCompile]
@@ -92,13 +95,13 @@ public unsafe class BurstDelegateTest
 
     [BurstCompile(CompileSynchronously = true)]
     private static void CallJob(ref DivideByZeroJob job)
-	{
+    {
         job.Run();
 
         // Even though job.Run() throws an exception in its body, the job system catches
         // that exception and handles it. So this statement is hit.
         job.I++;
-	}
+    }
 
     [Test, Ignore("DOTS-2992")]
     public void CallJobFromFunctionPointer()

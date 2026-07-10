@@ -58,11 +58,16 @@ namespace Unity.Networking.Transport
 
         internal unsafe int AppendToStream(ref PacketProcessor packetProcessor)
         {
-            m_DataStream.ResizeUninitializedTillPowerOf2(m_DataStream.Length + packetProcessor.Length);
+            m_DataStream.ResizeUninitializedTillPowerOf2(
+                m_DataStream.Length + packetProcessor.Length
+            );
             var offset = m_DataStream.Length;
 
             m_DataStream.Length = offset + packetProcessor.Length;
-            packetProcessor.CopyPayload((byte*)m_DataStream.GetUnsafePtr() + offset, packetProcessor.Length);
+            packetProcessor.CopyPayload(
+                (byte*)m_DataStream.GetUnsafePtr() + offset,
+                packetProcessor.Length
+            );
 
             return offset;
         }
@@ -80,18 +85,26 @@ namespace Unity.Networking.Transport
         }
 
         // Interface for receiving data from a pipeline
-        internal unsafe void PushDataEvent(NetworkConnection con, int pipelineId, byte* dataPtr, int dataLength, ref NetworkEventQueue eventQueue)
+        internal unsafe void PushDataEvent(
+            NetworkConnection con,
+            int pipelineId,
+            byte* dataPtr,
+            int dataLength,
+            ref NetworkEventQueue eventQueue
+        )
         {
             var sliceOffset = AppendToStream(dataPtr, dataLength);
 
-            eventQueue.PushEvent(new NetworkEvent
-            {
-                pipelineId = (short)pipelineId,
-                connectionId = con.InternalId,
-                type = NetworkEvent.Type.Data,
-                offset = sliceOffset,
-                size = dataLength
-            });
+            eventQueue.PushEvent(
+                new NetworkEvent
+                {
+                    pipelineId = (short)pipelineId,
+                    connectionId = con.InternalId,
+                    type = NetworkEvent.Type.Data,
+                    offset = sliceOffset,
+                    size = dataLength,
+                }
+            );
         }
     }
 }

@@ -5,6 +5,7 @@ using Unity.Burst.Intrinsics;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Entities.Tests;
+using UnityEngine.TestTools;
 
 #if UNITY_EDITOR
 /// <summary>
@@ -13,43 +14,56 @@ using Unity.Entities.Tests;
 /// </summary>
 partial class SystemSafetyTests_SystemStateConsistency : ECSTestsFixture
 {
-   public unsafe static void CheckCorrectStateInSystem(ref SystemState systemState, bool inForEach)
+    public static unsafe void CheckCorrectStateInSystem(ref SystemState systemState, bool inForEach)
     {
         if (inForEach != systemState.EntityManager.Debug.IsInForEachDisallowStructuralChange)
         {
             if (inForEach)
-                throw new ArgumentException("We are in a Entities.ForEach but IsInForEachDisallowStructuralChange is false");
+                throw new ArgumentException(
+                    "We are in a Entities.ForEach but IsInForEachDisallowStructuralChange is false"
+                );
             else
-                throw new ArgumentException("We are not in a Entities.ForEach but IsInForEachDisallowStructuralChange is true");
+                throw new ArgumentException(
+                    "We are not in a Entities.ForEach but IsInForEachDisallowStructuralChange is true"
+                );
         }
 
         if (systemState.WorldUnmanaged.ExecutingSystem != systemState.m_Handle)
-            throw new ArgumentException("ExecutingSystem is not set up correctly during system execution");
+            throw new ArgumentException(
+                "ExecutingSystem is not set up correctly during system execution"
+            );
 
         //NOTE: can't use SystemState.GetCurrentSystemFromJobDebugger here directly since that accesses managed data at the moment.
         if (SystemState.GetCurrentSystemIDFromJobDebugger() != systemState.m_SystemID)
             throw new ArgumentException("GetCurrentSystemFromJobDebugger is wrong");
     }
 
-    public unsafe static void CheckCorrectStateOutsideSystem(WorldUnmanaged world)
+    public static unsafe void CheckCorrectStateOutsideSystem(WorldUnmanaged world)
     {
         if (world.EntityManager.Debug.IsInForEachDisallowStructuralChange)
-            throw new ArgumentException("We are not in a system but IsInForEachDisallowStructuralChange is true");
+            throw new ArgumentException(
+                "We are not in a system but IsInForEachDisallowStructuralChange is true"
+            );
 
         if (world.ExecutingSystem != default)
             throw new ArgumentException("ExecutingSystem was not restored back to default");
 
         if (SystemState.GetCurrentSystemIDFromJobDebugger() != 0)
-            throw new ArgumentException($"We are not in a system but GetCurrentSystemFromJobDebugger is not null {SystemState.GetCurrentSystemIDFromJobDebugger()}");
+            throw new ArgumentException(
+                $"We are not in a system but GetCurrentSystemFromJobDebugger is not null {SystemState.GetCurrentSystemIDFromJobDebugger()}"
+            );
     }
 
-    class ExpectedException : System.Exception
-    {
-    }
+    class ExpectedException : System.Exception { }
 
     struct ThrowExceptionJob : IJobChunk
     {
-        public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+        public void Execute(
+            in ArchetypeChunk chunk,
+            int unfilteredChunkIndex,
+            bool useEnabledMask,
+            in v128 chunkEnabledMask
+        )
         {
             throw new ExpectedException();
         }
@@ -70,8 +84,11 @@ partial class SystemSafetyTests_SystemStateConsistency : ECSTestsFixture
         {
             CheckCorrectStateInSystem(ref state, false);
 
-            var job = new ThrowExceptionJob {};
-            Unity.Entities.Internal.InternalCompilerInterface.JobChunkInterface.RunByRefWithoutJobs(ref job, _Query);
+            var job = new ThrowExceptionJob { };
+            Unity.Entities.Internal.InternalCompilerInterface.JobChunkInterface.RunByRefWithoutJobs(
+                ref job,
+                _Query
+            );
         }
     }
 
@@ -79,17 +96,20 @@ partial class SystemSafetyTests_SystemStateConsistency : ECSTestsFixture
     {
         EntityQuery _Query;
 
-        override protected void OnCreate()
+        protected override void OnCreate()
         {
             _Query = GetEntityQuery(typeof(EcsTestData));
         }
 
-        unsafe protected override void OnUpdate()
+        protected override unsafe void OnUpdate()
         {
             CheckCorrectStateInSystem(ref *m_StatePtr, false);
 
-            var job = new ThrowExceptionJob {};
-            Unity.Entities.Internal.InternalCompilerInterface.JobChunkInterface.RunByRefWithoutJobs(ref job, _Query);
+            var job = new ThrowExceptionJob { };
+            Unity.Entities.Internal.InternalCompilerInterface.JobChunkInterface.RunByRefWithoutJobs(
+                ref job,
+                _Query
+            );
         }
     }
 
@@ -128,14 +148,17 @@ partial class SystemSafetyTests_SystemStateConsistency : ECSTestsFixture
         m_Manager.CreateEntity(typeof(EcsTestData));
         var throwSystem = World.CreateSystemManaged<ThrowDuringIJobChunkSystemBase>();
 
-        Assert.Throws<ExpectedException>(() => { throwSystem.Update(); });
+        Assert.Throws<ExpectedException>(() =>
+        {
+            throwSystem.Update();
+        });
 
         CheckCorrectStateOutsideSystem(World.Unmanaged);
     }
 
     partial class ExecuteOtherSystem : SystemBase
     {
-        unsafe protected override void OnUpdate()
+        protected override unsafe void OnUpdate()
         {
             CheckCorrectStateInSystem(ref *m_StatePtr, false);
 
@@ -174,7 +197,7 @@ partial class SystemSafetyTests_SystemStateConsistency : ECSTestsFixture
     {
         m_Manager.CreateEntity(typeof(EcsTestData));
 
-        var system= World.CreateSystemManaged<ExecuteOtherSystem>();
+        var system = World.CreateSystemManaged<ExecuteOtherSystem>();
         system.Update();
         CheckCorrectStateOutsideSystem(World.Unmanaged);
     }
@@ -191,7 +214,12 @@ partial class SystemSafetyTests_SystemStateConsistency : ECSTestsFixture
             public EntityQuery Query;
             public EntityManager.EntityManagerDebug Debug;
 
-            public void Execute(in ArchetypeChunk chunk, int unfilteredChunkIndex, bool useEnabledMask, in v128 chunkEnabledMask)
+            public void Execute(
+                in ArchetypeChunk chunk,
+                int unfilteredChunkIndex,
+                bool useEnabledMask,
+                in v128 chunkEnabledMask
+            )
             {
                 Assert.IsFalse(useEnabledMask);
                 if (!Debug.IsInForEachDisallowStructuralChange)
@@ -203,7 +231,10 @@ partial class SystemSafetyTests_SystemStateConsistency : ECSTestsFixture
 
                 var job = this;
                 job.depth++;
-                Unity.Entities.Internal.InternalCompilerInterface.JobChunkInterface.RunByRefWithoutJobs(ref job, Query);
+                Unity.Entities.Internal.InternalCompilerInterface.JobChunkInterface.RunByRefWithoutJobs(
+                    ref job,
+                    Query
+                );
             }
         }
 
@@ -217,10 +248,21 @@ partial class SystemSafetyTests_SystemStateConsistency : ECSTestsFixture
         {
             CheckCorrectStateInSystem(ref state, false);
 
-            using var value = new NativeReference<int>(state.WorldUnmanaged.UpdateAllocator.ToAllocator);
+            using var value = new NativeReference<int>(
+                state.WorldUnmanaged.UpdateAllocator.ToAllocator
+            );
 
-            var job = new RecursiveForEachJob { depth = 0, Sum = value, Debug = state.EntityManager.Debug, Query = _Query};
-            Unity.Entities.Internal.InternalCompilerInterface.JobChunkInterface.RunByRefWithoutJobs(ref job, _Query);
+            var job = new RecursiveForEachJob
+            {
+                depth = 0,
+                Sum = value,
+                Debug = state.EntityManager.Debug,
+                Query = _Query,
+            };
+            Unity.Entities.Internal.InternalCompilerInterface.JobChunkInterface.RunByRefWithoutJobs(
+                ref job,
+                _Query
+            );
 
             CheckCorrectStateInSystem(ref state, false);
 
@@ -242,16 +284,17 @@ partial class SystemSafetyTests_SystemStateConsistency : ECSTestsFixture
 
     partial class CatchInSystemIsRestoredAfterSystem : SystemBase
     {
-        unsafe override protected void OnUpdate()
+        protected override unsafe void OnUpdate()
         {
             try
             {
-                var job = new ThrowExceptionJob {};
-                Unity.Entities.Internal.InternalCompilerInterface.JobChunkInterface.RunByRefWithoutJobs(ref job, GetEntityQuery(ComponentType.ReadOnly<EcsTestData>()));
+                var job = new ThrowExceptionJob { };
+                Unity.Entities.Internal.InternalCompilerInterface.JobChunkInterface.RunByRefWithoutJobs(
+                    ref job,
+                    GetEntityQuery(ComponentType.ReadOnly<EcsTestData>())
+                );
             }
-            catch
-            {
-            }
+            catch { }
 
             // NOTE:
             // IsInForEachDisallowStructuralChange is expected to be incorrect since we threw an exception inside the system until the system completes.
@@ -280,21 +323,24 @@ partial class SystemSafetyTests_SystemStateConsistency : ECSTestsFixture
 
     partial struct CatchInSystemIsRestoredAfterISystem : ISystem
     {
-        unsafe public void OnUpdate(ref SystemState systemState)
+        public unsafe void OnUpdate(ref SystemState systemState)
         {
             try
             {
-                var job = new ThrowExceptionJob {};
-                Unity.Entities.Internal.InternalCompilerInterface.JobChunkInterface.RunByRefWithoutJobs(ref job, systemState.GetEntityQuery(ComponentType.ReadOnly<EcsTestData>()));
+                var job = new ThrowExceptionJob { };
+                Unity.Entities.Internal.InternalCompilerInterface.JobChunkInterface.RunByRefWithoutJobs(
+                    ref job,
+                    systemState.GetEntityQuery(ComponentType.ReadOnly<EcsTestData>())
+                );
             }
-            catch
-            {
-            }
+            catch { }
 
             if (systemState.WorldUnmanaged.ExecutingSystem != systemState.SystemHandle)
                 throw new ArgumentException("ExecutingSystem is not correct");
             if (!systemState.EntityManager.Debug.IsInForEachDisallowStructuralChange)
-                throw new ArgumentException("IsInForEachDisallowStructuralChange is expected to be incorrect since we threw an exception inside the system until the system completes. At which point it will be properly restored. NOTE: This isn't strictly required but it is the current behaviour since we want to avoid try/catch RunWithoutJobs");
+                throw new ArgumentException(
+                    "IsInForEachDisallowStructuralChange is expected to be incorrect since we threw an exception inside the system until the system completes. At which point it will be properly restored. NOTE: This isn't strictly required but it is the current behaviour since we want to avoid try/catch RunWithoutJobs"
+                );
         }
     }
 
@@ -311,7 +357,7 @@ partial class SystemSafetyTests_SystemStateConsistency : ECSTestsFixture
 
     partial class CreateAndUpdateNewWorldInSystem : SystemBase
     {
-        unsafe override protected void OnUpdate()
+        protected override unsafe void OnUpdate()
         {
             CheckCorrectStateInSystem(ref *m_StatePtr, false);
             var newWorld = new World("test");
