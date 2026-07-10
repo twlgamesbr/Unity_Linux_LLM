@@ -173,7 +173,11 @@ namespace NPCSystem
 
                 NPCDialogueActionPlan actionPlan =
                     _actionPlanner != null
-                        ? _actionPlanner.Plan(playerMessage, respondingProfile)
+                        ? _actionPlanner.Plan(
+                            playerMessage,
+                            respondingProfile,
+                            trustScore: ResolveTrustScore(slug)
+                        )
                         : NPCDialogueActionPlan.None("No action planner available.");
 
                 string actionHint = NPCDialogueActionPlanner.BuildPromptHint(actionPlan);
@@ -568,6 +572,21 @@ namespace NPCSystem
             }
 
             return AuthNetworkBridge.ActivePlayerName;
+        }
+
+        /// <summary>
+        /// Resolve the current trust score for a given NPC slug from the context
+        /// service, if available. Falls back to 50 (neutral) if no context exists.
+        /// </summary>
+        int ResolveTrustScore(string npcSlug)
+        {
+            if (_contextService != null && !string.IsNullOrWhiteSpace(npcSlug))
+            {
+                var ctx = _contextService.GetCachedContext(npcSlug);
+                if (ctx.HasValue)
+                    return ctx.Value.TrustScore;
+            }
+            return 50;
         }
 
         // ─────────────────────────────── Static Helpers ────

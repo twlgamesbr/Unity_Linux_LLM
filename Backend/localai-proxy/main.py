@@ -15,8 +15,11 @@ import logging
 
 import fastapi
 import httpx
-from ddtrace import tracer, pin
-from ddtrace.contrib.asgi import TraceMiddleware
+from ddtrace import tracer
+try:
+    from ddtrace.contrib.asgi import TraceMiddleware
+except ImportError:
+    TraceMiddleware = None
 from pydantic import BaseModel
 
 logger = logging.getLogger("localai-proxy")

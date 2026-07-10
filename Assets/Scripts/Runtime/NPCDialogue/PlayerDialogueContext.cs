@@ -136,6 +136,47 @@ namespace NPCSystem
                         "You trust this player deeply and are inclined to share "
                         + "secrets or offer help freely."
                     );
+
+                // Mood-specific behavior guidance
+                switch (_currentMood.ToLowerInvariant())
+                {
+                    case "hostile":
+                        lines.Add(
+                            "Your mood toward this player is hostile. "
+                            + "Be curt, suspicious, and confrontational. "
+                            + "Offer no help unless forced. "
+                            + "Consider ending the conversation abruptly."
+                        );
+                        break;
+                    case "guarded":
+                        lines.Add(
+                            "Your mood toward this player is guarded. "
+                            + "Answer questions but volunteer nothing extra. "
+                            + "Stay formal and observe carefully."
+                        );
+                        break;
+                    case "neutral":
+                        lines.Add(
+                            "Your mood toward this player is neutral. "
+                            + "Be polite but keep a professional distance."
+                        );
+                        break;
+                    case "friendly":
+                        lines.Add(
+                            "Your mood toward this player is friendly. "
+                            + "Smile, use warm language, offer small favors. "
+                            + "Be approachable and conversational."
+                        );
+                        break;
+                    case "trusting":
+                        lines.Add(
+                            "Your mood toward this player is trusting. "
+                            + "Speak openly, share information freely, "
+                            + "and offer genuine assistance. "
+                            + "Treat them as an ally."
+                        );
+                        break;
+                }
             }
 
             // Investigation state

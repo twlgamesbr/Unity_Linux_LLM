@@ -125,6 +125,24 @@ namespace NPCSystem
         int _remoteEmbeddingPort = 8080;
 
         [FoldoutGroup(
+            "Edge Functions",
+            true,
+            nameof(_edgeFunctionHost),
+            nameof(_edgeFunctionPort)
+        )]
+        [HelpBox("URL for the Supabase Edge Runtime that orchestrates memory and dialogue processing.", MessageMode.Log, drawAbove: true)]
+        [SerializeField]
+        EditorAttributes.Void edgeFunctionsGroup;
+
+        [HideProperty]
+        [SerializeField]
+        string _edgeFunctionHost = "localhost";
+
+        [HideProperty, Suffix("port")]
+        [SerializeField]
+        int _edgeFunctionPort = 8098;
+
+        [FoldoutGroup(
             "Dialogue Settings",
             true,
             nameof(_profiles),
@@ -308,6 +326,8 @@ namespace NPCSystem
         public bool IsInitialized =>
             _initializationTask != null && _initializationTask.IsCompletedSuccessfully;
         public bool IsRagAvailable => _retrievalService != null && _retrievalService.IsRagAvailable;
+        public string EdgeFunctionUrl =>
+            $"http://{_edgeFunctionHost}:{_edgeFunctionPort}";
 
         void Start()
         {

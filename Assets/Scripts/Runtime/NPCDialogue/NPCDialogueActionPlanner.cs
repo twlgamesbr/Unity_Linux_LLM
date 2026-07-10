@@ -37,6 +37,15 @@ namespace NPCSystem
 
     public class NPCDialogueActionPlanner : MonoBehaviour
     {
+        public enum TrustThreshold
+        {
+            Hostile = 0,      // 0-19
+            Guarded = 20,     // 20-39
+            Cautious = 40,    // 40-59
+            Cooperative = 60, // 60-79
+            Trusting = 80,    // 80-100
+        }
+
         static readonly string[] HintKeywords =
         {
             "hint",
@@ -59,12 +68,32 @@ namespace NPCSystem
             "alibi",
         };
 
-        public NPCDialogueActionPlan Plan(string playerMessage, NPCProfile profile)
+        public NPCDialogueActionPlan Plan(string playerMessage, NPCProfile profile, int trustScore = 50)
         {
             if (string.IsNullOrWhiteSpace(playerMessage))
                 return NPCDialogueActionPlan.None("Player message was empty.");
 
             string lower = playerMessage.Trim().ToLowerInvariant();
+            TrustThreshold trust = ClassifyTrust(trustScore);
+
+            // ── Actions restricted by trust level ────────────
+            // Hostile NPCs don't offer anything useful
+            if (trust == TrustThreshold.Hostile)
+            {
+                if (Matches(lower, HelpKeywords) || Matches(lower, HintKeywords))
+                    return NPCDialogueActionPlan.None(
+                        "NPC is hostile — will not help the player."
+                    );
+            }
+
+            // Guarded NPCs don't share hints or evidence
+            if (trust <= TrustThreshold.Guarded)
+            {
+                if (Matches(lower, HintKeywords) || Matches(lower, EvidenceKeywords))
+                    return NPCDialogueActionPlan.None(
+                        "NPC is guarded — will not share hints or evidence freely."
+                    );
+            }
             if (Matches(lower, NotesKeywords))
             {
                 return BuildPlan(
@@ -163,6 +192,18 @@ namespace NPCSystem
         static bool Matches(string text, IEnumerable<string> keywords)
         {
             return keywords.Any(keyword => text.Contains(keyword));
+        }
+
+        /// <summary>
+        /// Classify a numeric trust score (0-100) into a threshold level.
+        /// </summary>
+        public static TrustThreshold ClassifyTrust(int trustScore)
+        {
+            if (trustScore >= 80) return TrustThreshold.Trusting;
+            if (trustScore >= 60) return TrustThreshold.Cooperative;
+            if (trustScore >= 40) return TrustThreshold.Cautious;
+            if (trustScore >= 20) return TrustThreshold.Guarded;
+            return TrustThreshold.Hostile;
         }
     }
 }

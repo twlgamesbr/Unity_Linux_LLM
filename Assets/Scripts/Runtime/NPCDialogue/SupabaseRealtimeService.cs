@@ -8,6 +8,7 @@ using Postgrest.Exceptions;
 using Supabase.Interfaces;
 using Supabase.Realtime;
 using Supabase.Realtime.Interfaces;
+using Supabase.Realtime.Models;
 using Supabase.Realtime.PostgresChanges;
 using UnityEngine;
 
@@ -31,7 +32,13 @@ namespace NPCSystem
         [SerializeField, HideProperty]
         PlayerAuthService _authService;
 
-        [FoldoutGroup("Behaviour", true, nameof(_enablePollingFallback), nameof(_pollingIntervalSeconds))]
+        [FoldoutGroup(
+            "Behaviour",
+            true,
+            nameof(_enablePollingFallback),
+            nameof(_pollingIntervalSeconds),
+            nameof(_autoSubscribeRooms)
+        )]
         [SerializeField]
         EditorAttributes.Void behaviourGroup;
 
@@ -45,6 +52,12 @@ namespace NPCSystem
             "Polling interval when WebSocket is unavailable (WebGL only)."
         )]
         float _pollingIntervalSeconds = 3f;
+
+        [SerializeField, HideProperty, Tooltip(
+            "When true, automatically subscribes to room dialogue channels "
+            + "when the player joins a multiplayer room (via room_memberships)."
+        )]
+        bool _autoSubscribeRooms = true;
 
         [FoldoutGroup("Debug", true, nameof(_lastConnectionState), nameof(_lastError))]
         [SerializeField]
@@ -80,11 +93,18 @@ namespace NPCSystem
         long _highestSeenTurnId;
         IRealtimeClient<RealtimeSocket, RealtimeChannel> _realtime;
         RealtimeChannel _turnChannel;
+        RealtimeChannel _roomChannel;
+        RealtimeBroadcast<RoomDialoguePayload> _roomBroadcast;
         SynchronizationContext _mainThreadContext;
         CancellationTokenSource _cts;
         Coroutine _pollingRoutine;
 
         NPCFlowLogger _logger;
+
+        /// <summary>
+        /// Fired when a room dialogue broadcast is received.
+        /// </summary>
+        public event Action<string, string, string> OnRoomDialogueReceived;
 
         // ── Lifecycle ──────────────────────────────────────────────
 
@@ -177,6 +197,18 @@ namespace NPCSystem
                     );
                 }
                 _turnChannel = null;
+            }
+
+            if (_roomChannel != null)
+            {
+                try { _realtime?.Remove(_roomChannel); }
+                catch (Exception ex)
+                {
+                    Debug.LogWarning(
+                        $"[{nameof(SupabaseRealtimeService)}] Room channel cleanup: {ex.Message}"
+                    );
+                }
+                _roomChannel = null;
             }
 
             if (_realtime != null)
@@ -458,6 +490,138 @@ namespace NPCSystem
         {
             _lastSeenSessionId = null;
             _highestSeenTurnId = 0;
+        }
+
+        // ── Room Broadcast Channels (Phase 6: Multiplayer) ────────
+
+        /// <summary>
+        /// Subscribe to a room's dialogue broadcast channel.
+        /// All players in this room will receive NPC dialogue events
+        /// published to <c>room:{roomCode}</c>.
+        /// </summary>
+        public async Task SubscribeToRoomChannelAsync(string roomCode)
+        {
+            if (!_realtimeSupported || _realtime == null || string.IsNullOrWhiteSpace(roomCode))
+                return;
+
+            // Unsubscribe from any previous room first
+            if (_roomChannel != null)
+            {
+                try { _realtime.Remove(_roomChannel); }
+                catch { /* ignore */ }
+                _roomChannel = null;
+                _roomBroadcast = null;
+            }
+
+            try
+            {
+                string channelName = $"room:{roomCode}";
+                _roomChannel = _realtime.Channel(
+                    channelName,
+                    null, null, null, null, null
+                );
+
+                // Register for broadcast events
+                _roomBroadcast = _roomChannel.Register<RoomDialoguePayload>(false, false);
+                _roomBroadcast.AddBroadcastEventHandler(OnRoomBroadcastReceived);
+
+                await _roomChannel.Subscribe();
+
+                _logger?.Log(
+                    NPCFlowStage.ConfigurationValidation,
+                    NPCFlowStatus.Success,
+                    NPCFlowLogLevel.Debug,
+                    $"Joined room broadcast channel: {channelName}",
+                    source: nameof(SupabaseRealtimeService),
+                    data: new Dictionary<string, object>
+                    {
+                        ["roomCode"] = roomCode,
+                        ["channelName"] = channelName,
+                    }
+                );
+            }
+            catch (Exception ex)
+            {
+                _logger?.Log(
+                    NPCFlowStage.ConfigurationValidation,
+                    NPCFlowStatus.Error,
+                    NPCFlowLogLevel.Warning,
+                    $"Failed to subscribe to room channel '{roomCode}': {ex.Message}",
+                    source: nameof(SupabaseRealtimeService)
+                );
+            }
+        }
+
+        /// <summary>
+        /// Unsubscribe from the current room broadcast channel.
+        /// </summary>
+        public void UnsubscribeFromRoomChannel()
+        {
+            if (_roomChannel == null)
+                return;
+
+            try
+            {
+                if (_roomBroadcast != null)
+                {
+                    _roomBroadcast.RemoveBroadcastEventHandler(OnRoomBroadcastReceived);
+                    _roomBroadcast = null;
+                }
+                _realtime?.Remove(_roomChannel);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning(
+                    $"[{nameof(SupabaseRealtimeService)}] Room unsubscribe: {ex.Message}"
+                );
+            }
+            _roomChannel = null;
+
+            _logger?.Log(
+                NPCFlowStage.ConfigurationValidation,
+                NPCFlowStatus.Success,
+                NPCFlowLogLevel.Debug,
+                "Left room broadcast channel.",
+                source: nameof(SupabaseRealtimeService)
+            );
+        }
+
+        void OnRoomBroadcastReceived(IRealtimeBroadcast sender, BaseBroadcast broadcast)
+        {
+            // Route broadcast events to main thread
+            if (_mainThreadContext != null && broadcast is RoomDialoguePayload payload)
+            {
+                _mainThreadContext.Post(_ =>
+                {
+                    OnRoomDialogueReceived?.Invoke(
+                        payload.NpcSlug,
+                        payload.DialogueMessage,
+                        payload.PlayerName
+                    );
+                }, null);
+            }
+        }
+
+        /// <summary>
+        /// Broadcast payload for room dialogue events.
+        /// </summary>
+        [Serializable]
+        public class RoomDialoguePayload : BaseBroadcast
+        {
+            [Newtonsoft.Json.JsonProperty("npcSlug")]
+            public string NpcSlug;
+
+            [Newtonsoft.Json.JsonProperty("dialogueMessage")]
+            public string DialogueMessage;
+
+            [Newtonsoft.Json.JsonProperty("playerName")]
+            public string PlayerName;
+
+            [Newtonsoft.Json.JsonProperty("sessionId")]
+            public string SessionId;
+
+            [Newtonsoft.Json.JsonProperty("roomCode")]
+            public string RoomCode;
         }
 
         // ── Socket State Handling ───────────────────────────────────

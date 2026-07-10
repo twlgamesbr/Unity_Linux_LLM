@@ -1,6 +1,6 @@
 services:
   npc-webgl-client:
-    image: nginx:alpine
+    image: nginx:stable
     container_name: npc-webgl-client
     ports:
       - "8085:80"

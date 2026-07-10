@@ -25,7 +25,7 @@ services:
     # Bind-mount the project root so the watcher can read files and
     # maintain the .codebase-index/ artifact cache.
     volumes:
-      - ../..:/workspace:ro
+      - ../..:/workspace:rw
     restart: unless-stopped
     stop_grace_period: 15s
     logging:

@@ -1386,7 +1386,8 @@ MonoBehaviour:
   requireAuthBackend: 1
   requireLocalAiBackend: 1
   failInitializationOnRequiredBackendFailure: 1
-  lastReadinessStatus: Required multiplayer dialogue backends are reachable.
+  lastReadinessStatus: References assigned. auth=http://localhost:8091/auth/v1/health
+    localai=http://127.0.0.1:8080/v1/models
   lastAuthBackendStatus: AuthBackend reachable via http://localhost:8091/auth/v1/health
     (HTTP 404).
   lastLocalAiBackendStatus: LocalAI reachable via http://127.0.0.1:8080/v1/models
@@ -11318,6 +11319,8 @@ MonoBehaviour:
   - llama-3.1-8b-q4-k-m-vulkan
   _remoteEmbeddingHost: 127.0.0.1
   _remoteEmbeddingPort: 8080
+  _edgeFunctionHost: localhost
+  _edgeFunctionPort: 8098
   _profiles:
   - {fileID: 11400000, guid: fee9805d1a4aff5de9e2b4c154fda9a7, type: 2}
   - {fileID: 11400000, guid: a2b00eea2a038c8d890b04ea76369e61, type: 2}
@@ -11371,7 +11374,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPCSystem.NPCDialogueBootstrapper
   DialogueManager: {fileID: 1778380623}
-  autoSelectDefaultNPC: 0
+  autoSelectDefaultNPC: 1
   defaultNpcSlug: butler
   initializeOnStart: 0
 --- !u!114 &1778380626

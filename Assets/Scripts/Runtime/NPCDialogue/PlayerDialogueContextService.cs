@@ -160,6 +160,19 @@ namespace NPCSystem
             }
         }
 
+        /// <summary>
+        /// Non-blocking cached-context lookup. Returns null if the context
+        /// for this slug hasn't been loaded yet (caller should call
+        /// <see cref="GetOrLoadContextAsync"/> for a full async load).
+        /// </summary>
+        public PlayerDialogueContext? GetCachedContext(string npcSlug)
+        {
+            string key = npcSlug ?? "__global__";
+            if (_contextCache.TryGetValue(key, out PlayerDialogueContext ctx))
+                return ctx;
+            return null;
+        }
+
         // ── Internal ────────────────────────────────────────────────
 
         async Task<PlayerDialogueContext> LoadContextInternalAsync(string npcSlug)

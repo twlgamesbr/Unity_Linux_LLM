@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using EditorAttributes;
+using Newtonsoft.Json.Linq;
 using Supabase;
 using static Postgrest.Constants;
 using UnityEngine;
@@ -82,10 +83,22 @@ namespace NPCSystem
         string _lastSessionId;
         NPCFlowLogger _logger;
         Supabase.Client _client;
+        SessionAnalyticsService _analyticsService;
 
         void Awake()
         {
             _logger = NPCFlowLogger.FindOrCreate();
+        }
+
+        void Start()
+        {
+            // Auto-discover analytics service (may not be present)
+            if (_analyticsService == null)
+            {
+                _analyticsService = FindAnyObjectByType<SessionAnalyticsService>(
+                    FindObjectsInactive.Include
+                );
+            }
         }
 
         public bool IsConfigured =>
@@ -203,6 +216,13 @@ namespace NPCSystem
 
                 lastStatus = $"Saved {role} turn for NPC '{npcSlug}' (session {_lastSessionId}).";
                 Log(NPCFlowStage.HistoryPersist, NPCFlowStatus.Success, lastStatus);
+
+                // Notify analytics service to update session metadata
+                if (_analyticsService != null)
+                {
+                    await _analyticsService.OnTurnSavedAsync(_lastSessionId, npcSlug);
+                }
+
                 return true;
             }
             catch (Exception ex)
@@ -232,7 +252,8 @@ namespace NPCSystem
             {
                 var client = GetClient();
 
-                await client.Rpc("close_dialogue_session", new
+                // Close the session via pgmq-enabled RPC
+                JObject result = await client.Rpc<JObject>("close_dialogue_session", new
                 {
                     p_player_id = _authService.CurrentSession.playerId,
                     p_npc_slug = npcSlug,
@@ -241,6 +262,11 @@ namespace NPCSystem
                 _lastSessionId = null;
                 lastStatus = $"History deleted for NPC '{npcSlug}'.";
                 Log(NPCFlowStage.HistoryPersist, NPCFlowStatus.Success, lastStatus);
+
+                // Notify analytics
+                if (_analyticsService != null)
+                    await _analyticsService.CloseSessionAsync(npcSlug);
+
                 return true;
             }
             catch (Exception ex)

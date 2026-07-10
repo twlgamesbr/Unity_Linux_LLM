@@ -56,7 +56,6 @@ ddtrace-run codebase-embedder watch \
     --root /workspace \
     --qdrant-url "$QDRANT_URL" \
     --collection "$COLLECTION_NAME" \
-    --localai-base-url "$LOCALAI_BASE_URL" \
+    --localai-url "$LOCALAI_BASE_URL" \
     --embedding-model "$EMBEDDING_MODEL" \
-    --project-slug "$PROJECT_SLUG" \
     --debounce "$WATCH_DEBOUNCE_SECONDS"
