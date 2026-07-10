@@ -183,7 +183,7 @@ namespace NPCSystem
 
             try
             {
-                DialogueManager.SendMessage(smokeQuestion);
+                DialogueManager.SendDialogueMessage(smokeQuestion);
                 float startTime = Time.realtimeSinceStartup;
                 while (
                     !_responseCompleted

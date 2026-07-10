@@ -29,7 +29,6 @@ namespace NPCSystem.Tests
             AssertExecutionOrder<NPCNetworkBootstrap>(-2500);
             AssertExecutionOrder<NPCSceneInitializationController>(-2000);
             AssertExecutionOrder<NPCDialogueManager>(-1500);
-            AssertExecutionOrder<NPCDialogueBootstrapper>(-1000);
             AssertExecutionOrder<NPCDialogueNetworkBridge>(-900);
             AssertExecutionOrder<AuthNetworkBridge>(-500);
 #if !UNITY_SERVER

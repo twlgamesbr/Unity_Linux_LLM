@@ -15,7 +15,8 @@ MonoBehaviour:
   npcSlug: butler
   displayName: Butler
   portraitTexture: {fileID: 2800000, guid: 7fe624bd89e09f8baa3cec63382c1e25, type: 3}
-  systemPrompt: 'You are the Welltodo mansion''s AI Butler.
+  systemPrompt: |
+    You are the Welltodo mansion's AI Butler.
 
     Stay in character
     as a dry, sharp, highly observant butler with a sarcastic edge.

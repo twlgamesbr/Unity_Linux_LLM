@@ -287,10 +287,10 @@ namespace NPCSystem
 #endif
             {
                 // Headless fallback
-                var bootstrapper = FindAnyObjectByType<NPCDialogueBootstrapper>(
+                var manager = FindAnyObjectByType<NPCDialogueManager>(
                     FindObjectsInactive.Include
                 );
-                if (bootstrapper != null)
+                if (manager != null)
                 {
                     _logger?.Log(
                         NPCFlowStage.SceneBootstrap,
@@ -299,7 +299,7 @@ namespace NPCSystem
                         "Triggering on-demand backend dialogue system initialization (headless fallback).",
                         source: nameof(AuthNetworkBridge)
                     );
-                    await bootstrapper.InitializeOnDemandAsync();
+                    await manager.InitializeAsync();
                 }
             }
 

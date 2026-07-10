@@ -342,11 +342,12 @@ namespace NPCSystem
             promptVars.playerName = !string.IsNullOrEmpty(playerName) ? playerName : "Player";
             promptVars.npcSlug = slug;
 
+            PlayerDialogueContext playerCtx = default;
             if (_contextService != null && profile != null)
             {
                 try
                 {
-                    var playerCtx = await _contextService.GetOrLoadContextAsync(slug);
+                    playerCtx = await _contextService.GetOrLoadContextAsync(slug);
                     promptVars.trustScore = playerCtx.TrustScore;
                     promptVars.trustLabel = playerCtx.TrustLabel;
                     promptVars.mood = playerCtx.CurrentMood;
@@ -365,15 +366,11 @@ namespace NPCSystem
                 sysPrompt = "You are a helpful assistant.";
 
             // Inject enriched player context (trust, mood, clues, items, locations)
-            if (_contextService != null && profile != null)
+            if (_contextService != null && profile != null && playerCtx.HasContext)
             {
                 try
                 {
-                    var playerCtx = await _contextService.GetOrLoadContextAsync(slug);
-                    if (playerCtx.HasContext)
-                    {
-                        sysPrompt += "\n\n" + playerCtx.BuildPromptBlock(slug);
-                    }
+                    sysPrompt += "\n\n" + playerCtx.BuildPromptBlock(slug);
                 }
                 catch (Exception ex)
                 {

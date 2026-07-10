@@ -86,7 +86,12 @@ namespace Datadog.Unity.WebGL
             DDLogs_RemoveGlobalAttribute(key);
         }
 
-        public void SetUserInfo(string id, string name, string email, Dictionary<string, object> extraInfo)
+        public void SetUserInfo(
+            string id,
+            string name,
+            string email,
+            Dictionary<string, object> extraInfo
+        )
         {
             var jsonUserInfo = new Dictionary<string, object>();
             if (id != null)
@@ -133,20 +138,11 @@ namespace Datadog.Unity.WebGL
             return rum;
         }
 
-        public void SendDebugTelemetry(string message)
-        {
+        public void SendDebugTelemetry(string message) { }
 
-        }
+        public void SendErrorTelemetry(string message, string stack, string kind) { }
 
-        public void SendErrorTelemetry(string message, string stack, string kind)
-        {
-
-        }
-
-        public void ClearAllData()
-        {
-
-        }
+        public void ClearAllData() { }
 
         public string GetNativeStack(Exception error)
         {

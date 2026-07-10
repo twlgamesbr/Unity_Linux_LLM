@@ -36,6 +36,6 @@ MonoBehaviour:
   TraceContextInjection: 0
   FirstPartyHosts: []
   TrackNonFatalAnrs: 2
-  TrackNonFatalAppHangs: 0
+  TrackNonFatalAppHangs: 1
   NonFatalAppHangThreshold: 0.25
   TelemetrySampleRate: 20

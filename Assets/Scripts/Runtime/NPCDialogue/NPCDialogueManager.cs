@@ -240,6 +240,25 @@ namespace NPCSystem
         [HideProperty]
         public UnityEvent<string> OnError = new UnityEvent<string>();
 
+        // ── Bootstrapper flags (formerly NPCDialogueBootstrapper) ──
+
+        [FoldoutGroup(
+            "Startup Behaviour",
+            true,
+            nameof(_autoSelectDefaultNPC),
+            nameof(_defaultNpcSlug)
+        )]
+        [SerializeField]
+        EditorAttributes.Void startupGroup;
+
+        [SerializeField, HideProperty]
+        [FormerlySerializedAs("autoSelectDefaultNPC")]
+        bool _autoSelectDefaultNPC = true;
+
+        [SerializeField, HideProperty]
+        [FormerlySerializedAs("defaultNpcSlug")]
+        string _defaultNpcSlug = "";
+
         readonly Dictionary<string, NPCProfile> _profilesBySlug = new Dictionary<
             string,
             NPCProfile
@@ -331,6 +350,8 @@ namespace NPCSystem
 
         void Start()
         {
+            DatadogMetricsService.Initialize();
+            DatadogTracer.Initialize();
             if (InitializeOnStart)
             {
                 _ = InitializeAsync();
@@ -459,6 +480,18 @@ namespace NPCSystem
                 });
 
                 scope.Success("Initialization complete.");
+
+                // Auto-select default NPC if configured (formerly NPCDialogueBootstrapper)
+                if (_autoSelectDefaultNPC && _currentNPC == null)
+                {
+                    string npcKey = !string.IsNullOrWhiteSpace(_defaultNpcSlug)
+                        ? _defaultNpcSlug.Trim()
+                        : GetDefaultProfileSlug();
+                    if (!string.IsNullOrWhiteSpace(npcKey))
+                    {
+                        _ = SwitchToNPCAsync(npcKey);
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -732,7 +765,7 @@ namespace NPCSystem
             OnNpcChanged?.Invoke(profile.GetDisplayName());
         }
 
-        public new void SendMessage(string playerMessage)
+        public void SendDialogueMessage(string playerMessage)
         {
             if (_currentNPC == null)
             {
@@ -844,6 +877,8 @@ namespace NPCSystem
                 _sessionService.OnError -= OnSessionError;
                 _sessionService.CancelRequests();
             }
+            DatadogMetricsService.Shutdown();
+            DatadogTracer.Shutdown();
         }
 
 #if UNITY_EDITOR
