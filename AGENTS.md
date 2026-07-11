@@ -664,6 +664,21 @@ The following require explicit user approval before proceeding:
 **Docker:** `docker/Dockerfile` (ubuntu:22.04), `docker-compose.yml` (network_mode: host reaches host LocalAI at `localhost:8080`/`:11435`)
 **Architecture key:** `NPCNetworkBootstrap` auto-starts in `Start()` (not `Awake()`) to avoid NRE — `NetworkManager`'s `Awake` at order 0 runs first.
 
+## 12. Addressables & Compatibility Level
+
+**Critical:** All build profiles must use `apiCompatibilityLevel: 2` (.NET Standard 2.1). Level 6 (.NET) breaks Addressables, Unity Transport, Serialization, and RP Core packages.
+
+| Profile | apiCompatibilityLevel | Status |
+|---|---|---|
+| WebGL Desktop | 2 | ✅ |
+| WebGL Mobile | 2 | ✅ |
+| Linux Server | 2 | ✅ |
+| Linux | 2 | ✅ |
+
+**After changing `apiCompatibilityLevel`:** Delete `Library/` folder and rebuild from scratch — the IL2CPP cache is platform-specific and stale caches cause silent WASM errors at runtime (e.g. "out of bounds").
+
+**`m_BuildAddressablesWithPlayerBuild`:** Set to `1` in `AddressableAssetSettings.asset` to ensure Addressables content always rebuilds with the player build. This prevents stale bundle type trees. Disable it during iteration for faster builds, then re-enable for release builds.
+
 ---
 
 *Document generated from completed code-quality-improvement phases 1-9 (2026-07-09).*
