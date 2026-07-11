@@ -43,7 +43,6 @@ services:
       - DD_PROCESS_AGENT_ENABLED=true
       # DogStatsD
       - DD_DOGSTATSD_NON_LOCAL_TRAFFIC=true
-      - DD_DOGSTATSD_STATS=true
       - DD_DOGSTATSD_ORIGIN_DETECTION=true
       - DD_LOG_LEVEL=info
     volumes:

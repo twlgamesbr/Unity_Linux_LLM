@@ -385,6 +385,12 @@ namespace NPCSystem
                     mode = ResolvedNetworkStartupMode.Host;
                     return true;
                 }
+
+                if (string.Equals(arg, "-npc-server", StringComparison.OrdinalIgnoreCase))
+                {
+                    mode = ResolvedNetworkStartupMode.Host;
+                    return true;
+                }
             }
 
             mode = ResolvedNetworkStartupMode.Host;

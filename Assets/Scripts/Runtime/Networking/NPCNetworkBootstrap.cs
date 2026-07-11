@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using EditorAttributes;
 using Unity.Netcode;
@@ -132,6 +133,12 @@ namespace NPCSystem
 
         void Start()
         {
+            // Detect dedicated server CLI arg and auto-configure to Server mode
+            if (Application.isBatchMode && HasCommandLineArg("-npc-server"))
+            {
+                TransportConfig.autoStartMode = NPCNetworkAutoStartMode.Server;
+            }
+
             if (
                 (
                     AutoStartInPlayMode
@@ -144,6 +151,17 @@ namespace NPCSystem
             {
                 StartConfiguredMode();
             }
+        }
+
+        static bool HasCommandLineArg(string argName)
+        {
+            string[] args = Environment.GetCommandLineArgs();
+            foreach (string arg in args)
+            {
+                if (string.Equals(arg, argName, StringComparison.OrdinalIgnoreCase))
+                    return true;
+            }
+            return false;
         }
 
         void OnDestroy()

@@ -1,0 +1,43 @@
+## Supabase Stack monitoring.
+## Collects logs from the Supabase services (Gotrue, PostgREST, Realtime, etc.)
+## via Docker container log collection.
+init_config:
+
+instances:
+  ## Supabase Gotrue (Auth) — no native metrics endpoint, logs only
+  - tags:
+      - service:supabase-auth
+      - team:npc-platform
+      - env:production
+
+  ## Supabase PostgREST (REST API) — logs only
+  - tags:
+      - service:supabase-rest
+      - team:npc-platform
+      - env:production
+
+  ## Supabase Realtime (WebSocket)
+  - tags:
+      - service:supabase-realtime
+      - team:npc-platform
+      - env:production
+
+logs:
+  - type: docker
+    source: gotrue
+    service: supabase-auth
+    sourcecategory: auth_server
+    log_processing_rules:
+      - type: multi_line
+        name: new_log_start_with_timestamp
+        pattern: \d{4}/\d{2}/\d{2}
+
+  - type: docker
+    source: postgrest
+    service: supabase-rest
+    sourcecategory: api
+
+  - type: docker
+    source: supabase-realtime
+    service: supabase-realtime
+    sourcecategory: websocket

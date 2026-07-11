@@ -1,0 +1,408 @@
+# Unity_Linux_LLM WebGL Performance LLM Reference
+
+Generated: 2026-07-11
+Scope: optimized working notes from Documentation/WebGL_Development_guide.md, Unity 6000.5 Web manual pages, Context7 Unity manual results, and this repo's installed Web Stripping Tool docs.
+Use: read this before changing WebGL scene loading, build settings, compression, networking, browser integration, or stripping.
+
+## Project WebGL Facts
+
+- Unity project root: /mnt/data/Projects_SSD/Unity_Projects/Unity_Linux_LLM
+- Authoritative scene: Assets/Scenes/NPCDialoguePrototype1.unity
+- WebGL build profile: Assets/Settings/Build Profiles/WebGL - Desktop - Development.asset
+- WebGL build output: Builds/WebGL_client/WebGL/index.html
+- Build entry point: Assets/Editor/NPCDialogueBuild.cs -> NPCDialogueBuild.PerformWebGLBuild
+- Build wrapper: .agents/skills/unity-build-operator/scripts/unity-project.sh build-webgl
+- Logs: Diagnostics/Logs/, inspect with .agents/skills/unity-build-operator/scripts/unity-project.sh logs build-webgl
+- Web Stripping Tool package: Packages/com.unity.web.stripping-tool, version 1.3.0
+- Stripping settings asset: Assets/DefaultSubmoduleStrippingSettings.asset
+- Stripping hook: Assets/Editor/WebGLStripPostBuild.cs
+- Web index sanitizer: Assets/Editor/WebGLIndexPostBuild.cs
+- On-demand gameplay loader: Assets/Scripts/Runtime/Initialization/WebGLGameplayLoadController.cs
+- Addressables package is installed: Packages/manifest.json contains com.unity.addressables 2.9.1
+
+## Current WebGL Settings Snapshot
+
+- webGLDataCaching: 0, currently disabled.
+- webGLCompressionFormat: 2, Brotli.
+- webGLDecompressionFallback: 0, server must serve compressed files with correct headers.
+- webGLInitialMemorySize: 1024 MB.
+- webGLMaximumMemorySize: 4096 MB.
+- webGLMemoryGrowthMode: 2.
+- webGLThreadsSupport: 0, no WebAssembly threads.
+- webWasm2023: 1, WebAssembly 2023 enabled.
+- webEnableSubmoduleStrippingCompatibility: 1.
+- Build profile WebGL define: ENABLE_JSON_CATALOG.
+- Build profile WebGL IL2CPP code generation: 1, optimize size.
+- Build profile WebGL managed stripping level: 2.
+- DefaultSubmoduleStrippingSettings strips System.Xml and System.Data.
+- OptimizeCodeAfterStripping: 0, diagnostic/iteration mode.
+- RemoveEmbeddedDebugSymbols: 0, diagnostic/iteration mode.
+- MissingSubmoduleErrorHandling: 1, validation mode.
+
+## Main Load-Time Rule
+
+Inactive GameObjects in the first scene can prevent Awake, Start, Update, network connection, LLM initialization, and UI setup from running, but they do not remove the serialized scene data from the initial .data payload. For real WebGL download and startup savings, move heavyweight content out of the first scene or out of the initial build payload.
+
+Recommended boot shape:
+
+1. First scene contains only EventSystem, AuthUI, PlayerAuthService, minimal network/auth bridge, loading status, and WebGLGameplayLoadController.
+2. After successful login, load gameplay via additive scene or Addressables.
+3. Instantiate or activate NPCDialogueSystem, NPC characters, nameplates, ChatCanvas, RAG, networking roots, inventories, and gameplay props only after login.
+4. Move NPC prefabs, profile assets, character textures, audio, RAG files, and optional scenes into Addressables or AssetBundles when they are not required for login.
+5. Keep LocalAI, Supabase, Qdrant, and Cognee clients lazy: create clients on first use, not scene Awake.
+
+## First Scene Budget
+
+The login scene should avoid:
+
+- NPCDialogueManager.
+- QdrantRAGService.
+- LLMUnity components.
+- LLMAgent components.
+- RAG components.
+- NPC prefabs or animated NPC roots.
+- world-space nameplates.
+- full ChatCanvas/dialogue history UI.
+- AudioSources or VideoPlayers not needed for auth.
+- large textures, meshes, animation controllers, materials, or StreamingAssets references.
+- Resources.Load paths for gameplay prefabs.
+- Supabase Realtime subscriptions before the user is authenticated and actually enters gameplay.
+
+The login scene may keep:
+
+- AuthUIController and PlayerAuthService.
+- a tiny status/loading UI.
+- AuthNetworkBridge if it does not start networking until auth success.
+- WebGLGameplayLoadController.
+- lightweight configuration ScriptableObjects only if they do not reference heavy assets.
+
+## Deferred Content Strategy
+
+- Use additive scene loading for complete gameplay areas when the whole gameplay scene can be loaded after auth.
+- Use Addressables for individual prefabs, textures, profiles, knowledge files, and optional UI panels that should be downloaded only when requested.
+- Avoid putting optional content in Resources, because Resources assets are included in the player build and are harder to reason about for payload size.
+- StreamingAssets are copied to the build output. Large knowledge files there still increase download size unless they are hosted externally or moved to Addressables/remote bundles.
+- AssetBundles/Addressables still need caching and versioning discipline; hash or catalog changes must be deployed together.
+- Call Resources.UnloadUnusedAssets only at deliberate transition points, not during active dialogue.
+
+## Player Settings For Release Builds
+
+Use the checked-in build profile as authority. For release-oriented WebGL builds, verify:
+
+- Compression Format: Brotli.
+- Decompression Fallback: disabled when the server sends correct Content-Encoding and Content-Type.
+- Data Caching: consider enabling for stable production deployments so repeat visits reuse Unity data in browser storage.
+- WebAssembly 2023: enabled for modern browser target.
+- IL2CPP Code Generation: Optimize Size.
+- Managed Stripping Level: Medium or High only with link.xml and browser validation.
+- Debug Symbols: off for production, on only for profiling/debugging.
+- Exception Support: reduced for production only after stack traces are no longer needed.
+- Analyze Build Size: enable during audits, not necessarily every build.
+- Initial heap: keep only as large as needed for first scene; a high initial heap increases memory pressure.
+- Maximum heap: keep enough headroom for gameplay but watch mobile browser limits.
+- Threads: disabled unless the deployment sets cross-origin isolation headers and every target browser supports it.
+
+## Server Headers And Hosting
+
+Unity WebGL builds must be served over HTTP(S), not file://.
+
+For Brotli output, the server must send:
+
+- .wasm.br: Content-Encoding br, Content-Type application/wasm
+- .js.br: Content-Encoding br, Content-Type application/javascript
+- .data.br: Content-Encoding br, Content-Type application/octet-stream
+- .json.br: Content-Encoding br, Content-Type application/json
+
+For gzip output, use Content-Encoding gzip with the same content types.
+
+If WebAssembly threads are enabled later, hosting also needs cross-origin isolation:
+
+- Cross-Origin-Opener-Policy: same-origin
+- Cross-Origin-Embedder-Policy: require-corp
+- Cross-Origin-Resource-Policy: cross-origin or same-origin depending on asset hosting
+
+Use immutable caching for hashed build artifacts. Avoid stale index.html caching unless the deploy process updates all referenced files atomically.
+
+## Browser Networking Rules
+
+- Web builds support UnityWebRequest for HTTP(S).
+- Web builds can use WebSockets through supported networking packages.
+- Raw .NET sockets and native socket access are not supported in browser WebGL.
+- Browser localhost means the user's machine, not the deployment host. Replace local hostnames with the page host or configured backend host in WebGL.
+- Use HTTPS for production and for browser-gated device APIs.
+- Configure CORS on Supabase, LocalAI proxies, Qdrant/Cognee gateways, and any static asset host used by Addressables.
+- Keep auth before realtime subscriptions. Delay Supabase Realtime until after successful login and gameplay entry.
+
+## Browser Scripting And Native Plug-ins
+
+- Put JavaScript interop in .jslib files and keep the surface small.
+- Prefer UnityWebRequest, C# APIs, and package integrations before adding JS interop.
+- Avoid high-frequency C# <-> JS calls in gameplay loops.
+- Browser APIs often require a user gesture for fullscreen, pointer lock, clipboard, audio start, and some device access.
+- Emscripten native plugins are Web-only and must be compiled with a compatible Emscripten version. Keep them isolated behind platform guards.
+
+## Memory Guidance
+
+- The Unity heap, asset data, loaded scenes, browser JS engine, decompression buffers, audio/video, and GPU resources all compete in browser memory.
+- Reducing initial scene content reduces both initial data and peak startup memory.
+- Large textures and meshes are common WebGL load blockers. Compress, downscale, split, and defer them.
+- Use texture streaming and mip stripping only after visual QA.
+- Avoid decompressed audio on load unless the clip is tiny and needed immediately.
+- Do not allocate large transient strings or JSON documents in dialogue paths; stream, reuse buffers, and cap history.
+- Keep NPC dialogue history bounded. Persist only the compact state needed after login.
+- Use Task.Yield for WebGL-friendly async loops; avoid blocking waits.
+- Schedule expensive cleanup at scene transitions.
+
+## Graphics And Texture Rules
+
+- Use WebGL 2 as the normal baseline.
+- Keep render resolution independent from CSS canvas size when performance requires it.
+- Reduce MSAA, shadows, HDR, post-processing, real-time lights, and expensive shader variants for WebGL.
+- Strip shader variants through Graphics Settings only after testing all dialogue/NPC visual states.
+- Choose texture compression by target:
+  - Desktop browsers commonly support BC/DXT paths.
+  - Mobile browsers commonly prefer ETC2 or ASTC depending on device support.
+  - If one build targets both desktop and mobile, expect fallback or separate builds.
+- Avoid runtime texture decompression submodules by importing textures in formats that target browsers can use directly.
+- Use the Web Stripping Tool's Texture Decompression submodules only after profiling confirms the build never needs them.
+
+## Audio And Video Rules
+
+- Browser audio often needs a user gesture before playback.
+- Keep login scene silent unless audio is essential.
+- Use compressed audio for larger clips and avoid Decompress On Load for non-trivial files.
+- Test looping clips in browser; Web audio timing differs from native platforms.
+- Video playback support depends on browser codecs. Host video as external streamed files when possible instead of embedding large clips in the initial build.
+
+## Input, Canvas, And Device APIs
+
+- Fullscreen and cursor lock usually require user interaction.
+- Keyboard focus depends on the canvas and surrounding page.
+- Mobile keyboard, touch, sensors, webcam, microphone, and other device APIs can require HTTPS and permissions.
+- Keep the canvas size responsive but cap render resolution for slow devices.
+- For mobile WebGL, test orientation, touch, UI scaling, memory pressure, and background-tab resume.
+
+## WebAssembly 2023
+
+- WebAssembly 2023 can improve runtime performance and reduce code size for modern browsers.
+- Keep it enabled for current desktop targets.
+- If supporting older browsers, check Unity's WebAssembly 2023 prerequisites and fallback strategy before shipping.
+- WebAssembly 2023 is separate from threads. Threads still require cross-origin isolation and browser support.
+
+## Web Stripping Tool Workflow
+
+Use the installed package docs as version-matched authority:
+
+- Packages/com.unity.web.stripping-tool/Documentation~/index.md
+- Packages/com.unity.web.stripping-tool/Documentation~/submodule-stripping-workflow.md
+- Packages/com.unity.web.stripping-tool/Documentation~/submodule-profiling.md
+- Packages/com.unity.web.stripping-tool/Documentation~/test-stripped-build.md
+- Packages/com.unity.web.stripping-tool/Documentation~/optimize-stripped-build.md
+- Packages/com.unity.web.stripping-tool/Documentation~/submodule-reference.md
+- Packages/com.unity.web.stripping-tool/Documentation~/scripting.md
+
+Repo workflow:
+
+1. Run .agents/skills/unity-build-operator/scripts/unity-project.sh compile.
+2. Run .agents/skills/unity-build-operator/scripts/unity-project.sh test.
+3. Run .agents/skills/unity-build-operator/scripts/unity-project.sh strip-status.
+4. Build an instrumented/profiling WebGL player.
+5. Exercise auth, host/client connect, TextMeshPro UI, dialogue, NPC switching, inventory, physics, RAG, Supabase Realtime, and every unique visual effect.
+6. Import profiling reports. Combine desktop/mobile reports rather than overwriting.
+7. During validation, keep missing-submodule handling on and Optimize Code After Stripping off.
+8. Test stripped build in browser and inspect the console.
+9. For final release only: remove debug information, set missing-submodule handling to Ignore, enable Optimize Code After Stripping, then run build-webgl once.
+
+Project-specific stripping risks:
+
+- Do not strip Unity UI or TextCoreFontEngine without very strong evidence; this project uses UGUI and TextMeshPro.
+- Treat Newtonsoft.Json, System.Net, System.Security, System.ComponentModel, compression, XML, date/time parsing, and serialization as evidence-driven because Supabase, Realtime, UnityWebRequest, and JSON payloads can use hidden paths.
+- Current stripping of System.Xml and System.Data is plausible, but still needs browser coverage.
+- A successful login alone is not enough; stripped-function errors can appear only after dialogue or networking paths run.
+
+## Build And QA Commands
+
+Use these from the project root:
+
+```bash
+.agents/skills/unity-build-operator/scripts/unity-project.sh doctor
+.agents/skills/unity-build-operator/scripts/unity-project.sh compile
+.agents/skills/unity-build-operator/scripts/unity-project.sh test
+.agents/skills/unity-build-operator/scripts/unity-project.sh strip-status
+.agents/skills/unity-build-operator/scripts/unity-project.sh build-webgl
+.agents/skills/unity-build-operator/scripts/unity-project.sh logs build-webgl
+```
+
+Build success means all three are true:
+
+- Unity command exits 0.
+- The new log has no compiler/build failure marker.
+- Builds/WebGL_client/WebGL/index.html exists from the same run.
+
+Do not trust an old Builds directory as proof.
+
+## Recommended Next Refactor For This Project
+
+Short term:
+
+- Keep the first scene login-only.
+- Wire WebGLGameplayLoadController to run after AuthNetworkBridge auth success.
+- Move current gameplay roots behind an inactive parent only as an iteration step.
+- Split real gameplay into a separate additive scene when scene mutation is safe.
+- Delay NPCDialogueManager.InitializeAsync until after login and gameplay load.
+- Delay Supabase Realtime subscription until the dialogue system is opened.
+- Ensure AuthNetworkBridge starts networking only after authenticated user state exists.
+
+Medium term:
+
+- Move NPC prefabs and heavy NPC assets to Addressables.
+- Move character knowledge files out of StreamingAssets if they are not needed at login.
+- Replace Resources.Load gameplay prefab paths with serialized references in loaded scenes or Addressables keys.
+- Add a release WebGL build profile separate from the current development profile.
+- Add a browser smoke script that confirms login page first paint, login, gameplay load, first NPC spawn, first dialogue, and console errors.
+
+Release gate:
+
+- Brotli assets served with correct headers.
+- Data caching decision documented and tested across deploy updates.
+- No stale browser-agent script in index.html.
+- Browser console clean during auth and first dialogue.
+- Network calls use the deployed host, not localhost.
+- Build report reviewed for largest files.
+- Stripping profile captured from representative gameplay.
+
+## Do Not Do
+
+- Do not assume inactive scene objects reduce initial download size.
+- Do not keep LLMUnity local model objects in the first WebGL scene.
+- Do not initialize NPC dialogue, RAG, Cognee, Qdrant, or Realtime before login.
+- Do not use raw .NET sockets in browser builds.
+- Do not rely on localhost from a deployed WebGL page.
+- Do not enable WebAssembly threads without server isolation headers.
+- Do not turn on Optimize Code After Stripping for every diagnostic build.
+- Do not manually edit .unity scenes; use GladeKit for scene changes.
+- Do not strip modules based only on names. Profile and browser-test.
+
+## Original Unity Manual Pages
+
+- https://docs.unity3d.com/6000.5/Documentation/Manual/webgl-develop.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/class-PlayerSettingsWebGL.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/webgl-interactingwithbrowserscripting.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/webgl-native-plugins-with-emscripten.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/webgl-memory.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/webgl-caching.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/web-multithreading.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/webgl-graphics.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/webgl-audio.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/webgl-video.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/webgl-texture-compression.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/webgl-embeddedresources.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/webgl-input.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/webgl-canvas-size.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/webgl-browser-access-device.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/webgl-networking.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/webassembly-2023.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/webgl-performance.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/webgl-debugging.html
+
+## Missing Internal Links Worth Keeping
+
+General Web:
+
+- https://docs.unity3d.com/6000.5/Documentation/Manual/webgl.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/webgl-building.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/webgl-building-distribution.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/webgl-deploying.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/webgl-technical-overview.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/webgl-browsercompatibility.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/web-build-settings.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/webgl-server-configuration-code-samples.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/webgl-templates.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/web-templates-build-configuration.html
+
+Optimization:
+
+- https://docs.unity3d.com/6000.5/Documentation/Manual/web-optimization.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/web-optimization-player.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/web-optimization-mobile.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/Profiler.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/performance-managed-memory.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/performance-garbage-collector.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/AssetBundlesIntro.html
+
+WebAssembly 2023:
+
+- https://docs.unity3d.com/6000.5/Documentation/Manual/wasm-2023-enable.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/wasm-2023-features.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/wasm-2023-prereq.html
+
+Multithreading:
+
+- https://docs.unity3d.com/6000.5/Documentation/Manual/web-multithreading-intro.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/web-multithreading-burst.html
+
+Debugging:
+
+- https://docs.unity3d.com/6000.5/Documentation/Manual/web-debugging-development.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/web-debugging-production.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/web-debugging-troubleshooting.html
+
+Browser scripting:
+
+- https://docs.unity3d.com/6000.5/Documentation/Manual/web-interacting-browser-error-handling.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/web-interacting-browser-js.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/web-interacting-browser-js-to-unity.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/web-interacting-browser-unity-to-js.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/web-interacting-browsers-c-to-unity.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/web-interacting-browsers-library.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/web-js-interface.html
+
+Networking:
+
+- https://docs.unity3d.com/6000.5/Documentation/Manual/web-request.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/web-request-hlapi.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/multiplayer.html
+
+Graphics and assets:
+
+- https://docs.unity3d.com/6000.5/Documentation/Manual/WebGL2.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/texture-choose-format-by-platform.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/texture-compression-formats.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/class-TextureImporter.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/ShadowPerformance.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/TextureStreaming.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/compressing-mesh-data-optimization.html
+
+Audio and video:
+
+- https://docs.unity3d.com/6000.5/Documentation/Manual/class-AudioClip.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/AudioMixer.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/VideoPlayer.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/class-VideoClip.html
+- https://docs.unity3d.com/6000.5/Documentation/Manual/video-clock.html
+
+## Quick Question Routing
+
+If asked "why is WebGL slow to load":
+
+- Check initial scene payload and heavy references first.
+- Check Brotli headers and decompression fallback second.
+- Check initial heap, texture size, StreamingAssets, Resources, and embedded assets third.
+- Check submodule stripping and build size last, because it is a release optimization after behavior is validated.
+
+If asked "how do we defer NPC/dialogue":
+
+- Use login-only scene.
+- Load gameplay scene additively or via Addressables after auth.
+- Initialize dialogue services after gameplay load.
+- Subscribe Realtime only after dialogue is needed.
+- Instantiate NPCs from Addressables or loaded gameplay scene, not from first-scene roots.
+
+If asked "how do we validate":
+
+- Build with the wrapper.
+- Serve through HTTP with correct compressed headers.
+- Test in Chromium/Firefox.
+- Inspect browser console.
+- Exercise login, networking, NPC spawn, first dialogue, NPC switch, and UI text.
+- Compare network waterfall and first playable time before/after.

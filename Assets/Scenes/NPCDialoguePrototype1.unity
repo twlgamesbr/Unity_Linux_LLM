@@ -8703,8 +8703,8 @@ MonoBehaviour:
   _authController: {fileID: 1351714794}
   _networkBootstrap: {fileID: 774187519}
   _gameplayLoadController: {fileID: 985270263}
-  _autoDetectStartupMode: 0
-  _startAsHost: 0
+  _autoDetectStartupMode: 1
+  _startAsHost: 1
   _hostAddress: 127.0.0.1
   _hostPort: 0
   _onHostStarted:

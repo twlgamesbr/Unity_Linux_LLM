@@ -22,7 +22,6 @@ GameObject:
   - component: {fileID: 2705921267641347282}
   - component: {fileID: 8244578066159571029}
   - component: {fileID: -9195951490691375075}
-  - component: {fileID: 2256178644128380247}
   m_Layer: 0
   m_Name: NPCPlayerAvatar
   m_TagString: Player
@@ -109,9 +108,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 392683ab17916abeead3a8bc00ff1ed2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCMultiplayerInputActions
-  inputActions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  actionMapName: Player
-  uiActionMapName: UI
+  _inputActions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  _actionMapName: Player
+  _uiActionMapName: UI
 --- !u!114 &2790446208225623981
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -260,10 +259,9 @@ MonoBehaviour:
   animBridge: {fileID: 443494246079970836}
   cameraController: {fileID: 7643673492631074896}
   interactor: {fileID: 8244578066159571029}
-  inputActions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  actionMapName: Player
-  lockCursorForOwner: 1
-  logSpawnDiagnostics: 1
+  _inputActions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  _lockCursorForOwner: 1
+  _logSpawnDiagnostics: 1
 --- !u!114 &230604849949135256
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -309,9 +307,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCNetworkItemInteractor
   ShowTopMostFoldoutHeaderGroup: 1
-  inventory: {fileID: 2705921267641347282}
-  pickupRange: 3
-  transferRange: 4
+  _inventory: {fileID: 2705921267641347282}
+  PickupRange: 3
+  TransferRange: 4
 --- !u!114 &-9195951490691375075
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -360,28 +358,6 @@ MonoBehaviour:
       Synchronize: 1
       ParameterType: 9
   AnimatorParametersExpanded: 0
---- !u!64 &2256178644128380247
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4442102780728157853}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 6796121518194019630, guid: 8a3c35dfb7885f26e9cf390ff740aeb5, type: 3}
 --- !u!1001 &1609983377784481111
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -442,10 +418,40 @@ PrefabInstance:
     - {fileID: 5866666021909216657, guid: 8a3c35dfb7885f26e9cf390ff740aeb5, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 8a3c35dfb7885f26e9cf390ff740aeb5, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5067016309225440157}
   m_SourcePrefab: {fileID: 100100000, guid: 8a3c35dfb7885f26e9cf390ff740aeb5, type: 3}
 --- !u!4 &1287314980011360956 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 8a3c35dfb7885f26e9cf390ff740aeb5, type: 3}
   m_PrefabInstance: {fileID: 1609983377784481111}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1915901811637458950 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 8a3c35dfb7885f26e9cf390ff740aeb5, type: 3}
+  m_PrefabInstance: {fileID: 1609983377784481111}
+  m_PrefabAsset: {fileID: 0}
+--- !u!64 &5067016309225440157
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1915901811637458950}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 6796121518194019630, guid: 8a3c35dfb7885f26e9cf390ff740aeb5, type: 3}
