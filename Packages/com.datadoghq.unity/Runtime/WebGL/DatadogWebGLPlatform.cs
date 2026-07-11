@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using Datadog.Unity.Internal;
+using Datadog.Unity.Internal.Logging;
 using Datadog.Unity.Logging;
 using Datadog.Unity.Logs;
 using Datadog.Unity.Rum;

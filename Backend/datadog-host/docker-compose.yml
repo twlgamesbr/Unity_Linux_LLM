@@ -45,6 +45,10 @@ services:
       - DD_DOGSTATSD_NON_LOCAL_TRAFFIC=true
       - DD_DOGSTATSD_ORIGIN_DETECTION=true
       - DD_LOG_LEVEL=info
+      # Disable remote config (no system-probe needed)
+      - DD_REMOTE_CONFIGURATION_ENABLED=false
+      # Pin agent version to avoid unexpected breaking changes
+      # - DD_AGENT_VERSION=7.81.0
     volumes:
       # Docker control socket for container discovery
       - /var/run/docker.sock:/var/run/docker.sock:ro

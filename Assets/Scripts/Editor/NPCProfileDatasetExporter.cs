@@ -59,7 +59,10 @@ namespace NPCSystem.Editor
                 string knowledgeSourcePath = profile.GetKnowledgeSourcePath();
                 string resolvedKnowledgePath = NPCSearchable.ResolveAssetPath(knowledgeSourcePath);
                 string knowledgeText = string.Empty;
-                if (!string.IsNullOrWhiteSpace(resolvedKnowledgePath) && File.Exists(resolvedKnowledgePath))
+                if (
+                    !string.IsNullOrWhiteSpace(resolvedKnowledgePath)
+                    && File.Exists(resolvedKnowledgePath)
+                )
                 {
                     knowledgeText = File.ReadAllText(resolvedKnowledgePath);
                 }
@@ -77,8 +80,10 @@ namespace NPCSystem.Editor
                         can_give_puzzle_hints = profile.canGivePuzzleHints,
                         can_accuse_suspects = profile.canAccuseSuspects,
                         can_reveal_secrets = profile.canRevealSecrets,
-                        preferred_action_functions = profile.preferredActionFunctions ?? Array.Empty<string>(),
-                        forbidden_action_functions = profile.forbiddenActionFunctions ?? Array.Empty<string>(),
+                        preferred_action_functions =
+                            profile.preferredActionFunctions ?? Array.Empty<string>(),
+                        forbidden_action_functions =
+                            profile.forbiddenActionFunctions ?? Array.Empty<string>(),
                         rag_category = profile.GetRagCategory(),
                         knowledge_source_path = knowledgeSourcePath,
                         knowledge_text = knowledgeText,
@@ -86,8 +91,12 @@ namespace NPCSystem.Editor
                 );
             }
 
-            string projectRoot = Directory.GetParent(Application.dataPath)?.FullName ?? Application.dataPath;
-            string outputPath = Path.Combine(projectRoot, assetRelativePath.Replace("Assets/", string.Empty));
+            string projectRoot =
+                Directory.GetParent(Application.dataPath)?.FullName ?? Application.dataPath;
+            string outputPath = Path.Combine(
+                projectRoot,
+                assetRelativePath.Replace("Assets/", string.Empty)
+            );
             string outputDirectory = Path.GetDirectoryName(outputPath);
             if (!string.IsNullOrWhiteSpace(outputDirectory))
             {
@@ -97,7 +106,9 @@ namespace NPCSystem.Editor
             string json = JsonUtility.ToJson(collection, true);
             File.WriteAllText(outputPath, json);
             AssetDatabase.Refresh();
-            Debug.Log($"[NPCProfileDatasetExporter] Exported {collection.profiles.Count} profiles to {outputPath}");
+            Debug.Log(
+                $"[NPCProfileDatasetExporter] Exported {collection.profiles.Count} profiles to {outputPath}"
+            );
         }
     }
 }

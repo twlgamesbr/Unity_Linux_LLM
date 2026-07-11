@@ -677,7 +677,14 @@ The following require explicit user approval before proceeding:
 
 **After changing `apiCompatibilityLevel`:** Delete `Library/` folder and rebuild from scratch — the IL2CPP cache is platform-specific and stale caches cause silent WASM errors at runtime (e.g. "out of bounds").
 
-**`m_BuildAddressablesWithPlayerBuild`:** Set to `1` in `AddressableAssetSettings.asset` to ensure Addressables content always rebuilds with the player build. This prevents stale bundle type trees. Disable it during iteration for faster builds, then re-enable for release builds.
+**`m_BuildAddressablesWithPlayerBuild`:** Set to `0` for iteration builds. The existing Addressables content in `StreamingAssets/aa/` is included automatically. When you need to update Addressables content, rebuild it manually via `Window → Asset Management → Addressables → Groups → Build → New Build → Default Build Script`. Set it back to `1` only for release builds.
+
+**If you get "SBP ErrorError" during Addressables build:** The Scriptable Build Pipeline cache is stale after changing apiCompatibilityLevel. Fix:
+1. Set `m_BuildAddressablesWithPlayerBuild: 0` in `AddressableAssetSettings.asset`
+2. Delete `Library/com.unity.addressables/` and any stale `addressables_content_state.bin` files
+3. Delete `Temp/com.unity.addressables/`
+4. Build the player (existing Addressables content is preserved in `StreamingAssets/aa/`)
+5. When ready, rebuild Addressables content manually from the Groups window
 
 ---
 

@@ -1,0 +1,47 @@
+## OpenMetrics checks for all self-hosted services.
+## Uses the built-in openmetrics check (no Python package needed).
+init_config:
+
+instances:
+  ## LocalAI LLM inference
+  - openmetrics_endpoint: http://localhost:8080/metrics
+    namespace: localai
+    metrics:
+      - llm_inference_requests_total
+      - llm_inference_tokens_total
+      - llm_inference_duration_ms
+      - llm_inference_tokens_per_second
+      - process_gpu_compute_utilization
+      - process_gpu_memory_utilization
+      - llm_backend_loaded_models
+      - llm_backend_queue_size
+      - process_resident_memory_bytes
+    tags:
+      - service:localai
+      - team:npc-platform
+      - env:production
+
+  ## Qdrant vector database
+  - openmetrics_endpoint: http://localhost:6333/metrics
+    namespace: qdrant
+    metrics:
+      - qdrant_collection_points_total
+      - qdrant_collection_vectors_total
+      - qdrant_grpc_requests_total
+      - qdrant_rest_requests_total
+      - qdrant_search_duration_ms
+      - qdrant_update_duration_ms
+      - qdrant_segments_total
+      - qdrant_optimizer_errors_total
+      - qdrant_optimizer_cpu_seconds_total
+      - qdrant_mapped_memory_bytes
+      - qdrant_actual_memory_bytes
+    tags:
+      - service:qdrant
+      - team:npc-platform
+      - env:production
+
+logs:
+  ## Docker container logs are auto-collected by the agent
+  ## via DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true
+  ## No per-service log config needed.
