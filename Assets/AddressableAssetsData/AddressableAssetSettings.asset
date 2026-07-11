@@ -19,6 +19,7 @@ MonoBehaviour:
   m_ExtractTypeTreeData: 1
   m_OptimizeCatalogSize: 0
   m_BuildRemoteCatalog: 1
+  m_BundleLocalCatalog: 0
   m_CatalogRequestsTimeout: 0
   m_DisableCatalogUpdateOnStart: 0
   m_InternalIdNamingMode: 0
@@ -59,7 +60,7 @@ MonoBehaviour:
   m_ContentStateBuildPathProfileVariableName: <default settings path>
   m_CustomContentStateBuildPath: 
   m_ContentStateBuildPath: 
-  m_BuildAddressablesWithPlayerBuild: 0
+  m_BuildAddressablesWithPlayerBuild: 2
   m_overridePlayerVersion: '[UnityEditor.PlayerSettings.bundleVersion]'
   m_GroupAssets:
   - {fileID: 11400000, guid: c61cd5c963d5e5ec7893b9e4edc62a05, type: 2}

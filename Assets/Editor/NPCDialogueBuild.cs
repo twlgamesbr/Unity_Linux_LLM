@@ -60,6 +60,19 @@ public static class NPCDialogueBuild
     [MenuItem("Build/WebGL")]
     public static void BuildWebGL()
     {
+        // Force-disable Addressables auto-build during player build to avoid SBP cache errors
+        var settings = UnityEditor.AddressableAssets.AddressableAssetSettingsDefaultObject.Settings;
+        var prevValue = UnityEditor.AddressableAssets.Settings.AddressableAssetSettings.PlayerBuildOption.DoNotBuildWithPlayer;
+        if (settings != null)
+        {
+            prevValue = settings.BuildAddressablesWithPlayerBuild;
+            settings.BuildAddressablesWithPlayerBuild = UnityEditor.AddressableAssets.Settings.AddressableAssetSettings.PlayerBuildOption.DoNotBuildWithPlayer;
+            UnityEditor.EditorUtility.SetDirty(settings);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            Debug.Log($"[NPCBuild] Temporarily disabled Addressables auto-build (was {prevValue}).");
+        }
+
         string outputPath = ResolvePath("Builds/WebGL_client/WebGL");
         var options = new BuildPlayerWithProfileOptions
         {
@@ -74,6 +87,15 @@ public static class NPCDialogueBuild
             report.summary.result == BuildResult.Succeeded
         );
         HandleBuildReport(report, "WebGL");
+
+        // Restore Addressables auto-build setting
+        if (settings != null)
+        {
+            settings.BuildAddressablesWithPlayerBuild = prevValue;
+            UnityEditor.EditorUtility.SetDirty(settings);
+            AssetDatabase.SaveAssets();
+            Debug.Log($"[NPCBuild] Restored Addressables auto-build to {prevValue}.");
+        }
     }
 
     // Build both Linux targets
