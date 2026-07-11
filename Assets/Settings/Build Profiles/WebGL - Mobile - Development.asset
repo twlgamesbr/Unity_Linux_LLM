@@ -847,7 +847,7 @@ MonoBehaviour:
     - line: '|   webGLThreadsSupport: 0'
     - line: '|   webGLDecompressionFallback: 0'
     - line: '|   webGLInitialMemorySize: 128'
-    - line: '|   webGLMaximumMemorySize: 2048'
+    - line: '|   webGLMaximumMemorySize: 4096'
     - line: '|   webGLMemoryGrowthMode: 2'
     - line: '|   webGLMemoryLinearGrowthStep: 16'
     - line: '|   webGLMemoryGeometricGrowthStep: 2'

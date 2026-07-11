@@ -14,7 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
   m_GroupName: Default Local Group
   m_GUID: 5b455e24255f6a3098169dc15edce043
-  m_SerializeEntries: []
+  m_SerializeEntries:
+  - m_GUID: a38d0f6a35d285b58a8264207005b243
+    m_Address: Assets/Prefabs/Networking/NPCTransferableItem.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 43c98c7b645d342529e5b27554ee64e6, type: 2}
   m_SchemaSet:

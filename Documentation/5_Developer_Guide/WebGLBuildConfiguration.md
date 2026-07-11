@@ -33,7 +33,7 @@ Each setting below was evaluated during the debugging process. The current produ
 
 - **Debug Symbols → Off** — Strips DWARF debug information from the WASM binary. The original build had symbols enabled (for the diagnostic `FullWithStacktrace` build), which inflated the `.wasm.br` from ~7.7 MB to ~12.6 MB. Symbols are only useful for crash triage and should remain off in release builds.
 
-- **Maximum Memory Size → 4096 MB** — Sets the initial WebAssembly memory heap to 4 GB (the maximum WebGL supports). The dialogue system loads LLM inference context and NPC knowledge assets at runtime; sufficient headroom prevents out-of-memory crashes during gameplay. The heap is virtual — the browser only commits pages as they are used.
+- **Maximum Memory Size → 4096 MB** — Allows the WebAssembly memory heap to grow to 4 GB (the maximum WebGL supports). The dialogue system loads LLM inference context and NPC knowledge assets at runtime; sufficient headroom prevents out-of-memory crashes during gameplay. Keep the initial heap lower so startup does not reserve more memory than needed.
 
 ## Build Profiles
 

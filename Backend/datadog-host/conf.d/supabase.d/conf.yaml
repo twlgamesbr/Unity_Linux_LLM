@@ -1,24 +1,14 @@
 ## Supabase Stack monitoring.
-## Collects logs from the Supabase services (Gotrue, PostgREST, Realtime, etc.)
-## via Docker container log collection.
+## Simplified to use Docker log collection only (no Supabase SDK check dependency).
+## The Datadog Agent's built-in supabase check requires specific API endpoints
+## that we don't expose — so we use generic Docker log collection instead.
 init_config:
 
 instances:
-  ## Supabase Gotrue (Auth) — no native metrics endpoint, logs only
-  - tags:
-      - service:supabase-auth
-      - team:npc-platform
-      - env:production
-
-  ## Supabase PostgREST (REST API) — logs only
-  - tags:
-      - service:supabase-rest
-      - team:npc-platform
-      - env:production
-
-  ## Supabase Realtime (WebSocket)
-  - tags:
-      - service:supabase-realtime
+  ## Logs-only configuration for Supabase services
+  - min_collection_interval: 60
+    tags:
+      - service:supabase
       - team:npc-platform
       - env:production
 
@@ -27,10 +17,6 @@ logs:
     source: gotrue
     service: supabase-auth
     sourcecategory: auth_server
-    log_processing_rules:
-      - type: multi_line
-        name: new_log_start_with_timestamp
-        pattern: \d{4}/\d{2}/\d{2}
 
   - type: docker
     source: postgrest
@@ -41,3 +27,8 @@ logs:
     source: supabase-realtime
     service: supabase-realtime
     sourcecategory: websocket
+
+  - type: docker
+    source: postgresql
+    service: supabase-db
+    sourcecategory: database
