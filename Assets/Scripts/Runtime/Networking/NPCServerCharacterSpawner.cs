@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using EditorAttributes;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.Serialization;
 
 namespace NPCSystem
@@ -28,12 +29,14 @@ namespace NPCSystem
         public string NpcPrefabResourcesPath = "Networking/NPCServerCharacter";
 
         [Header("Spawn Layout")]
-        public Vector3 spawnOrigin = new Vector3(-4f, 1f, 6f);
+        public Vector3 spawnOrigin = new Vector3(-4f, 0f, 6f);
         public Vector3 spawnSpacing = new Vector3(2.75f, 0f, 2.5f);
         [FormerlySerializedAs("MaxColumns")]
         public int MaxColumns = 3;
         [FormerlySerializedAs("ClearExistingNpcCharactersBeforeSpawn")]
         public bool ClearExistingNpcCharactersBeforeSpawn = true;
+        [Tooltip("Raycast down to snap spawned NPCs to ground level. Disable if using a NavMesh with automatic ground placement.")]
+        public bool SnapToGround = true;
 
         [Header("Diagnostics")]
         [SerializeField, ReadOnly]
@@ -169,6 +172,12 @@ namespace NPCSystem
                     character.InitializeIdentity(profile);
                 }
 
+                // Snap to ground via raycast so NPCs don't float
+                if (SnapToGround)
+                {
+                    SnapToGroundLevel(instance);
+                }
+
                 lastSpawnedCount++;
             }
 
@@ -259,6 +268,30 @@ namespace NPCSystem
                 }
 
                 Destroy(character.gameObject);
+            }
+        }
+
+        /// <summary>
+        /// Raycast from the transform position downward to find ground level.
+        /// If the ground is found, places the object on it.
+        /// </summary>
+        void SnapToGroundLevel(GameObject instance)
+        {
+            Vector3 origin = instance.transform.position;
+            float maxDist = 20f;
+            LayerMask groundMask = LayerMask.GetMask("Default");
+
+            if (Physics.Raycast(origin + Vector3.up * 0.5f, Vector3.down, out RaycastHit hit, maxDist, groundMask))
+            {
+                Vector3 pos = instance.transform.position;
+                pos.y = hit.point.y;
+                instance.transform.position = pos;
+
+                NavMeshAgent agent = instance.GetComponent<NavMeshAgent>();
+                if (agent != null)
+                {
+                    agent.Warp(pos);
+                }
             }
         }
 

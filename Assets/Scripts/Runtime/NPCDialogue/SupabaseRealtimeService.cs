@@ -605,7 +605,6 @@ namespace NPCSystem
         /// <summary>
         /// Broadcast payload for room dialogue events.
         /// </summary>
-        [Serializable]
         public class RoomDialoguePayload : BaseBroadcast
         {
             [Newtonsoft.Json.JsonProperty("npcSlug")]

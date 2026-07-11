@@ -80,7 +80,8 @@ namespace NPCSystem
             "Behaviour",
             true,
             nameof(requestTimeoutSeconds),
-            nameof(validateStoredSessionOnStart)
+            nameof(validateStoredSessionOnStart),
+            nameof(restoreStoredSessionOnWebGLStart)
         )]
         [SerializeField]
         EditorAttributes.Void behaviourGroup;
@@ -90,6 +91,9 @@ namespace NPCSystem
 
         [SerializeField, HideProperty]
         bool validateStoredSessionOnStart = true;
+
+        [SerializeField, HideProperty]
+        bool restoreStoredSessionOnWebGLStart;
 
         [FoldoutGroup(
             "Debug",
@@ -186,11 +190,24 @@ namespace NPCSystem
             if (_initialized)
                 return IsAuthenticated ? CurrentSession : null;
 
+            bool shouldValidateStoredSession = ShouldValidateStoredSessionOnStart(
+                validateStoredSessionOnStart,
+                restoreStoredSessionOnWebGLStart,
+                Application.platform
+            );
+
 #if UNITY_WEBGL && !UNITY_EDITOR
             ResolveWebGLUrls();
             _sessionStore = new UnitySessionStore();
-            CurrentSession = UnitySessionStore.Load();
             _initialized = true;
+
+            if (!shouldValidateStoredSession)
+            {
+                lastAuthStatus = "Stored session restore deferred on WebGL startup.";
+                return null;
+            }
+
+            CurrentSession = UnitySessionStore.Load();
 
             if (CurrentSession != null && !UnitySessionStore.IsExpired(CurrentSession.expiresAtUtc))
             {
@@ -220,7 +237,7 @@ namespace NPCSystem
                 nameof(PlayerAuthService),
                 data: new System.Collections.Generic.Dictionary<string, object>
                 {
-                    ["validateStoredSessionOnStart"] = validateStoredSessionOnStart,
+                    ["validateStoredSessionOnStart"] = shouldValidateStoredSession,
                     ["supabaseUrl"] = supabaseUrl ?? string.Empty,
                 }
             );
@@ -278,10 +295,11 @@ namespace NPCSystem
                     lastAuthStatus = "SDK initialized. No active session.";
                 }
 
-                if (!validateStoredSessionOnStart)
+                if (!shouldValidateStoredSession)
                 {
+                    lastAuthStatus = "Stored session restore deferred on startup.";
                     scope.Success(lastAuthStatus);
-                    return IsAuthenticated ? CurrentSession : null;
+                    return null;
                 }
 
                 if (CurrentSession == null)
@@ -832,6 +850,17 @@ namespace NPCSystem
                 return "unknown";
             int atIndex = email.IndexOf('@');
             return atIndex > 0 ? email.Substring(0, atIndex) : email;
+        }
+
+        static bool ShouldValidateStoredSessionOnStart(
+            bool configuredValue,
+            bool restoreOnWebGLStart,
+            RuntimePlatform platform
+        )
+        {
+            if (!configuredValue)
+                return false;
+            return platform != RuntimePlatform.WebGLPlayer || restoreOnWebGLStart;
         }
 
         static System.Collections.Generic.Dictionary<string, object> BuildSessionData(

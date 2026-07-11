@@ -350,8 +350,10 @@ namespace NPCSystem
 
         void Start()
         {
+#if !UNITY_WEBGL || UNITY_EDITOR
             DatadogMetricsService.Initialize();
             DatadogTracer.Initialize();
+#endif
             if (InitializeOnStart)
             {
                 _ = InitializeAsync();

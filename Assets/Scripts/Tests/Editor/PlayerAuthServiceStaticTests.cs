@@ -25,6 +25,10 @@ namespace NPCSystem.Tests
                 "ReplaceHost",
                 BindingFlags.Static | BindingFlags.NonPublic
             );
+            _shouldValidateStoredSessionOnStart = typeof(PlayerAuthService).GetMethod(
+                "ShouldValidateStoredSessionOnStart",
+                BindingFlags.Static | BindingFlags.NonPublic
+            );
             _buildSessionData = typeof(PlayerAuthService).GetMethod(
                 "BuildSessionData",
                 BindingFlags.Static | BindingFlags.NonPublic
@@ -34,6 +38,7 @@ namespace NPCSystem.Tests
         static readonly MethodInfo _emailFromUsername;
         static readonly MethodInfo _usernameFromEmail;
         static readonly MethodInfo _replaceHost;
+        static readonly MethodInfo _shouldValidateStoredSessionOnStart;
         static readonly MethodInfo _buildSessionData;
 
         static T Invoke<T>(MethodInfo method, params object[] args)
@@ -122,6 +127,58 @@ namespace NPCSystem.Tests
         {
             string result = Invoke<string>(_replaceHost, "not-a-url", "newhost");
             Assert.That(result, Is.EqualTo("not-a-url"));
+        }
+
+        [Test]
+        public void ShouldValidateStoredSessionOnStart_WebGLDefersByDefault()
+        {
+            bool result = Invoke<bool>(
+                _shouldValidateStoredSessionOnStart,
+                true,
+                false,
+                UnityEngine.RuntimePlatform.WebGLPlayer
+            );
+
+            Assert.That(result, Is.False);
+        }
+
+        [Test]
+        public void ShouldValidateStoredSessionOnStart_WebGLEnabledWhenOptedIn()
+        {
+            bool result = Invoke<bool>(
+                _shouldValidateStoredSessionOnStart,
+                true,
+                true,
+                UnityEngine.RuntimePlatform.WebGLPlayer
+            );
+
+            Assert.That(result, Is.True);
+        }
+
+        [Test]
+        public void ShouldValidateStoredSessionOnStart_NonWebGLUsesConfiguredValue()
+        {
+            bool result = Invoke<bool>(
+                _shouldValidateStoredSessionOnStart,
+                true,
+                false,
+                UnityEngine.RuntimePlatform.LinuxPlayer
+            );
+
+            Assert.That(result, Is.True);
+        }
+
+        [Test]
+        public void ShouldValidateStoredSessionOnStart_ConfiguredFalseAlwaysDefers()
+        {
+            bool result = Invoke<bool>(
+                _shouldValidateStoredSessionOnStart,
+                false,
+                true,
+                UnityEngine.RuntimePlatform.LinuxPlayer
+            );
+
+            Assert.That(result, Is.False);
         }
 
         // ── BuildSessionData ───────────────────────────────────────

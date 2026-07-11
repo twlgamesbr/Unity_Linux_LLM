@@ -35,7 +35,7 @@ namespace NPCSystem
                 $"Applying client session and switching to NPC '{request.npcSlug}' before dialogue generation."
             );
             await _dialogueManager.SwitchToNPCAsync(request.npcSlug);
-            _dialogueManager.SendMessage(request.playerMessage);
+            _dialogueManager.SendDialogueMessage(request.playerMessage);
         }
 
         async Task WaitForResolvedPlayerNameAsync(ulong clientId)

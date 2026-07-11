@@ -181,7 +181,7 @@ namespace NPCSystem
                 || IsServer
             )
             {
-                _dialogueManager?.SendMessage(request.playerMessage);
+                _dialogueManager?.SendDialogueMessage(request.playerMessage);
                 return;
             }
 

@@ -44,6 +44,9 @@ namespace NPCSystem
         /// <summary>Public accessor (used by tests).</summary>
         public NPCNetworkBootstrap NetworkBootstrap { get => _networkBootstrap; set => _networkBootstrap = value; }
 
+        [SerializeField]
+        WebGLGameplayLoadController _gameplayLoadController;
+
         [Header("Mode")]
         [Tooltip(
             "Dedicated-server projects should keep this disabled so auth always starts a client unless an explicit CLI override is supplied. Enable only for legacy listen-server/Multiplayer Play Mode host tests."
@@ -144,6 +147,11 @@ namespace NPCSystem
 #endif
             if (_networkBootstrap == null)
                 _networkBootstrap = FindAnyObjectByType<NPCNetworkBootstrap>(
+                    FindObjectsInactive.Include
+                );
+
+            if (_gameplayLoadController == null)
+                _gameplayLoadController = FindAnyObjectByType<WebGLGameplayLoadController>(
                     FindObjectsInactive.Include
                 );
         }
@@ -261,7 +269,30 @@ namespace NPCSystem
             lastBridgeStatus =
                 $"Auth success for {_authenticatedPlayerName}; resolved mode {resolvedMode}.";
 
-            // Initialize dialogue UI and backend system on demand to be memory smart!
+            await PrepareGameplayAsync();
+
+            if (resolvedMode == ResolvedNetworkStartupMode.Host)
+                StartHostAndRegisterPlayerName();
+            else
+                StartClientAndRegisterPlayerName();
+        }
+
+        async System.Threading.Tasks.Task PrepareGameplayAsync()
+        {
+            ResolveReferences();
+            if (_gameplayLoadController != null)
+            {
+                _logger?.Log(
+                    NPCFlowStage.SceneBootstrap,
+                    NPCFlowStatus.Start,
+                    NPCFlowLogLevel.Info,
+                    "Preparing gameplay systems after authentication.",
+                    source: nameof(AuthNetworkBridge)
+                );
+                await _gameplayLoadController.PrepareGameplayAsync();
+                return;
+            }
+
 #if !UNITY_SERVER
             var uiController = FindAnyObjectByType<NPCDialogueUIController>(
                 FindObjectsInactive.Include
@@ -282,31 +313,24 @@ namespace NPCSystem
                     source: nameof(AuthNetworkBridge)
                 );
                 await uiController.InitializeOnDemandAsync();
+                return;
             }
-            else
 #endif
-            {
-                // Headless fallback
-                var manager = FindAnyObjectByType<NPCDialogueManager>(
-                    FindObjectsInactive.Include
-                );
-                if (manager != null)
-                {
-                    _logger?.Log(
-                        NPCFlowStage.SceneBootstrap,
-                        NPCFlowStatus.Start,
-                        NPCFlowLogLevel.Info,
-                        "Triggering on-demand backend dialogue system initialization (headless fallback).",
-                        source: nameof(AuthNetworkBridge)
-                    );
-                    await manager.InitializeAsync();
-                }
-            }
 
-            if (resolvedMode == ResolvedNetworkStartupMode.Host)
-                StartHostAndRegisterPlayerName();
-            else
-                StartClientAndRegisterPlayerName();
+            var manager = FindAnyObjectByType<NPCDialogueManager>(
+                FindObjectsInactive.Include
+            );
+            if (manager != null)
+            {
+                _logger?.Log(
+                    NPCFlowStage.SceneBootstrap,
+                    NPCFlowStatus.Start,
+                    NPCFlowLogLevel.Info,
+                    "Triggering on-demand backend dialogue system initialization.",
+                    source: nameof(AuthNetworkBridge)
+                );
+                await manager.InitializeAsync();
+            }
         }
 
         ResolvedNetworkStartupMode ResolveStartupMode()

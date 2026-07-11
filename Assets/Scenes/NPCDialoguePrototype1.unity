@@ -1318,7 +1318,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &276694091
 Transform:
   m_ObjectHideFlags: 0
@@ -1360,7 +1360,7 @@ MonoBehaviour:
   DialogueManager: {fileID: 1778380623}
   NpcPrefab: {fileID: 6903247061848355748, guid: 3adc01a49d3d92f3eb81281b65e4b9c9, type: 3}
   NpcPrefabResourcesPath: Networking/NPCServerCharacter
-  spawnOrigin: {x: -4, y: 1, z: 6}
+  spawnOrigin: {x: -4, y: 0, z: 6}
   spawnSpacing: {x: 2.75, y: 0, z: 2.5}
   MaxColumns: 3
   ClearExistingNpcCharactersBeforeSpawn: 1
@@ -2241,7 +2241,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &489627713
 Transform:
   m_ObjectHideFlags: 0
@@ -4121,7 +4121,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &774187516
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4139,7 +4139,7 @@ MonoBehaviour:
   _dialogueManager: {fileID: 1778380623}
   _backendReadiness: {fileID: 276694094}
   _networkBridge: {fileID: 1471440990}
-  _smokeValidator: {fileID: 1778380626}
+  _smokeValidator: {fileID: 0}
   _initializeOnStart: 1
   _configureNetworkTransport: 0
   _initializeDialogueManager: 0
@@ -6319,6 +6319,63 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 978683443}
   m_CullTransparentMesh: 1
+--- !u!1 &985270262
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 985270264}
+  - component: {fileID: 985270263}
+  m_Layer: 0
+  m_Name: WebGLGameplayLoadController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &985270263
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 985270262}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3cd17132d557292f9b6db6b8348787ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.WebGLGameplayLoadController
+  _loadAdditiveGameplayScene: 0
+  _additiveGameplaySceneName: Gameplay
+  _gameplayRootNames:
+  - Network_Manager
+  - NPCSceneInitialization
+  - NPCDialogueRuntimeBridge
+  - Backend
+  - NPCDialogueUI
+  - NPCDialogueSystem
+  - NPCNameplates
+  _initializeDialogueUi: 1
+  _showGameplayCanvas: 1
+  _lastLoadStatus: Idle
+--- !u!4 &985270264
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 985270262}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1023571708
 GameObject:
   m_ObjectHideFlags: 0
@@ -7030,7 +7087,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1161870790
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8627,6 +8684,7 @@ MonoBehaviour:
   restApiUrl: http://localhost:8092
   requestTimeoutSeconds: 15
   validateStoredSessionOnStart: 1
+  restoreStoredSessionOnWebGLStart: 0
   lastAuthStatus: SDK initialized. No active session.
   lastAuthRoute: 
   lastAuthDurationMs: 0
@@ -8644,6 +8702,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.AuthNetworkBridge
   _authController: {fileID: 1351714794}
   _networkBootstrap: {fileID: 774187519}
+  _gameplayLoadController: {fileID: 985270263}
   _autoDetectStartupMode: 0
   _startAsHost: 0
   _hostAddress: 127.0.0.1
@@ -9334,7 +9393,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1471440988
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10859,15 +10918,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1778380624}
   - component: {fileID: 1778380623}
-  - component: {fileID: 1778380626}
-  - component: {fileID: 1778380628}
-  - component: {fileID: 1778380629}
-  - component: {fileID: 1778380630}
   - component: {fileID: 1778380632}
   - component: {fileID: 1778380636}
-  - component: {fileID: 1778380633}
-  - component: {fileID: 1778380634}
-  - component: {fileID: 1778380635}
   - component: {fileID: 1778380637}
   - component: {fileID: 1778380640}
   - component: {fileID: 1778380639}
@@ -10878,7 +10930,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1778380623
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10892,12 +10944,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPCSystem.NPCDialogueManager
   ChatClient: {fileID: 1778380636}
-  LocalRag: {fileID: 1778380634}
+  LocalRag: {fileID: 0}
   _ragEmbeddingPath: RAG/NPCDialogues.rag
   _useQdrantRag: 0
-  QdrantRag: {fileID: 1778380628}
-  ActionPlanner: {fileID: 1778380629}
-  EvidenceState: {fileID: 1778380630}
+  QdrantRag: {fileID: 0}
+  ActionPlanner: {fileID: 0}
+  EvidenceState: {fileID: 0}
   SupabaseRepo: {fileID: 1778380637}
   _remoteHost: 127.0.0.1
   _remotePort: 8080
@@ -10948,6 +11000,8 @@ MonoBehaviour:
   OnError:
     m_PersistentCalls:
       m_Calls: []
+  _autoSelectDefaultNPC: 1
+  _defaultNpcSlug: 
 --- !u!4 &1778380624
 Transform:
   m_ObjectHideFlags: 0
@@ -10963,73 +11017,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1778380626
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1778380622}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cecd407aa89f6dec98a9a4c4b999d68c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NPCSystem.NPCDialogueSmokeValidator
-  DialogueManager: {fileID: 1778380623}
-  ChatClient: {fileID: 1778380636}
-  LocalRag: {fileID: 1778380634}
-  validateOnStart: 0
-  runFirstQuestionSmokeOnStart: 0
-  smokeQuestion: How many namespaces are there in this unity project?
-  smokeTimeoutSeconds: 60
---- !u!114 &1778380628
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1778380622}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 307aa1d34162b1b759aeeac4d0b0ba14, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.QdrantRAGService
-  _qdrantUrl: http://localhost:6333
-  _collectionName: unity_linux_llm_codebase_v2
-  _embedder: {fileID: 1778380633}
-  inspectorStatus: Qdrant is reachable but empty (no points).
---- !u!114 &1778380629
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1778380622}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 768834cce95a7c94fb343460934183f5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCDialogueActionPlanner
---- !u!114 &1778380630
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1778380622}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4dbc73d3966f70eacb6a3c1f868b15e4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCEvidenceState
-  discoveredClues: []
-  obtainedItems: []
-  visitedLocations:
-  - foyer
-  npcMoodKeys: []
-  npcMoodValues: []
-  npcTrustKeys: []
-  npcTrustValues: 
 --- !u!1652712579 &1778380632
 MultiplayerRolesData:
   m_ObjectHideFlags: 2
@@ -11039,52 +11026,6 @@ MultiplayerRolesData:
   m_GameObject: {fileID: 1778380622}
   m_GameObjectRolesMask: 3
   m_ComponentsRolesMasks: []
---- !u!114 &1778380633
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1778380622}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4fc1cc6216f8393fd94c3253333df4f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCLocalAIEmbedder
-  host: 127.0.0.1
-  port: 8080
-  apiKey: 
-  model: nomic-embed-text-v1.5
-  numRetries: 3
---- !u!114 &1778380634
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1778380622}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd7076bb6525c3ae6b9afa6d8d9ec1ec, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCLocalRAG
-  _searchType: 1
-  _search: {fileID: 1778380635}
-  _chunkingType: 0
-  _chunking: {fileID: 0}
---- !u!114 &1778380635
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1778380622}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1e05154708e1da8a285c8ce8968bc646, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCSimpleSearch
-  _llmEmbedder: {fileID: 1778380633}
 --- !u!114 &1778380636
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11092,7 +11033,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1778380622}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2a2e4b181559021ddab4f2cbdaf4b400, type: 3}
   m_Name: 
@@ -13605,3 +13546,4 @@ SceneRoots:
   - {fileID: 1778380624}
   - {fileID: 1788130159}
   - {fileID: 1597061039}
+  - {fileID: 985270264}

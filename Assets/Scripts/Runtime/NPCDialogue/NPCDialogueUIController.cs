@@ -161,8 +161,16 @@ namespace NPCSystem
                 DialogueManager.OnResponseUpdated.RemoveListener(HandleResponseUpdated);
                 DialogueManager.OnResponseComplete.RemoveListener(HandleResponseComplete);
                 DialogueManager.OnError.RemoveListener(HandleError);
-                _listenersBound = false;
             }
+            if (NetworkBridge != null && _listenersBound)
+            {
+                NetworkBridge.OnNpcChanged.RemoveListener(HandleNpcChanged);
+                NetworkBridge.OnResponseStart.RemoveListener(HandleResponseStart);
+                NetworkBridge.OnResponseUpdated.RemoveListener(HandleResponseUpdated);
+                NetworkBridge.OnResponseComplete.RemoveListener(HandleResponseComplete);
+                NetworkBridge.OnError.RemoveListener(HandleError);
+            }
+            _listenersBound = false;
         }
 
         void OnDisable()
@@ -174,8 +182,16 @@ namespace NPCSystem
                 DialogueManager.OnResponseUpdated.RemoveListener(HandleResponseUpdated);
                 DialogueManager.OnResponseComplete.RemoveListener(HandleResponseComplete);
                 DialogueManager.OnError.RemoveListener(HandleError);
-                _listenersBound = false;
             }
+            if (NetworkBridge != null && _listenersBound)
+            {
+                NetworkBridge.OnNpcChanged.RemoveListener(HandleNpcChanged);
+                NetworkBridge.OnResponseStart.RemoveListener(HandleResponseStart);
+                NetworkBridge.OnResponseUpdated.RemoveListener(HandleResponseUpdated);
+                NetworkBridge.OnResponseComplete.RemoveListener(HandleResponseComplete);
+                NetworkBridge.OnError.RemoveListener(HandleError);
+            }
+            _listenersBound = false;
         }
 
         // ── Public API ──────────────────────────────────────────────────
@@ -263,6 +279,16 @@ namespace NPCSystem
                 DialogueManager.OnResponseUpdated.AddListener(HandleResponseUpdated);
                 DialogueManager.OnResponseComplete.AddListener(HandleResponseComplete);
                 DialogueManager.OnError.AddListener(HandleError);
+            }
+            // Also bind to NetworkBridge events for networked client scenarios
+            // where the dialogue runs on the server and responses come via RPC.
+            if (NetworkBridge != null)
+            {
+                NetworkBridge.OnNpcChanged.AddListener(HandleNpcChanged);
+                NetworkBridge.OnResponseStart.AddListener(HandleResponseStart);
+                NetworkBridge.OnResponseUpdated.AddListener(HandleResponseUpdated);
+                NetworkBridge.OnResponseComplete.AddListener(HandleResponseComplete);
+                NetworkBridge.OnError.AddListener(HandleError);
             }
             _listenersBound = true;
         }
