@@ -10,11 +10,32 @@ services:
       - DD_SERVICE=webgl-client
       - DD_ENV=${DD_ENV:-production}
       - DD_SITE=${DD_SITE:-us5.datadoghq.com}
+      - DD_PROFILING_ENABLED=auto
+      - DD_DATA_STREAMS_ENABLED=true
       - DD_AGENT_HOST=dd-agent
       - DD_TRACE_AGENT_PORT=8126
     volumes:
       - ../../Builds/WebGL_client/WebGL:/usr/share/nginx/html:ro
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # DataDog Intake Proxy — handles /dd-intake?ddforward=<encodedPath> for v6 SDK
+  # Avoids CORS errors by proxying intake requests through local Python service.
+  ddproxy:
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM python:3.12-alpine
+        COPY ddproxy.py /ddproxy.py
+        CMD ["python3", "/ddproxy.py"]
+    container_name: ddproxy
+    ports:
+      - "9090:9090"
     restart: unless-stopped
     logging:
       driver: json-file

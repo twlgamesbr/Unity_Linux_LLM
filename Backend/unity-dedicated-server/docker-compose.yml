@@ -12,6 +12,13 @@ services:
       - SERVER_PORT=11474
       - SERVER_ADDRESS=0.0.0.0
       - USE_WEBSOCKETS=true
+      - DD_SERVICE=npc-server
+      - DD_ENV=${DD_ENV:-production}
+      - DD_SITE=${DD_SITE:-us5.datadoghq.com}
+      - DD_PROFILING_ENABLED=auto
+      - DD_DATA_STREAMS_ENABLED=true
+      - DD_AGENT_HOST=dd-agent
+      - DD_TRACE_AGENT_PORT=8126
     # Bind-mount the server build so you can iterate without rebuilding.
     # Read-write: Unity needs to write to _Data/ for logs and config.
     volumes:

@@ -10,7 +10,7 @@ storage:
   snapshots_path: /qdrant/storage/snapshots
 
 service:
-  grpc_port: 6333
+  grpc_port: 6334
   http_port: 6333
   enable_cors: true
   cors_domain: "*"

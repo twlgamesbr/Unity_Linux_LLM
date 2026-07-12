@@ -10,8 +10,14 @@ services:
       - /mnt/data/Projects_SSD/qdrant_storage:/qdrant/storage:rw
       - ./config.yaml:/qdrant/config/production.yaml:ro
     environment:
-      - QDRANT__SERVICE__GRPC_PORT=6333
+      - QDRANT__SERVICE__GRPC_PORT=6334
       - QDRANT__SERVICE__HTTP_PORT=6333
+      - DD_SERVICE=qdrant
+      - DD_ENV=${DD_ENV:-production}
+      - DD_API_KEY=${DD_API_KEY:-}
+      - DD_SITE=${DD_SITE:-us5.datadoghq.com}
+      - DD_AGENT_HOST=dd-agent
+      - DD_TRACE_AGENT_PORT=8126
     restart: unless-stopped
     stop_grace_period: 30s
     logging:

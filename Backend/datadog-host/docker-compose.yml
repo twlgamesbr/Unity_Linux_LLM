@@ -3,21 +3,33 @@ services:
   # Datadog Agent — single host-level agent that
   # monitors everything: Linux OS, Docker containers,
   # custom DogStatsD metrics from Unity, APM traces,
-  # and all service logs.
+  # profiling, runtime security, and all service logs.
   #
   # The agent auto-discovers Docker containers and
   # collects their stdout/stderr logs. Custom
   # integration configs in conf.d/ enable structured
   # log parsing and enhanced metrics.
   #
-  # Requires DD_API_KEY set in Backend/.env
+  # Requires DD_API_KEY and DD_APP_KEY set in Backend/.env
   # Site: us5.datadoghq.com
   # ─────────────────────────────────────────────────
   datadog-agent:
     container_name: dd-agent
-    image: gcr.io/datadoghq/agent:latest
+    image: registry.datadoghq.com/agent:7
     pid: host
     network_mode: host
+    security_opt:
+      - apparmor:unconfined
+    cap_add:
+      - SYS_ADMIN
+      - SYS_RESOURCE
+      - SYS_PTRACE
+      - NET_ADMIN
+      - NET_BROADCAST
+      - NET_RAW
+      - IPC_LOCK
+      - CHOWN
+      - KILL
     deploy:
       resources:
         reservations:
@@ -26,6 +38,7 @@ services:
               count: all
               capabilities: [gpu]
     environment:
+      # Credentials
       - DD_API_KEY=${DD_API_KEY:?err}
       - DD_APP_KEY=${DD_APP_KEY:?err}
       - DD_SITE=${DD_SITE:-us5.datadoghq.com}
@@ -34,36 +47,51 @@ services:
       # APM & Tracing
       - DD_APM_ENABLED=true
       - DD_APM_NON_LOCAL_TRAFFIC=true
+      - DD_DATA_STREAMS_ENABLED=true
       # GPU Monitoring
       - DD_GPU_ENABLED=true
       # Logs
       - DD_LOGS_ENABLED=true
       - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true
+      - DD_LOGS_CONFIG_AUTO_MULTI_LINE_DETECTION=true
+      - DD_CONTAINER_EXCLUDE_LOGS=name:dd-agent
       # Process
       - DD_PROCESS_AGENT_ENABLED=true
       # DogStatsD
       - DD_DOGSTATSD_NON_LOCAL_TRAFFIC=true
       - DD_DOGSTATSD_ORIGIN_DETECTION=true
+      # Runtime Security
+      - DD_RUNTIME_SECURITY_CONFIG_ENABLED=true
       - DD_LOG_LEVEL=info
       # Disable remote config (no system-probe needed)
       - DD_REMOTE_CONFIGURATION_ENABLED=false
-      # Pin agent version to avoid unexpected breaking changes
-      # - DD_AGENT_VERSION=7.81.0
     volumes:
       # Docker control socket for container discovery
       - /var/run/docker.sock:/var/run/docker.sock:ro
       # Host proc/cgroup for system metrics (CPU, memory, disk, network)
       - /proc/:/host/proc/:ro
       - /sys/fs/cgroup/:/host/sys/fs/cgroup:ro
+      # Full host root for security checks and system probes
+      - /:/host/root:ro
       # Docker container logs for tailing
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       # Custom integration configs (nginx, unity, postgres, etc.)
       - ./conf.d:/etc/datadog-agent/conf.d:ro
+      # APM & DogStatsD socket directory (for UDS connections)
+      - /var/run/datadog:/var/run/datadog
+      # Agent run directory
+      - /opt/datadog-agent/run:/opt/datadog-agent/run:rw
       # NVIDIA GPU monitoring (NVML access)
       - /dev/nvidia0:/dev/nvidia0:ro
       - /dev/nvidia1:/dev/nvidia1:ro
       - /dev/nvidiactl:/dev/nvidiactl:ro
       - /dev/nvidia-modeset:/dev/nvidia-modeset:ro
+      # System identity (for process-user mapping)
+      - /etc/passwd:/etc/passwd:ro
+      - /etc/group:/etc/group:ro
+      # OS info and kernel debug (for runtime security)
+      - /etc/os-release:/etc/os-release:ro
+      - /sys/kernel/debug:/sys/kernel/debug
     restart: unless-stopped
     stop_grace_period: 30s
     logging:

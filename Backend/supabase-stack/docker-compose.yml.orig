@@ -246,8 +246,8 @@ services:
       DEFAULT_ORGANIZATION_NAME: ${STUDIO_DEFAULT_ORGANIZATION:-Local}
       DEFAULT_PROJECT_NAME: ${STUDIO_DEFAULT_PROJECT:-Unity}
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
-      SUPABASE_URL: ${SUPABASE_URL:-http://auth:9999}
-      SUPABASE_PUBLIC_URL: http://localhost:8091
+      SUPABASE_URL: ${SUPABASE_URL:-http://localhost:8091}
+      SUPABASE_PUBLIC_URL: ${SUPABASE_PUBLIC_URL:-http://localhost:8091}
       SUPABASE_ANON_KEY: ${ANON_KEY:-dev-local-anon-key}
       SUPABASE_SERVICE_KEY: ${SERVICE_ROLE_KEY:-dev-local-service-role-key}
       AUTH_JWT_SECRET: ${JWT_SECRET:-dev-local-jwt-secret-dev-local-jwt-secret}

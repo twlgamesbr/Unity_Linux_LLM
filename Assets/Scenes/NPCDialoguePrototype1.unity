@@ -1364,6 +1364,7 @@ MonoBehaviour:
   spawnSpacing: {x: 2.75, y: 0, z: 2.5}
   MaxColumns: 3
   ClearExistingNpcCharactersBeforeSpawn: 1
+  SnapToGround: 1
   lastSpawnStatus: Idle
   lastSpawnedCount: 0
 --- !u!114 &276694094
