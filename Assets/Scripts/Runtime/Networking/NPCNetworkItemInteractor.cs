@@ -26,6 +26,7 @@ namespace NPCSystem
         [Header("Range")]
         [FormerlySerializedAs("PickupRange")]
         public float PickupRange = 3f;
+
         [FormerlySerializedAs("TransferRange")]
         public float TransferRange = 4f;
 
@@ -46,7 +47,8 @@ namespace NPCSystem
         [Rpc(SendTo.Server)]
         public void RequestPickupNearestItemServerRpc(RpcParams rpcParams = default)
         {
-            if (!IsServer) return;
+            if (!IsServer)
+                return;
             ulong clientId = rpcParams.Receive.SenderClientId;
             NPCTransferableItem item = FindNearestPickupCandidate(clientId);
             if (item == null)
@@ -66,7 +68,8 @@ namespace NPCSystem
         [Rpc(SendTo.Server)]
         public void RequestGiveHeldItemToNearestPlayerServerRpc(RpcParams rpcParams = default)
         {
-            if (!IsServer) return;
+            if (!IsServer)
+                return;
             ulong clientId = rpcParams.Receive.SenderClientId;
             NPCTransferableItem item = FindHeldItem(clientId);
             NPCPlayerNetworkAvatar targetPlayer = FindNearestOtherPlayer(clientId);
@@ -87,7 +90,8 @@ namespace NPCSystem
         [Rpc(SendTo.Server)]
         public void RequestGiveHeldItemToNearestNpcServerRpc(RpcParams rpcParams = default)
         {
-            if (!IsServer) return;
+            if (!IsServer)
+                return;
             ulong clientId = rpcParams.Receive.SenderClientId;
             NPCTransferableItem item = FindHeldItem(clientId);
             NPCServerCharacter npc = FindNearestNpc(clientId);

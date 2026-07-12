@@ -564,7 +564,7 @@ namespace NPCSystem
             }
 
             string npcSlug = _profiles[selection].GetNpcSlug();
-            if (NetworkBridge != null)
+            if (ShouldUseNetworkBridge())
                 await NetworkBridge.RequestNpcSelectionAsync(npcSlug);
             else
                 await DialogueManager.SwitchToNPCAsync(npcSlug);
@@ -618,7 +618,7 @@ namespace NPCSystem
             if (PlayerInput != null)
                 PlayerInput.interactable = false;
 
-            if (NetworkBridge != null)
+            if (ShouldUseNetworkBridge())
                 NetworkBridge.SubmitPlayerMessage(message);
             else
                 DialogueManager.SendDialogueMessage(message);
@@ -626,12 +626,23 @@ namespace NPCSystem
 
         void OnStopPressed()
         {
-            if (NetworkBridge != null)
+            if (ShouldUseNetworkBridge())
                 NetworkBridge.CancelActiveRequest();
             else
                 DialogueManager.CancelRequests();
             SetAIText(string.Empty);
             SetInputEnabled(true);
+        }
+
+        /// <summary>
+        /// Returns true when the network bridge should be the primary routing path.
+        /// Requires the bridge to exist, its NetworkObject to be spawned,
+        /// NetworkManager to be listening, and local peer to be client or server.
+        /// Falls back to direct manager calls otherwise.
+        /// </summary>
+        bool ShouldUseNetworkBridge()
+        {
+            return NetworkBridge != null && NetworkBridge.IsNetworkReady;
         }
 
         // ── Reference resolution ──────────────────────────────────────

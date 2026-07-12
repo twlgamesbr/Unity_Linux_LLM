@@ -92,25 +92,45 @@ namespace NPCSystem
         // ──────────────────────────────────────────────
 
         /// <summary>Increment a counter metric.</summary>
-        public static void Increment(string metricName, double value = 1.0, double sampleRate = 1.0, string[] tags = null)
+        public static void Increment(
+            string metricName,
+            double value = 1.0,
+            double sampleRate = 1.0,
+            string[] tags = null
+        )
         {
             EnqueueMetric(FormatMetric(metricName, value, "c", sampleRate, tags));
         }
 
         /// <summary>Record a gauge (current value).</summary>
-        public static void Gauge(string metricName, double value, double sampleRate = 1.0, string[] tags = null)
+        public static void Gauge(
+            string metricName,
+            double value,
+            double sampleRate = 1.0,
+            string[] tags = null
+        )
         {
             EnqueueMetric(FormatMetric(metricName, value, "g", sampleRate, tags));
         }
 
         /// <summary>Record a timing in milliseconds.</summary>
-        public static void Timer(string metricName, double milliseconds, double sampleRate = 1.0, string[] tags = null)
+        public static void Timer(
+            string metricName,
+            double milliseconds,
+            double sampleRate = 1.0,
+            string[] tags = null
+        )
         {
             EnqueueMetric(FormatMetric(metricName, milliseconds, "ms", sampleRate, tags));
         }
 
         /// <summary>Record a histogram value.</summary>
-        public static void Histogram(string metricName, double value, double sampleRate = 1.0, string[] tags = null)
+        public static void Histogram(
+            string metricName,
+            double value,
+            double sampleRate = 1.0,
+            string[] tags = null
+        )
         {
             EnqueueMetric(FormatMetric(metricName, value, "h", sampleRate, tags));
         }
@@ -133,7 +153,13 @@ namespace NPCSystem
             }
         }
 
-        private static string FormatMetric(string name, double value, string type, double sampleRate, string[] tags)
+        private static string FormatMetric(
+            string name,
+            double value,
+            string type,
+            double sampleRate,
+            string[] tags
+        )
         {
             var sb = new StringBuilder();
             sb.Append(name);
@@ -145,7 +171,9 @@ namespace NPCSystem
             if (Math.Abs(sampleRate - 1.0) > 0.001)
             {
                 sb.Append("|@");
-                sb.Append(sampleRate.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture));
+                sb.Append(
+                    sampleRate.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)
+                );
             }
 
             if (tags != null && tags.Length > 0)

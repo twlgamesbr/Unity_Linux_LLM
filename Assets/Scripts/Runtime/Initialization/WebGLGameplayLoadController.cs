@@ -60,7 +60,9 @@ namespace NPCSystem
 
         async Task LoadGameplaySceneAsync()
         {
-            if (!_loadAdditiveGameplayScene || string.IsNullOrWhiteSpace(_additiveGameplaySceneName))
+            if (
+                !_loadAdditiveGameplayScene || string.IsNullOrWhiteSpace(_additiveGameplaySceneName)
+            )
                 return;
 
             string sceneName = _additiveGameplaySceneName.Trim();

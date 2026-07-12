@@ -55,7 +55,11 @@ namespace NPCSystem
         public event Action OnAttack;
 
         // ─── Public accessors for Inspector-assigned fields ───
-        public InputActionAsset InputActions { get => _inputActions; set => _inputActions = value; }
+        public InputActionAsset InputActions
+        {
+            get => _inputActions;
+            set => _inputActions = value;
+        }
 
         void Awake()
         {

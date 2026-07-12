@@ -18,23 +18,29 @@ namespace NPCSystem
             if (UserNetworkVariableSerialization<string>.WriteValue != null)
                 return; // already registered — idempotent guard
 
-            UserNetworkVariableSerialization<string>.WriteValue =
-                (FastBufferWriter writer, in string value) =>
-                {
-                    writer.WriteValueSafe(value);
-                };
+            UserNetworkVariableSerialization<string>.WriteValue = (
+                FastBufferWriter writer,
+                in string value
+            ) =>
+            {
+                writer.WriteValueSafe(value);
+            };
 
-            UserNetworkVariableSerialization<string>.ReadValue =
-                (FastBufferReader reader, out string value) =>
-                {
-                    reader.ReadValueSafe(out value);
-                };
+            UserNetworkVariableSerialization<string>.ReadValue = (
+                FastBufferReader reader,
+                out string value
+            ) =>
+            {
+                reader.ReadValueSafe(out value);
+            };
 
-            UserNetworkVariableSerialization<string>.DuplicateValue =
-                (in string value, ref string duplicatedValue) =>
-                {
-                    duplicatedValue = value;
-                };
+            UserNetworkVariableSerialization<string>.DuplicateValue = (
+                in string value,
+                ref string duplicatedValue
+            ) =>
+            {
+                duplicatedValue = value;
+            };
 
             Debug.Log(
                 "[NPCNetworkSerialization] Registered NetworkVariable<string> serialization."

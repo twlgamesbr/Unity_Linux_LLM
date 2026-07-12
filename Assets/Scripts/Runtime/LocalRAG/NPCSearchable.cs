@@ -22,24 +22,34 @@ namespace NPCSystem
     {
         /// <summary>Retrieve the raw string for a stored entry key.</summary>
         public abstract string Get(int key);
+
         /// <summary>Add a string to the search index, optionally under a group. Returns the assigned key.</summary>
         public abstract Task<int> Add(string inputString, string group = "");
+
         /// <summary>Remove entries matching the string within an optional group. Returns count removed.</summary>
         public abstract int Remove(string inputString, string group = "");
+
         /// <summary>Remove the entry with the exact given key.</summary>
         public abstract void Remove(int key);
+
         /// <summary>Total entries across all groups.</summary>
         public abstract int Count();
+
         /// <summary>Total entries within a specific group.</summary>
         public abstract int Count(string group);
+
         /// <summary>Remove every entry from the index.</summary>
         public abstract void Clear();
+
         /// <summary>Search for the query string and return a fetch key for incremental retrieval.</summary>
         public abstract Task<int> IncrementalSearch(string queryString, string group = "");
+
         /// <summary>Fetch the next batch of results for a prior IncrementalSearch call.</summary>
         public abstract (string[], float[], bool) IncrementalFetch(int fetchKey, int k);
+
         /// <summary>Fetch the next batch of result keys (int IDs) for a prior IncrementalSearch call.</summary>
         public abstract (int[], float[], bool) IncrementalFetchKeys(int fetchKey, int k);
+
         /// <summary>Signal that incremental retrieval is done; the implementation may release resources.</summary>
         public abstract void IncrementalSearchComplete(int fetchKey);
 

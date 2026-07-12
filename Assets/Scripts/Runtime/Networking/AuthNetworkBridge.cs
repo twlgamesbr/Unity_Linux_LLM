@@ -36,13 +36,24 @@ namespace NPCSystem
         [FormerlySerializedAs("AuthController")]
         [SerializeField]
         AuthUIController _authController;
+
         /// <summary>Public accessor (used by tests).</summary>
-        public AuthUIController AuthController { get => _authController; set => _authController = value; }
+        public AuthUIController AuthController
+        {
+            get => _authController;
+            set => _authController = value;
+        }
+
         [FormerlySerializedAs("NetworkBootstrap")]
         [SerializeField]
         NPCNetworkBootstrap _networkBootstrap;
+
         /// <summary>Public accessor (used by tests).</summary>
-        public NPCNetworkBootstrap NetworkBootstrap { get => _networkBootstrap; set => _networkBootstrap = value; }
+        public NPCNetworkBootstrap NetworkBootstrap
+        {
+            get => _networkBootstrap;
+            set => _networkBootstrap = value;
+        }
 
         [SerializeField]
         WebGLGameplayLoadController _gameplayLoadController;
@@ -54,8 +65,13 @@ namespace NPCSystem
         [FormerlySerializedAs("AutoDetectStartupMode")]
         [SerializeField]
         bool _autoDetectStartupMode = false;
+
         /// <summary>Public accessor for _autoDetectStartupMode (used by tests).</summary>
-        public bool AutoDetectStartupMode { get => _autoDetectStartupMode; set => _autoDetectStartupMode = value; }
+        public bool AutoDetectStartupMode
+        {
+            get => _autoDetectStartupMode;
+            set => _autoDetectStartupMode = value;
+        }
 
         [Tooltip(
             "False for Docker/dedicated-server flow: auth starts StartClient() against the dedicated server. Enable only for intentional legacy listen-server host tests."
@@ -63,8 +79,13 @@ namespace NPCSystem
         [FormerlySerializedAs("StartAsHost")]
         [SerializeField]
         bool _startAsHost = false;
+
         /// <summary>Public accessor for _startAsHost (used by tests).</summary>
-        public bool StartAsHost { get => _startAsHost; set => _startAsHost = value; }
+        public bool StartAsHost
+        {
+            get => _startAsHost;
+            set => _startAsHost = value;
+        }
 
         [Tooltip("Host address to connect to when _startAsHost is false.")]
         [FormerlySerializedAs("HostAddress")]
@@ -143,7 +164,9 @@ namespace NPCSystem
                 _authController = GetComponent<AuthUIController>();
 
             if (_authController == null)
-                _authController = FindAnyObjectByType<AuthUIController>(FindObjectsInactive.Include);
+                _authController = FindAnyObjectByType<AuthUIController>(
+                    FindObjectsInactive.Include
+                );
 #endif
             if (_networkBootstrap == null)
                 _networkBootstrap = FindAnyObjectByType<NPCNetworkBootstrap>(
@@ -214,10 +237,7 @@ namespace NPCSystem
                 service: "unity-dedicated-server",
                 resource: "PlayerAuth",
                 type: "auth",
-                tags: new[]
-                {
-                    $"player_name:{username?.Trim() ?? "unknown"}",
-                }
+                tags: new[] { $"player_name:{username?.Trim() ?? "unknown"}" }
             );
 
 #if UNITY_WEBGL && !UNITY_EDITOR
@@ -247,10 +267,10 @@ namespace NPCSystem
 
             CloseAuthUI();
 
-            DatadogMetricsService.Increment("auth.login.count", tags: new[]
-            {
-                $"mode:{resolvedMode.ToString().ToLowerInvariant()}",
-            });
+            DatadogMetricsService.Increment(
+                "auth.login.count",
+                tags: new[] { $"mode:{resolvedMode.ToString().ToLowerInvariant()}" }
+            );
 
             _logger?.Log(
                 NPCFlowStage.UIInput,
@@ -317,9 +337,7 @@ namespace NPCSystem
             }
 #endif
 
-            var manager = FindAnyObjectByType<NPCDialogueManager>(
-                FindObjectsInactive.Include
-            );
+            var manager = FindAnyObjectByType<NPCDialogueManager>(FindObjectsInactive.Include);
             if (manager != null)
             {
                 _logger?.Log(
@@ -570,7 +588,9 @@ namespace NPCSystem
             }
 
             // Override bootstrap's connect address if specified, then delegate to bootstrap
-            _networkBootstrap.TransportConfig.connectAddress = string.IsNullOrWhiteSpace(_hostAddress)
+            _networkBootstrap.TransportConfig.connectAddress = string.IsNullOrWhiteSpace(
+                _hostAddress
+            )
                 ? "127.0.0.1"
                 : _hostAddress.Trim();
             if (_hostPort > 0)

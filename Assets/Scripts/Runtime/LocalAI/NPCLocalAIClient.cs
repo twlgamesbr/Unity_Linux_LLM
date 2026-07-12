@@ -94,11 +94,7 @@ namespace NPCSystem
                     service: "unity-dedicated-server",
                     resource: $"LocalAI/{modelName}",
                     type: "llm",
-                    tags: new[]
-                    {
-                        $"model:{modelName}",
-                        $"attempt:{attempt}",
-                    }
+                    tags: new[] { $"model:{modelName}", $"attempt:{attempt}" }
                 );
 
                 var sw = System.Diagnostics.Stopwatch.StartNew();

@@ -57,23 +57,24 @@ namespace NPCSystem
         /// Initializes the APM tracer. Call once at server startup
         /// (alongside <c>DatadogMetricsService.Initialize()</c>).
         /// </summary>
-        public static void Initialize(string agentHost = DefaultAgentHost, int tracePort = DefaultTracePort)
+        public static void Initialize(
+            string agentHost = DefaultAgentHost,
+            int tracePort = DefaultTracePort
+        )
         {
             if (_initialized)
                 return;
 
             try
             {
-                _httpClient = new HttpClient
-                {
-                    Timeout = TimeSpan.FromSeconds(2),
-                };
+                _httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(2) };
 
                 _traceEndpoint = $"http://{agentHost}:{tracePort}/v0.5/traces";
 
                 // Seed trace ID from process start ticks for uniqueness
-                _nextTraceId = (Stopwatch.GetTimestamp() & 0x7FFFFFFFFFFFFFFF) ^
-                               (long)(DateTime.UtcNow.Ticks & 0x7FFFFFFFFFFFFFFF);
+                _nextTraceId =
+                    (Stopwatch.GetTimestamp() & 0x7FFFFFFFFFFFFFFF)
+                    ^ (long)(DateTime.UtcNow.Ticks & 0x7FFFFFFFFFFFFFFF);
 
                 _flushTimer = new Timer(
                     async _ =>
@@ -84,15 +85,20 @@ namespace NPCSystem
                         }
                         catch (Exception ex)
                         {
-                            UnityEngine.Debug.LogWarning($"[DatadogTracer] Flush error: {ex.Message}");
+                            UnityEngine.Debug.LogWarning(
+                                $"[DatadogTracer] Flush error: {ex.Message}"
+                            );
                         }
                     },
                     null,
                     FlushIntervalMs,
-                    FlushIntervalMs);
+                    FlushIntervalMs
+                );
 
                 _initialized = true;
-                UnityEngine.Debug.Log($"[DatadogTracer] Initialized — sending to {agentHost}:{tracePort}");
+                UnityEngine.Debug.Log(
+                    $"[DatadogTracer] Initialized — sending to {agentHost}:{tracePort}"
+                );
             }
             catch (Exception ex)
             {
@@ -132,7 +138,8 @@ namespace NPCSystem
             string resource = null,
             string type = "custom",
             Span parent = null,
-            string[] tags = null)
+            string[] tags = null
+        )
         {
             long traceId;
             long parentId = 0;
@@ -150,7 +157,17 @@ namespace NPCSystem
             long spanId = Interlocked.Increment(ref _nextSpanId);
             long start = NanosSinceEpoch();
 
-            return new Span(traceId, spanId, parentId, start, operationName, service, resource ?? operationName, type, tags);
+            return new Span(
+                traceId,
+                spanId,
+                parentId,
+                start,
+                operationName,
+                service,
+                resource ?? operationName,
+                type,
+                tags
+            );
         }
 
         // ──────────────────────────────────────────────
@@ -201,13 +218,16 @@ namespace NPCSystem
 
                 using var request = new HttpRequestMessage(HttpMethod.Post, _traceEndpoint)
                 {
-                    Content = new ByteArrayContent(data)
+                    Content = new ByteArrayContent(data),
                 };
                 request.Content.Headers.ContentType =
                     new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
 
-                var response = _httpClient.SendAsync(request)
-                    .ConfigureAwait(false).GetAwaiter().GetResult();
+                var response = _httpClient
+                    .SendAsync(request)
+                    .ConfigureAwait(false)
+                    .GetAwaiter()
+                    .GetResult();
                 _ = response.StatusCode; // swallow — we just care it was sent
             }
             catch (Exception ex)
@@ -225,7 +245,7 @@ namespace NPCSystem
 
                 using var request = new HttpRequestMessage(HttpMethod.Post, _traceEndpoint)
                 {
-                    Content = new ByteArrayContent(data)
+                    Content = new ByteArrayContent(data),
                 };
                 request.Content.Headers.ContentType =
                     new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
@@ -257,20 +277,22 @@ namespace NPCSystem
                     traces[span.TraceId] = traceSpans;
                 }
 
-                traceSpans.Add(new Dictionary<string, object>
-                {
-                    ["trace_id"] = span.TraceId,
-                    ["span_id"] = span.SpanId,
-                    ["parent_id"] = span.ParentId,
-                    ["start"] = span.StartNanos,
-                    ["duration"] = span.DurationNanos,
-                    ["service"] = span.Service,
-                    ["name"] = span.OperationName,
-                    ["resource"] = span.Resource,
-                    ["type"] = span.Type,
-                    ["meta"] = span.Tags,
-                    ["metrics"] = new Dictionary<string, object>(),
-                });
+                traceSpans.Add(
+                    new Dictionary<string, object>
+                    {
+                        ["trace_id"] = span.TraceId,
+                        ["span_id"] = span.SpanId,
+                        ["parent_id"] = span.ParentId,
+                        ["start"] = span.StartNanos,
+                        ["duration"] = span.DurationNanos,
+                        ["service"] = span.Service,
+                        ["name"] = span.OperationName,
+                        ["resource"] = span.Resource,
+                        ["type"] = span.Type,
+                        ["meta"] = span.Tags,
+                        ["metrics"] = new Dictionary<string, object>(),
+                    }
+                );
             }
 
             // Build outer array of trace arrays
@@ -280,8 +302,11 @@ namespace NPCSystem
                 payload.Add(traceSpans);
             }
 
-            return JsonConvert.SerializeObject(payload, Formatting.None,
-                new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+            return JsonConvert.SerializeObject(
+                payload,
+                Formatting.None,
+                new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore }
+            );
         }
 
         private static long NanosSinceEpoch()
@@ -308,8 +333,18 @@ namespace NPCSystem
         public string Type { get; }
         public Dictionary<string, string> Tags { get; }
 
-        public SpanData(long traceId, long spanId, long parentId, long startNanos, long durationNanos,
-            string operationName, string service, string resource, string type, Dictionary<string, string> tags)
+        public SpanData(
+            long traceId,
+            long spanId,
+            long parentId,
+            long startNanos,
+            long durationNanos,
+            string operationName,
+            string service,
+            string resource,
+            string type,
+            Dictionary<string, string> tags
+        )
         {
             TraceId = traceId;
             SpanId = spanId;
@@ -353,8 +388,17 @@ namespace NPCSystem
         private readonly Dictionary<string, string> _tags;
         private volatile bool _finished;
 
-        internal Span(long traceId, long spanId, long parentId, long startNanos,
-            string operationName, string service, string resource, string type, string[] tags)
+        internal Span(
+            long traceId,
+            long spanId,
+            long parentId,
+            long startNanos,
+            string operationName,
+            string service,
+            string resource,
+            string type,
+            string[] tags
+        )
         {
             _traceId = traceId;
             _spanId = spanId;
@@ -423,8 +467,17 @@ namespace NPCSystem
                 durationNanos = 1;
 
             var data = new SpanData(
-                _traceId, _spanId, _parentId, _startNanos, durationNanos,
-                _operationName, _service, _resource, _type, _tags);
+                _traceId,
+                _spanId,
+                _parentId,
+                _startNanos,
+                durationNanos,
+                _operationName,
+                _service,
+                _resource,
+                _type,
+                _tags
+            );
 
             DatadogTracer.EnqueueSpan(data);
         }

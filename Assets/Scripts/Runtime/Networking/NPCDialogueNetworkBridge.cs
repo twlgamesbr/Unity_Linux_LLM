@@ -23,8 +23,14 @@ namespace NPCSystem
         [FormerlySerializedAs("DialogueManager")]
         [SerializeField]
         NPCDialogueManager _dialogueManager;
+
         /// <summary>Public accessor (used by tests).</summary>
-        public NPCDialogueManager DialogueManager { get => _dialogueManager; set => _dialogueManager = value; }
+        public NPCDialogueManager DialogueManager
+        {
+            get => _dialogueManager;
+            set => _dialogueManager = value;
+        }
+
         [FormerlySerializedAs("SessionManager")]
         [SerializeField]
         NPCNetworkSessionManager _sessionManager;
@@ -111,6 +117,21 @@ namespace NPCSystem
                 }
             }
         }
+
+        // ── Network Readiness ───────────────────────────────────────────
+
+        /// <summary>
+        /// Returns true when the full network predicate is satisfied:
+        /// bridge is active, NetworkObject is spawned, NetworkManager is listening,
+        /// and local peer is client or server. Use this to decide whether to route
+        /// through the network bridge or fall back to direct manager calls.
+        /// </summary>
+        public bool IsNetworkReady =>
+            Application.isPlaying
+            && NetworkManager != null
+            && NetworkManager.IsListening
+            && IsSpawned
+            && (IsClient || IsServer);
 
         // ── Public API ──────────────────────────────────────────────────
 
@@ -299,12 +320,10 @@ namespace NPCSystem
             RpcParams rpcParams = default
         )
         {
-            if (!IsServer) return;
+            if (!IsServer)
+                return;
             FireAndForget(
-                () => HandleNpcSelectionServerAsync(
-                    selection,
-                    rpcParams.Receive.SenderClientId
-                ),
+                () => HandleNpcSelectionServerAsync(selection, rpcParams.Receive.SenderClientId),
                 nameof(RequestNpcSelectionServerRpc)
             );
         }
@@ -371,12 +390,10 @@ namespace NPCSystem
             RpcParams rpcParams = default
         )
         {
-            if (!IsServer) return;
+            if (!IsServer)
+                return;
             FireAndForget(
-                () => HandleSubmitDialogueServerAsync(
-                    request,
-                    rpcParams.Receive.SenderClientId
-                ),
+                () => HandleSubmitDialogueServerAsync(request, rpcParams.Receive.SenderClientId),
                 nameof(SubmitDialogueServerRpc)
             );
         }
@@ -430,7 +447,8 @@ namespace NPCSystem
         [Rpc(SendTo.Server)]
         void CancelActiveRequestServerRpc(RpcParams rpcParams = default)
         {
-            if (!IsServer) return;
+            if (!IsServer)
+                return;
             if (
                 _activeClientId.HasValue
                 && _activeClientId.Value == rpcParams.Receive.SenderClientId
@@ -475,10 +493,7 @@ namespace NPCSystem
         void SendResponseCompleteToClient(ulong clientId, NPCDialogueResponseMessage payload)
         {
             payload.SanitizeInPlace();
-            ReceiveResponseCompleteClientRpc(
-                payload,
-                GetClientTarget(clientId)
-            );
+            ReceiveResponseCompleteClientRpc(payload, GetClientTarget(clientId));
         }
 
         void SendErrorToClient(ulong clientId, string error)
@@ -671,9 +686,7 @@ namespace NPCSystem
             }
             catch (Exception ex)
             {
-                Debug.LogError(
-                    $"[{nameof(NPCDialogueNetworkBridge)}] {operationName} threw: {ex}"
-                );
+                Debug.LogError($"[{nameof(NPCDialogueNetworkBridge)}] {operationName} threw: {ex}");
             }
         }
     }
