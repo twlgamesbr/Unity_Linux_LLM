@@ -5,12 +5,12 @@ namespace NPCSystem
     /// <summary>
     /// Drives animator parameters from character movement state.
     /// Reads from NPCCharacterMotor (or optionally from raw input).
-    /// No movement logic, no input logic \u2014 pure animation.
+    /// No movement logic, no input logic — pure animation.
     /// </summary>
     [RequireComponent(typeof(Animator))]
     public sealed class NPCCharacterAnimatorBridge : MonoBehaviour
     {
-        // \u2500\u2500\u2500 Animator hashes (computed once) \u2500\u2500\u2500
+        // ─── Animator hashes (computed once) ───
         static readonly int MoveXHash = Animator.StringToHash("MoveX");
         static readonly int MoveYHash = Animator.StringToHash("MoveY");
         static readonly int SpeedHash = Animator.StringToHash("Speed");

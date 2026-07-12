@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace NPCSystem
 {
@@ -13,37 +14,47 @@ namespace NPCSystem
         CharacterController _controller;
 
         [Header("Movement")]
+        [FormerlySerializedAs("walkSpeed")]
         [SerializeField]
-        float walkSpeed = 3.5f;
+        private float _walkSpeed = 3.5f;
 
+        [FormerlySerializedAs("sprintSpeed")]
         [SerializeField]
-        float sprintSpeed = 6.0f;
+        private float _sprintSpeed = 6.0f;
 
+        [FormerlySerializedAs("rotationSpeed")]
         [SerializeField]
-        float rotationSpeed = 720f;
+        private float _rotationSpeed = 720f;
 
+        [FormerlySerializedAs("acceleration")]
         [SerializeField]
-        float acceleration = 12f;
+        private float _acceleration = 12f;
 
+        [FormerlySerializedAs("deceleration")]
         [SerializeField]
-        float deceleration = 10f;
+        private float _deceleration = 10f;
 
         [Header("Jump / Gravity")]
+        [FormerlySerializedAs("jumpHeight")]
         [SerializeField]
-        float jumpHeight = 1.25f;
+        private float _jumpHeight = 1.25f;
 
+        [FormerlySerializedAs("gravity")]
         [SerializeField]
-        float gravity = -24f;
+        private float _gravity = -24f;
 
+        [FormerlySerializedAs("groundedStickVelocity")]
         [SerializeField]
-        float groundedStickVelocity = -2f;
+        private float _groundedStickVelocity = -2f;
 
         [Header("Ground Check")]
+        [FormerlySerializedAs("groundCheckDistance")]
         [SerializeField]
-        float groundCheckDistance = 0.15f;
+        private float _groundCheckDistance = 0.15f;
 
+        [FormerlySerializedAs("groundLayers")]
         [SerializeField]
-        LayerMask groundLayers = ~0;
+        private LayerMask _groundLayers = ~0;
 
         // \u2500\u2500\u2500 Runtime state \u2500\u2500\u2500
         Vector2 _moveInput;
@@ -90,7 +101,7 @@ namespace NPCSystem
         /// <summary>Whether the character just left the ground this frame.</summary>
         public bool JustLeftGround => _wasGrounded && !_grounded;
 
-        public float TargetSpeed => _sprintInput && _grounded ? sprintSpeed : walkSpeed;
+        public float TargetSpeed => _sprintInput && _grounded ? _sprintSpeed : _walkSpeed;
         public CharacterController CharacterController => _controller;
 
         void Awake()
@@ -113,9 +124,9 @@ namespace NPCSystem
         {
             if (_grounded && _verticalVelocity < 0f)
             {
-                _verticalVelocity = groundedStickVelocity;
+                _verticalVelocity = _groundedStickVelocity;
             }
-            _verticalVelocity += gravity * Time.fixedDeltaTime;
+            _verticalVelocity += _gravity * Time.fixedDeltaTime;
         }
 
         void HandleJump()
@@ -127,7 +138,7 @@ namespace NPCSystem
             if (!_grounded)
                 return;
 
-            _verticalVelocity = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            _verticalVelocity = Mathf.Sqrt(_jumpHeight * -2f * _gravity);
             _grounded = false;
         }
 
@@ -144,19 +155,19 @@ namespace NPCSystem
                 transform.rotation = Quaternion.RotateTowards(
                     transform.rotation,
                     targetRotation,
-                    rotationSpeed * deltaTime
+                    _rotationSpeed * deltaTime
                 );
 
                 _currentSpeed = Mathf.MoveTowards(
                     _currentSpeed,
                     TargetSpeed,
-                    acceleration * deltaTime
+                    _acceleration * deltaTime
                 );
                 _currentVelocity = transform.forward * _currentSpeed;
             }
             else
             {
-                _currentSpeed = Mathf.MoveTowards(_currentSpeed, 0f, deceleration * deltaTime);
+                _currentSpeed = Mathf.MoveTowards(_currentSpeed, 0f, _deceleration * deltaTime);
                 _currentVelocity = transform.forward * _currentSpeed;
             }
 
@@ -174,8 +185,8 @@ namespace NPCSystem
             return Physics.Raycast(
                 origin,
                 Vector3.down,
-                groundCheckDistance,
-                groundLayers,
+                _groundCheckDistance,
+                _groundLayers,
                 QueryTriggerInteraction.Ignore
             );
         }
@@ -201,7 +212,7 @@ namespace NPCSystem
             Gizmos.color = _grounded ? Color.green : Color.red;
             Gizmos.DrawRay(
                 transform.position + Vector3.up * 0.1f,
-                Vector3.down * groundCheckDistance
+                Vector3.down * _groundCheckDistance
             );
         }
     }

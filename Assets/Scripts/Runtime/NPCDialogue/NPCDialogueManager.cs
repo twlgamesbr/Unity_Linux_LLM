@@ -93,12 +93,11 @@ namespace NPCSystem
         [SerializeField]
         string _remoteHost = "localhost";
 
-        [ShowField(nameof(enableRemoteServer))]
-        [HideProperty, Suffix("port")]
+        [HideProperty]
         [FormerlySerializedAs("remotePort")]
         [FormerlySerializedAs("RemotePort")]
         [SerializeField]
-        int _remotePort = 11435;
+        int _remotePort = 8080;
 
         [Dropdown(nameof(_cachedModelNames))]
         [HideProperty]
@@ -110,37 +109,17 @@ namespace NPCSystem
         [SerializeField, HideInInspector]
         string[] _cachedModelNames = new string[] { "default-llm" };
 
-        [ShowField(nameof(enableRemoteServer))]
         [HideProperty, Suffix("port")]
         [FormerlySerializedAs("remoteEmbeddingHost")]
         [FormerlySerializedAs("RemoteEmbeddingHost")]
         [SerializeField]
         string _remoteEmbeddingHost = "localhost";
 
-        [ShowField(nameof(enableRemoteServer))]
         [HideProperty, Suffix("port")]
         [FormerlySerializedAs("remoteEmbeddingPort")]
         [FormerlySerializedAs("RemoteEmbeddingPort")]
         [SerializeField]
         int _remoteEmbeddingPort = 8080;
-
-        [FoldoutGroup(
-            "Edge Functions",
-            true,
-            nameof(_edgeFunctionHost),
-            nameof(_edgeFunctionPort)
-        )]
-        [HelpBox("URL for the Supabase Edge Runtime that orchestrates memory and dialogue processing.", MessageMode.Log, drawAbove: true)]
-        [SerializeField]
-        EditorAttributes.Void edgeFunctionsGroup;
-
-        [HideProperty]
-        [SerializeField]
-        string _edgeFunctionHost = "localhost";
-
-        [HideProperty, Suffix("port")]
-        [SerializeField]
-        int _edgeFunctionPort = 8098;
 
         [FoldoutGroup(
             "Dialogue Settings",
@@ -189,7 +168,6 @@ namespace NPCSystem
             true,
             nameof(OnNpcChanged),
             nameof(OnResponseStart),
-            nameof(OnResponseUpdated),
             nameof(OnResponseComplete),
             nameof(OnError)
         )]
@@ -211,15 +189,6 @@ namespace NPCSystem
         string ActiveProfilePreview =>
             currentProfile == null ? "<none>" : currentProfile.GetDisplayName();
 
-        [SerializeField, HideInInspector]
-        string lastBackendStatus = "Idle";
-
-        [ReadOnly]
-        [ShowInInspector]
-        string LastBackendStatusPreview => lastBackendStatus;
-
-        bool enableRemoteServer => true;
-
         [FormerlySerializedAs("onNPCChanged")]
         [HideProperty]
         public UnityEvent<string> OnNpcChanged = new UnityEvent<string>();
@@ -227,10 +196,6 @@ namespace NPCSystem
         [FormerlySerializedAs("onResponseStart")]
         [HideProperty]
         public UnityEvent<string> OnResponseStart = new UnityEvent<string>();
-
-        [FormerlySerializedAs("onResponseUpdated")]
-        [HideProperty]
-        public UnityEvent<string> OnResponseUpdated = new UnityEvent<string>();
 
         [FormerlySerializedAs("onResponseComplete")]
         [HideProperty]
@@ -345,8 +310,6 @@ namespace NPCSystem
         public bool IsInitialized =>
             _initializationTask != null && _initializationTask.IsCompletedSuccessfully;
         public bool IsRagAvailable => _retrievalService != null && _retrievalService.IsRagAvailable;
-        public string EdgeFunctionUrl =>
-            $"http://{_edgeFunctionHost}:{_edgeFunctionPort}";
 
         void Start()
         {
@@ -589,15 +552,13 @@ namespace NPCSystem
                 _retrievalService.SyncEmbedderHost();
             }
 
-            if (ChatClient != null)
-            {
-                ChatClient.host = RemoteHost;
-                ChatClient.port = RemotePort;
-                ChatClient.model = RemoteModel;
-                Debug.Log(
-                    $"[NPCDialogueManager] Synced ChatClient — host={ChatClient.host} port={ChatClient.port} model='{ChatClient.model}'"
-                );
-            }
+            Logger.Log(
+                NPCFlowStage.SceneBootstrap,
+                NPCFlowStatus.Success,
+                NPCFlowLogLevel.Debug,
+                "AutoAssignReferencesIfNeeded completed.",
+                source: nameof(NPCDialogueManager)
+            );
         }
 
         [Button("Validate Dialogue References")]
@@ -782,6 +743,13 @@ namespace NPCSystem
                 return;
             }
 
+            // Resolve current player name from the auth bridge before each turn
+            string activePlayerName = AuthNetworkBridge.ActivePlayerName;
+            if (!string.IsNullOrWhiteSpace(activePlayerName) && activePlayerName != "Player")
+            {
+                SetRuntimePlayerContext(activePlayerName);
+            }
+
             _sessionService?.SendMessage(playerMessage, _currentNPC);
         }
 
@@ -854,7 +822,7 @@ namespace NPCSystem
             EvidenceState.ApplySnapshot(snapshot);
         }
 
-        public async void ClearHistory(string npcName)
+        public async Task ClearHistory(string npcName)
         {
             if (_historyService != null)
                 await _historyService.ClearHistoryAsync(npcName, Profiles);

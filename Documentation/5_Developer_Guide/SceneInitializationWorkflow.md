@@ -98,13 +98,15 @@ Startup toggles:
 The prefab is the operational Netcode player object spawned by `NetworkManager` when host/server/client mode is started. Verified root components:
 
 - `NetworkObject`
-- `NPCPlayerNetworkAvatar`
 - `CharacterController`
 - `Animator`
-- `NetworkAnimator` with owner authority
 - `NPCOwnerNetworkTransform` with owner-authoritative transform sync
-- `NPCNetworkPlayerController`
-- `PlayerInput`
+- `NPCPlayerCharacterController` (orchestrator)
+- `NPCCharacterMotor` (physics movement)
+- `NPCMultiplayerInputActions` (InputSystem wrapper)
+- `NPCCharacterAnimatorBridge` (animator driving)
+- `NPCThirdPersonCameraController` (orbit camera)
+- `NPCNetworkItemInteractor` (item interaction)
 
 The visible avatar is the child `AvatarVisual`, a blue URP capsule using `Assets/Materials/NetworkPlayerBlue.mat`. The root object stays at the CharacterController feet (`0,0,0`) and the visual capsule is offset to `0,1,0` so the controller bottom rests on the ground.
 
@@ -114,6 +116,8 @@ The controller uses the `Player` action map from `Assets/InputSystem_Actions.inp
 - `Look` (`Vector2`) — mouse/gamepad look, used for owner camera yaw
 - `Jump` (`Button`) — CharacterController jump
 - `Sprint` (`Button`) — sprint speed modifier
+- `Interact` (`Button`) — item pickup
+- `Previous` / `Next` (`Button`) — give items to players/NPCs
 
 The player controller is owner-only: the owning client reads input and moves its `CharacterController`; `NPCOwnerNetworkTransform` replicates the resulting transform; `NetworkAnimator` replicates animator parameters/triggers.
 

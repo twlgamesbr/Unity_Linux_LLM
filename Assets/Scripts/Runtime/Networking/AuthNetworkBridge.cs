@@ -101,7 +101,7 @@ namespace NPCSystem
         /// Static accessor for the active player name (read by NPCDialogueManager when building prompts).
         /// Also used by NPCPlayerNetworkAvatar to auto-register on client spawn.
         /// </summary>
-        public static string ActivePlayerName { get; private set; } = "Player";
+        public static string ActivePlayerName { get; internal set; } = "Player";
 
         void Reset()
         {

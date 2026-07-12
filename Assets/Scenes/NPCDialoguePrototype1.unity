@@ -10920,11 +10920,12 @@ GameObject:
   - component: {fileID: 1778380624}
   - component: {fileID: 1778380623}
   - component: {fileID: 1778380632}
-  - component: {fileID: 1778380636}
   - component: {fileID: 1778380637}
   - component: {fileID: 1778380640}
   - component: {fileID: 1778380639}
   - component: {fileID: 1778380638}
+  - component: {fileID: 1778380642}
+  - component: {fileID: 1778380641}
   m_Layer: 0
   m_Name: NPCDialogueSystem
   m_TagString: Untagged
@@ -10944,11 +10945,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32852d652d4bd17afa0f0b195a43165b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPCSystem.NPCDialogueManager
-  ChatClient: {fileID: 1778380636}
+  ChatClient: {fileID: 0}
   LocalRag: {fileID: 0}
   _ragEmbeddingPath: RAG/NPCDialogues.rag
   _useQdrantRag: 0
-  QdrantRag: {fileID: 0}
+  QdrantRag: {fileID: 1778380642}
   ActionPlanner: {fileID: 0}
   EvidenceState: {fileID: 0}
   SupabaseRepo: {fileID: 1778380637}
@@ -10974,8 +10975,6 @@ MonoBehaviour:
   - llama-3.1-8b-q4-k-m-vulkan
   _remoteEmbeddingHost: 127.0.0.1
   _remoteEmbeddingPort: 8080
-  _edgeFunctionHost: localhost
-  _edgeFunctionPort: 8098
   _profiles:
   - {fileID: 11400000, guid: fee9805d1a4aff5de9e2b4c154fda9a7, type: 2}
   - {fileID: 11400000, guid: a2b00eea2a038c8d890b04ea76369e61, type: 2}
@@ -11027,30 +11026,6 @@ MultiplayerRolesData:
   m_GameObject: {fileID: 1778380622}
   m_GameObjectRolesMask: 3
   m_ComponentsRolesMasks: []
---- !u!114 &1778380636
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1778380622}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2a2e4b181559021ddab4f2cbdaf4b400, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCLocalAIClient
-  host: 127.0.0.1
-  port: 8080
-  apiKey: 
-  model: llama-3.2-3b-instruct:q8_0
-  temperature: 0.2
-  topP: 0.9
-  topK: 40
-  minP: 0.05
-  repeatPenalty: 1.1
-  maxTokens: 256
-  numRetries: 3
-  requestTimeoutSeconds: 120
 --- !u!114 &1778380637
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11105,6 +11080,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d3d8c6f0677f7f6bad1e541cea397cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCDialogueHistoryService
+--- !u!114 &1778380641
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778380622}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fc1cc6216f8393fd94c3253333df4f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCLocalAIEmbedder
+  host: localhost
+  port: 8080
+  apiKey: 
+  model: nomic-embed-text-v1.5
+  numRetries: 3
+--- !u!114 &1778380642
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778380622}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 307aa1d34162b1b759aeeac4d0b0ba14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.QdrantRAGService
+  _qdrantUrl: http://localhost:6333
+  _collectionName: unity_linux_llm_codebase_v2
+  _embedder: {fileID: 1778380641}
+  inspectorStatus: Qdrant is reachable but empty (no points).
 --- !u!1 &1779205794
 GameObject:
   m_ObjectHideFlags: 0

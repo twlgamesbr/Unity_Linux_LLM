@@ -15,15 +15,15 @@ namespace NPCSystem
         [Header("Input Asset")]
         [FormerlySerializedAs("inputActions")]
         [SerializeField]
-        InputActionAsset _inputActions;
+        private InputActionAsset _inputActions;
 
         [FormerlySerializedAs("actionMapName")]
         [SerializeField]
-        string _actionMapName = "Player";
+        private string _actionMapName = "Player";
 
         [FormerlySerializedAs("uiActionMapName")]
         [SerializeField]
-        string _uiActionMapName = "UI";
+        private string _uiActionMapName = "UI";
 
         // Cached action references — set once in Awake, never string-looked-up again.
         InputAction _moveAction;

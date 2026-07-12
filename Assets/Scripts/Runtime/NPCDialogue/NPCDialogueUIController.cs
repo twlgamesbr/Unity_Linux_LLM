@@ -158,7 +158,6 @@ namespace NPCSystem
             {
                 DialogueManager.OnNpcChanged.RemoveListener(HandleNpcChanged);
                 DialogueManager.OnResponseStart.RemoveListener(HandleResponseStart);
-                DialogueManager.OnResponseUpdated.RemoveListener(HandleResponseUpdated);
                 DialogueManager.OnResponseComplete.RemoveListener(HandleResponseComplete);
                 DialogueManager.OnError.RemoveListener(HandleError);
             }
@@ -179,7 +178,6 @@ namespace NPCSystem
             {
                 DialogueManager.OnNpcChanged.RemoveListener(HandleNpcChanged);
                 DialogueManager.OnResponseStart.RemoveListener(HandleResponseStart);
-                DialogueManager.OnResponseUpdated.RemoveListener(HandleResponseUpdated);
                 DialogueManager.OnResponseComplete.RemoveListener(HandleResponseComplete);
                 DialogueManager.OnError.RemoveListener(HandleError);
             }
@@ -276,7 +274,6 @@ namespace NPCSystem
             {
                 DialogueManager.OnNpcChanged.AddListener(HandleNpcChanged);
                 DialogueManager.OnResponseStart.AddListener(HandleResponseStart);
-                DialogueManager.OnResponseUpdated.AddListener(HandleResponseUpdated);
                 DialogueManager.OnResponseComplete.AddListener(HandleResponseComplete);
                 DialogueManager.OnError.AddListener(HandleError);
             }

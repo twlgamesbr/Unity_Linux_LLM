@@ -76,7 +76,17 @@ namespace NPCSystem
                                (long)(DateTime.UtcNow.Ticks & 0x7FFFFFFFFFFFFFFF);
 
                 _flushTimer = new Timer(
-                    _ => FlushAsync(),
+                    async _ =>
+                    {
+                        try
+                        {
+                            await FlushAsync().ConfigureAwait(false);
+                        }
+                        catch (Exception ex)
+                        {
+                            UnityEngine.Debug.LogWarning($"[DatadogTracer] Flush error: {ex.Message}");
+                        }
+                    },
                     null,
                     FlushIntervalMs,
                     FlushIntervalMs);

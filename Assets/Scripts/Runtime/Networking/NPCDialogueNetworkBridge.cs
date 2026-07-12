@@ -241,7 +241,6 @@ namespace NPCSystem
 
             _dialogueManager.OnNpcChanged.AddListener(HandleManagerNpcChanged);
             _dialogueManager.OnResponseStart.AddListener(HandleManagerResponseStart);
-            _dialogueManager.OnResponseUpdated.AddListener(HandleManagerResponseUpdated);
             _dialogueManager.OnResponseComplete.AddListener(HandleManagerResponseComplete);
             _dialogueManager.OnError.AddListener(HandleManagerError);
             _eventsBound = true;
@@ -254,7 +253,6 @@ namespace NPCSystem
 
             _dialogueManager.OnNpcChanged.RemoveListener(HandleManagerNpcChanged);
             _dialogueManager.OnResponseStart.RemoveListener(HandleManagerResponseStart);
-            _dialogueManager.OnResponseUpdated.RemoveListener(HandleManagerResponseUpdated);
             _dialogueManager.OnResponseComplete.RemoveListener(HandleManagerResponseComplete);
             _dialogueManager.OnError.RemoveListener(HandleManagerError);
             _eventsBound = false;

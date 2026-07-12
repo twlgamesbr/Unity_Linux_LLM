@@ -28,34 +28,39 @@ namespace NPCSystem
     public sealed class NPCPlayerCharacterController : NetworkBehaviour
     {
         [Header("References")]
+        [FormerlySerializedAs("inputHandler")]
         [SerializeField]
-        NPCMultiplayerInputActions inputHandler;
+        private NPCMultiplayerInputActions _inputHandler;
 
+        [FormerlySerializedAs("motor")]
         [SerializeField]
-        NPCCharacterMotor motor;
+        private NPCCharacterMotor _motor;
 
+        [FormerlySerializedAs("animBridge")]
         [SerializeField]
-        NPCCharacterAnimatorBridge animBridge;
+        private NPCCharacterAnimatorBridge _animBridge;
 
+        [FormerlySerializedAs("cameraController")]
         [SerializeField]
-        NPCThirdPersonCameraController cameraController;
+        private NPCThirdPersonCameraController _cameraController;
 
+        [FormerlySerializedAs("interactor")]
         [SerializeField]
-        NPCNetworkItemInteractor interactor;
+        private NPCNetworkItemInteractor _interactor;
 
         [Header("Input Asset")]
         [FormerlySerializedAs("inputActions")]
         [SerializeField]
-        InputActionAsset _inputActions;
+        private InputActionAsset _inputActions;
 
         [Header("Owner Settings")]
         [FormerlySerializedAs("LockCursorForOwner")]
         [SerializeField]
-        bool _lockCursorForOwner = true;
+        private bool _lockCursorForOwner = true;
 
         [FormerlySerializedAs("LogSpawnDiagnostics")]
         [SerializeField]
-        bool _logSpawnDiagnostics = true;
+        private bool _logSpawnDiagnostics = true;
 
         // ─── Singleton-style access for the owning client ───
         public static NPCPlayerCharacterController LocalInstance { get; private set; }
@@ -114,8 +119,8 @@ namespace NPCSystem
                     EnableOwnerInput();
                 }
 
-                if (cameraController != null)
-                    cameraController.StartFollowing();
+                if (_cameraController != null)
+                    _cameraController.StartFollowing();
             }
             else
             {
@@ -128,8 +133,8 @@ namespace NPCSystem
             if (IsOwner && LocalInstance == this)
                 LocalInstance = null;
             DisableAllInput();
-            if (IsOwner && cameraController != null)
-                cameraController.StopFollowing();
+            if (IsOwner && _cameraController != null)
+                _cameraController.StopFollowing();
             base.OnNetworkDespawn();
         }
 
@@ -155,7 +160,7 @@ namespace NPCSystem
 
         void Update()
         {
-            if (!IsOwner || motor == null)
+            if (!IsOwner || _motor == null)
                 return;
 
             // Tab toggles between UI mode (cursor free, movement locked) and gameplay
@@ -165,67 +170,67 @@ namespace NPCSystem
                 return;
             }
 
-            motor.MoveInput = inputHandler != null ? inputHandler.MoveInput : Vector2.zero;
-            motor.SprintInput = inputHandler != null && inputHandler.SprintHeld;
+            _motor.MoveInput = _inputHandler != null ? _inputHandler.MoveInput : Vector2.zero;
+            _motor.SprintInput = _inputHandler != null && _inputHandler.SprintHeld;
         }
 
         // ─── Input Event Wiring ───
 
         void SubscribeInputEvents()
         {
-            if (_eventsSubscribed || inputHandler == null)
+            if (_eventsSubscribed || _inputHandler == null)
                 return;
 
-            inputHandler.OnJump += HandleJump;
-            inputHandler.OnInteract += HandleInteract;
-            inputHandler.OnPrevious += HandleGiveToPlayer;
-            inputHandler.OnNext += HandleGiveToNpc;
-            inputHandler.OnCrouch += HandleCrouch;
+            _inputHandler.OnJump += HandleJump;
+            _inputHandler.OnInteract += HandleInteract;
+            _inputHandler.OnPrevious += HandleGiveToPlayer;
+            _inputHandler.OnNext += HandleGiveToNpc;
+            _inputHandler.OnCrouch += HandleCrouch;
 
             _eventsSubscribed = true;
         }
 
         void UnsubscribeInputEvents()
         {
-            if (!_eventsSubscribed || inputHandler == null)
+            if (!_eventsSubscribed || _inputHandler == null)
                 return;
 
-            inputHandler.OnJump -= HandleJump;
-            inputHandler.OnInteract -= HandleInteract;
-            inputHandler.OnPrevious -= HandleGiveToPlayer;
-            inputHandler.OnNext -= HandleGiveToNpc;
-            inputHandler.OnCrouch -= HandleCrouch;
+            _inputHandler.OnJump -= HandleJump;
+            _inputHandler.OnInteract -= HandleInteract;
+            _inputHandler.OnPrevious -= HandleGiveToPlayer;
+            _inputHandler.OnNext -= HandleGiveToNpc;
+            _inputHandler.OnCrouch -= HandleCrouch;
 
             _eventsSubscribed = false;
         }
 
         void HandleJump()
         {
-            if (!IsOwner || motor == null)
+            if (!IsOwner || _motor == null)
                 return;
-            motor.RequestJump();
-            animBridge?.TriggerJump();
+            _motor.RequestJump();
+            _animBridge?.TriggerJump();
         }
 
         void HandleInteract()
         {
-            if (!IsOwner || interactor == null)
+            if (!IsOwner || _interactor == null)
                 return;
-            interactor.RequestPickupNearestItemServerRpc();
+            _interactor.RequestPickupNearestItemServerRpc();
         }
 
         void HandleGiveToPlayer()
         {
-            if (!IsOwner || interactor == null)
+            if (!IsOwner || _interactor == null)
                 return;
-            interactor.RequestGiveHeldItemToNearestPlayerServerRpc();
+            _interactor.RequestGiveHeldItemToNearestPlayerServerRpc();
         }
 
         void HandleGiveToNpc()
         {
-            if (!IsOwner || interactor == null)
+            if (!IsOwner || _interactor == null)
                 return;
-            interactor.RequestGiveHeldItemToNearestNpcServerRpc();
+            _interactor.RequestGiveHeldItemToNearestNpcServerRpc();
         }
 
         void HandleCrouch()
@@ -237,12 +242,12 @@ namespace NPCSystem
 
         void EnableOwnerInput()
         {
-            if (inputHandler != null)
+            if (_inputHandler != null)
             {
-                if (inputHandler.InputActions == null && _inputActions != null)
-                    inputHandler.InputActions = _inputActions;
+                if (_inputHandler.InputActions == null && _inputActions != null)
+                    _inputHandler.InputActions = _inputActions;
 
-                inputHandler.EnableActions();
+                _inputHandler.EnableActions();
             }
 
             if (_lockCursorForOwner)
@@ -254,8 +259,8 @@ namespace NPCSystem
 
         void DisableAllInput()
         {
-            if (inputHandler != null)
-                inputHandler.DisableAll();
+            if (_inputHandler != null)
+                _inputHandler.DisableAll();
 
             if (_lockCursorForOwner && IsOwner)
             {
@@ -266,21 +271,21 @@ namespace NPCSystem
 
         public void SetUIActive(bool active)
         {
-            if (inputHandler == null)
+            if (_inputHandler == null)
                 return;
 
             if (active)
             {
-                inputHandler.DisableActions();
-                inputHandler.EnableUIActions();
+                _inputHandler.DisableActions();
+                _inputHandler.EnableUIActions();
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
                 ClearUIActiveRequest();
             }
             else
             {
-                inputHandler.DisableUIActions();
-                inputHandler.EnableActions();
+                _inputHandler.DisableUIActions();
+                _inputHandler.EnableActions();
                 if (_lockCursorForOwner)
                 {
                     Cursor.lockState = CursorLockMode.Locked;
@@ -293,22 +298,22 @@ namespace NPCSystem
 
         void ResolveReferences()
         {
-            if (inputHandler == null)
-                inputHandler = GetComponent<NPCMultiplayerInputActions>();
-            if (motor == null)
-                motor = GetComponent<NPCCharacterMotor>();
-            if (animBridge == null)
-                animBridge = GetComponent<NPCCharacterAnimatorBridge>();
-            if (cameraController == null)
-                cameraController = GetComponent<NPCThirdPersonCameraController>();
-            if (interactor == null)
-                interactor = GetComponent<NPCNetworkItemInteractor>();
+            if (_inputHandler == null)
+                _inputHandler = GetComponent<NPCMultiplayerInputActions>();
+            if (_motor == null)
+                _motor = GetComponent<NPCCharacterMotor>();
+            if (_animBridge == null)
+                _animBridge = GetComponent<NPCCharacterAnimatorBridge>();
+            if (_cameraController == null)
+                _cameraController = GetComponent<NPCThirdPersonCameraController>();
+            if (_interactor == null)
+                _interactor = GetComponent<NPCNetworkItemInteractor>();
         }
 
         // ─── Public API ───
 
-        public NPCCharacterMotor Motor => motor;
-        public NPCMultiplayerInputActions InputHandler => inputHandler;
-        public NPCThirdPersonCameraController CameraController => cameraController;
+        public NPCCharacterMotor Motor => _motor;
+        public NPCMultiplayerInputActions InputHandler => _inputHandler;
+        public NPCThirdPersonCameraController CameraController => _cameraController;
     }
 }

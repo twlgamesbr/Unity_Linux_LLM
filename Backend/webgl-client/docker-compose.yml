@@ -31,11 +31,19 @@ services:
       context: .
       dockerfile_inline: |
         FROM python:3.12-alpine
+        RUN pip install ddtrace
         COPY ddproxy.py /ddproxy.py
         CMD ["python3", "/ddproxy.py"]
     container_name: ddproxy
     ports:
       - "9090:9090"
+    environment:
+      - DD_SERVICE=ddproxy
+      - DD_ENV=${DD_ENV:-production}
+      - DD_SITE=${DD_SITE:-us5.datadoghq.com}
+      - DD_AGENT_HOST=dd-agent
+      - DD_TRACE_AGENT_PORT=8126
+      - DD_LOGS_INJECTION=true
     restart: unless-stopped
     logging:
       driver: json-file

@@ -182,7 +182,7 @@ docker/
 | `LLMAgent` | `LLMUnity.LLMAgent` (`enabled=false`) | Present but inactive |
 | `LLMRAG` | `LLMUnity.LLM` (`_embeddingsOnly=1`, model `all-MiniLM-L12-v2.Q4_K_M.gguf`) | Active for local `.rag` embedding |
 | `RAG` | LLMUnity RAG component | Assigned to `NPCDialogueManager.rag` |
-| `NPCNetworkSystem` | `NPCNetworkBootstrap`, `NPCNetworkPlayerController` | Networking root |
+| `NPCNetworkSystem` | `NPCNetworkBootstrap` | Networking root |
 | `AuthUI` | `AuthUIController` | Login/register UI |
 | `AuthBridge` | `AuthNetworkBridge` | Auth → network bridge |
 | `PlayerSpawnPoint` | Transform | Player spawn location |

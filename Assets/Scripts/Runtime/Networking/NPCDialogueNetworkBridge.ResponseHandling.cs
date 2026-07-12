@@ -48,32 +48,6 @@ namespace NPCSystem
             }
         }
 
-        void HandleManagerResponseUpdated(string partialResponse)
-        {
-            if (
-                _activeClientId.HasValue
-                && IsServer
-                && NetworkManager != null
-                && NetworkManager.IsListening
-            )
-            {
-                var payload = BuildResponsePayload(partialResponse);
-                LogRoutingEvent(
-                    _activeClientId.Value,
-                    _activeRequestId,
-                    NPCFlowStatus.Start,
-                    "Relaying response-update event to requesting client."
-                );
-                SendResponseUpdatedToClient(_activeClientId.Value, payload);
-                return;
-            }
-
-            if (ShouldRelayLocally())
-            {
-                OnResponseUpdated?.Invoke(partialResponse);
-            }
-        }
-
         void HandleManagerResponseComplete(string npcDisplayName, string response)
         {
             if (

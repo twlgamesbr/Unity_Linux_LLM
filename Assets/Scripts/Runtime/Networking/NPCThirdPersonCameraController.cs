@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace NPCSystem
 {
@@ -10,37 +11,47 @@ namespace NPCSystem
     public sealed class NPCThirdPersonCameraController : MonoBehaviour
     {
         [Header("Follow")]
+        [FormerlySerializedAs("followTarget")]
         [SerializeField]
-        Transform followTarget;
+        private Transform _followTarget;
 
+        [FormerlySerializedAs("cameraOffset")]
         [SerializeField]
-        Vector3 cameraOffset = new Vector3(0f, 4.5f, -6f);
+        private Vector3 _cameraOffset = new Vector3(0f, 4.5f, -6f);
 
+        [FormerlySerializedAs("followSharpness")]
         [SerializeField]
-        float followSharpness = 12f;
+        private float _followSharpness = 12f;
 
+        [FormerlySerializedAs("lookTargetOffset")]
         [SerializeField]
-        Vector3 lookTargetOffset = new Vector3(0f, 1.25f, 0f);
+        private Vector3 _lookTargetOffset = new Vector3(0f, 1.25f, 0f);
 
         [Header("Look Sensitivity")]
+        [FormerlySerializedAs("yawSensitivity")]
         [SerializeField]
-        float yawSensitivity = 0.12f;
+        private float _yawSensitivity = 0.12f;
 
+        [FormerlySerializedAs("pitchSensitivity")]
         [SerializeField]
-        float pitchSensitivity = 0.08f;
+        private float _pitchSensitivity = 0.08f;
 
+        [FormerlySerializedAs("minPitch")]
         [SerializeField]
-        float minPitch = -30f;
+        private float _minPitch = -30f;
 
+        [FormerlySerializedAs("maxPitch")]
         [SerializeField]
-        float maxPitch = 60f;
+        private float _maxPitch = 60f;
 
+        [FormerlySerializedAs("invertY")]
         [SerializeField]
-        bool invertY = false;
+        private bool _invertY = false;
 
         [Header("Input Source")]
+        [FormerlySerializedAs("inputSource")]
         [SerializeField]
-        NPCMultiplayerInputActions inputSource;
+        private NPCMultiplayerInputActions _inputSource;
 
         // \u2500\u2500\u2500 Runtime \u2500\u2500\u2500
         Camera _cam;
@@ -56,9 +67,9 @@ namespace NPCSystem
             if (_cam != null)
             {
                 // Initialize yaw/pitch from current camera position relative to target
-                if (followTarget != null)
+                if (_followTarget != null)
                 {
-                    Vector3 dir = _cam.transform.position - followTarget.position;
+                    Vector3 dir = _cam.transform.position - _followTarget.position;
                     _yaw = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
                     _pitch = Mathf.Asin(dir.y / dir.magnitude) * Mathf.Rad2Deg;
                 }
@@ -73,43 +84,43 @@ namespace NPCSystem
         void Awake()
         {
             _cam = Camera.main;
-            if (followTarget == null)
-                followTarget = transform;
-            if (inputSource == null)
-                inputSource = GetComponent<NPCMultiplayerInputActions>();
+            if (_followTarget == null)
+                _followTarget = transform;
+            if (_inputSource == null)
+                _inputSource = GetComponent<NPCMultiplayerInputActions>();
 
-            _yaw = followTarget != null ? followTarget.eulerAngles.y : transform.eulerAngles.y;
+            _yaw = _followTarget != null ? _followTarget.eulerAngles.y : transform.eulerAngles.y;
         }
 
         void LateUpdate()
         {
-            if (!_active || _cam == null || followTarget == null)
+            if (!_active || _cam == null || _followTarget == null)
                 return;
 
             // Read look input
             Vector2 lookInput = Vector2.zero;
-            if (inputSource != null)
-                lookInput = inputSource.LookInput;
+            if (_inputSource != null)
+                lookInput = _inputSource.LookInput;
 
-            _yaw += lookInput.x * yawSensitivity;
-            _pitch += lookInput.y * pitchSensitivity * (invertY ? 1f : -1f);
-            _pitch = Mathf.Clamp(_pitch, minPitch, maxPitch);
+            _yaw += lookInput.x * _yawSensitivity;
+            _pitch += lookInput.y * _pitchSensitivity * (_invertY ? 1f : -1f);
+            _pitch = Mathf.Clamp(_pitch, _minPitch, _maxPitch);
 
             // Calculate camera position
             Quaternion cameraRotation = Quaternion.Euler(_pitch, _yaw, 0f);
-            Vector3 targetPosition = followTarget.position + cameraRotation * cameraOffset;
+            Vector3 targetPosition = _followTarget.position + cameraRotation * _cameraOffset;
 
             // Smooth follow
-            float t = 1f - Mathf.Exp(-followSharpness * Time.deltaTime);
+            float t = 1f - Mathf.Exp(-_followSharpness * Time.deltaTime);
             _cam.transform.position = Vector3.Lerp(_cam.transform.position, targetPosition, t);
 
             // Look at target
-            _cam.transform.LookAt(followTarget.position + lookTargetOffset);
+            _cam.transform.LookAt(_followTarget.position + _lookTargetOffset);
         }
 
         public void SetInputSource(NPCMultiplayerInputActions source)
         {
-            inputSource = source;
+            _inputSource = source;
         }
     }
 }

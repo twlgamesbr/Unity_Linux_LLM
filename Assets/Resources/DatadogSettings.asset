@@ -16,7 +16,7 @@ MonoBehaviour:
   SdkVerbosity: 1
   OutputSymbols: 1
   PerformNativeStackMapping: 1
-  ClientToken: ddapp_cjnoUWau59ai2gSDq0KqTGRQi4m02wGP6e
+  ClientToken: pubce6f5872c9887cd7765df7b1ee18951f
   Site: 2
   Env: production
   ServiceName: unity
@@ -34,7 +34,9 @@ MonoBehaviour:
   SessionSampleRate: 100
   TraceSampleRate: 20
   TraceContextInjection: 0
-  FirstPartyHosts: []
+  FirstPartyHosts:
+  - Host: http://localhost:8080/metrics
+    TracingHeaderType: 18
   TrackNonFatalAnrs: 2
   TrackNonFatalAppHangs: 1
   NonFatalAppHangThreshold: 0.25

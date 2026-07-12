@@ -384,10 +384,16 @@ namespace NPCSystem
             string json = req.downloadHandler.text;
             var result = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
 
-            string userId = result?.GetValueOrDefault("id")?.ToString()
+            // Extract user id from nested "user" object (Gotrue returns id inside user)
+            string userId = null;
+            string accessToken = result?.GetValueOrDefault("access_token")?.ToString() ?? string.Empty;
+            if (result?.TryGetValue("user", out var userObj) == true && userObj is JObject userJObj)
+            {
+                userId = userJObj.Value<string>("id");
+            }
+            userId = userId ?? result?.GetValueOrDefault("id")?.ToString()
                 ?? throw new InvalidOperationException("Signup returned no user ID.");
 
-            string accessToken = result?.GetValueOrDefault("access_token")?.ToString() ?? string.Empty;
             string refreshToken = result?.GetValueOrDefault("refresh_token")?.ToString() ?? string.Empty;
             long expiresIn = 3600L;
             if (result?.TryGetValue("expires_in", out var expVal) == true)
@@ -633,7 +639,10 @@ namespace NPCSystem
         public async Task<PlayerAuthSessionResponse> TryRestoreStoredSessionAsync()
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
-            return await TryRestoreWebGLAsync();
+            PlayerAuthSessionResponse webglResult = await TryRestoreWebGLAsync();
+            if (webglResult != null)
+                AuthNetworkBridge.ActivePlayerName = webglResult.username;
+            return webglResult;
 #else
             if (_supabaseClient?.Auth?.CurrentSession == null)
             {
@@ -659,6 +668,7 @@ namespace NPCSystem
                 );
 
                 await TryCreatePlayerProfileAsync(CurrentSession.username);
+                AuthNetworkBridge.ActivePlayerName = CurrentSession.username;
                 await TryConnectRealtimeAsync();
                 return CurrentSession;
             }

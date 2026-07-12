@@ -26,15 +26,18 @@ namespace NPCSystem
         [SerializeField, HideProperty]
         NPCDialogueManager _dialogueManager;
 
-        [FoldoutGroup("Behaviour", true, nameof(_requestTimeoutSeconds))]
+        [FoldoutGroup("Behaviour", true, nameof(_edgeFunctionUrl), nameof(_requestTimeoutSeconds))]
         [SerializeField]
         EditorAttributes.Void behaviourGroup;
+
+        [SerializeField, HideProperty]
+        [Tooltip("Base URL of the Edge Runtime that orchestrates memory and dialogue processing.")]
+        string _edgeFunctionUrl = "http://localhost:8098";
 
         [SerializeField, HideProperty, Suffix("s")]
         float _requestTimeoutSeconds = 10f;
 
         NPCFlowLogger _logger;
-        string _baseUrl;
 
         void Awake()
         {
@@ -48,19 +51,9 @@ namespace NPCSystem
             );
         }
 
-        bool IsReady =>
-            _baseUrl != null
-            || (_dialogueManager != null && !string.IsNullOrWhiteSpace(_dialogueManager.EdgeFunctionUrl));
+        bool IsReady => !string.IsNullOrWhiteSpace(_edgeFunctionUrl);
 
-        string BaseUrl
-        {
-            get
-            {
-                if (_baseUrl == null && _dialogueManager != null)
-                    _baseUrl = _dialogueManager.EdgeFunctionUrl;
-                return _baseUrl ?? "http://localhost:8098";
-            }
-        }
+        string BaseUrl => _edgeFunctionUrl;
 
         // ── Public API ──────────────────────────────────────────
 
