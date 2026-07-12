@@ -10926,6 +10926,11 @@ GameObject:
   - component: {fileID: 1778380638}
   - component: {fileID: 1778380642}
   - component: {fileID: 1778380641}
+  - component: {fileID: 1778380643}
+  - component: {fileID: 1778380647}
+  - component: {fileID: 1778380646}
+  - component: {fileID: 1778380645}
+  - component: {fileID: 1778380644}
   m_Layer: 0
   m_Name: NPCDialogueSystem
   m_TagString: Untagged
@@ -10945,13 +10950,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 32852d652d4bd17afa0f0b195a43165b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPCSystem.NPCDialogueManager
-  ChatClient: {fileID: 0}
-  LocalRag: {fileID: 0}
+  ChatClient: {fileID: 1778380643}
+  LocalRag: {fileID: 1778380647}
   _ragEmbeddingPath: RAG/NPCDialogues.rag
   _useQdrantRag: 0
   QdrantRag: {fileID: 1778380642}
-  ActionPlanner: {fileID: 0}
-  EvidenceState: {fileID: 0}
+  ActionPlanner: {fileID: 1778380645}
+  EvidenceState: {fileID: 1778380644}
   SupabaseRepo: {fileID: 1778380637}
   _remoteHost: 127.0.0.1
   _remotePort: 8080
@@ -10984,14 +10989,10 @@ MonoBehaviour:
   _rebuildRagFromKnowledgeIfMissing: 0
   _maxHistoryPerNPC: 20
   _initializeOnStart: 0
-  lastBackendStatus: LocalAI response received for player 'deco'.
   OnNpcChanged:
     m_PersistentCalls:
       m_Calls: []
   OnResponseStart:
-    m_PersistentCalls:
-      m_Calls: []
-  OnResponseUpdated:
     m_PersistentCalls:
       m_Calls: []
   OnResponseComplete:
@@ -11113,6 +11114,90 @@ MonoBehaviour:
   _collectionName: unity_linux_llm_codebase_v2
   _embedder: {fileID: 1778380641}
   inspectorStatus: Qdrant is reachable but empty (no points).
+--- !u!114 &1778380643
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778380622}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a2e4b181559021ddab4f2cbdaf4b400, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCLocalAIClient
+  host: 127.0.0.1
+  port: 8080
+  apiKey: 
+  model: llama-3.2-3b-instruct:q8_0
+  temperature: 0.2
+  topP: 0.9
+  topK: 40
+  minP: 0.05
+  repeatPenalty: 1.1
+  maxTokens: 256
+  numRetries: 3
+  requestTimeoutSeconds: 120
+--- !u!114 &1778380644
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778380622}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4dbc73d3966f70eacb6a3c1f868b15e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCEvidenceState
+  discoveredClues: []
+  obtainedItems: []
+  visitedLocations: []
+  npcMoodKeys: []
+  npcMoodValues: []
+  npcTrustKeys: []
+  npcTrustValues: 
+--- !u!114 &1778380645
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778380622}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 768834cce95a7c94fb343460934183f5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCDialogueActionPlanner
+--- !u!114 &1778380646
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778380622}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e05154708e1da8a285c8ce8968bc646, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCSimpleSearch
+  _llmEmbedder: {fileID: 1778380641}
+--- !u!114 &1778380647
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1778380622}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd7076bb6525c3ae6b9afa6d8d9ec1ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCLocalRAG
+  _searchType: 1
+  _search: {fileID: 1778380646}
+  _chunkingType: 2
+  _chunking: {fileID: 0}
 --- !u!1 &1779205794
 GameObject:
   m_ObjectHideFlags: 0
