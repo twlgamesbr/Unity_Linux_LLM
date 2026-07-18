@@ -142,7 +142,7 @@ namespace NPCSystem
                 displayName =
                     _dialogueManager != null && _dialogueManager.CurrentProfile != null
                         ? _dialogueManager.CurrentProfile.GetDisplayName()
-                    : currentProfile != null ? currentProfile.GetDisplayName()
+                    : CurrentProfile != null ? CurrentProfile.GetDisplayName()
                     : string.Empty,
                 content = NPCFlowTextSanitizer.CleanDialogueText(content),
             };

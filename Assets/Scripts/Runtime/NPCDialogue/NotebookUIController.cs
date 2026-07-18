@@ -146,7 +146,7 @@ namespace NPCSystem
         [Title("Runtime Status")]
         [ShowInInspector, ReadOnly]
         string CurrentNpcSlug =>
-            NetworkBridge?.currentProfile?.GetNpcSlug()
+            NetworkBridge?.CurrentProfile?.GetNpcSlug()
             ?? DialogueManager?.CurrentProfile?.GetNpcSlug()
             ?? "<none>";
 

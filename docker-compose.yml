@@ -57,7 +57,7 @@ services:
       - |
         echo "=== Unity Linux LLM — Health Check ==="
         for url in \
-          "http://localhost:6333/healthz:Qdrant" \
+          "http://localhost:6333/health:Qdrant" \
           "http://localhost:8090/health:LocalAI Proxy" \
           "http://localhost:8091/health:Supabase Auth"; do
           name=$${url#*:}; addr=$${url%:*}

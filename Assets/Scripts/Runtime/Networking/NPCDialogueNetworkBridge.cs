@@ -184,7 +184,7 @@ namespace NPCSystem
             {
                 requestId = Guid.NewGuid().ToString("N"),
                 npcSlug =
-                    currentProfile != null ? currentProfile.GetNpcSlug() : _localSelectedNpcSlug,
+                    CurrentProfile != null ? CurrentProfile.GetNpcSlug() : _localSelectedNpcSlug,
                 playerMessage = playerMessage,
             };
             request.SanitizeInPlace();

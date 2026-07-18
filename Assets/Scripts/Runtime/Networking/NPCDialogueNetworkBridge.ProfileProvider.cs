@@ -11,7 +11,7 @@ namespace NPCSystem
     {
         public NPCProfile[] Profiles =>
             _dialogueManager == null ? Array.Empty<NPCProfile>() : _dialogueManager.Profiles;
-        public NPCProfile currentProfile
+        public NPCProfile CurrentProfile
         {
             get
             {
