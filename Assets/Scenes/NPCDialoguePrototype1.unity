@@ -1051,6 +1051,98 @@ MonoBehaviour:
   isAlert: 0
   m_InputValidator: {fileID: 0}
   m_ShouldActivateOnSelect: 1
+--- !u!1 &167870410
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 167870412}
+  - component: {fileID: 167870411}
+  m_Layer: 0
+  m_Name: Circle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!212 &167870411
+SpriteRenderer:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 167870410}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 0
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 1, y: 1}
+  m_AdaptiveModeThreshold: 0.5
+  m_SpriteTileMode: 0
+  m_WasSpriteAssigned: 1
+  m_SpriteSortPoint: 0
+  m_BlendShapeWeights: []
+--- !u!4 &167870412
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 167870410}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.51442, y: -0, z: -0.11019}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &177970561
 GameObject:
   m_ObjectHideFlags: 0
@@ -7104,7 +7196,7 @@ MonoBehaviour:
   m_ProtocolType: 0
   m_UseWebSockets: 1
   m_UseEncryption: 0
-  m_MaxPacketQueueSize: 128
+  m_MaxPacketQueueSize: 256
   m_MaxPayloadSize: 6144
   m_HeartbeatTimeoutMS: 500
   m_ConnectTimeoutMS: 1000
@@ -9449,7 +9541,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCDialogueNetworkBridge
   ShowTopMostFoldoutHeaderGroup: 1
-  _dialogueManager: {fileID: 0}
+  _dialogueManager: {fileID: 1778380623}
   _sessionManager: {fileID: 0}
   OnNpcChanged:
     m_PersistentCalls:
@@ -10927,10 +11019,10 @@ GameObject:
   - component: {fileID: 1778380642}
   - component: {fileID: 1778380641}
   - component: {fileID: 1778380643}
-  - component: {fileID: 1778380647}
   - component: {fileID: 1778380646}
   - component: {fileID: 1778380645}
   - component: {fileID: 1778380644}
+  - component: {fileID: 1778380647}
   m_Layer: 0
   m_Name: NPCDialogueSystem
   m_TagString: Untagged
@@ -10951,13 +11043,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPCSystem.NPCDialogueManager
   _chatClient: {fileID: 1778380643}
-  _localRag: {fileID: 1778380647}
+  _localRag: {fileID: 0}
   _ragEmbeddingPath: RAG/NPCDialogues.rag
   _useQdrantRag: 1
   _qdrantRag: {fileID: 1778380642}
-  _actionPlanner: {fileID: 0}
-  _evidenceState: {fileID: 0}
-  _supabaseRepo: {fileID: 0}
+  _actionPlanner: {fileID: 1778380645}
+  _evidenceState: {fileID: 1778380644}
+  _supabaseRepo: {fileID: 1778380637}
   _remoteHost: 127.0.0.1
   _remotePort: 8090
   _remoteModel: llama-3.2-3b-instruct:q8_0
@@ -10983,8 +11075,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: a2b00eea2a038c8d890b04ea76369e61, type: 2}
   - {fileID: 11400000, guid: aa3445a7aac99dbb2b3803972a0b9de1, type: 2}
   _persistHistory: 1
-  _enableRAG: 1
-  _rebuildRagFromKnowledgeIfMissing: 1
+  _enableRAG: 0
+  _rebuildRagFromKnowledgeIfMissing: 0
   _maxHistoryPerNPC: 20
   _initializeOnStart: 0
   OnNpcChanged:
@@ -11189,11 +11281,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1778380622}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cd7076bb6525c3ae6b9afa6d8d9ec1ec, type: 3}
+  m_Script: {fileID: 11500000, guid: c9ff7619e10321088a74f38d26847a89, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCLocalRAG
-  _search: {fileID: 1778380646}
-  _chunking: {fileID: 0}
+  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCNetworkSessionManager
 --- !u!1 &1779205794
 GameObject:
   m_ObjectHideFlags: 0
@@ -13638,3 +13728,4 @@ SceneRoots:
   - {fileID: 1788130159}
   - {fileID: 1597061039}
   - {fileID: 985270264}
+  - {fileID: 167870412}

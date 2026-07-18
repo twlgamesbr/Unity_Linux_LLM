@@ -13,14 +13,14 @@ MonoBehaviour:
   m_Name: TMP Settings
   m_EditorClassIdentifier: 
   assetVersion: 2
-  m_TextWrappingMode: 1
+  m_TextWrappingMode: 0
   m_enableKerning: 1
   m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   m_enableTintAllSprites: 0
   m_enableParseEscapeCharacters: 1
   m_EnableRaycastTarget: 1
-  m_GetFontFeaturesAtRuntime: 1
+  m_GetFontFeaturesAtRuntime: 0
   m_missingGlyphCharacter: 0
   m_ClearDynamicDataOnBuild: 1
   m_warningsDisabled: 1
@@ -33,8 +33,9 @@ MonoBehaviour:
   m_defaultTextMeshProUITextContainerSize: {x: 200, y: 50}
   m_autoSizeTextContainer: 0
   m_IsTextObjectScaleStatic: 0
-  m_fallbackFontAssets: []
-  m_matchMaterialPreset: 1
+  m_fallbackFontAssets:
+  - {fileID: 11400000, guid: 2e498d1c8094910479dc3e1b768306a4, type: 2}
+  m_matchMaterialPreset: 0
   m_HideSubTextObjects: 0
   m_defaultSpriteAsset: {fileID: 11400000, guid: fbef3c704dce48f08a44612d6c856c8d, type: 2}
   m_defaultSpriteAssetPath: Sprite Assets/
