@@ -109,6 +109,53 @@ dotnet build NPCSystem.Runtime.csproj -c Release
 # Result: 0 Error(s), 45 Warning(s)
 ```
 
+### 3. ✅ Fixed PostgreSQL Exporter NULL Scan Error (P1b)
+**File:** `Backend/supabase-stack/docker-compose.yml`
+
+#### Issue:
+```
+error scraping dsn: error retrieving settings: Error retrieving rows on "db:5432":
+pg sql: Scan error on column index 3, name "short_desc": converting NULL to string is unsupported
+```
+708 occurrences/hour, every ~5 seconds.
+
+#### Root Cause:
+The `supabase-stack-pg-exporter` container (prometheuscommunity/postgres-exporter:v0.17.1)
+was scraping `pg_settings` from Supabase postgres 17, which has NULL values in the
+`short_desc` column. The Go scanner in `postgres_exporter.go:684` cannot handle NULL→string.
+
+**Note:** This was NOT the Datadog agent — it was the Supabase stack's own Prometheus
+postgres-exporter. My initial `DD_CONTAINER_EXCLUDE` and `DD_IGNORE_AUTOCONF` fixes
+targeted the wrong component (Datadog agent), not the actual source.
+
+#### Fix:
+Added `PG_EXPORTER_DISABLE_SETTINGS_METRICS=true` to the pg-exporter environment.
+This disables the `pg_settings` collector entirely, avoiding the NULL scan error.
+
+```yaml
+# Before:
+environment:
+  DATA_SOURCE_NAME: "postgresql://..."
+  PG_EXPORTER_AUTO_DISCOVER_DATABASES: "true"
+
+# After:
+environment:
+  DATA_SOURCE_NAME: "postgresql://..."
+  PG_EXPORTER_AUTO_DISCOVER_DATABASES: "true"
+  PG_EXPORTER_DISABLE_SETTINGS_METRICS: "true"
+```
+
+#### Validation:
+```bash
+# Datadog logs — zero new errors
+mcp_datadog-mcp_search_datadog_logs(query="error scraping dsn", from="now-1m")
+# Result: count=0
+
+# Local container logs — clean startup
+docker logs supabase-stack-pg-exporter --since 30s
+# Result: no errors
+```
+
 ---
 
 ## Deployment Checklist
@@ -117,6 +164,8 @@ dotnet build NPCSystem.Runtime.csproj -c Release
 - [x] **P1a Validation:** No deprecated warnings in recent logs
 - [x] **P0:** Fixed APM trace MessagePack serialization
 - [x] **P0 Validation:** Code compiles without errors
+- [x] **P1b:** Fixed postgres_exporter NULL scan error
+- [x] **P1b Validation:** Zero postgres errors in new logs
 - [ ] **P0 Full Validation:** Run Unity server and verify traces reach Datadog (pending Unity deployment)
 
 ---
@@ -144,7 +193,8 @@ dotnet build NPCSystem.Runtime.csproj -c Release
 
 | File | Changes | Status |
 |------|---------|--------|
-| `Backend/datadog-host/docker-compose.yml` | 4 env var removals, 2 additions, 2 updates | ✅ Live |
+| `Backend/datadog-host/docker-compose.yml` | 5 env var removals, 3 additions, 2 updates | ✅ Live |
+| `Backend/supabase-stack/docker-compose.yml` | Added PG_EXPORTER_DISABLE_SETTINGS_METRICS=true | ✅ Live |
 | `Assets/Scripts/Runtime/Monitoring/DatadogTraceService.cs` | JSON→msgpack, +5 encoding methods, 2 method updates | ✅ Compiled |
 
 ---

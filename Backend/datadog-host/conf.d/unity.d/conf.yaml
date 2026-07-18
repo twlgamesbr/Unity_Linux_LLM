@@ -1,0 +1,53 @@
+## Unity Dedicated Server log collection (npc-dedicated-server container).
+## The Unity server writes structured JSON logs to stdout via NPCFlowLogger
+## (auto-enabled on server builds via ApplyPlatformLoggingOverrides).
+## These logs are captured by Docker's json-file log driver and forwarded
+## to the Datadog Agent via container log collection.
+##
+## Container label: com.datadoghq.ad.logs routes to this config.
+## Source: unity-server  |  Service: npc-server
+init_config:
+
+instances:
+  # No custom check instances — we rely on DogStatsD metrics sent directly
+  # by the Unity server (DatadogMetricsService → UDP 8125).
+
+logs:
+  - type: docker
+    service: npc-server
+    source: unity-server
+    ## The NPCFlowLogger outputs JSON lines with fields:
+    ##   schemaVersion, timestampUtc, sessionId, requestId, conversationId,
+    ##   npcSlug, source, stage, status, level, message, durationMs, category, data
+    ##
+    ## Datadog log pipeline will auto-parse JSON logs and create facets
+    ## for: level, stage, status, source, category, npcSlug.
+    log_processing_rules:
+      # Tag log lines by severity for Datadog log analytics.
+      # Maps NPCFlowLogLevel (Debug/Info/Warning/Error) → Datadog status.
+      - type: status_remapper
+        name: npc_level_to_status
+        # The level field in the JSON is: "Debug", "Info", "Warning", "Error"
+        # Datadog status remapper reads from a parsed attribute.
+        source: level
+        # Remap level values to Datadog log statuses
+        # Datadog recognizes: alert, audit, error, info, notice, warn
+      # Extract the "level" field from JSON and map to Datadog log status.
+      # Since JSON logs are auto-parsed by the Agent, the "level" attribute
+      # is available as a facet. The status_remapper picks the right one.
+      - type: status_remapper
+        name: npc_level_to_log_status
+        # For JSON logs, the Agent parses all top-level fields as attributes.
+        # We use the "level" attribute (which contains Debug/Info/Warning/Error).
+        # The status_remapper maps these to Datadog log statuses.
+        source: level
+      # Multi-line detection: if Unity ever outputs non-JSON lines (e.g. crash stacktraces),
+      # group them with the preceding JSON log entry.
+      - type: multi_line
+        name: group_stacktraces
+        pattern: \s+at\s+|Traceback|Exception|Stack Trace|--- End of
+    ## Custom tags applied to all logs from this source
+    tags:
+      - "service:npc-server"
+      - "team:npc-platform"
+      - "runtime:il2cpp"

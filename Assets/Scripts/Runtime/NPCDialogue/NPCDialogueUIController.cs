@@ -442,11 +442,13 @@ namespace NPCSystem
             UpdatePortrait(GetActiveProfile());
 
             NPCProfile profile = GetActiveProfile();
-            if (RelationshipUI != null && profile != null && DialogueManager != null)
+            if (RelationshipUI != null && profile != null)
             {
                 string slug = profile.GetNpcSlug();
-                int count = DialogueManager.GetHistory(slug).Count;
-                RelationshipUI.Refresh(DialogueManager._evidenceState, slug, count);
+                NPCEvidenceState evidence = GetComponentInParent<NPCEvidenceState>()
+                    ?? FindAnyObjectByType<NPCEvidenceState>(FindObjectsInactive.Include);
+                int count = DialogueManager?.GetHistory(slug).Count ?? 0;
+                RelationshipUI.Refresh(evidence, slug, count);
             }
 
             _readyForInput = true;
@@ -501,10 +503,12 @@ namespace NPCSystem
             if (PlayerInput != null)
                 PlayerInput.text = "";
 
-            if (RelationshipUI != null && DialogueManager != null)
+            if (RelationshipUI != null)
             {
-                int count = DialogueManager.GetHistory(npcName).Count;
-                RelationshipUI.Refresh(DialogueManager._evidenceState, npcName, count);
+                NPCEvidenceState evidence = GetComponentInParent<NPCEvidenceState>()
+                    ?? FindAnyObjectByType<NPCEvidenceState>(FindObjectsInactive.Include);
+                int count = DialogueManager?.GetHistory(npcName).Count ?? 0;
+                RelationshipUI.Refresh(evidence, npcName, count);
             }
         }
 

@@ -12,10 +12,37 @@ instances:
       - env:production
 
 logs:
+  ## ── Nginx access logs ────────────────────────────────────────────
+  ## Matched by container label com.datadoghq.ad.logs on npc-webgl-client.
+  ## The json-file Docker driver wraps each line in {"log":"...","stream":"...","time":"..."}.
+  ## Datadog Agent auto-extracts the "log" field, then these processing rules apply.
   - type: docker
     source: nginx
     service: webgl-client
     log_processing_rules:
-      - type: multi_line
-        name: log_start_with_date
-        pattern: \d{4}\/\d{2}\/\d{2}
+      # Strip the JSON envelope wrapper (redundant with Agent auto-extraction,
+      # but acts as safety net if raw JSON leaks through).
+      - type: crawler
+        name: crawl_docker_json
+        # The Agent usually handles this, but if logs arrive as raw JSON,
+        # this ensures we extract the message field.
+        pattern: \{"log":"(.*)","stream":"stdout".*\}
+        replace: \1
+      # Tag nginx access vs error logs by status code presence.
+      - type: grok
+        name: nginx_access_or_error
+        # Match either access log (has status code) or error log (starts with date).
+        patterns:
+          - 'access: %{date("yyyy/MM/dd:HH:mm:ss", greedyData):date} %{regex("[^ ]+"):host} %{word:user} %{ipOrHost:remote_ip} \[%{regex(".*"):request_id}\] "%{word:method} %{data:url} HTTP/%{number:http_version}" %{number:status:int} %{number:bytes:int} "%{data:referrer}" "%{data:user_agent}"'
+          - 'error: %{date("yyyy/MM/dd:HH:mm:ss", greedyData):date} \[%{word:level}\] %{number:pid:int}#%{number:tid:int}: %{data:message}'
+
+  ## ── Nginx error logs (stderr) ────────────────────────────────────
+  ## Separate config for error log stream if needed in future.
+  - type: docker
+    source: nginx
+    service: webgl-client
+    log_processing_rules:
+      - type: mask sensitive data
+        name: mask_ip_addresses
+        pattern: \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}
+        replacement: "xxx.xxx.xxx.xxx"

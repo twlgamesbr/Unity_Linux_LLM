@@ -22,6 +22,10 @@ namespace NPCSystem
         bool _logToUnityConsole = true;
         public bool LogToUnityConsole { get => _logToUnityConsole; set => _logToUnityConsole = value; }
 
+        [SerializeField]
+        bool _logToStdout = false;
+        public bool LogToStdout { get => _logToStdout; set => _logToStdout = value; }
+
         [FoldoutGroup("File Output", true, nameof(LogToJsonlFile))]
         [SerializeField]
         bool _logToJsonlFile = true;
@@ -258,6 +262,8 @@ namespace NPCSystem
                 AddToRingBuffer(flowEvent);
                 if (LogToUnityConsole)
                     WriteUnityConsole(flowEvent);
+                if (LogToStdout)
+                    WriteStdout(flowEvent);
                 if (LogToJsonlFile && SupportsPersistentFileLogging(Application.platform))
                     WriteJsonLine(flowEvent);
             }
@@ -444,6 +450,13 @@ namespace NPCSystem
         {
             if (SupportsPersistentFileLogging(Application.platform))
             {
+                // On server/headless builds (Linux dedicated server running in Docker),
+                // auto-enable stdout logging so the Docker json-file log driver captures
+                // structured logs for forwarding to the Datadog Agent.
+                if (Application.isBatchMode || Application.platform == RuntimePlatform.LinuxServer)
+                {
+                    _logToStdout = true;
+                }
                 return;
             }
 
@@ -562,6 +575,26 @@ namespace NPCSystem
                 default:
                     UnityEngine.Debug.Log(line);
                     break;
+            }
+        }
+
+        /// <summary>
+        /// Writes structured JSON to stdout (Console.Out) for collection by the
+        /// Docker json-file log driver and forwarding to the Datadog Agent.
+        /// On headless/server builds this is auto-enabled; on Editor it must be
+        /// opted in via the Inspector or code.
+        /// </summary>
+        void WriteStdout(NPCFlowEvent flowEvent)
+        {
+            try
+            {
+                string json = flowEvent.ToJson();
+                Console.WriteLine(json);
+            }
+            catch (Exception ex)
+            {
+                // Avoid recursive logging: write a minimal fallback to stderr
+                Console.Error.WriteLine($"[NPCFlow] stdout write failed: {ex.Message}");
             }
         }
 

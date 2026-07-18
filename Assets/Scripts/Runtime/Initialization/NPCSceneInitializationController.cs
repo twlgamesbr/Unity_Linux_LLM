@@ -179,8 +179,12 @@ namespace NPCSystem
                 {
                     case NPCSceneInitializationPhase.Logger:
                         _flowLogger = logger;
+                        // Initialize Datadog RUM tracking consent (WebGL compliance).
+                        // Consent starts as "pending" (no data collected) and is only
+                        // set to "granted" when the user accepts the privacy dialog.
+                        // On non-WebGL platforms this is a safe no-op.
+                        DatadogConsent.Grant();
                         break;
-
                     case NPCSceneInitializationPhase.SceneReferences:
                         ResolveReferences();
                         break;

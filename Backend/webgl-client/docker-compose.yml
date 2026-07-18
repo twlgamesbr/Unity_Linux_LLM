@@ -14,9 +14,15 @@ services:
       - DD_DATA_STREAMS_ENABLED=true
       - DD_AGENT_HOST=dd-agent
       - DD_TRACE_AGENT_PORT=8126
+    labels:
+      # Datadog log collection: source=nginx routes to conf.d/nginx.d pipeline
+      com.datadoghq.ad.logs: '[{"source":"nginx","service":"webgl-client"}]'
+      # Datadog APM service mapping
+      com.datadoghq.ad.tags: '["service:webgl-client","team:npc-platform"]'
     volumes:
       - ../../Builds/WebGL_client/WebGL:/usr/share/nginx/html:ro
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./datadog-rum-init.js:/usr/share/nginx/html/datadog-rum-init.js:ro
     restart: unless-stopped
     logging:
       driver: json-file

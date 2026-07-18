@@ -46,6 +46,7 @@ namespace NPCSystem
         [SerializeField, HideProperty]
         string _ragEmbeddingPath = "RAG/NPCDialogues.rag";
 
+        [Tooltip("Use Qdrant vector database for NPC knowledge search (vs local .rag file on disk). Requires QdrantRAGService + NPCLocalAIEmbedder on the GameObject.")]
         [SerializeField, HideProperty]
         [FormerlySerializedAs("useQdrantRag")]
         [FormerlySerializedAs("UseQdrantRag")]
@@ -143,6 +144,7 @@ namespace NPCSystem
         [SerializeField]
         bool _persistHistory = true;
 
+        [Tooltip("Enable local file-based .rag index search (local embeddings file on disk). Not needed when Qdrant is active.")]
         [HideProperty, FormerlySerializedAs("enableRAG")]
         [SerializeField]
         bool _enableRAG = true;
@@ -246,70 +248,26 @@ namespace NPCSystem
         }
 
         // ─── Configuration properties (backed by [SerializeField] private fields) ───
-        public string RemoteHost
-        {
-            get => _remoteHost;
-            set => _remoteHost = value;
-        }
-        public int RemotePort
-        {
-            get => _remotePort;
-            set => _remotePort = value;
-        }
-        public string RemoteModel
-        {
-            get => _remoteModel;
-            set => _remoteModel = value;
-        }
-        public string RemoteEmbeddingHost
-        {
-            get => _remoteEmbeddingHost;
-            set => _remoteEmbeddingHost = value;
-        }
-        public int RemoteEmbeddingPort
-        {
-            get => _remoteEmbeddingPort;
-            set => _remoteEmbeddingPort = value;
-        }
-        public string RagEmbeddingPath
-        {
-            get => _ragEmbeddingPath;
-            set => _ragEmbeddingPath = value;
-        }
-        public bool UseQdrantRag
-        {
-            get => _useQdrantRag;
-            set => _useQdrantRag = value;
-        }
-        public bool PersistHistory
-        {
-            get => _persistHistory;
-            set => _persistHistory = value;
-        }
-        public bool EnableRAG
-        {
-            get => _enableRAG;
-            set => _enableRAG = value;
-        }
-        public bool RebuildRagFromKnowledgeIfMissing
-        {
-            get => _rebuildRagFromKnowledgeIfMissing;
-            set => _rebuildRagFromKnowledgeIfMissing = value;
-        }
-        public int MaxHistoryPerNPC
-        {
-            get => _maxHistoryPerNPC;
-            set => _maxHistoryPerNPC = value;
-        }
-        public bool InitializeOnStart
-        {
-            get => _initializeOnStart;
-            set => _initializeOnStart = value;
-        }
+        public string RemoteHost { get => _remoteHost; set => _remoteHost = value; }
+        public int RemotePort { get => _remotePort; set => _remotePort = value; }
+        public string RemoteModel { get => _remoteModel; set => _remoteModel = value; }
+        public string RemoteEmbeddingHost { get => _remoteEmbeddingHost; set => _remoteEmbeddingHost = value; }
+        public int RemoteEmbeddingPort { get => _remoteEmbeddingPort; set => _remoteEmbeddingPort = value; }
+        public string RagEmbeddingPath { get => _ragEmbeddingPath; set => _ragEmbeddingPath = value; }
+        public bool UseQdrantRag { get => _useQdrantRag; set => _useQdrantRag = value; }
+        public bool PersistHistory { get => _persistHistory; set => _persistHistory = value; }
+        public bool EnableRAG { get => _enableRAG; set => _enableRAG = value; }
+        public bool RebuildRagFromKnowledgeIfMissing { get => _rebuildRagFromKnowledgeIfMissing; set => _rebuildRagFromKnowledgeIfMissing = value; }
+        public int MaxHistoryPerNPC { get => _maxHistoryPerNPC; set => _maxHistoryPerNPC = value; }
+        public bool InitializeOnStart { get => _initializeOnStart; set => _initializeOnStart = value; }
         public bool IsResponding => _sessionService != null && _sessionService.IsResponding;
-        public bool IsInitialized =>
-            _initializationTask != null && _initializationTask.IsCompletedSuccessfully;
+        public bool IsInitialized => _initializationTask != null && _initializationTask.IsCompletedSuccessfully;
         public bool IsRagAvailable => _retrievalService != null && _retrievalService.IsRagAvailable;
+
+        void Awake()
+        {
+            ResolveServices();
+        }
 
         void Start()
         {
@@ -323,11 +281,30 @@ namespace NPCSystem
             }
         }
 
+        /// <summary>
+        /// Resolve child/core service references via direct GetComponent (not FindObjectOfType).
+        /// Services are expected to be on the same GameObject hierarchy.
+        /// </summary>
+        void ResolveServices()
+        {
+            _historyService ??= GetComponentInChildren<NPCDialogueHistoryService>(true)
+                ?? GetComponent<NPCDialogueHistoryService>();
+            _retrievalService ??= GetComponentInChildren<NPCDialogueRetrievalService>(true)
+                ?? GetComponent<NPCDialogueRetrievalService>();
+            _sessionService ??= GetComponentInChildren<NPCDialogueSessionService>(true)
+                ?? GetComponent<NPCDialogueSessionService>();
+            _contextService ??= GetComponentInChildren<PlayerDialogueContextService>(true)
+                ?? GetComponent<PlayerDialogueContextService>();
+        }
+
         public Task InitializeAsync()
         {
             lock (_initializationLock)
             {
-                _initializationTask ??= InitializeInternalAsync();
+                if (_initializationTask == null)
+                {
+                    _initializationTask = InitializeInternalAsync();
+                }
                 return _initializationTask;
             }
         }
@@ -335,114 +312,67 @@ namespace NPCSystem
         async Task InitializeInternalAsync()
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
-            if (!string.IsNullOrWhiteSpace(RemoteHost) && NPCNetworkUtils.IsLocalHost(RemoteHost))
-            {
-                try
-                {
-                    Uri pageUri = new Uri(Application.absoluteURL);
-                    if (!NPCNetworkUtils.IsLocalHost(pageUri.Host))
-                    {
-                        RemoteHost = pageUri.Host;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogWarning(
-                        $"[NPCDialogueManager] Failed to dynamically resolve RemoteHost: {ex.Message}"
-                    );
-                }
-            }
-            if (
-                !string.IsNullOrWhiteSpace(RemoteEmbeddingHost)
-                && NPCNetworkUtils.IsLocalHost(RemoteEmbeddingHost)
-            )
-            {
-                try
-                {
-                    Uri pageUri = new Uri(Application.absoluteURL);
-                    if (!NPCNetworkUtils.IsLocalHost(pageUri.Host))
-                    {
-                        RemoteEmbeddingHost = pageUri.Host;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogWarning(
-                        $"[NPCDialogueManager] Failed to dynamically resolve RemoteEmbeddingHost: {ex.Message}"
-                    );
-                }
-            }
+            ResolveWebGlHost();
 #endif
-
             using var scope = NPCFlowScope.Start(
                 Logger,
                 NPCFlowStage.SceneBootstrap,
                 source: nameof(NPCDialogueManager)
             );
-            using var initSpan = DatadogTracer.StartSpan(
-                "dialogue.manager.initialize",
-                service: "unity-dedicated-server",
-                resource: "InitializeDialogue",
-                type: "system",
-                tags: new[]
-                {
-                    $"profile_count:{Profiles.Length}",
-                    $"use_qdrant:{UseQdrantRag}",
-                }
-            );
-            var initSw = System.Diagnostics.Stopwatch.StartNew();
+
             try
             {
-                AutoAssignReferencesIfNeeded();
-                ValidateReferences();
                 BuildProfileIndex();
-                _historyService?.Initialize(_supabaseRepo, PersistHistory, MaxHistoryPerNPC);
+
+                // Each service self-initializes using config from this Manager
+                // We await them in parallel since they run on their own schedule
+                var serviceTasks = new List<Task>(3);
+
                 if (_historyService != null)
-                    await _historyService.LoadAllHistoriesAsync(Profiles);
-                _retrievalService?.Initialize(
-                    _localRag,
-                    RagEmbeddingPath,
-                    EnableRAG,
-                    UseQdrantRag,
-                    _qdrantRag,
-                    RebuildRagFromKnowledgeIfMissing,
-                    RemoteEmbeddingHost,
-                    RemoteEmbeddingPort
-                );
+                {
+                    _historyService.Initialize(_supabaseRepo, PersistHistory, MaxHistoryPerNPC);
+                    serviceTasks.Add(_historyService.LoadAllHistoriesAsync(Profiles));
+                }
                 if (_retrievalService != null)
-                    await _retrievalService.LoadOrBuildIndexAsync(Profiles);
-
-                _sessionService?.Initialize(
-                    _chatClient,
-                    _historyService,
-                    _retrievalService,
-                    _actionPlanner,
-                    _evidenceState,
-                    _contextService,
-                    RemoteHost,
-                    RemotePort,
-                    RemoteModel,
-                    _profiles
-                );
-
+                {
+                    _retrievalService.Initialize(
+                        _localRag, RagEmbeddingPath, EnableRAG, UseQdrantRag,
+                        _qdrantRag, RebuildRagFromKnowledgeIfMissing,
+                        RemoteEmbeddingHost, RemoteEmbeddingPort
+                    );
+                    _retrievalService.SyncEmbedderHost();
+                    serviceTasks.Add(_retrievalService.LoadOrBuildIndexAsync(Profiles));
+                }
                 if (_sessionService != null)
                 {
+                    _sessionService.Initialize(
+                        _chatClient, _historyService, _retrievalService,
+                        _actionPlanner, _evidenceState, _contextService,
+                        RemoteHost, RemotePort, RemoteModel, _profiles
+                    );
+                }
+
+                if (serviceTasks.Count > 0)
+                    await Task.WhenAll(serviceTasks);
+
+                // Subscribe session events → UnityEvents
+                if (_sessionService != null)
+                {
+                    _sessionService.OnResponseStart -= OnSessionResponseStart;
+                    _sessionService.OnResponseComplete -= OnSessionResponseComplete;
+                    _sessionService.OnError -= OnSessionError;
                     _sessionService.OnResponseStart += OnSessionResponseStart;
                     _sessionService.OnResponseComplete += OnSessionResponseComplete;
                     _sessionService.OnError += OnSessionError;
                 }
 
-                initSw.Stop();
-                initSpan.SetTag("status", "success");
-                DatadogMetricsService.Timer("dialogue.manager.initialize.duration", initSw.ElapsedMilliseconds, tags: new[]
-                {
-                    $"profile_count:{Profiles.Length}",
-                    $"use_qdrant:{UseQdrantRag}",
-                });
-                DatadogMetricsService.Increment("dialogue.manager.initialize.count", tags: new[]
-                {
-                    "status:success",
-                });
+                Logger?.Log(
+                    NPCFlowStage.SceneBootstrap,
+                    NPCFlowStatus.Success,
+                    NPCFlowLogLevel.Debug,
+                    "Dialogue services initialized.",
+                    source: nameof(NPCDialogueManager)
+                );
 
                 scope.Success("Initialization complete.");
 
@@ -460,216 +390,62 @@ namespace NPCSystem
             }
             catch (Exception ex)
             {
-                initSw.Stop();
-                initSpan.SetError(ex.Message);
-                DatadogMetricsService.Timer("dialogue.manager.initialize.duration", initSw.ElapsedMilliseconds, tags: new[]
-                {
-                    $"profile_count:{Profiles.Length}",
-                    $"use_qdrant:{UseQdrantRag}",
-                });
-                DatadogMetricsService.Increment("dialogue.manager.initialize.count", tags: new[]
-                {
-                    "status:failed",
-                });
-
+                Logger?.Log(
+                    NPCFlowStage.SceneBootstrap,
+                    NPCFlowStatus.Error,
+                    NPCFlowLogLevel.Error,
+                    $"Initialization failed: {ex.Message}",
+                    source: nameof(NPCDialogueManager)
+                );
                 scope.Error(ex, "Initialization failed.");
                 throw;
             }
         }
 
-        [Button("Auto Assign Dialogue References")]
-        void AutoAssignReferencesIfNeeded()
+#if UNITY_WEBGL && !UNITY_EDITOR
+        void ResolveWebGlHost()
         {
-            if (_chatClient == null)
+            try
             {
-                _chatClient = FindAnyObjectByType<NPCLocalAIClient>(FindObjectsInactive.Include);
+                Uri pageUri = new Uri(Application.absoluteURL);
+                if (!NPCNetworkUtils.IsLocalHost(pageUri.Host))
+                {
+                    if (!string.IsNullOrWhiteSpace(RemoteHost) && NPCNetworkUtils.IsLocalHost(RemoteHost))
+                        RemoteHost = pageUri.Host;
+                    if (!string.IsNullOrWhiteSpace(RemoteEmbeddingHost) && NPCNetworkUtils.IsLocalHost(RemoteEmbeddingHost))
+                        RemoteEmbeddingHost = pageUri.Host;
+                }
             }
-
-            if (_localRag == null)
+            catch (Exception ex)
             {
-                _localRag = FindAnyObjectByType<NPCLocalRAG>(FindObjectsInactive.Include);
+                Debug.LogWarning($"[NPCDialogueManager] Failed to resolve WebGL host: {ex.Message}");
             }
-
-            if (UseQdrantRag && _qdrantRag == null)
-            {
-                _qdrantRag = FindAnyObjectByType<QdrantRAGService>(FindObjectsInactive.Include);
-            }
-
-            if (_actionPlanner == null)
-            {
-                _actionPlanner = FindAnyObjectByType<NPCDialogueActionPlanner>(
-                    FindObjectsInactive.Include
-                );
-            }
-
-            if (_evidenceState == null)
-            {
-                _evidenceState = FindAnyObjectByType<NPCEvidenceState>(FindObjectsInactive.Include);
-            }
-
-            if (_historyService == null)
-            {
-                _historyService = GetComponent<NPCDialogueHistoryService>();
-            }
-            if (_historyService == null)
-            {
-                _historyService = FindAnyObjectByType<NPCDialogueHistoryService>(
-                    FindObjectsInactive.Include
-                );
-            }
-
-            if (_retrievalService == null)
-            {
-                _retrievalService = GetComponent<NPCDialogueRetrievalService>();
-            }
-            if (_retrievalService == null)
-            {
-                _retrievalService = FindAnyObjectByType<NPCDialogueRetrievalService>(
-                    FindObjectsInactive.Include
-                );
-            }
-
-            if (_sessionService == null)
-            {
-                _sessionService = GetComponent<NPCDialogueSessionService>();
-            }
-            if (_sessionService == null)
-            {
-                _sessionService = FindAnyObjectByType<NPCDialogueSessionService>(
-                    FindObjectsInactive.Include
-                );
-            }
-
-            if (_contextService == null)
-            {
-                _contextService = FindAnyObjectByType<PlayerDialogueContextService>(
-                    FindObjectsInactive.Include
-                );
-            }
-
-            if (_retrievalService != null)
-            {
-                _retrievalService.SyncEmbedderHost();
-            }
-
-            Logger.Log(
-                NPCFlowStage.SceneBootstrap,
-                NPCFlowStatus.Success,
-                NPCFlowLogLevel.Debug,
-                "AutoAssignReferencesIfNeeded completed.",
-                source: nameof(NPCDialogueManager)
-            );
         }
-
-        [Button("Validate Dialogue References")]
-        void ValidateReferences()
-        {
-            if (_chatClient == null)
-                Logger.Log(
-                    NPCFlowStage.ConfigurationValidation,
-                    NPCFlowStatus.Error,
-                    NPCFlowLogLevel.Error,
-                    "NPCLocalAIClient reference not set!",
-                    source: nameof(NPCDialogueManager)
-                );
-            if (_localRag == null)
-                Logger.Log(
-                    NPCFlowStage.ConfigurationValidation,
-                    NPCFlowStatus.Warning,
-                    NPCFlowLogLevel.Warning,
-                    "LocalRAG reference not set. Prompt-only mode will be used.",
-                    source: nameof(NPCDialogueManager)
-                );
-        }
+#endif
 
         // ── SessionService event bridge ──
         void OnSessionResponseStart(string msg) => OnResponseStart?.Invoke(msg);
-
-        void OnSessionResponseComplete(string npc, string response) =>
-            OnResponseComplete?.Invoke(npc, response);
-
+        void OnSessionResponseComplete(string npc, string response) => OnResponseComplete?.Invoke(npc, response);
         void OnSessionError(string err) => OnError?.Invoke(err);
-
-        [Button("Fetch Models from LocalAI")]
-        void FetchAvailableModelsFromLocalAI()
-        {
-            string url = $"http://{RemoteHost}:{RemotePort}/v1/models";
-            Debug.Log($"[NPC] Fetching models from {url}...");
-
-            try
-            {
-                var handler = new System.Net.Http.HttpClientHandler();
-                using (var client = new System.Net.Http.HttpClient(handler))
-                {
-                    client.Timeout = TimeSpan.FromSeconds(10);
-                    var responseTask = client.GetAsync(url);
-                    var responseMsg = responseTask.GetAwaiter().GetResult();
-                    string response = responseMsg
-                        .Content.ReadAsStringAsync()
-                        .GetAwaiter()
-                        .GetResult();
-
-                    Debug.Log(
-                        $"[NPC] Raw response ({response.Length} chars): {response.Substring(0, Mathf.Min(response.Length, 300))}"
-                    );
-
-                    var wrapper = JsonUtility.FromJson<LocalAIModelsResponse>(response);
-                    if (wrapper != null && wrapper.data != null && wrapper.data.Length > 0)
-                    {
-                        _cachedModelNames = Array.ConvertAll(wrapper.data, m => m.id);
-                        string modelList = string.Join(", ", _cachedModelNames);
-                        Debug.Log($"[NPC] Found {_cachedModelNames.Length} model(s): {modelList}");
-                        Logger.Log(
-                            NPCFlowStage.EditorWorkflow,
-                            NPCFlowStatus.Success,
-                            NPCFlowLogLevel.Info,
-                            $"Found {_cachedModelNames.Length} model(s): {modelList}",
-                            source: nameof(NPCDialogueManager)
-                        );
-
-#if UNITY_EDITOR
-                        UnityEditor.EditorUtility.SetDirty(this);
-                        UnityEditorInternal.InternalEditorUtility.RepaintAllViews();
-#endif
-                    }
-                    else
-                    {
-                        string errorDetail =
-                            wrapper == null
-                                ? "JsonUtility returned null"
-                                : $"data array is empty or null (object={wrapper.@object})";
-                        Debug.LogError($"[NPC] Failed to parse models response. {errorDetail}");
-                    }
-                }
-            }
-            catch (System.Exception ex)
-            {
-                Debug.LogError(
-                    $"[NPC] Failed to fetch models from {url}: {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}"
-                );
-            }
-        }
 
         void BuildProfileIndex()
         {
             _profilesBySlug.Clear();
-
             foreach (NPCProfile profile in Profiles)
             {
                 string slug = profile.GetNpcSlug();
                 if (_profilesBySlug.ContainsKey(slug))
                 {
-                    Logger.Log(
+                    Logger?.Log(
                         NPCFlowStage.ProfileIndexBuild,
                         NPCFlowStatus.Warning,
                         NPCFlowLogLevel.Warning,
-                        $"Duplicate NPC profile slug detected: {slug}. Keeping the first entry.",
+                        $"Duplicate NPC profile slug: {slug}.",
                         source: nameof(NPCDialogueManager),
                         data: new Dictionary<string, object> { ["slug"] = slug }
                     );
                     continue;
                 }
-
                 _profilesBySlug[slug] = profile;
             }
         }
@@ -680,18 +456,13 @@ namespace NPCSystem
             return firstProfile != null ? firstProfile.GetNpcSlug() : string.Empty;
         }
 
-        public void SwitchToNPC(string npcName)
-        {
-            _ = SwitchToNPCAsync(npcName);
-        }
+        public void SwitchToNPC(string npcName) { _ = SwitchToNPCAsync(npcName); }
 
         public async Task SwitchToNPCAsync(string npcName)
         {
             using var scope = NPCFlowScope.Start(
-                Logger,
-                NPCFlowStage.NPCSwitch,
-                source: nameof(NPCDialogueManager),
-                npcSlug: npcName
+                Logger, NPCFlowStage.NPCSwitch,
+                source: nameof(NPCDialogueManager), npcSlug: npcName
             );
             await InitializeAsync();
 
@@ -699,115 +470,70 @@ namespace NPCSystem
             if (profile == null)
             {
                 string error = $"NPC '{npcName}' not found";
-                Logger.Log(
-                    NPCFlowStage.NPCSwitch,
-                    NPCFlowStatus.Error,
-                    NPCFlowLogLevel.Warning,
-                    error + "!",
-                    source: nameof(NPCDialogueManager)
-                );
+                Logger?.Log(NPCFlowStage.NPCSwitch, NPCFlowStatus.Error, NPCFlowLogLevel.Warning, error, source: nameof(NPCDialogueManager));
                 OnError?.Invoke(error);
                 scope.Skipped(error);
                 return;
             }
 
             CancelRequests();
-
             _currentNPC = profile;
-            scope.Success(
-                $"Switched to NPC: {profile.GetDisplayName()}",
-                new Dictionary<string, object> { ["npcSlug"] = profile.GetNpcSlug() }
-            );
-
-            DatadogMetricsService.Increment("dialogue.npc.switch.count", tags: new[]
-            {
-                $"npc:{profile.GetNpcSlug()}",
-                $"display_name:{profile.GetDisplayName()}",
-            });
-
             OnNpcChanged?.Invoke(profile.GetDisplayName());
+            scope.Success($"Switched to NPC: {profile.GetDisplayName()}");
         }
 
         public void SendDialogueMessage(string playerMessage)
         {
             if (_currentNPC == null)
             {
-                Logger.Log(
-                    NPCFlowStage.RequestStart,
-                    NPCFlowStatus.Skipped,
-                    NPCFlowLogLevel.Warning,
-                    "No NPC selected! Call SwitchToNPC() first.",
-                    source: nameof(NPCDialogueManager)
-                );
+                Logger?.Log(NPCFlowStage.RequestStart, NPCFlowStatus.Skipped, NPCFlowLogLevel.Warning,
+                    "No NPC selected! Call SwitchToNPC() first.", source: nameof(NPCDialogueManager));
                 OnError?.Invoke("No NPC selected");
                 return;
             }
 
-            // Resolve current player name from the auth bridge before each turn
+            // Resolve player name before each turn
             string activePlayerName = AuthNetworkBridge.ActivePlayerName;
             if (!string.IsNullOrWhiteSpace(activePlayerName) && activePlayerName != "Player")
             {
-                SetRuntimePlayerContext(activePlayerName);
+                _sessionService?.SetRuntimePlayerContext(activePlayerName);
             }
 
             _sessionService?.SendDialogueMessage(playerMessage, _currentNPC);
         }
 
-        public void SetRuntimePlayerContext(string playerName, ulong? clientId = null)
-        {
-            _sessionService?.SetRuntimePlayerContext(playerName, clientId);
-        }
-
-        public void ClearRuntimePlayerContext()
-        {
-            _sessionService?.ClearRuntimePlayerContext();
-        }
-
         NPCProfile FindProfile(string npcName)
         {
-            if (string.IsNullOrWhiteSpace(npcName))
-                return null;
-
+            if (string.IsNullOrWhiteSpace(npcName)) return null;
             string key = npcName.Trim();
-            if (_profilesBySlug.TryGetValue(key, out NPCProfile bySlug))
-                return bySlug;
-
+            if (_profilesBySlug.TryGetValue(key, out NPCProfile bySlug)) return bySlug;
             return Profiles.FirstOrDefault(profile =>
                 string.Equals(profile.GetDisplayName(), key, StringComparison.OrdinalIgnoreCase)
-                || string.Equals(profile.name, key, StringComparison.OrdinalIgnoreCase)
-            );
+                || string.Equals(profile.name, key, StringComparison.OrdinalIgnoreCase));
         }
 
-        public async Task AddNPCKnowledge(string npcName, string knowledgeText)
-        {
-            if (_retrievalService != null)
-                await _retrievalService.AddKnowledgeAsync(npcName, knowledgeText, Profiles);
-        }
-
-        public void SaveRAGEmbeddings()
-        {
-            _retrievalService?.SaveIndex();
-        }
-
+        /// <summary>Get history count for a given NPC (used by UI).</summary>
         public List<DialogueEntry> GetHistory(string npcName)
         {
             NPCProfile profile = FindProfile(npcName);
-            if (profile == null)
-                return new List<DialogueEntry>();
+            if (profile == null) return new List<DialogueEntry>();
             return _historyService?.GetHistory(profile) ?? new List<DialogueEntry>();
         }
 
+        /// <summary>Network-bridge snapshot: capture all NPC histories.</summary>
         public Dictionary<string, List<DialogueEntry>> CaptureHistorySnapshot()
         {
             return _historyService?.CaptureHistorySnapshot(Profiles)
                 ?? new Dictionary<string, List<DialogueEntry>>(StringComparer.OrdinalIgnoreCase);
         }
 
+        /// <summary>Network-bridge snapshot: restore all NPC histories.</summary>
         public void ApplyHistorySnapshot(Dictionary<string, List<DialogueEntry>> historyByNpc)
         {
             _historyService?.ApplyHistorySnapshot(historyByNpc, Profiles);
         }
 
+        /// <summary>Network-bridge snapshot: capture evidence state.</summary>
         public NPCEvidenceStateSnapshot CaptureEvidenceSnapshot()
         {
             return _evidenceState != null
@@ -815,28 +541,34 @@ namespace NPCSystem
                 : new NPCEvidenceStateSnapshot();
         }
 
+        /// <summary>Network-bridge snapshot: restore evidence state.</summary>
         public void ApplyEvidenceSnapshot(NPCEvidenceStateSnapshot snapshot)
         {
-            if (_evidenceState == null)
-                return;
-            _evidenceState.ApplySnapshot(snapshot);
+            _evidenceState?.ApplySnapshot(snapshot);
         }
 
+        /// <summary>Clear history for a given NPC or all NPCs.</summary>
         public async Task ClearHistory(string npcName)
         {
             if (_historyService != null)
                 await _historyService.ClearHistoryAsync(npcName, Profiles);
         }
 
-        public void CancelRequests()
+        /// <summary>Set the runtime player name/ID override for the dialogue turn.</summary>
+        public void SetRuntimePlayerContext(string playerName, ulong? clientId = null)
         {
-            _sessionService?.CancelRequests();
+            _sessionService?.SetRuntimePlayerContext(playerName, clientId);
         }
 
-        public string[] GetNPCNames()
+        /// <summary>Clear any runtime player-context override.</summary>
+        public void ClearRuntimePlayerContext()
         {
-            return Profiles.Select(profile => profile.GetNpcSlug()).ToArray();
+            _sessionService?.ClearRuntimePlayerContext();
         }
+
+        public void CancelRequests() { _sessionService?.CancelRequests(); }
+
+        public string[] GetNPCNames() => Profiles.Select(p => p.GetNpcSlug()).ToArray();
 
         void OnDestroy()
         {
@@ -854,29 +586,9 @@ namespace NPCSystem
 #if UNITY_EDITOR
         void OnValidate()
         {
-            if (Application.isPlaying)
-                return;
-
-            // Discover optional service references without auto-adding or destroying scene components.
-            if (_qdrantRag == null)
-            {
-                _qdrantRag = GetComponent<QdrantRAGService>();
-            }
+            if (Application.isPlaying) return;
+            if (_qdrantRag == null) _qdrantRag = GetComponent<QdrantRAGService>();
         }
 #endif
-    }
-
-    [Serializable]
-    public class LocalAIModelEntry
-    {
-        public string id;
-        public string @object;
-    }
-
-    [Serializable]
-    public class LocalAIModelsResponse
-    {
-        public string @object;
-        public LocalAIModelEntry[] data;
     }
 }

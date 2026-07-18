@@ -19,6 +19,11 @@ services:
       - DD_DATA_STREAMS_ENABLED=true
       - DD_AGENT_HOST=dd-agent
       - DD_TRACE_AGENT_PORT=8126
+    labels:
+      # Datadog log collection: routes stdout/stderr to conf.d/unity.d pipeline
+      com.datadoghq.ad.logs: '[{"source":"unity-server","service":"npc-server"}]'
+      # Datadog APM service mapping
+      com.datadoghq.ad.tags: '["service:npc-server","team:npc-platform"]'
     # Bind-mount the server build so you can iterate without rebuilding.
     # Read-write: Unity needs to write to _Data/ for logs and config.
     volumes:

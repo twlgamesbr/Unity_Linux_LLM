@@ -54,6 +54,12 @@ services:
       - DD_LOGS_ENABLED=true
       - DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true
       - DD_LOGS_CONFIG_AUTO_MULTI_LINE_DETECTION=true
+      # Exclude Supabase postgres from auto-discovery — internal service, not monitored.
+      # The built-in postgres check fails with: "Scan error on column index 3, name
+      # \"short_desc\": converting NULL to string is unsupported" because Supabase
+      # postgres 17 exposes NULL short_desc values in pg_settings that the Go scanner
+      # cannot handle. Exclude by container name to stop the scraping entirely.
+      - DD_CONTAINER_EXCLUDE=name:supabase-stack-db
       - DD_CONTAINER_EXCLUDE_LOGS=name:dd-agent
       # Process Agent — use new config format (deprecated: DD_PROCESS_AGENT_ENABLED)
       - DD_PROCESS_CONFIG_CONTAINER_COLLECTION_ENABLED=true
@@ -68,6 +74,12 @@ services:
       - DD_RUNTIME_SECURITY_CONFIG_ENABLED=false
       # GPU Monitoring — use NVIDIA DCGM queries instead of deprecated DD_GPU_ENABLED
       - DD_NVIDIA_DCGM_QUERIES=true
+      # Ignore postgres auto-discovery — Supabase postgres (supabase-stack-db) has
+      # NULL short_desc values in pg_settings that crash the Go scanner in
+      # postgres_exporter.go:684. DD_CONTAINER_EXCLUDE only affects log/process
+      # collection, not check auto-discovery. DD_IGNORE_AUTOCONF prevents the agent
+      # from creating postgres check instances via auto-discovery entirely.
+      - DD_IGNORE_AUTOCONF=postgres
       # Reduce log noise from expected platform skips (Kubernetes, EC2, CloudFoundry)
       - DD_LOG_LEVEL=warn
       # Disable remote config (no system-probe needed)

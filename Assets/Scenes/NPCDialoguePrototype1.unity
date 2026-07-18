@@ -1051,6 +1051,37 @@ MonoBehaviour:
   isAlert: 0
   m_InputValidator: {fileID: 0}
   m_ShouldActivateOnSelect: 1
+--- !u!1 &171030986
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 171030987}
+  m_Layer: 0
+  m_Name: Services
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &171030987
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 171030986}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1778380624}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &177970561
 GameObject:
   m_ObjectHideFlags: 0
@@ -1327,12 +1358,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 276694090}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1778380624}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1652712579 &276694092
 MultiplayerRolesData:
@@ -3647,6 +3678,37 @@ MultiplayerRolesData:
   m_ComponentsRolesMasks:
   - m_Object: {fileID: 692572911}
     m_RolesMask: 1
+--- !u!1 &701091023
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 701091024}
+  m_Layer: 0
+  m_Name: Network
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &701091024
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 701091023}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1778380624}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &708191810
 GameObject:
   m_ObjectHideFlags: 0
@@ -4638,6 +4700,37 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_IsOn: 1
+--- !u!1 &850448792
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 850448793}
+  m_Layer: 0
+  m_Name: Backend
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &850448793
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 850448792}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1778380624}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &852115856
 GameObject:
   m_ObjectHideFlags: 0
@@ -9628,6 +9721,37 @@ MultiplayerRolesData:
   m_GameObject: {fileID: 1535596276}
   m_GameObjectRolesMask: 1
   m_ComponentsRolesMasks: []
+--- !u!1 &1555757778
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1555757779}
+  m_Layer: 0
+  m_Name: Core
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1555757779
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1555757778}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1778380624}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1556622913
 GameObject:
   m_ObjectHideFlags: 0
@@ -10919,7 +11043,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1778380624}
   - component: {fileID: 1778380623}
-  - component: {fileID: 1778380632}
   - component: {fileID: 1778380637}
   - component: {fileID: 1778380640}
   - component: {fileID: 1778380639}
@@ -10927,17 +11050,15 @@ GameObject:
   - component: {fileID: 1778380642}
   - component: {fileID: 1778380641}
   - component: {fileID: 1778380643}
-  - component: {fileID: 1778380646}
   - component: {fileID: 1778380645}
   - component: {fileID: 1778380644}
-  - component: {fileID: 1778380647}
   m_Layer: 0
   m_Name: NPCDialogueSystem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1778380623
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11013,18 +11134,14 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1555757779}
+  - {fileID: 850448793}
+  - {fileID: 171030987}
+  - {fileID: 701091024}
+  - {fileID: 276694091}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1652712579 &1778380632
-MultiplayerRolesData:
-  m_ObjectHideFlags: 2
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1778380622}
-  m_GameObjectRolesMask: 3
-  m_ComponentsRolesMasks: []
 --- !u!114 &1778380637
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11167,31 +11284,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 768834cce95a7c94fb343460934183f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCDialogueActionPlanner
---- !u!114 &1778380646
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1778380622}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1e05154708e1da8a285c8ce8968bc646, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCSimpleSearch
-  _llmEmbedder: {fileID: 1778380641}
---- !u!114 &1778380647
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1778380622}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c9ff7619e10321088a74f38d26847a89, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCNetworkSessionManager
 --- !u!1 &1779205794
 GameObject:
   m_ObjectHideFlags: 0
@@ -11299,6 +11391,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCFlowLogger
   _logToUnityConsole: 1
+  _logToStdout: 1
   _logToJsonlFile: 1
   _includeTextSnippets: 0
   _includeRawTextPayloads: 0
@@ -13630,7 +13723,6 @@ SceneRoots:
   - {fileID: 1205281770}
   - {fileID: 1351714795}
   - {fileID: 898411689}
-  - {fileID: 276694091}
   - {fileID: 489627713}
   - {fileID: 1778380624}
   - {fileID: 1788130159}
