@@ -19,13 +19,13 @@ namespace NPCSystem
 
         class NPCClientDialogueSession
         {
-            public string playerDisplayName = string.Empty;
-            public string selectedNpcSlug = string.Empty;
-            public Dictionary<string, List<DialogueEntry>> historyByNpc = new Dictionary<
+            public string PlayerDisplayName = string.Empty;
+            public string SelectedNpcSlug = string.Empty;
+            public Dictionary<string, List<DialogueEntry>> HistoryByNpc = new Dictionary<
                 string,
                 List<DialogueEntry>
             >(StringComparer.OrdinalIgnoreCase);
-            public NPCEvidenceStateSnapshot evidenceSnapshot = new NPCEvidenceStateSnapshot();
+            public NPCEvidenceStateSnapshot EvidenceSnapshot = new NPCEvidenceStateSnapshot();
         }
 
         readonly Dictionary<ulong, NPCClientDialogueSession> _sessionsByClientId =
@@ -43,15 +43,15 @@ namespace NPCSystem
                 return;
             }
 
-            GetOrCreateSession(clientId).selectedNpcSlug = normalizedSlug;
+            GetOrCreateSession(clientId).SelectedNpcSlug = normalizedSlug;
         }
 
         public bool TryGetSelectedNpcSlug(ulong clientId, out string npcSlug)
         {
             npcSlug = string.Empty;
             return _sessionsByClientId.TryGetValue(clientId, out NPCClientDialogueSession session)
-                && !string.IsNullOrWhiteSpace(session.selectedNpcSlug)
-                && ((npcSlug = session.selectedNpcSlug) != null);
+                && !string.IsNullOrWhiteSpace(session.SelectedNpcSlug)
+                && ((npcSlug = session.SelectedNpcSlug) != null);
         }
 
         public bool HasSession(ulong clientId)
@@ -62,7 +62,7 @@ namespace NPCSystem
         public void SetPlayerDisplayName(ulong clientId, string playerDisplayName)
         {
             NPCClientDialogueSession session = GetOrCreateSession(clientId);
-            session.playerDisplayName = string.IsNullOrWhiteSpace(playerDisplayName)
+            session.PlayerDisplayName = string.IsNullOrWhiteSpace(playerDisplayName)
                 ? string.Empty
                 : playerDisplayName.Trim();
         }
@@ -74,9 +74,9 @@ namespace NPCSystem
                 return string.Empty;
             }
 
-            return string.IsNullOrWhiteSpace(session.playerDisplayName)
+            return string.IsNullOrWhiteSpace(session.PlayerDisplayName)
                 ? string.Empty
-                : session.playerDisplayName;
+                : session.PlayerDisplayName;
         }
 
         public void SetHistorySnapshot(ulong clientId, string npcSlug, List<DialogueEntry> history)
@@ -85,7 +85,7 @@ namespace NPCSystem
             if (string.IsNullOrWhiteSpace(normalizedSlug))
                 return;
 
-            GetOrCreateSession(clientId).historyByNpc[normalizedSlug] = CloneEntries(history);
+            GetOrCreateSession(clientId).HistoryByNpc[normalizedSlug] = CloneEntries(history);
         }
 
         public List<DialogueEntry> GetHistorySnapshot(ulong clientId, string npcSlug)
@@ -96,7 +96,7 @@ namespace NPCSystem
 
             return
                 _sessionsByClientId.TryGetValue(clientId, out NPCClientDialogueSession session)
-                && session.historyByNpc.TryGetValue(normalizedSlug, out List<DialogueEntry> history)
+                && session.HistoryByNpc.TryGetValue(normalizedSlug, out List<DialogueEntry> history)
                 ? CloneEntries(history)
                 : new List<DialogueEntry>();
         }
@@ -113,7 +113,7 @@ namespace NPCSystem
             var clone = new Dictionary<string, List<DialogueEntry>>(
                 StringComparer.OrdinalIgnoreCase
             );
-            foreach (var pair in session.historyByNpc)
+            foreach (var pair in session.HistoryByNpc)
             {
                 clone[pair.Key] = CloneEntries(pair.Value);
             }
@@ -127,7 +127,7 @@ namespace NPCSystem
         )
         {
             NPCClientDialogueSession session = GetOrCreateSession(clientId);
-            session.historyByNpc.Clear();
+            session.HistoryByNpc.Clear();
 
             if (historyByNpc == null)
                 return;
@@ -137,13 +137,13 @@ namespace NPCSystem
                 string normalizedSlug = NormalizeNpcSlug(pair.Key);
                 if (string.IsNullOrWhiteSpace(normalizedSlug))
                     continue;
-                session.historyByNpc[normalizedSlug] = CloneEntries(pair.Value);
+                session.HistoryByNpc[normalizedSlug] = CloneEntries(pair.Value);
             }
         }
 
         public void SetEvidenceSnapshot(ulong clientId, NPCEvidenceStateSnapshot snapshot)
         {
-            GetOrCreateSession(clientId).evidenceSnapshot =
+            GetOrCreateSession(clientId).EvidenceSnapshot =
                 snapshot?.Clone() ?? new NPCEvidenceStateSnapshot();
         }
 
@@ -187,7 +187,7 @@ namespace NPCSystem
         public NPCEvidenceStateSnapshot GetEvidenceSnapshot(ulong clientId)
         {
             return _sessionsByClientId.TryGetValue(clientId, out NPCClientDialogueSession session)
-                ? session.evidenceSnapshot?.Clone() ?? new NPCEvidenceStateSnapshot()
+                ? session.EvidenceSnapshot?.Clone() ?? new NPCEvidenceStateSnapshot()
                 : new NPCEvidenceStateSnapshot();
         }
 
@@ -254,9 +254,9 @@ namespace NPCSystem
                 clone.Add(
                     new DialogueEntry
                     {
-                        role = entry.role,
-                        content = entry.content,
-                        timestampUtc = entry.timestampUtc,
+                        Role = entry.Role,
+                        Content = entry.Content,
+                        TimestampUtc = entry.TimestampUtc,
                     }
                 );
             }

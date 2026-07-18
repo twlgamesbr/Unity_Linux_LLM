@@ -15,8 +15,10 @@ from .indexer import build_index, load_chunks
 from .qdrant_store import QdrantStore
 from .query import build_query_response, format_query_workflow, format_results, lexical_query, qdrant_query
 from .records import IndexRecord
+from .rules_engine import run_check
 from .sparse import compute_sparse_vectors
 from .vector_cache import VectorCache
+from .advise import advise_asmdef, advise_placement, format_asmdef_advice, format_placement_advice
 
 
 @contextmanager
@@ -278,6 +280,48 @@ def cmd_watch(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_check(args: argparse.Namespace) -> int:
+    """Run config-driven codebase rule checks."""
+    root = Path(args.root).resolve()
+    rules_path = root / ".codebaserules.yaml"
+    return run_check(
+        project_root=root,
+        rules_path=rules_path if args.rules is None else Path(args.rules),
+        target_dir=args.target,
+        output_path=args.output,
+        min_severity=args.min_severity,
+        json_output=args.json,
+    )
+
+
+def cmd_advise(args: argparse.Namespace) -> int:
+    """Deterministic placement / asmdef advice over structure-graph.json."""
+    cfg = _config(args)
+    art = cfg.artifact_dir
+    if args.advise_command == "placement":
+        advice = advise_placement(art, args.feature, limit=args.limit)
+        if args.json:
+            print(json.dumps(advice, indent=2, sort_keys=True))
+        else:
+            print(format_placement_advice(advice))
+        return 0
+    if args.advise_command == "asmdef":
+        usings = [u.strip() for u in (args.usings or "").split(",") if u.strip()]
+        advice = advise_asmdef(
+            art,
+            name=args.name,
+            folder=args.folder,
+            usings=usings,
+            root_namespace=args.root_namespace,
+        )
+        if args.json:
+            print(json.dumps(advice, indent=2, sort_keys=True))
+        else:
+            print(format_asmdef_advice(advice))
+        return 0
+    raise SystemExit(f"Unknown advise command: {args.advise_command}")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="codebase-embedder")
     add_common_args(parser)
@@ -320,6 +364,33 @@ def build_parser() -> argparse.ArgumentParser:
     add_common_args(p)
     p.add_argument("--debounce", type=float, default=1.5, help="Quiet period in seconds to debounce file events")
     p.set_defaults(func=cmd_watch)
+    p = sub.add_parser("check")
+    add_common_args(p)
+    p.add_argument("--target", help="Target subdirectory (e.g., Assets/Scripts/Runtime)")
+    p.add_argument("--output", help="Write report to file")
+    p.add_argument("--rules", help="Path to .codebaserules.yaml (default: project root)")
+    p.add_argument("--min-severity", default="Suggestion", choices=["Error", "Warning", "Suggestion", "Info"],
+                    help="Minimum severity to report (default: Suggestion)")
+    p.add_argument("--json", action="store_true", help="Output as JSON")
+    p.set_defaults(func=cmd_check)
+
+    advise = sub.add_parser("advise", help="Deterministic placement / asmdef advice from structure-graph.json")
+    add_common_args(advise)
+    advise_sub = advise.add_subparsers(dest="advise_command", required=True)
+    place = advise_sub.add_parser("placement", help="Suggest namespace/folder/asmdef for a feature")
+    add_common_args(place)
+    place.add_argument("--feature", required=True, help="Feature description, e.g. 'dialogue history persistence'")
+    place.add_argument("--limit", type=int, default=5)
+    place.add_argument("--json", action="store_true")
+    place.set_defaults(func=cmd_advise)
+    asm = advise_sub.add_parser("asmdef", help="Predict references for a new asmdef")
+    add_common_args(asm)
+    asm.add_argument("--name", required=True, help="New assembly name, e.g. NPCSystem.Presence")
+    asm.add_argument("--folder", required=True, help="Target folder, e.g. Assets/Scripts/Runtime/Presence")
+    asm.add_argument("--usings", default="", help="Comma-separated namespaces the new code will import")
+    asm.add_argument("--root-namespace", default=None, help="Optional rootNamespace override")
+    asm.add_argument("--json", action="store_true")
+    asm.set_defaults(func=cmd_advise)
     return parser
 
 

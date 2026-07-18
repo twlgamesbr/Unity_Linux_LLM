@@ -239,7 +239,7 @@ namespace NPCSystem
                             }
                             else
                             {
-                                _smokeValidator.ValidateConfiguration();
+                                await _smokeValidator.ValidateConfiguration();
                             }
                         }
                         break;

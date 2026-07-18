@@ -279,9 +279,9 @@ namespace NPCSystem
                 clone.Add(
                     new DialogueEntry
                     {
-                        role = entry.role,
-                        content = entry.content,
-                        timestampUtc = entry.timestampUtc,
+                        Role = entry.Role,
+                        Content = entry.Content,
+                        TimestampUtc = entry.TimestampUtc,
                     }
                 );
             }

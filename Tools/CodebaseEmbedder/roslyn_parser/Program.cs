@@ -46,7 +46,10 @@ internal static class Program
             DocumentationMode.Parse,
             kind: SourceCodeKind.Regular
         );
+
+        var allSymbols = new List<(string StableKey, string FullyQualifiedName, string Kind)>();
         var results = new List<object>();
+        var filePaths = new HashSet<string>();
 
         foreach (var file in files)
         {
@@ -55,8 +58,74 @@ internal static class Program
             var root = await tree.GetRootAsync().ConfigureAwait(false);
             var relativePath = Path.GetRelativePath(projectRoot, file)
                 .Replace(Path.DirectorySeparatorChar, '/');
-            results.AddRange(AnalyzeFile(projectRoot, relativePath, sourceText, root));
+            filePaths.Add(relativePath);
+            var (fileResults, fileSymbols) = AnalyzeFile(projectRoot, relativePath, sourceText, root);
+            results.AddRange(fileResults);
+            allSymbols.AddRange(fileSymbols);
         }
+
+        // Cross-file symbol resolution: build lookup
+        var symbolLookup = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+        foreach (var (stableKey, fqn, kind) in allSymbols)
+        {
+            // Index by the fully-qualified name
+            if (!symbolLookup.ContainsKey(fqn))
+                symbolLookup[fqn] = new();
+            symbolLookup[fqn].Add(stableKey);
+
+            // Also index by simple name (last dot-segment)
+            var simpleName = fqn.Split('.').LastOrDefault() ?? fqn;
+            if (simpleName != fqn && !string.IsNullOrEmpty(simpleName))
+            {
+                if (!symbolLookup.ContainsKey(simpleName))
+                    symbolLookup[simpleName] = new();
+                symbolLookup[simpleName].Add(stableKey);
+            }
+
+            // Also index by type-qualified name (e.g. NPCDialogueManager.InitializeAsync)
+            var fqnParts = fqn.Split('.');
+            if (fqnParts.Length >= 2)
+            {
+                var typeQualified = string.Join(".", fqnParts[^2..]);
+                if (typeQualified != fqn && !string.IsNullOrEmpty(typeQualified))
+                {
+                    if (!symbolLookup.ContainsKey(typeQualified))
+                        symbolLookup[typeQualified] = new();
+                    symbolLookup[typeQualified].Add(stableKey);
+                }
+            }
+        }
+
+        // Resolve unresolved call targets
+        foreach (var obj in results)
+        {
+            if (obj is RelationRecord rel && rel.RelationKind == "calls" && !string.IsNullOrEmpty(rel.Target))
+            {
+                var targetName = rel.Target.Split('(')[0].Trim();
+                if (symbolLookup.TryGetValue(targetName, out var candidates))
+                {
+                    rel.Payload["resolved_to"] = candidates[0];
+                    rel.Payload["resolution_count"] = candidates.Count;
+                }
+            }
+        }
+
+        // Emit symbol index as a synthetic record
+        var symbolIndex = new Dictionary<string, object>
+        {
+            ["record_type"] = "symbol_index",
+            ["stable_key"] = "symbol_index:global",
+            ["total_symbols"] = allSymbols.Count,
+            ["files_scanned"] = filePaths.Count,
+            ["files"] = filePaths.ToList(),
+        };
+        results.Add(new FileRecord
+        {
+            RecordType = "symbol_index",
+            StableKey = "symbol_index:global",
+            Text = $"Symbol index: {allSymbols.Count} symbols across {filePaths.Count} files",
+            Payload = symbolIndex,
+        });
 
         var json = JsonSerializer.Serialize(
             results,
@@ -70,16 +139,19 @@ internal static class Program
         return 0;
     }
 
-    private static IEnumerable<object> AnalyzeFile(
+    private static (List<object> Records, List<(string StableKey, string FQN, string Kind)> Symbols) AnalyzeFile(
         string projectRoot,
         string relPath,
         string text,
         SyntaxNode root
     )
     {
+        var records = new List<object>();
+        var symbols = new List<(string StableKey, string FQN, string Kind)>();
+
         var usings = root.DescendantNodes()
             .OfType<UsingDirectiveSyntax>()
-            .Select(u => u.Name.ToString())
+            .Select(u => u.Name?.ToString() ?? string.Empty)
             .Distinct()
             .OrderBy(u => u)
             .ToList();
@@ -100,7 +172,7 @@ internal static class Program
             ["unity_region"] = "Runtime",
             ["asmdef"] = string.Empty,
             ["asmdef_path"] = string.Empty,
-            ["root_namespace"] = string.Empty,
+            ["root_namespace"] = declaredNamespaces.FirstOrDefault() ?? string.Empty,
             ["declared_namespaces"] = declaredNamespaces,
             ["using_directives"] = usings,
             ["type_names"] = typeDeclarations
@@ -124,8 +196,18 @@ internal static class Program
             ["line_start"] = 1,
             ["line_end"] = Math.Max(1, text.Count(c => c == '\n') + 1),
         };
+        // Extend member_names for properties and events for the file_overview
+        var allMemberNames = new HashSet<string>((List<string>)filePayload["member_names"]);
+        foreach (var t in typeDeclarations)
+        {
+            foreach (var prop in t.Members.OfType<PropertyDeclarationSyntax>())
+                allMemberNames.Add(prop.Identifier.Text);
+            foreach (var evt in t.Members.OfType<EventDeclarationSyntax>())
+                allMemberNames.Add(evt.Identifier.Text);
+        }
+        filePayload["member_names"] = allMemberNames.OrderBy(n => n).ToList();
 
-        yield return new FileRecord
+        records.Add(new FileRecord
         {
             RecordType = "file_overview",
             StableKey = $"file:{relPath}",
@@ -138,16 +220,15 @@ internal static class Program
                     $"Region Runtime",
                     $"Namespaces: {string.Join(", ", declaredNamespaces)}",
                     $"Using directives: {string.Join(", ", usings)}",
-                    $"Types: {string.Join(", ", typeDeclarations.Select(t => t.Identifier.Text).Distinct())}",
-                    $"Members: {string.Join(", ", filePayload["member_names"] as List<string> ?? new())}",
+                    $"Types: {string.Join(", ", filePayload["type_names"] as List<string> ?? new())}",
+                    $"Members: {string.Join(", ", allMemberNames)}",
                 }
             ),
             Payload = filePayload,
-        };
+        });
+        symbols.Add(($"file:{relPath}", relPath, "file"));
 
-        foreach (
-            var namespaceDeclaration in root.DescendantNodes().OfType<NamespaceDeclarationSyntax>()
-        )
+        foreach (var namespaceDeclaration in root.DescendantNodes().OfType<NamespaceDeclarationSyntax>())
         {
             var ns = namespaceDeclaration.Name.ToString();
             var types = namespaceDeclaration
@@ -166,7 +247,7 @@ internal static class Program
                 ["line_end"] =
                     namespaceDeclaration.GetLocation().GetLineSpan().EndLinePosition.Line + 1,
             };
-            yield return new FileRecord
+            records.Add(new FileRecord
             {
                 RecordType = "namespace",
                 StableKey = $"namespace:{ns}:{relPath}:{payload["line_start"]}",
@@ -183,7 +264,54 @@ internal static class Program
                     }
                 ),
                 Payload = payload,
+            });
+            symbols.Add(($"namespace:{ns}:{relPath}", ns, "namespace"));
+        }
+
+        // --- USING DIRECTIVES + namespace-uses-namespace ---
+        var usingNodes = root.DescendantNodes().OfType<UsingDirectiveSyntax>().ToList();
+        for (var usingIndex = 0; usingIndex < usingNodes.Count; usingIndex++)
+        {
+            var usingNode = usingNodes[usingIndex];
+            var usingNs = usingNode.Name?.ToString() ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(usingNs))
+                continue;
+            var usingLine = usingNode.GetLocation().GetLineSpan().StartLinePosition.Line + 1;
+            var usingPayload = new Dictionary<string, object>(filePayload)
+            {
+                ["using_namespace"] = usingNs,
+                ["symbol_kind"] = "using_directive",
+                ["line_start"] = usingLine,
+                ["line_end"] = usingLine,
             };
+            records.Add(new FileRecord
+            {
+                RecordType = "using_directive",
+                StableKey = $"using:{usingNs}:{relPath}:{usingLine}",
+                Text = string.Join(
+                    "\n",
+                    new[]
+                    {
+                        $"Using directive {usingNs}",
+                        $"Path {relPath}",
+                        $"Assembly -",
+                        $"Declared namespaces: {string.Join(", ", declaredNamespaces)}",
+                        $"Types in file: {string.Join(", ", filePayload["type_names"] as List<string> ?? new())}",
+                    }
+                ),
+                Payload = usingPayload,
+            });
+            foreach (var declaredNs in declaredNamespaces)
+            {
+                records.Add(new RelationRecord
+                {
+                    RelationKind = "namespace-uses-namespace",
+                    Source = declaredNs,
+                    Target = usingNs,
+                    Path = relPath,
+                    Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty },
+                });
+            }
         }
 
         foreach (var typeDeclaration in typeDeclarations)
@@ -229,10 +357,12 @@ internal static class Program
                 }
             }
 
+            var fqTypeName = string.IsNullOrEmpty(ns) ? typeName : $"{ns}.{typeName}";
             var payload = new Dictionary<string, object>(filePayload)
             {
                 ["namespace"] = ns,
                 ["type_name"] = typeName,
+                ["fq_name"] = fqTypeName,
                 ["symbol_kind"] = typeDeclaration.Keyword.Text,
                 ["line_start"] =
                     typeDeclaration.GetLocation().GetLineSpan().StartLinePosition.Line + 1,
@@ -267,154 +397,228 @@ internal static class Program
                 $"Interfaces: {(interfaces.Any() ? string.Join(", ", interfaces) : "-")}"
             );
 
-            yield return new FileRecord
+            records.Add(new FileRecord
             {
                 RecordType = "type",
-                StableKey = $"type:{ns}.{typeName}:{relPath}",
+                StableKey = $"type:{fqTypeName}:{relPath}",
                 Text = string.Join("\n", textParts),
                 Payload = payload,
-            };
+            });
+            symbols.Add(($"type:{fqTypeName}:{relPath}", fqTypeName, "type"));
 
             if (!string.IsNullOrEmpty(ns))
             {
-                yield return new RelationRecord
+                records.Add(new RelationRecord
                 {
                     RelationKind = "namespace-contains-type",
                     Source = ns,
-                    Target = $"{ns}.{typeName}",
+                    Target = fqTypeName,
                     Path = relPath,
                     Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty },
-                };
+                });
             }
             foreach (var baseType in baseTypes)
             {
-                yield return new RelationRecord
+                records.Add(new RelationRecord
                 {
                     RelationKind = "inherits",
-                    Source = $"{ns}.{typeName}",
-                    Target = baseType,
+                    Source = fqTypeName,
+                    Target = NormalizeTypeName(baseType),
                     Path = relPath,
                     Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty },
-                };
+                });
+                EmitTypeUses(records, fqTypeName, baseType, relPath, "base_type");
             }
             foreach (var iface in interfaces)
             {
-                yield return new RelationRecord
+                records.Add(new RelationRecord
                 {
                     RelationKind = "implements",
-                    Source = $"{ns}.{typeName}",
-                    Target = iface,
+                    Source = fqTypeName,
+                    Target = NormalizeTypeName(iface),
                     Path = relPath,
                     Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty },
-                };
+                });
+                EmitTypeUses(records, fqTypeName, iface, relPath, "interface");
             }
 
+            // --- METHODS ---
             foreach (var member in typeDeclaration.Members.OfType<MethodDeclarationSyntax>())
             {
                 var memberName = member.Identifier.Text;
-                var signature =
+                var paramTypes = member.ParameterList.Parameters
+                    .Select(p => p.Type?.ToString() ?? string.Empty)
+                    .Where(t => !string.IsNullOrWhiteSpace(t))
+                    .ToList();
+                EmitMember(
+                    records,
+                    symbols,
+                    relPath,
+                    filePayload,
+                    ns,
+                    typeName,
+                    fqTypeName,
+                    member,
+                    memberName,
+                    "method",
                     member.Modifiers.ToString()
                     + " "
                     + member.ReturnType
                     + " "
                     + memberName
-                    + member.ParameterList;
-                var payloadMember = new Dictionary<string, object>(filePayload)
+                    + member.ParameterList,
+                    member.ReturnType.ToString(),
+                    paramTypes);
+            }
+
+            // --- CONSTRUCTORS ---
+            foreach (var ctor in typeDeclaration.Members.OfType<ConstructorDeclarationSyntax>())
+            {
+                var ctorName = ctor.Identifier.Text;
+                var signature = ctor.Modifiers + " " + ctorName + ctor.ParameterList;
+                EmitMember(records, symbols, relPath, filePayload, ns, typeName, fqTypeName, ctor, ctorName, "constructor", signature);
+            }
+
+            // --- PROPERTIES ---
+            foreach (var prop in typeDeclaration.Members.OfType<PropertyDeclarationSyntax>())
+            {
+                var propName = prop.Identifier.Text;
+                var hasGetter = prop.AccessorList?.Accessors.Any(a => a.IsKind(SyntaxKind.GetAccessorDeclaration)) ?? false;
+                var hasSetter = prop.AccessorList?.Accessors.Any(a => a.IsKind(SyntaxKind.SetAccessorDeclaration)) ?? false;
+                var hasInit = prop.AccessorList?.Accessors.Any(a => a.IsKind(SyntaxKind.InitAccessorDeclaration)) ?? false;
+                var isAutoProp = prop.AccessorList?.Accessors.All(a => a.Body == null && a.ExpressionBody == null) ?? false;
+                var accessorSummary = $"get:{(hasGetter ? "Y" : "N")} set:{(hasSetter ? "Y" : "N")} init:{(hasInit ? "Y" : "N")} auto:{(isAutoProp ? "Y" : "N")}";
+                var signature = prop.Modifiers + " " + prop.Type + " " + propName + " { " + accessorSummary + " }";
+
+                var line = prop.GetLocation().GetLineSpan().StartLinePosition.Line + 1;
+                var endLine = prop.GetLocation().GetLineSpan().EndLinePosition.Line + 1;
+                var fq = $"{fqTypeName}.{propName}";
+                var propType = prop.Type.ToString();
+                var memberPayload = new Dictionary<string, object>(filePayload)
                 {
                     ["namespace"] = ns,
                     ["type_name"] = typeName,
-                    ["member_name"] = memberName,
-                    ["symbol_kind"] = "method",
-                    ["signature"] = string.Join(
-                        " ",
-                        signature.Split(
-                            new[] { ' ', '\t', '\r', '\n' },
-                            StringSplitOptions.RemoveEmptyEntries
-                        )
-                    ),
-                    ["line_start"] = member.GetLocation().GetLineSpan().StartLinePosition.Line + 1,
-                    ["line_end"] = member.GetLocation().GetLineSpan().EndLinePosition.Line + 1,
-                    ["attributes"] = member
-                        .AttributeLists.SelectMany(a => a.Attributes)
-                        .Select(a => a.Name.ToString())
-                        .Distinct()
-                        .ToList(),
+                    ["member_name"] = propName,
+                    ["symbol_kind"] = "property",
+                    ["signature"] = string.Join(" ", signature.Split(new[] { ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)),
+                    ["return_type"] = propType,
+                    ["line_start"] = line,
+                    ["line_end"] = endLine,
+                    ["has_getter"] = hasGetter,
+                    ["has_setter"] = hasSetter,
+                    ["has_init"] = hasInit,
+                    ["is_auto_property"] = isAutoProp,
                 };
-                var fq = string.IsNullOrEmpty(ns)
-                    ? $"{typeName}.{memberName}"
-                    : $"{ns}.{typeName}.{memberName}";
-                yield return new FileRecord
+
+                records.Add(new FileRecord
                 {
                     RecordType = "member",
-                    StableKey = $"member:{fq}:{payloadMember["line_start"]}:{relPath}",
-                    Text =
-                        payloadMember["signature"].ToString()
-                        + "\n"
-                        + relPath
-                        + ":"
-                        + payloadMember["line_start"]
-                        + "-"
-                        + payloadMember["line_end"]
-                        + "\nType "
-                        + typeName
-                        + " in "
-                        + ns,
-                    Payload = payloadMember,
-                };
-                yield return new RelationRecord
+                    StableKey = $"member:{fq}:{line}:{relPath}",
+                    Text = $"{prop.Type} {propName} {{ {accessorSummary} }}\n{relPath}:{line}-{endLine}\nType {typeName} in {ns}",
+                    Payload = memberPayload,
+                });
+                symbols.Add(($"member:{fq}:{line}:{relPath}", fq, "property"));
+
+                records.Add(new RelationRecord
                 {
                     RelationKind = "type-contains-member",
-                    Source = string.IsNullOrEmpty(ns) ? typeName : $"{ns}.{typeName}",
+                    Source = fqTypeName,
                     Target = fq,
                     Path = relPath,
-                    Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty },
-                };
+                    Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty, ["member_kind"] = "property" },
+                });
+                EmitTypeUses(records, fqTypeName, propType, relPath, "property");
             }
 
+            // --- EVENTS ---
+            foreach (var evt in typeDeclaration.Members.OfType<EventDeclarationSyntax>())
+            {
+                var evtName = evt.Identifier.Text;
+                var line = evt.GetLocation().GetLineSpan().StartLinePosition.Line + 1;
+                var endLine = evt.GetLocation().GetLineSpan().EndLinePosition.Line + 1;
+                var fq = $"{fqTypeName}.{evtName}";
+                var signature = evt.Modifiers + " event " + evt.Type + " " + evtName;
+                var memberPayload = new Dictionary<string, object>(filePayload)
+                {
+                    ["namespace"] = ns,
+                    ["type_name"] = typeName,
+                    ["member_name"] = evtName,
+                    ["symbol_kind"] = "event",
+                    ["signature"] = string.Join(" ", signature.Split(new[] { ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)),
+                    ["line_start"] = line,
+                    ["line_end"] = endLine,
+                };
+
+                records.Add(new FileRecord
+                {
+                    RecordType = "member",
+                    StableKey = $"member:{fq}:{line}:{relPath}",
+                    Text = $"{signature}\n{relPath}:{line}-{endLine}\nType {typeName} in {ns}",
+                    Payload = memberPayload,
+                });
+                symbols.Add(($"member:{fq}:{line}:{relPath}", fq, "event"));
+
+                records.Add(new RelationRecord
+                {
+                    RelationKind = "type-contains-member",
+                    Source = fqTypeName,
+                    Target = fq,
+                    Path = relPath,
+                    Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty, ["member_kind"] = "event" },
+                });
+            }
+
+            // --- ALL FIELDS (not just serialized) ---
             foreach (var field in typeDeclaration.Members.OfType<FieldDeclarationSyntax>())
             {
                 var isSerialized =
-                    field
-                        .AttributeLists.SelectMany(a => a.Attributes)
-                        .Any(a =>
-                            a.Name.ToString()
-                                .EndsWith("SerializeField", StringComparison.OrdinalIgnoreCase)
-                        ) || field.Modifiers.Any(SyntaxKind.PublicKeyword);
-                if (!isSerialized)
-                {
-                    continue;
-                }
+                    field.AttributeLists.SelectMany(a => a.Attributes)
+                        .Any(a => a.Name.ToString().EndsWith("SerializeField", StringComparison.OrdinalIgnoreCase))
+                    || field.Modifiers.Any(SyntaxKind.PublicKeyword);
                 foreach (var variable in field.Declaration.Variables)
                 {
                     var fieldName = variable.Identifier.Text;
                     var line = field.GetLocation().GetLineSpan().StartLinePosition.Line + 1;
+                    var endLine = field.GetLocation().GetLineSpan().EndLinePosition.Line + 1;
+                    var fq = $"{fqTypeName}.{fieldName}";
+                    var fieldType = field.Declaration.Type.ToString();
                     var payloadField = new Dictionary<string, object>(filePayload)
                     {
                         ["namespace"] = ns,
                         ["type_name"] = typeName,
                         ["member_name"] = fieldName,
                         ["symbol_kind"] = "field",
+                        ["field_type"] = fieldType,
                         ["line_start"] = line,
-                        ["line_end"] = line,
-                        ["attributes"] = field
-                            .AttributeLists.SelectMany(a => a.Attributes)
-                            .Select(a => a.Name.ToString())
-                            .Distinct()
-                            .ToList(),
-                        ["signature"] =
-                            $"{field.Modifiers} {field.Declaration.Type} {fieldName}".Trim(),
+                        ["line_end"] = endLine,
+                        ["is_serialized"] = isSerialized,
+                        ["attributes"] = field.AttributeLists.SelectMany(a => a.Attributes)
+                            .Select(a => a.Name.ToString()).Distinct().ToList(),
+                        ["signature"] = $"{field.Modifiers} {fieldType} {fieldName}".Trim(),
                     };
-                    yield return new FileRecord
+                    var recordType = isSerialized ? "serialized_field" : "field";
+                    records.Add(new FileRecord
                     {
-                        RecordType = "serialized_field",
-                        StableKey = $"serialized_field:{ns}.{typeName}.{fieldName}:{relPath}",
-                        Text =
-                            $"Serialized field {typeName}.{fieldName} in {relPath}\nType {typeName}, Namespace {ns}",
+                        RecordType = recordType,
+                        StableKey = $"{recordType}:{fq}:{relPath}",
+                        Text = $"{(isSerialized ? "Serialized" : "Non-serialized")} field {typeName}.{fieldName} : {fieldType} in {relPath}\nOwning type {typeName}, Namespace {ns}",
                         Payload = payloadField,
-                    };
+                    });
+                    symbols.Add(($"{recordType}:{fq}:{relPath}", fq, "field"));
+
+                    records.Add(new RelationRecord
+                    {
+                        RelationKind = "type-contains-member",
+                        Source = fqTypeName,
+                        Target = fq,
+                        Path = relPath,
+                        Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty, ["member_kind"] = "field", ["is_serialized"] = isSerialized },
+                    });
+                    EmitTypeUses(records, fqTypeName, fieldType, relPath, "field");
                 }
             }
 
+            // --- CALL EXPRESSIONS ---
             var callExpressions = typeDeclaration
                 .DescendantNodes()
                 .OfType<InvocationExpressionSyntax>();
@@ -422,33 +626,16 @@ internal static class Program
             {
                 var target = call.Expression.ToString();
                 if (string.IsNullOrWhiteSpace(target))
-                {
                     continue;
-                }
-                if (
-                    new[]
-                    {
-                        "if",
-                        "for",
-                        "foreach",
-                        "while",
-                        "switch",
-                        "catch",
-                        "using",
-                        "nameof",
-                        "typeof",
-                        "new",
-                    }.Contains(target)
-                )
-                {
+                if (new[] { "if", "for", "foreach", "while", "switch", "catch", "using", "nameof", "typeof", "new" }
+                    .Contains(target))
                     continue;
-                }
 
                 var line = call.GetLocation().GetLineSpan().StartLinePosition.Line + 1;
-                yield return new RelationRecord
+                records.Add(new RelationRecord
                 {
                     RelationKind = "calls",
-                    Source = string.IsNullOrEmpty(ns) ? typeName : $"{ns}.{typeName}",
+                    Source = fqTypeName,
                     Target = target,
                     Path = relPath,
                     Payload = new Dictionary<string, object>
@@ -456,8 +643,145 @@ internal static class Program
                         ["asmdef"] = string.Empty,
                         ["line_start"] = line,
                     },
-                };
+                });
             }
+        }
+
+        return (records, symbols);
+    }
+
+    private static void EmitMember(
+        List<object> records,
+        List<(string StableKey, string FQN, string Kind)> symbols,
+        string relPath,
+        Dictionary<string, object> filePayload,
+        string ns,
+        string typeName,
+        string fqTypeName,
+        SyntaxNode member,
+        string memberName,
+        string kind,
+        string rawSignature,
+        string? returnType = null,
+        List<string>? parameterTypes = null)
+    {
+        var line = member.GetLocation().GetLineSpan().StartLinePosition.Line + 1;
+        var endLine = member.GetLocation().GetLineSpan().EndLinePosition.Line + 1;
+        var fq = string.IsNullOrEmpty(ns)
+            ? $"{typeName}.{memberName}"
+            : $"{ns}.{typeName}.{memberName}";
+
+        // Extract attributes
+        var attributes = new List<string>();
+        if (member is MemberDeclarationSyntax memberDecl)
+        {
+            attributes = memberDecl.AttributeLists
+                .SelectMany(a => a.Attributes)
+                .Select(a => a.Name.ToString())
+                .Distinct()
+                .ToList();
+        }
+
+        var memberPayload = new Dictionary<string, object>(filePayload)
+        {
+            ["namespace"] = ns,
+            ["type_name"] = typeName,
+            ["member_name"] = memberName,
+            ["symbol_kind"] = kind,
+            ["signature"] = string.Join(" ", rawSignature.Split(new[] { ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)),
+            ["line_start"] = line,
+            ["line_end"] = endLine,
+            ["attributes"] = attributes,
+        };
+        if (!string.IsNullOrWhiteSpace(returnType))
+            memberPayload["return_type"] = returnType;
+        if (parameterTypes is { Count: > 0 })
+            memberPayload["parameter_types"] = parameterTypes;
+
+        records.Add(new FileRecord
+        {
+            RecordType = "member",
+            StableKey = $"member:{fq}:{line}:{relPath}",
+            Text = $"{memberPayload["signature"]}\n{relPath}:{line}-{endLine}\nType {typeName} in {ns}",
+            Payload = memberPayload,
+        });
+        symbols.Add(($"member:{fq}:{line}:{relPath}", fq, kind));
+
+        records.Add(new RelationRecord
+        {
+            RelationKind = "type-contains-member",
+            Source = fqTypeName,
+            Target = fq,
+            Path = relPath,
+            Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty, ["member_kind"] = kind },
+        });
+
+        if (!string.IsNullOrWhiteSpace(returnType))
+            EmitTypeUses(records, fqTypeName, returnType, relPath, "return");
+        if (parameterTypes != null)
+        {
+            foreach (var paramType in parameterTypes)
+                EmitTypeUses(records, fqTypeName, paramType, relPath, "parameter");
+        }
+    }
+
+    private static readonly HashSet<string> PrimitiveTypeNames = new(StringComparer.Ordinal)
+    {
+        "void", "bool", "byte", "sbyte", "char", "decimal", "double", "float", "int", "uint",
+        "long", "ulong", "short", "ushort", "object", "string", "dynamic", "var",
+        "Task", "UniTask", "CancellationToken", "Action", "Func",
+    };
+
+    private static string NormalizeTypeName(string typeName)
+    {
+        var cleaned = typeName.Trim();
+        var generic = cleaned.IndexOf('<');
+        if (generic >= 0)
+            cleaned = cleaned[..generic];
+        cleaned = cleaned.TrimEnd('?', '[', ']').Trim();
+        return cleaned;
+    }
+
+    private static IEnumerable<string> ExtractTypeNames(string typeText)
+    {
+        if (string.IsNullOrWhiteSpace(typeText))
+            yield break;
+        // Split generic args and arrays: List<Foo>, Foo[], Dictionary<A,B>
+        foreach (var part in typeText.Split(new[] { '<', '>', ',', '[', ']', ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries))
+        {
+            var name = NormalizeTypeName(part);
+            if (string.IsNullOrWhiteSpace(name))
+                continue;
+            if (PrimitiveTypeNames.Contains(name))
+                continue;
+            if (name is "System" or "UnityEngine" or "Unity" or "NPCSystem")
+                continue;
+            yield return name;
+        }
+    }
+
+    private static void EmitTypeUses(
+        List<object> records,
+        string sourceFq,
+        string typeText,
+        string relPath,
+        string via)
+    {
+        foreach (var target in ExtractTypeNames(typeText).Distinct(StringComparer.Ordinal))
+        {
+            records.Add(new RelationRecord
+            {
+                RelationKind = "type-uses-type",
+                Source = sourceFq,
+                Target = target,
+                Path = relPath,
+                Payload = new Dictionary<string, object>
+                {
+                    ["asmdef"] = string.Empty,
+                    ["via"] = via,
+                    ["raw_type"] = typeText,
+                },
+            });
         }
     }
 }

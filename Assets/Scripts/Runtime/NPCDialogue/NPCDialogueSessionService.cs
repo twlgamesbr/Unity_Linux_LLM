@@ -390,13 +390,13 @@ namespace NPCSystem
             )
             {
                 string role = string.Equals(
-                    entry.role,
+                    entry.Role,
                     "assistant",
                     StringComparison.OrdinalIgnoreCase
                 )
                     ? "assistant"
                     : "user";
-                messages.Add(new NPCOpenAIMessage { role = role, content = entry.content });
+                messages.Add(new NPCOpenAIMessage { role = role, content = entry.Content });
             }
 
             messages.Add(new NPCOpenAIMessage { role = "user", content = playerMessage });

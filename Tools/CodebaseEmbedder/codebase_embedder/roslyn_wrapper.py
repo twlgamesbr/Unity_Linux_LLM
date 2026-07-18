@@ -6,7 +6,7 @@ import subprocess
 from pathlib import Path
 from typing import Any
 
-from .records import IndexRecord, RelationRecord
+from .records import IndexRecord, RelationRecord, flatten_payload
 
 PARSER_PATH = Path(__file__).parent.parent / "roslyn_parser"
 PARSER_DLL = PARSER_PATH / "bin" / "Debug" / "net10.0" / "CodebaseRoslynParser.dll"
@@ -51,21 +51,22 @@ def parse_csharp_files_with_roslyn(root: Path, csharp_paths: list[Path]) -> tupl
         return default
 
     for obj in payload:
-        record_type = field(obj, "record_type", "recordType", default="")
-        if record_type == "relation":
+        # Relations are detected by presence of relationKind, not record_type
+        if field(obj, "relation_kind", "relationKind", default=""):
             relations.append(
                 RelationRecord(
                     field(obj, "relation_kind", "relationKind", default=""),
                     field(obj, "source", default=""),
                     field(obj, "target", default=""),
                     field(obj, "path", default=""),
-                    field(obj, "payload", default={}),
+                    flatten_payload(field(obj, "payload", default={}) or {}),
                 )
             )
         else:
+            rec_type = field(obj, "record_type", "recordType", default="")
             records.append(
                 IndexRecord(
-                    str(record_type),
+                    str(rec_type),
                     str(field(obj, "stable_key", "stableKey", default="")),
                     str(field(obj, "text", default="")),
                     field(obj, "payload", default={}),

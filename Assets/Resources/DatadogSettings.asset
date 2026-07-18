@@ -13,10 +13,10 @@ MonoBehaviour:
   m_Name: DatadogSettings
   m_EditorClassIdentifier: com.datadog.unity::Datadog.Unity.DatadogConfigurationOptions
   Enabled: 1
-  SdkVerbosity: 1
+  SdkVerbosity: 3
   OutputSymbols: 1
   PerformNativeStackMapping: 1
-  ClientToken: pubce6f5872c9887cd7765df7b1ee18951f
+  ClientToken: pubd0c26b48193b2c8d1ab9ca5f163ebadd
   Site: 2
   Env: production
   ServiceName: unity
@@ -38,6 +38,6 @@ MonoBehaviour:
   - Host: http://localhost:8080/metrics
     TracingHeaderType: 18
   TrackNonFatalAnrs: 2
-  TrackNonFatalAppHangs: 1
+  TrackNonFatalAppHangs: 0
   NonFatalAppHangThreshold: 0.25
   TelemetrySampleRate: 20

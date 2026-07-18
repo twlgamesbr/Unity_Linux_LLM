@@ -37,6 +37,9 @@ STRUCTURAL_TERMS = {
 STRUCTURAL_RECORD_BOOSTS = {
     "namespace": 52.0,
     "namespace_summary": 48.0,
+    "type_summary": 44.0,
+    "asmdef_summary": 42.0,
+    "project_rule": 40.0,
     "runtime_summary": 26.0,
     "coverage_summary": 24.0,
     "using_directive": 14.0,

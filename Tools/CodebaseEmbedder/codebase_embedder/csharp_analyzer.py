@@ -6,7 +6,7 @@ from pathlib import Path
 
 from .asmdef_parser import AssemblyRecord, resolve_asmdef_for_file
 from .discovery import classify_unity_region
-from .records import IndexRecord, RelationRecord
+from .records import IndexRecord, RelationRecord, content_hash, flatten_payload
 from .roslyn_wrapper import parse_csharp_files_with_roslyn
 
 NS_RE = re.compile(r"\bnamespace\s+([A-Za-z_][A-Za-z0-9_.]*)")
@@ -151,23 +151,51 @@ def _purpose_text(type_name: str, ns: str, region: str, asm_name: str) -> str:
     return f"{region} {type_name} in assembly {asm_name}"
 
 
+def _set_if_blank(payload: dict, key: str, value: str) -> None:
+    """Set payload[key] when missing or blank (Roslyn writes empty asmdef strings)."""
+    if not payload.get(key):
+        payload[key] = value
+
+
+def attach_asmdef_to_records(
+    records: list[IndexRecord],
+    relations: list[RelationRecord],
+    assemblies: list[AssemblyRecord],
+) -> None:
+    """Attach asmdef ownership, overwriting blank Roslyn placeholders."""
+    # Longest directory prefix wins.
+    ordered = sorted(assemblies, key=lambda a: len(a.directory), reverse=True)
+    for rec in records:
+        path = rec.payload.get("path", "")
+        for asm in ordered:
+            prefix = asm.directory.rstrip("/")
+            if path.startswith(prefix + "/") or path == prefix:
+                _set_if_blank(rec.payload, "asmdef", asm.name)
+                _set_if_blank(rec.payload, "asmdef_path", asm.path)
+                break
+        # Refresh embed text Assembly line when we filled a blank asmdef
+        asm_name = rec.payload.get("asmdef") or ""
+        if asm_name and ("\nAssembly -" in rec.text or rec.text.startswith("Assembly -")):
+            if "\nAssembly -" in rec.text:
+                rec.text = rec.text.replace("\nAssembly -", f"\nAssembly {asm_name}", 1)
+            else:
+                rec.text = rec.text.replace("Assembly -", f"Assembly {asm_name}", 1)
+            rec.payload["content_hash"] = content_hash(rec.text)
+
+    for rel in relations:
+        rel.payload = flatten_payload(rel.payload)
+        path = rel.path
+        for asm in ordered:
+            prefix = asm.directory.rstrip("/")
+            if path.startswith(prefix + "/") or path == prefix:
+                _set_if_blank(rel.payload, "asmdef", asm.name)
+                break
+
+
 def analyze_csharp_files(root: Path, csharp_paths: list[Path], assemblies: list[AssemblyRecord], project: str = "Unity_Linux_LLM") -> tuple[list[IndexRecord], list[RelationRecord]]:
     try:
         records, relations = parse_csharp_files_with_roslyn(root, csharp_paths)
-        path_to_asm = {asm.directory.rstrip("/"): asm for asm in assemblies}
-        for rec in records:
-            path = rec.payload.get("path", "")
-            for prefix, asm in path_to_asm.items():
-                if path.startswith(prefix + "/") or path == prefix:
-                    rec.payload.setdefault("asmdef", asm.name)
-                    rec.payload.setdefault("asmdef_path", asm.path)
-                    break
-        for rel in relations:
-            path = rel.path
-            for prefix, asm in path_to_asm.items():
-                if path.startswith(prefix + "/") or path == prefix:
-                    rel.payload.setdefault("asmdef", asm.name)
-                    break
+        attach_asmdef_to_records(records, relations, assemblies)
 
         # --- Roslyn+regex merge: enrich Roslyn serialized_field records with convention data ---
         path_to_text: dict[str, str] = {}

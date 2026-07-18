@@ -1,0 +1,105 @@
+# Codebase rules configuration for the unified codebase-embedder check command.
+# Only Unity-specific and architectural rules that .editorconfig cannot enforce.
+# .editorconfig handles: naming (NAM01-NAM06), formatting (FMT01-FMT05).
+#
+# Each rule defines:
+#   - id: unique rule identifier
+#   - title: human-readable name
+#   - severity: Info | Suggestion | Warning | Error
+#   - agents_md_ref: reference to AGENTS.md section
+#   - check: 'text' (raw match), 'regex' (per-line), 'roslyn' (structural AST)
+#   - pattern: the regex or text to search for
+#   - exclude_files: glob patterns to skip
+#   - auto_fix: optional replacement text (for fixable violations)
+
+rules:
+  # --- NAMING (editorconfig cannot enforce namespace naming) ---
+  - id: NAM07
+    title: Namespace naming (PascalCase)
+    severity: Warning
+    agents_md_ref: "§1.1 Naming Rules"
+    check: regex
+    pattern: "^namespace\\s+([a-z]\\w*)"
+    message: "Namespace '{match}' should be PascalCase."
+
+  # --- SERIALIZED FIELD PATTERN (Unity-specific, AGENTS.md §1.1) ---
+  - id: SER01
+    title: SerializeField private pattern
+    severity: Warning
+    agents_md_ref: "§1.1 Naming Rules"
+    check: regex
+    pattern: "\\[SerializeField\\]\\s+(?!private)"
+    message: "[SerializeField] fields must be private."
+
+  - id: SER02
+    title: FormerlySerializedAs required after rename
+    severity: Warning
+    agents_md_ref: "§1.1 Naming Rules"
+    check: roslyn
+    description: "When renaming a serialized field, [FormerlySerializedAs(\"OldName\")] must be added."
+
+  # --- ANTI-PATTERN RULES (AGENTS.md §1.6) ---
+  - id: BPR01
+    title: No bool flag parameters
+    severity: Warning
+    agents_md_ref: "§1.6 Key Anti-Pattern Rules"
+    check: regex
+    pattern: ",\\s*(bool|System\\.Boolean)\\s+\\w+"
+    message: "Boolean parameter detected — consider splitting into two methods or using an enum."
+
+  - id: TODO01
+    title: No TODO/FIXME/HACK markers
+    severity: Warning
+    agents_md_ref: "§1.6 Key Anti-Pattern Rules"
+    check: regex
+    pattern: "\\b(TODO|FIXME|HACK)\\b"
+    message: "Comment contains '{match}' marker — address or remove."
+
+  - id: CMT01
+    title: Possible commented-out code
+    severity: Suggestion
+    agents_md_ref: "§1.6 Key Anti-Pattern Rules"
+    check: regex
+    pattern: "//\\s*(if|for|foreach|while|switch|public|private|protected|internal|static|void|var|return|using|namespace|class|struct)\\b"
+    message: "Comment resembles commented-out code — confirm and delete if so."
+
+  - id: NET01
+    title: No hard-coded "localhost" comparisons
+    severity: Warning
+    agents_md_ref: "§1.6 Key Anti-Pattern Rules"
+    check: regex
+    pattern: "\"(localhost|127\\.0\\.0\\.1)\""
+    exclude_files: ["**/NPCNetworkUtils.cs"]
+    message: "Literal '{match}' — use NPCNetworkUtils.IsLocalHost(host) instead."
+
+  - id: AWS01
+    title: No ConfigureAwait(false) in Unity code
+    severity: Warning
+    agents_md_ref: "§1.6 Key Anti-Pattern Rules"
+    check: regex
+    pattern: "\\.ConfigureAwait\\(false\\)"
+    exclude_files: ["**/Tools/**"]
+    message: "Avoid ConfigureAwait(false) in Unity — use await Task.Yield() for WebGL safety per AGENTS.md §1.3."
+
+  # --- SPECIAL RULES ---
+  - id: VAR01
+    title: No single-letter variables outside loop counters
+    severity: Suggestion
+    agents_md_ref: "§1.6 Key Anti-Pattern Rules"
+    check: roslyn
+    description: "Only for/foreach loop counters should be single-letter."
+
+  - id: SND01
+    title: User-defined SendMessage hides Component.SendMessage
+    severity: Warning
+    agents_md_ref: "§2.3 Namespace Hierarchy note / §11 Known Compile Warnings (CS0108)"
+    check: text
+    pattern: "void SendMessage\\("
+    message: "SendMessage(...) hides Component.SendMessage(string) (CS0108) — rename or add 'new'."
+
+  - id: DOC01
+    title: XML docs required on public API
+    severity: Suggestion
+    agents_md_ref: "§1.4 Formatting Rules"
+    check: roslyn
+    description: "Public methods should have XML documentation comments."

@@ -8,6 +8,7 @@ This file is the project-wide source of truth for agents. Keep it short, stable,
 |---|---|
 | Architecture / live services | `Documentation/2_Architecture/Backend_Services_Topology.md` |
 | Code rules | `#1-code-conventions` |
+| Codebase scanning/rules | `#5-codebase-embedder` |
 | Scene wiring | `#3-scene-wiring-current` |
 | Tests | `#7-testing` |
 | Networking / auth | `#8-networking--auth` |
@@ -19,13 +20,17 @@ This file is the project-wide source of truth for agents. Keep it short, stable,
 
 ## 1. Code conventions
 
-- Names: private `_camelCase`; serialized private `[FormerlySerializedAs("OldName")] [SerializeField] private _camelCase`; public members PascalCase; locals/params camelCase; namespaces `NPCSystem.*`.
-- Serialized fields: always keep the `FormerlySerializedAs` attribute when renaming inspector-backed fields.
-- Async: use `try/finally`; `await Task.Yield()` is WebGL-safe; avoid `ConfigureAwait(false)`.
-- Formatting: spaces, 4-space indent, Allman braces, LF, trimmed whitespace, final newline.
-- Docs: public APIs get XML docs where useful; delete redundant comments.
-- Anti-patterns: no bool flag params, no hard-coded `"localhost"` strings, no commented-out code, no TODO/FIXME/HACK, no single-letter vars except loop counters.
-- If `#1` changes, run `dotnet run --project Tools/NPCDialogueCodeReview -- --verify-docs`.
+Dual source of truth (do not duplicate rule text here):
+
+| Concern | Owner |
+|---|---|
+| Formatting + naming (IDE) | `.editorconfig` |
+| Unity-specific + architectural rules (CI) | `.codebaserules.yaml` |
+
+- Namespaces for project code: `NPCSystem.*` (Runtime / Editor / Tests).
+- If conventions change: update `.editorconfig` first, then `.codebaserules.yaml` if needed.
+- After touching rules: `uv run --directory Tools/CodebaseEmbedder codebase-embedder check --root ..`.
+- Agents: retrieve policy via `codebase-embedder query` (`project_rule` records) or read the two files above.
 
 ## 2. Project map
 
@@ -52,16 +57,55 @@ This file is the project-wide source of truth for agents. Keep it short, stable,
 - Cognee: `http://localhost:8000/api/v1`, Postgres `127.0.0.1:5432`, disabled in the active scene.
 - WebGL host rewriting uses `NPCNetworkUtils.IsLocalHost()`; do not reintroduce raw `"localhost"` checks.
 
-## 5. Codebase embedder
+## 5. Codebase embedder (unified toolchain)
 
 - Tool root: `Tools/CodebaseEmbedder/`.
-- Common commands:
-  - `uv run codebase-embedder status --root ../..`
-  - `uv run codebase-embedder query --root ../.. --local "<concept>"`
-  - `uv run codebase-embedder audit --root ../.. --scene Assets/Scenes/NPCDialoguePrototype1.unity --scenario localai-llmunity --local`
-  - `uv run --extra test pytest -q`
+- **Roslyn parser** (`Tools/CodebaseEmbedder/roslyn_parser/`): C# .NET 10 console app using Microsoft.CodeAnalysis.CSharp 4.9.2.
+  Extracts **10 symbol types** (file_overview, namespace, type, member, field, serialized_field, constructor, property, event, using_directive) and **5 relation kinds** (inherits, implements, calls, namespace-contains-type, type-contains-member).
+  Includes cross-file symbol resolution: `calls` relation targets are linked to their declaration stable keys.
+
+### Commands
+
+| Command | What it does |
+|---|---|
+| `scan` | Discover files, run Roslyn parser, write `.codebase-index/` artifacts |
+| `index` | Embed artifacts via LocalAI and upsert to Qdrant |
+| `query` | Semantic or lexical search against Qdrant or local artifacts |
+| `check` | Config-driven rule checking against `.codebaserules.yaml` |
+| `audit` | Scene-aware retrieval audit |
+| `status` | File counts + Qdrant health |
+
+### Common usage
+
+```
+uv run codebase-embedder status --root ../..
+uv run codebase-embedder scan --root ../..
+uv run codebase-embedder index --root ../..   # embeds + upserts to Qdrant
+uv run codebase-embedder query --root ../.. --local "<concept>"
+uv run codebase-embedder check --root ../..   # runs all 21 rules from .codebaserules.yaml
+uv run codebase-embedder check --root ../.. --target Assets/Scripts/Runtime --output check-report.md
+uv run codebase-embedder audit --root ../.. --scene Assets/Scenes/NPCDialoguePrototype1.unity --scenario localai-llmunity --local
+uv run --extra test pytest -q
+```
+
 - Use `UV_CACHE_DIR=/tmp/uv-cache` and `UV_TOOL_DIR=/tmp/uv-tools` if the default uv cache is read-only.
 - Current defaults: profile `runtime`, collection `unity_linux_llm_codebase_v2`. Live collections: `npc_knowledge` and `unity_linux_llm_codebase_v2`.
+
+### Rule checking (.codebaserules.yaml)
+
+- Rules defined in `.codebaserules.yaml` at project root — **10 rules** covering Unity-specific serialization (SER01-SER02), anti-patterns (BPR01, TODO01, CMT01, NET01, AWS01), and special cases (NAM07, VAR01, SND01, DOC01). Formatting and naming conventions are enforced by `.editorconfig` (not duplicated here).
+- Three check types: `text` (raw substring), `regex` (per-line match), `roslyn` (structural — requires full `scan`).
+- Rule reference: `AGENTS.md §1.1` (naming via `.editorconfig`), `§1.4` (formatting via `.editorconfig`), `§1.6` (anti-patterns via `.codebaserules.yaml`).
+
+### Artifact structure (.codebase-index/)
+
+| File | Contents |
+|---|---|
+| `manifest.json` | Collection metadata, counts, timestamp |
+| `symbols.jsonl` | All extracted symbol records (types, members, fields, etc.) |
+| `relations.jsonl` | Full relation graph (calls, inherits, implements, containment) |
+| `chunks.jsonl` | Embedding-ready text chunks for Qdrant |
+| `asmdefs.json` | Assembly definition metadata |
 
 ## 6. Datadog monitoring
 
@@ -70,6 +114,8 @@ This file is the project-wide source of truth for agents. Keep it short, stable,
 - Unity emits custom metrics from `Assets/Scripts/Runtime/Monitoring/DatadogMetricsService.cs` and spans from `DatadogTraceService.cs`.
 - Dashboard JSON: `Backend/datadog-host/dashboard.json`.
 - Key metric families: `llm.request.*`, `dialogue.*`, `qdrant.search.*`, `auth.login.*`, `network.*`.
+- SAST: `code-security.datadog.yaml` uses rulesets `csharp-best-practices`, `csharp-code-style`, `csharp-security`, `csharp-inclusive`.
+- SAST operates on a different layer from `.editorconfig` (formatting) and `.codebaserules.yaml` (arch rules). Naming rules in `csharp-code-style` use MS conventions (`s_` for static fields) — our project uses `_camelCase` uniformly. If SAST reports false positives on naming, tune via `.datadog/static-analysis.yml` or update `code-security.datadog.yaml` per-rule overrides.
 
 ## 7. Testing
 
@@ -77,7 +123,7 @@ This file is the project-wide source of truth for agents. Keep it short, stable,
 - Standard pattern: instantiate with `new GameObject() + AddComponent<T>()`, then `Object.DestroyImmediate()` in `finally`.
 - Keep test names explicit: `Subject_Scenario_ExpectedBehavior()`.
 - No magic strings unless documented.
-- `Tools/NPCDialogueCodeReview` is the code-rule verifier; run it manually after touching `NPCDialogue` scripts or rule docs.
+- After touching NPCDialogue scripts or rule docs, run `uv run --directory Tools/CodebaseEmbedder codebase-embedder check --root ..`.
 
 ## 8. Networking & auth
 
@@ -122,4 +168,4 @@ This file is the project-wide source of truth for agents. Keep it short, stable,
 
 ---
 
-*Generated from completed code-quality-improvement phases 1-9 (2026-07-09).*
+*Generated from completed code-quality-improvement phases 1-9 (2026-07-09). Unified codebase workflow: roslyn_parser + codebase-embedder check replaces deprecated NPCDialogueCodeReview.*

@@ -8,24 +8,24 @@ namespace NPCSystem
     [Serializable]
     public class DialogueEntry
     {
-        public string role;
-        public string content;
-        public string timestampUtc;
+        public string Role;
+        public string Content;
+        public string TimestampUtc;
 
         public DialogueEntry() { }
 
         public DialogueEntry(string role, string content)
         {
-            this.role = role;
-            this.content = content;
-            timestampUtc = DateTime.UtcNow.ToString("o");
+            this.Role = role;
+            this.Content = content;
+            this.TimestampUtc = DateTime.UtcNow.ToString("o");
         }
     }
 
     [Serializable]
     internal class DialogueHistoryFile
     {
-        public List<DialogueEntry> entries = new List<DialogueEntry>();
+        public List<DialogueEntry> Entries = new List<DialogueEntry>();
     }
 
     public static class NPCHistoryStore
@@ -53,8 +53,8 @@ namespace NPCSystem
                 string json = File.ReadAllText(fullPath);
                 DialogueHistoryFile history = JsonUtility.FromJson<DialogueHistoryFile>(json);
                 List<DialogueEntry> entries =
-                    history != null && history.entries != null
-                        ? history.entries
+                    history != null && history.Entries != null
+                        ? history.Entries
                         : new List<DialogueEntry>();
 
                 List<DialogueEntry> normalized = NormalizeForChatTemplate(
@@ -132,7 +132,7 @@ namespace NPCSystem
 
                 DialogueHistoryFile history = new DialogueHistoryFile
                 {
-                    entries = NormalizeForChatTemplate(entries, out _),
+                    Entries = NormalizeForChatTemplate(entries, out _),
                 };
 
                 File.WriteAllText(fullPath, JsonUtility.ToJson(history, true));
@@ -147,7 +147,7 @@ namespace NPCSystem
                         data: new Dictionary<string, object>
                         {
                             ["path"] = fullPath,
-                            ["entryCount"] = history.entries.Count,
+                            ["entryCount"] = history.Entries.Count,
                         }
                     );
             }
@@ -243,21 +243,21 @@ namespace NPCSystem
 
             foreach (DialogueEntry entry in entries ?? new List<DialogueEntry>())
             {
-                if (entry == null || string.IsNullOrWhiteSpace(entry.content))
+                if (entry == null || string.IsNullOrWhiteSpace(entry.Content))
                 {
                     droppedCount++;
                     continue;
                 }
 
-                string role = NormalizeRole(entry.role);
+                string role = NormalizeRole(entry.Role);
                 if (role == null || !string.Equals(role, expectedRole, StringComparison.Ordinal))
                 {
                     droppedCount++;
                     continue;
                 }
 
-                entry.role = role;
-                entry.content = entry.content.Trim();
+                entry.Role = role;
+                entry.Content = entry.Content.Trim();
                 normalized.Add(entry);
                 expectedRole = string.Equals(expectedRole, "user", StringComparison.Ordinal)
                     ? "assistant"

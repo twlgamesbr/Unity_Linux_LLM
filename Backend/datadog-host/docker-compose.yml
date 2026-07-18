@@ -72,8 +72,8 @@ services:
       - HOST_ROOT=/host/root
       # Runtime Security (disabled for non-production or if eBPF unavailable)
       - DD_RUNTIME_SECURITY_CONFIG_ENABLED=false
-      # GPU Monitoring — use NVIDIA DCGM queries instead of deprecated DD_GPU_ENABLED
-      - DD_NVIDIA_DCGM_QUERIES=true
+      # GPU Monitoring — nvidia-smi integration (requires agent:7-gpu image)
+      - DD_GPU_ENABLED=true
       # Ignore postgres auto-discovery — Supabase postgres (supabase-stack-db) has
       # NULL short_desc values in pg_settings that crash the Go scanner in
       # postgres_exporter.go:684. DD_CONTAINER_EXCLUDE only affects log/process

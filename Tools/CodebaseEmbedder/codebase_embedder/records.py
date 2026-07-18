@@ -17,6 +17,21 @@ def content_hash(text: str) -> str:
     return "sha256:" + sha256(text.encode("utf-8", errors="ignore")).hexdigest()
 
 
+def flatten_payload(payload: dict[str, Any] | None) -> dict[str, Any]:
+    """Unwrap accidentally nested {payload: {payload: ...}} structures."""
+    if not payload:
+        return {}
+    current: dict[str, Any] = dict(payload)
+    depth = 0
+    while isinstance(current.get("payload"), dict) and depth < 32:
+        nested = current["payload"]
+        merged = {k: v for k, v in current.items() if k != "payload"}
+        merged.update(nested)
+        current = merged
+        depth += 1
+    return current
+
+
 def stable_point_id(*parts: object) -> str:
     return str(uuid5(NAMESPACE_URL, "|".join(str(p) for p in parts)))
 
