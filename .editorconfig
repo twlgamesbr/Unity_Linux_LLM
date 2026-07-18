@@ -224,8 +224,8 @@ dotnet_diagnostic.IDE0060.severity = suggestion
 csharp_prefer_braces = when_multiline:warning
 dotnet_diagnostic.IDE0011.severity = warning
 
-# IDE0040: Add accessibility modifiers
-dotnet_diagnostic.IDE0040.severity = warning
+# IDE0040: Add accessibility modifiers (suggestion for Unity — implicit private on Awake/Start/Update is conventional)
+dotnet_diagnostic.IDE0040.severity = suggestion
 
 # IDE0052: Remove unread private member
 dotnet_diagnostic.IDE0052.severity = warning
