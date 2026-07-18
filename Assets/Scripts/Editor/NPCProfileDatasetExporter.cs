@@ -72,18 +72,18 @@ namespace NPCSystem.Editor
                     {
                         npc_slug = profile.GetNpcSlug(),
                         display_name = profile.GetDisplayName(),
-                        system_prompt = profile.systemPrompt,
-                        personality_brief = profile.personalityBrief,
-                        speaking_style = profile.speakingStyle,
-                        boundaries = profile.boundaries,
-                        secret_knowledge = profile.secretKnowledge,
-                        can_give_puzzle_hints = profile.canGivePuzzleHints,
-                        can_accuse_suspects = profile.canAccuseSuspects,
-                        can_reveal_secrets = profile.canRevealSecrets,
+                        system_prompt = profile.SystemPrompt,
+                        personality_brief = profile.PersonalityBrief,
+                        speaking_style = profile.SpeakingStyle,
+                        boundaries = profile.Boundaries,
+                        secret_knowledge = profile.SecretKnowledge,
+                        can_give_puzzle_hints = profile.CanGivePuzzleHints,
+                        can_accuse_suspects = profile.CanAccuseSuspects,
+                        can_reveal_secrets = profile.CanRevealSecrets,
                         preferred_action_functions =
-                            profile.preferredActionFunctions ?? Array.Empty<string>(),
+                            profile.PreferredActionFunctions ?? Array.Empty<string>(),
                         forbidden_action_functions =
-                            profile.forbiddenActionFunctions ?? Array.Empty<string>(),
+                            profile.ForbiddenActionFunctions ?? Array.Empty<string>(),
                         rag_category = profile.GetRagCategory(),
                         knowledge_source_path = knowledgeSourcePath,
                         knowledge_text = knowledgeText,
@@ -95,20 +95,19 @@ namespace NPCSystem.Editor
                 Directory.GetParent(Application.dataPath)?.FullName ?? Application.dataPath;
             string outputPath = Path.Combine(
                 projectRoot,
-                assetRelativePath.Replace("Assets/", string.Empty)
+                assetRelativePath.TrimStart('/').Replace('/', Path.DirectorySeparatorChar)
             );
-            string outputDirectory = Path.GetDirectoryName(outputPath);
-            if (!string.IsNullOrWhiteSpace(outputDirectory))
+            string directory = Path.GetDirectoryName(outputPath);
+            if (!string.IsNullOrWhiteSpace(directory) && !Directory.Exists(directory))
             {
-                Directory.CreateDirectory(outputDirectory);
+                Directory.CreateDirectory(directory);
             }
 
-            string json = JsonUtility.ToJson(collection, true);
+            string json = JsonUtility.ToJson(collection, prettyPrint: true);
             File.WriteAllText(outputPath, json);
+            Debug.Log($"[NPCProfileDatasetExporter] Exported {collection.profiles.Count} profiles to {outputPath}");
+
             AssetDatabase.Refresh();
-            Debug.Log(
-                $"[NPCProfileDatasetExporter] Exported {collection.profiles.Count} profiles to {outputPath}"
-            );
         }
     }
 }

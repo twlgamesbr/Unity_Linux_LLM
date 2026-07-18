@@ -18,25 +18,56 @@ namespace NPCSystem
         )]
         [Header("References")]
         [FormerlySerializedAs("NetworkManager")]
-        public NetworkManager NetworkManager;
+        [SerializeField]
+        NetworkManager _networkManager;
+        public NetworkManager NetworkManager { get => _networkManager; set => _networkManager = value; }
+
         [FormerlySerializedAs("NetworkBootstrap")]
-        public NPCNetworkBootstrap NetworkBootstrap;
+        [SerializeField]
+        NPCNetworkBootstrap _networkBootstrap;
+        public NPCNetworkBootstrap NetworkBootstrap { get => _networkBootstrap; set => _networkBootstrap = value; }
+
         [FormerlySerializedAs("DialogueManager")]
-        public NPCDialogueManager DialogueManager;
+        [SerializeField]
+        NPCDialogueManager _dialogueManager;
+        public NPCDialogueManager DialogueManager { get => _dialogueManager; set => _dialogueManager = value; }
+
         [FormerlySerializedAs("NpcPrefab")]
-        public GameObject NpcPrefab;
+        [SerializeField]
+        GameObject _npcPrefab;
+        public GameObject NpcPrefab { get => _npcPrefab; set => _npcPrefab = value; }
+
         [FormerlySerializedAs("NpcPrefabResourcesPath")]
-        public string NpcPrefabResourcesPath = "Networking/NPCServerCharacter";
+        [SerializeField]
+        string _npcPrefabResourcesPath = "Networking/NPCServerCharacter";
+        public string NpcPrefabResourcesPath { get => _npcPrefabResourcesPath; set => _npcPrefabResourcesPath = value; }
 
         [Header("Spawn Layout")]
-        public Vector3 spawnOrigin = new Vector3(-4f, 0f, 6f);
-        public Vector3 spawnSpacing = new Vector3(2.75f, 0f, 2.5f);
+        [FormerlySerializedAs("spawnOrigin")]
+        [SerializeField]
+        Vector3 _spawnOrigin = new Vector3(-4f, 0f, 6f);
+        public Vector3 SpawnOrigin { get => _spawnOrigin; set => _spawnOrigin = value; }
+
+        [FormerlySerializedAs("spawnSpacing")]
+        [SerializeField]
+        Vector3 _spawnSpacing = new Vector3(2.75f, 0f, 2.5f);
+        public Vector3 SpawnSpacing { get => _spawnSpacing; set => _spawnSpacing = value; }
+
         [FormerlySerializedAs("MaxColumns")]
-        public int MaxColumns = 3;
+        [SerializeField]
+        int _maxColumns = 3;
+        public int MaxColumns { get => _maxColumns; set => _maxColumns = value; }
+
         [FormerlySerializedAs("ClearExistingNpcCharactersBeforeSpawn")]
-        public bool ClearExistingNpcCharactersBeforeSpawn = true;
+        [SerializeField]
+        bool _clearExistingNpcCharactersBeforeSpawn = true;
+        public bool ClearExistingNpcCharactersBeforeSpawn { get => _clearExistingNpcCharactersBeforeSpawn; set => _clearExistingNpcCharactersBeforeSpawn = value; }
+
+        [FormerlySerializedAs("SnapToGround")]
+        [SerializeField]
         [Tooltip("Raycast down to snap spawned NPCs to ground level. Disable if using a NavMesh with automatic ground placement.")]
-        public bool SnapToGround = true;
+        bool _snapToGround = true;
+        public bool SnapToGround { get => _snapToGround; set => _snapToGround = value; }
 
         [Header("Diagnostics")]
         [SerializeField, ReadOnly]
@@ -79,7 +110,7 @@ namespace NPCSystem
         {
             ResolveReferences();
 
-            if (NetworkManager == null || !NetworkManager.IsServer)
+            if (_networkManager == null || !_networkManager.IsServer)
             {
                 lastSpawnStatus = "Spawn skipped because this instance is not the server.";
                 NPCFlowLogger
@@ -94,10 +125,10 @@ namespace NPCSystem
                 return;
             }
 
-            if (NpcPrefab == null)
+            if (_npcPrefab == null)
             {
                 lastSpawnStatus =
-                    $"NPC prefab could not be loaded from Resources/{NpcPrefabResourcesPath}.";
+                    $"NPC prefab could not be loaded from Resources/{_npcPrefabResourcesPath}.";
                 NPCFlowLogger
                     .FindOrCreate()
                     ?.Log(
@@ -111,9 +142,9 @@ namespace NPCSystem
             }
 
             NPCProfile[] profiles =
-                DialogueManager == null
+                _dialogueManager == null
                     ? System.Array.Empty<NPCProfile>()
-                    : DialogueManager.Profiles;
+                    : _dialogueManager.Profiles;
             if (profiles.Length == 0)
             {
                 lastSpawnStatus = "No NPC profiles are configured on the dialogue manager.";
@@ -129,7 +160,7 @@ namespace NPCSystem
                 return;
             }
 
-            if (ClearExistingNpcCharactersBeforeSpawn)
+            if (_clearExistingNpcCharactersBeforeSpawn)
             {
                 ClearExistingNpcCharacters();
             }
@@ -144,7 +175,7 @@ namespace NPCSystem
                 }
 
                 GameObject instance = Instantiate(
-                    NpcPrefab,
+                    _npcPrefab,
                     GetSpawnPosition(i),
                     Quaternion.identity
                 );
@@ -152,7 +183,7 @@ namespace NPCSystem
                 {
                     Destroy(instance);
                     lastSpawnStatus =
-                        $"Spawned prefab '{NpcPrefab.name}' is missing a NetworkObject.";
+                        $"Spawned prefab '{_npcPrefab.name}' is missing a NetworkObject.";
                     NPCFlowLogger
                         .FindOrCreate()
                         ?.Log(
@@ -173,7 +204,7 @@ namespace NPCSystem
                 }
 
                 // Snap to ground via raycast so NPCs don't float
-                if (SnapToGround)
+                if (_snapToGround)
                 {
                     SnapToGroundLevel(instance);
                 }
@@ -196,50 +227,50 @@ namespace NPCSystem
 
         void ResolveReferences()
         {
-            if (NetworkManager == null)
+            if (_networkManager == null)
             {
-                NetworkManager = FindAnyObjectByType<NetworkManager>(FindObjectsInactive.Include);
+                _networkManager = FindAnyObjectByType<NetworkManager>(FindObjectsInactive.Include);
             }
 
-            if (NetworkBootstrap == null)
+            if (_networkBootstrap == null)
             {
-                NetworkBootstrap = FindAnyObjectByType<NPCNetworkBootstrap>(
+                _networkBootstrap = FindAnyObjectByType<NPCNetworkBootstrap>(
                     FindObjectsInactive.Include
                 );
             }
 
-            if (DialogueManager == null)
+            if (_dialogueManager == null)
             {
-                DialogueManager = FindAnyObjectByType<NPCDialogueManager>(
+                _dialogueManager = FindAnyObjectByType<NPCDialogueManager>(
                     FindObjectsInactive.Include
                 );
             }
 
-            if (NpcPrefab == null && !string.IsNullOrWhiteSpace(NpcPrefabResourcesPath))
+            if (_npcPrefab == null && !string.IsNullOrWhiteSpace(_npcPrefabResourcesPath))
             {
-                NpcPrefab = Resources.Load<GameObject>(NpcPrefabResourcesPath.Trim());
+                _npcPrefab = Resources.Load<GameObject>(_npcPrefabResourcesPath.Trim());
             }
         }
 
         void RegisterCallbacks()
         {
-            if (_callbacksRegistered || NetworkManager == null)
+            if (_callbacksRegistered || _networkManager == null)
             {
                 return;
             }
 
-            NetworkManager.OnServerStarted += HandleServerStarted;
+            _networkManager.OnServerStarted += HandleServerStarted;
             _callbacksRegistered = true;
         }
 
         void UnregisterCallbacks()
         {
-            if (!_callbacksRegistered || NetworkManager == null)
+            if (!_callbacksRegistered || _networkManager == null)
             {
                 return;
             }
 
-            NetworkManager.OnServerStarted -= HandleServerStarted;
+            _networkManager.OnServerStarted -= HandleServerStarted;
             _callbacksRegistered = false;
         }
 
@@ -297,10 +328,10 @@ namespace NPCSystem
 
         Vector3 GetSpawnPosition(int index)
         {
-            int columnCount = Mathf.Max(1, MaxColumns);
+            int columnCount = Mathf.Max(1, _maxColumns);
             int row = index / columnCount;
             int column = index % columnCount;
-            return spawnOrigin + new Vector3(spawnSpacing.x * column, 0f, spawnSpacing.z * row);
+            return _spawnOrigin + new Vector3(_spawnSpacing.x * column, 0f, _spawnSpacing.z * row);
         }
     }
 }

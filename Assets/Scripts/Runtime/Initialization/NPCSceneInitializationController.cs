@@ -245,7 +245,7 @@ namespace NPCSystem
                         {
                             bool skipForBatchmodeBootstrap =
                                 Application.isBatchMode
-                                && _networkBootstrap.TransportConfig.autoStartMode
+                                && _networkBootstrap.TransportConfig.AutoStartMode
                                     != NPCNetworkAutoStartMode.Manual;
 
                             if (skipForBatchmodeBootstrap)
@@ -260,7 +260,7 @@ namespace NPCSystem
                                     {
                                         ["phase"] = phase.ToString(),
                                         ["autoStartMode"] =
-                                            _networkBootstrap.TransportConfig.autoStartMode.ToString(),
+                                            _networkBootstrap.TransportConfig.AutoStartMode.ToString(),
                                     }
                                 );
                                 break;

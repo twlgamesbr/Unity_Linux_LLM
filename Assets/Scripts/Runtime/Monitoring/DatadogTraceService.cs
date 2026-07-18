@@ -25,6 +25,9 @@ namespace NPCSystem
     /// The Trace Agent (part of dd-agent) listens on port 8126 and forwards spans
     /// to Datadog.
     ///
+    /// Automatically subscribes to NPCFlowScope.OnScopeComplete so every flow
+    /// scope creates a corresponding Datadog span — no manual dual-instrumentation needed.
+    ///
     /// Usage:
     /// <code>
     /// DatadogTracer.Initialize();
@@ -56,6 +59,8 @@ namespace NPCSystem
         /// <summary>
         /// Initializes the APM tracer. Call once at server startup
         /// (alongside <c>DatadogMetricsService.Initialize()</c>).
+        /// Subscribes to NPCFlowScope.OnScopeComplete to auto-create spans
+        /// from flow scopes, eliminating manual dual-instrumentation.
         /// </summary>
         public static void Initialize(
             string agentHost = DefaultAgentHost,
@@ -85,8 +90,12 @@ namespace NPCSystem
                         }
                         catch (Exception ex)
                         {
-                            UnityEngine.Debug.LogWarning(
-                                $"[DatadogTracer] Flush error: {ex.Message}"
+                            NPCFlowLogger.FindOrCreate().Log(
+                                NPCFlowStage.SceneBootstrap,
+                                NPCFlowStatus.Warning,
+                                NPCFlowLogLevel.Warning,
+                                $"[DatadogTracer] Flush error: {ex.Message}",
+                                source: nameof(DatadogTracer)
                             );
                         }
                     },
@@ -96,13 +105,33 @@ namespace NPCSystem
                 );
 
                 _initialized = true;
-                UnityEngine.Debug.Log(
-                    $"[DatadogTracer] Initialized — sending to {agentHost}:{tracePort}"
+
+                // Subscribe to NPCFlowScope bridge — auto-creates Datadog spans
+                // for every flow scope completion, eliminating dual-instrumentation.
+                NPCFlowScope.OnScopeComplete += OnFlowScopeComplete;
+
+                NPCFlowLogger.FindOrCreate().Log(
+                    NPCFlowStage.SceneBootstrap,
+                    NPCFlowStatus.Success,
+                    NPCFlowLogLevel.Info,
+                    $"[DatadogTracer] Initialized — sending to {agentHost}:{tracePort}",
+                    source: nameof(DatadogTracer),
+                    data: new Dictionary<string, object>
+                    {
+                        ["agentHost"] = agentHost,
+                        ["tracePort"] = tracePort,
+                    }
                 );
             }
             catch (Exception ex)
             {
-                UnityEngine.Debug.LogError($"[DatadogTracer] Failed to initialize: {ex.Message}");
+                NPCFlowLogger.FindOrCreate().Log(
+                    NPCFlowStage.SceneBootstrap,
+                    NPCFlowStatus.Error,
+                    NPCFlowLogLevel.Error,
+                    $"[DatadogTracer] Failed to initialize: {ex.Message}",
+                    source: nameof(DatadogTracer)
+                );
             }
         }
 
@@ -114,12 +143,20 @@ namespace NPCSystem
             if (!_initialized)
                 return;
 
+            NPCFlowScope.OnScopeComplete -= OnFlowScopeComplete;
+
             _flushTimer?.Dispose();
             FlushAsync().GetAwaiter().GetResult();
             _httpClient?.Dispose();
             _initialized = false;
 
-            UnityEngine.Debug.Log("[DatadogTracer] Shutdown complete.");
+            NPCFlowLogger.FindOrCreate().Log(
+                NPCFlowStage.SceneBootstrap,
+                NPCFlowStatus.Success,
+                NPCFlowLogLevel.Info,
+                "[DatadogTracer] Shutdown complete.",
+                source: nameof(DatadogTracer)
+            );
         }
 
         /// <summary>
@@ -194,6 +231,49 @@ namespace NPCSystem
             }
         }
 
+        /// <summary>
+        /// Bridge callback from NPCFlowScope — auto-creates a Datadog span
+        /// for every flow scope completion. Replaces manual dual-instrumentation.
+        /// </summary>
+        static void OnFlowScopeComplete(
+            NPCFlowStage stage,
+            NPCFlowStatus status,
+            string source,
+            long durationMs,
+            string npcSlug,
+            string requestId,
+            Dictionary<string, object> data
+        )
+        {
+            if (!_initialized)
+                return;
+
+            string operationName = NPCFlowLogger.StageToCategory(stage).ToString().ToLowerInvariant()
+                + "." + stage.ToString();
+
+            using (var span = StartSpan(
+                operationName,
+                resource: string.IsNullOrWhiteSpace(source) ? stage.ToString() : source,
+                tags: new[]
+                {
+                    $"npc_slug:{npcSlug ?? "none"}",
+                    $"request_id:{requestId ?? "none"}",
+                    $"status:{status}",
+                    $"stage:{stage}",
+                }
+            ))
+            {
+                if (status == NPCFlowStatus.Error)
+                {
+                    span.SetError(data != null && data.TryGetValue("exceptionMessage", out var msg)
+                        ? msg?.ToString()
+                        : $"{stage} failed");
+                }
+
+                span.SetTag("duration_ms", durationMs.ToString("F0"));
+            }
+        }
+
         /// <summary>Flush all pending spans to the Trace Agent.</summary>
         private static async Task FlushAsync()
         {
@@ -232,7 +312,13 @@ namespace NPCSystem
             }
             catch (Exception ex)
             {
-                UnityEngine.Debug.LogWarning($"[DatadogTracer] Send error: {ex.Message}");
+                NPCFlowLogger.FindOrCreate().Log(
+                    NPCFlowStage.SceneBootstrap,
+                    NPCFlowStatus.Warning,
+                    NPCFlowLogLevel.Warning,
+                    $"[DatadogTracer] Send error: {ex.Message}",
+                    source: nameof(DatadogTracer)
+                );
             }
         }
 
@@ -255,7 +341,13 @@ namespace NPCSystem
             }
             catch (Exception ex)
             {
-                UnityEngine.Debug.LogWarning($"[DatadogTracer] Send error: {ex.Message}");
+                NPCFlowLogger.FindOrCreate().Log(
+                    NPCFlowStage.SceneBootstrap,
+                    NPCFlowStatus.Warning,
+                    NPCFlowLogLevel.Warning,
+                    $"[DatadogTracer] SendTracesAsync error: {ex.Message}",
+                    source: nameof(DatadogTracer)
+                );
             }
         }
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace NPCSystem
 {
@@ -12,7 +13,11 @@ namespace NPCSystem
         public const string DefaultDelimiters = ".!:;?\n\r";
 
         [Tooltip("delimiters used to split the phrases")]
-        public char[] delimiters = DefaultDelimiters.ToCharArray();
+        [FormerlySerializedAs("delimiters")]
+        [SerializeField]
+        char[] _delimiters = DefaultDelimiters.ToCharArray();
+
+        public char[] Delimiters => _delimiters;
 
         public override async Task<List<(int, int)>> Split(string input)
         {
@@ -23,13 +28,13 @@ namespace NPCSystem
                 bool seenChar = false;
                 for (int i = 0; i < input.Length; i++)
                 {
-                    bool isDelimiter = delimiters.Contains(input[i]);
+                    bool isDelimiter = _delimiters.Contains(input[i]);
                     if (isDelimiter)
                     {
                         while (
                             (i < input.Length - 1)
                             && (
-                                delimiters.Contains(input[i + 1]) || char.IsWhiteSpace(input[i + 1])
+                                _delimiters.Contains(input[i + 1]) || char.IsWhiteSpace(input[i + 1])
                             )
                         )
                             i++;

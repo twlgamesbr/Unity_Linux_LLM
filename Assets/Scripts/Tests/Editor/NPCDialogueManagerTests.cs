@@ -56,7 +56,7 @@ namespace NPCSystem.Tests
             try
             {
                 manager.SwitchToNPCAsync("maid").GetAwaiter().GetResult();
-                manager.SendMessage("   ");
+                manager.SendDialogueMessage("   ");
 
                 Assert.That(errorMessage, Is.Null);
                 Assert.That(responseStart, Is.Null);
@@ -109,7 +109,7 @@ namespace NPCSystem.Tests
 
             try
             {
-                manager.SendMessage("Hello");
+                manager.SendDialogueMessage("Hello");
                 Assert.That(errorMessage, Is.EqualTo("No NPC selected"));
             }
             finally
@@ -225,7 +225,7 @@ namespace NPCSystem.Tests
                 manager.SetRuntimePlayerContext("Alice", 99ul);
                 Assert.DoesNotThrow(() => manager.CancelRequests());
 
-                manager.SendMessage("Hello");
+                manager.SendDialogueMessage("Hello");
                 Assert.That(manager.IsResponding, Is.False);
             }
             finally
@@ -260,7 +260,7 @@ namespace NPCSystem.Tests
             var manager = managerObject.AddComponent<NPCDialogueManager>();
             AttachMinimalChatClient(managerObject, manager);
             var profile = CreateProfile("butler", "Butler");
-            profile.historySaveFile = $"NPCDialogue/test_clear{Guid.NewGuid():N}.json";
+            profile.HistorySaveFile = $"NPCDialogue/test_clear{Guid.NewGuid():N}.json";
             manager.Profiles = new[] { profile };
             manager.PersistHistory = false;
             manager.EnableRAG = false;
@@ -375,19 +375,19 @@ namespace NPCSystem.Tests
             var profile = ScriptableObject.CreateInstance<NPCProfile>();
             profile.NpcSlug = slug;
             profile.DisplayName = displayName;
-            profile.systemPrompt = "You are a helpful NPC.";
-            profile.maxTokens = 64;
-            profile.ragResults = 1;
-            profile.historySaveFile = $"NPCDialogue/{slug}.json";
+            profile.SystemPrompt = "You are a helpful NPC.";
+            profile.MaxTokens = 64;
+            profile.RagResults = 1;
+            profile.HistorySaveFile = $"NPCDialogue/{slug}.json";
             return profile;
         }
 
         static void AttachMinimalChatClient(GameObject managerObject, NPCDialogueManager manager)
         {
-            manager.ChatClient = managerObject.AddComponent<NPCLocalAIClient>();
-            manager.ChatClient.numRetries = 0;
-            manager.ChatClient.host = "127.0.0.1";
-            manager.ChatClient.port = 19999;
+            manager._chatClient = managerObject.AddComponent<NPCLocalAIClient>();
+            manager._chatClient.NumRetries = 0;
+            manager._chatClient.Host = "127.0.0.1";
+            manager._chatClient.Port = 19999;
         }
     }
 }

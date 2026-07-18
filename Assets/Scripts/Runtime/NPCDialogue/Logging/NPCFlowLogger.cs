@@ -17,65 +17,93 @@ namespace NPCSystem
             MessageMode.Log,
             drawAbove: true
         )]
-        [FoldoutGroup("Console Output", true, nameof(logToUnityConsole))]
-        public bool logToUnityConsole = true;
+        [FoldoutGroup("Console Output", true, nameof(LogToUnityConsole))]
+        [SerializeField]
+        bool _logToUnityConsole = true;
+        public bool LogToUnityConsole { get => _logToUnityConsole; set => _logToUnityConsole = value; }
 
-        [FoldoutGroup("File Output", true, nameof(logToJsonlFile))]
-        public bool logToJsonlFile = true;
+        [FoldoutGroup("File Output", true, nameof(LogToJsonlFile))]
+        [SerializeField]
+        bool _logToJsonlFile = true;
+        public bool LogToJsonlFile { get => _logToJsonlFile; set => _logToJsonlFile = value; }
 
         [FoldoutGroup(
             "Text Sanitization",
-            nameof(includeTextSnippets),
-            nameof(includeRawTextPayloads),
-            nameof(maxSnippetChars)
+            nameof(IncludeTextSnippets),
+            nameof(IncludeRawTextPayloads),
+            nameof(MaxSnippetChars)
         )]
-        public bool includeTextSnippets = false;
-        public bool includeRawTextPayloads = false;
+        [SerializeField]
+        bool _includeTextSnippets = false;
+        public bool IncludeTextSnippets { get => _includeTextSnippets; set => _includeTextSnippets = value; }
+
+        [SerializeField]
+        bool _includeRawTextPayloads = false;
+        public bool IncludeRawTextPayloads { get => _includeRawTextPayloads; set => _includeRawTextPayloads = value; }
 
         [ShowField(nameof(IncludeTextOrRaw))]
-        public int maxSnippetChars = 80;
+        [SerializeField]
+        int _maxSnippetChars = 80;
+        public int MaxSnippetChars { get => _maxSnippetChars; set => _maxSnippetChars = value; }
 
-        [FoldoutGroup("Cache Settings", true, nameof(maxInMemoryEvents))]
+        [FoldoutGroup("Cache Settings", true, nameof(MaxInMemoryEvents))]
         [SerializeField]
         private EditorAttributes.Void cacheSettingsGroup;
 
         [SerializeField, HideProperty]
-        public int maxInMemoryEvents = 500;
+        int _maxInMemoryEvents = 500;
+        public int MaxInMemoryEvents { get => _maxInMemoryEvents; set => _maxInMemoryEvents = value; }
 
         [FoldoutGroup(
             "Log File Storage",
             true,
-            nameof(relativeLogDirectory),
-            nameof(overrideAbsoluteLogDirectory),
-            nameof(maxLogDays),
-            nameof(maxLogDirectorySizeMB)
+            nameof(RelativeLogDirectory),
+            nameof(OverrideAbsoluteLogDirectory),
+            nameof(MaxLogDays),
+            nameof(MaxLogDirectorySizeMB)
         )]
         [SerializeField]
         private EditorAttributes.Void logFileStorageGroup;
 
         [SerializeField, HideProperty]
-        public string relativeLogDirectory = "NPCDialogue/Logs";
+        string _relativeLogDirectory = "NPCDialogue/Logs";
+        public string RelativeLogDirectory { get => _relativeLogDirectory; set => _relativeLogDirectory = value; }
 
         [SerializeField, HideProperty]
-        public string overrideAbsoluteLogDirectory = "";
+        string _overrideAbsoluteLogDirectory = "";
+        public string OverrideAbsoluteLogDirectory { get => _overrideAbsoluteLogDirectory; set => _overrideAbsoluteLogDirectory = value; }
 
         [SerializeField, HideProperty, Suffix("days")]
-        public int maxLogDays = 7;
+        int _maxLogDays = 7;
+        public int MaxLogDays { get => _maxLogDays; set => _maxLogDays = value; }
 
         [SerializeField, HideProperty, Suffix("MB")]
-        public int maxLogDirectorySizeMB = 100;
+        int _maxLogDirectorySizeMB = 100;
+        public int MaxLogDirectorySizeMB { get => _maxLogDirectorySizeMB; set => _maxLogDirectorySizeMB = value; }
+
+        [FoldoutGroup("Retry Suppression", true, nameof(MaxDuplicateEventsPerMinute))]
+        [SerializeField]
+        private EditorAttributes.Void suppressionGroup;
+
+        [SerializeField, HideProperty, Suffix("events/min")]
+        int _maxDuplicateEventsPerMinute = 5;
+        public int MaxDuplicateEventsPerMinute { get => _maxDuplicateEventsPerMinute; set => _maxDuplicateEventsPerMinute = value; }
 
         // ── Runtime state ──
         static NPCFlowLogger _instance;
+        static readonly object _initSync = new object();
         static int _fallbackWarningEmitted;
         static bool _cleanupRun;
 
         readonly object _sync = new object();
         readonly List<NPCFlowEvent> _recentEvents = new List<NPCFlowEvent>();
+        readonly Dictionary<string, SuppressionCounter> _suppressionCounters =
+            new Dictionary<string, SuppressionCounter>();
         int _requestCounter;
         string _sessionId = string.Empty;
         string _currentLogPath = string.Empty;
         bool _fileFailureWarned;
+        string _currentConversationId = string.Empty;
 
         // ── Inspector preview helpers (not serialised) ──
         [ShowInInspector]
@@ -85,6 +113,10 @@ namespace NPCSystem
         [ShowInInspector]
         string InspectorLogFilePath =>
             string.IsNullOrWhiteSpace(_currentLogPath) ? "not set" : _currentLogPath;
+
+        [ShowInInspector]
+        string InspectorConversationId =>
+            string.IsNullOrWhiteSpace(_currentConversationId) ? "not set" : _currentConversationId;
 
         [ShowInInspector]
         int InspectorRecentEventCount
@@ -122,6 +154,16 @@ namespace NPCSystem
             }
         }
 
+        /// <summary>
+        /// Set the active conversationId for correlation across dialogue turns.
+        /// All subsequent Log calls without an explicit conversationId will use this value.
+        /// </summary>
+        public string ConversationId
+        {
+            get => _currentConversationId;
+            set => _currentConversationId = value ?? string.Empty;
+        }
+
         void OnDestroy()
         {
             if (_instance == this)
@@ -135,30 +177,36 @@ namespace NPCSystem
             if (_instance != null)
                 return _instance;
 
-            NPCFlowLogger[] sceneLoggers = FindObjectsByType<NPCFlowLogger>(
-                FindObjectsInactive.Include
-            );
-            NPCFlowLogger sceneLogger = sceneLoggers.Length > 0 ? sceneLoggers[0] : null;
-            if (sceneLogger != null)
+            lock (_initSync)
             {
-                _instance = sceneLogger;
+                if (_instance != null)
+                    return _instance;
+
+                NPCFlowLogger[] sceneLoggers = FindObjectsByType<NPCFlowLogger>(
+                    FindObjectsInactive.Include
+                );
+                NPCFlowLogger sceneLogger = sceneLoggers.Length > 0 ? sceneLoggers[0] : null;
+                if (sceneLogger != null)
+                {
+                    _instance = sceneLogger;
+                    _instance.ApplyPlatformLoggingOverrides();
+                    return _instance;
+                }
+
+                var loggerObject = new GameObject("NPCFlowLogger");
+                if (Application.isPlaying)
+                    DontDestroyOnLoad(loggerObject);
+                _instance = loggerObject.AddComponent<NPCFlowLogger>();
                 _instance.ApplyPlatformLoggingOverrides();
+                _instance.Log(
+                    NPCFlowStage.SceneBootstrap,
+                    NPCFlowStatus.Warning,
+                    NPCFlowLogLevel.Warning,
+                    "Auto-created fallback NPCFlowLogger. Add an explicit scene logger for Inspector-controlled settings.",
+                    source: nameof(NPCFlowLogger)
+                );
                 return _instance;
             }
-
-            var loggerObject = new GameObject("NPCFlowLogger");
-            if (Application.isPlaying)
-                DontDestroyOnLoad(loggerObject);
-            _instance = loggerObject.AddComponent<NPCFlowLogger>();
-            _instance.ApplyPlatformLoggingOverrides();
-            _instance.Log(
-                NPCFlowStage.SceneBootstrap,
-                NPCFlowStatus.Warning,
-                NPCFlowLogLevel.Warning,
-                "Auto-created fallback NPCFlowLogger. Add an explicit scene logger for Inspector-controlled settings.",
-                source: nameof(NPCFlowLogger)
-            );
-            return _instance;
         }
 
         public string NextRequestId()
@@ -181,15 +229,15 @@ namespace NPCSystem
             Log(
                 new NPCFlowEvent
                 {
-                    stage = stage,
-                    status = status,
-                    level = level,
-                    message = message ?? string.Empty,
-                    source = source ?? string.Empty,
-                    requestId = requestId ?? string.Empty,
-                    npcSlug = npcSlug ?? string.Empty,
-                    durationMs = durationMs ?? 0,
-                    data = data,
+                    Stage = stage,
+                    Status = status,
+                    Level = level,
+                    Message = message ?? string.Empty,
+                    Source = source ?? string.Empty,
+                    RequestId = requestId ?? string.Empty,
+                    NpcSlug = npcSlug ?? string.Empty,
+                    DurationMs = durationMs ?? 0,
+                    Data = data,
                 }
             );
         }
@@ -202,10 +250,15 @@ namespace NPCSystem
             try
             {
                 PrepareEvent(flowEvent);
+
+                // Retry suppression: skip duplicate events that exceed the rate limit
+                if (IsSuppressed(flowEvent))
+                    return;
+
                 AddToRingBuffer(flowEvent);
-                if (logToUnityConsole)
+                if (LogToUnityConsole)
                     WriteUnityConsole(flowEvent);
-                if (logToJsonlFile && SupportsPersistentFileLogging(Application.platform))
+                if (LogToJsonlFile && SupportsPersistentFileLogging(Application.platform))
                     WriteJsonLine(flowEvent);
             }
             catch (Exception ex)
@@ -243,13 +296,13 @@ namespace NPCSystem
         [Button("Run Log Cleanup Now", buttonHeight: 20f)]
         void RunLogCleanupInspector()
         {
-            string directory = !string.IsNullOrWhiteSpace(overrideAbsoluteLogDirectory)
-                ? overrideAbsoluteLogDirectory.Trim()
+            string directory = !string.IsNullOrWhiteSpace(OverrideAbsoluteLogDirectory)
+                ? OverrideAbsoluteLogDirectory.Trim()
                 : Path.Combine(
                     Application.persistentDataPath,
-                    string.IsNullOrWhiteSpace(relativeLogDirectory)
+                    string.IsNullOrWhiteSpace(RelativeLogDirectory)
                         ? "NPCDialogue/Logs"
-                        : relativeLogDirectory.Trim()
+                        : RelativeLogDirectory.Trim()
                 );
             RunLogCleanup(directory);
         }
@@ -276,23 +329,23 @@ namespace NPCSystem
         {
             var issues = new System.Collections.Generic.List<string>();
             if (!HasValidMaxEvents())
-                issues.Add("maxInMemoryEvents must be > 0");
+                issues.Add("MaxInMemoryEvents must be > 0");
             if (!HasValidMaxLogDays())
-                issues.Add("maxLogDays must be > 0");
+                issues.Add("MaxLogDays must be > 0");
             if (!HasValidMaxDirMB())
-                issues.Add("maxLogDirectorySizeMB must be > 0");
+                issues.Add("MaxLogDirectorySizeMB must be > 0");
             if (!HasValidSnippetChars())
-                issues.Add("maxSnippetChars must be > 0 when text sanitization is active");
+                issues.Add("MaxSnippetChars must be > 0 when text sanitization is active");
             if (!HasValidRelativeLogDir())
-                issues.Add("relativeLogDirectory cannot be empty");
+                issues.Add("RelativeLogDirectory cannot be empty");
 
-            string directory = !string.IsNullOrWhiteSpace(overrideAbsoluteLogDirectory)
-                ? overrideAbsoluteLogDirectory.Trim()
+            string directory = !string.IsNullOrWhiteSpace(OverrideAbsoluteLogDirectory)
+                ? OverrideAbsoluteLogDirectory.Trim()
                 : Path.Combine(
                     Application.persistentDataPath,
-                    string.IsNullOrWhiteSpace(relativeLogDirectory)
+                    string.IsNullOrWhiteSpace(RelativeLogDirectory)
                         ? "NPCDialogue/Logs"
-                        : relativeLogDirectory.Trim()
+                        : RelativeLogDirectory.Trim()
                 );
 
             Log(
@@ -309,11 +362,11 @@ namespace NPCSystem
                 source: nameof(NPCFlowLogger),
                 data: new Dictionary<string, object>
                 {
-                    ["logToUnityConsole"] = logToUnityConsole,
-                    ["logToJsonlFile"] = logToJsonlFile,
-                    ["maxInMemoryEvents"] = maxInMemoryEvents,
-                    ["maxLogDays"] = maxLogDays,
-                    ["maxLogDirectorySizeMB"] = maxLogDirectorySizeMB,
+                    ["LogToUnityConsole"] = LogToUnityConsole,
+                    ["LogToJsonlFile"] = LogToJsonlFile,
+                    ["MaxInMemoryEvents"] = MaxInMemoryEvents,
+                    ["MaxLogDays"] = MaxLogDays,
+                    ["MaxLogDirectorySizeMB"] = MaxLogDirectorySizeMB,
                     ["logDirectory"] = directory,
                     ["issuesFound"] = issues.Count,
                 }
@@ -338,9 +391,53 @@ namespace NPCSystem
                 new Dictionary<string, object>(),
                 prefix,
                 text,
-                includeTextSnippets || includeRawTextPayloads,
-                maxSnippetChars
+                IncludeTextSnippets || IncludeRawTextPayloads,
+                MaxSnippetChars
             );
+        }
+
+        // ── Stage-to-Category mapping ──
+        public static NPCFlowCategory StageToCategory(NPCFlowStage stage)
+        {
+            return stage switch
+            {
+                NPCFlowStage.SceneBootstrap or NPCFlowStage.ReferenceResolution
+                    or NPCFlowStage.ConfigurationValidation or NPCFlowStage.ProfileIndexBuild
+                        => NPCFlowCategory.Infrastructure,
+
+                NPCFlowStage.HistoryLoad or NPCFlowStage.HistoryRestore
+                    or NPCFlowStage.HistoryPersist => NPCFlowCategory.Memory,
+
+                NPCFlowStage.NPCSwitch or NPCFlowStage.UIInput
+                    => NPCFlowCategory.UI,
+
+                NPCFlowStage.AuthRequest or NPCFlowStage.AuthSession
+                    => NPCFlowCategory.Auth,
+
+                NPCFlowStage.RequestStart or NPCFlowStage.ClientSession
+                    or NPCFlowStage.DialogueRouting or NPCFlowStage.ActionSelection
+                    or NPCFlowStage.ActionExecution or NPCFlowStage.GrammarOverride
+                    or NPCFlowStage.GrammarRestore or NPCFlowStage.ResponseComplete
+                        => NPCFlowCategory.Dialogue,
+
+                NPCFlowStage.ContextRetrieval or NPCFlowStage.LocalRagReady
+                    or NPCFlowStage.LocalRagSearch or NPCFlowStage.QdrantEmbedding
+                    or NPCFlowStage.QdrantSearch => NPCFlowCategory.RAG,
+
+                NPCFlowStage.PromptBuild or NPCFlowStage.DialogueGeneration
+                    or NPCFlowStage.BackendRequest or NPCFlowStage.LLMChat
+                    or NPCFlowStage.LLMStream => NPCFlowCategory.LLM,
+
+                NPCFlowStage.NetworkHost or NPCFlowStage.PlayerSpawn
+                    or NPCFlowStage.NpcSpawn or NPCFlowStage.PlayerNameRegistration
+                    or NPCFlowStage.RpcTraffic or NPCFlowStage.OwnershipAuthority
+                        => NPCFlowCategory.Network,
+
+                NPCFlowStage.EditorWorkflow or NPCFlowStage.SmokeValidation
+                    => NPCFlowCategory.EditorWorkflow,
+
+                _ => NPCFlowCategory.Infrastructure,
+            };
         }
 
         void ApplyPlatformLoggingOverrides()
@@ -350,7 +447,7 @@ namespace NPCSystem
                 return;
             }
 
-            logToJsonlFile = false;
+            LogToJsonlFile = false;
         }
 
         public static bool SupportsPersistentFileLogging(RuntimePlatform platform)
@@ -360,15 +457,82 @@ namespace NPCSystem
 
         void PrepareEvent(NPCFlowEvent flowEvent)
         {
-            flowEvent.schemaVersion = flowEvent.schemaVersion <= 0 ? 1 : flowEvent.schemaVersion;
-            if (string.IsNullOrWhiteSpace(flowEvent.timestampUtc))
-                flowEvent.timestampUtc = DateTime.UtcNow.ToString("o");
-            if (string.IsNullOrWhiteSpace(flowEvent.sessionId))
-                flowEvent.sessionId = SessionId;
-            flowEvent.source = flowEvent.source ?? string.Empty;
-            flowEvent.requestId = flowEvent.requestId ?? string.Empty;
-            flowEvent.npcSlug = flowEvent.npcSlug ?? string.Empty;
-            flowEvent.message = flowEvent.message ?? string.Empty;
+            flowEvent.SchemaVersion = flowEvent.SchemaVersion <= 0 ? 1 : flowEvent.SchemaVersion;
+            if (string.IsNullOrWhiteSpace(flowEvent.TimestampUtc))
+                flowEvent.TimestampUtc = DateTime.UtcNow.ToString("o");
+            if (string.IsNullOrWhiteSpace(flowEvent.SessionId))
+                flowEvent.SessionId = SessionId;
+            if (string.IsNullOrWhiteSpace(flowEvent.ConversationId) && !string.IsNullOrWhiteSpace(_currentConversationId))
+                flowEvent.ConversationId = _currentConversationId;
+            if (flowEvent.Category == NPCFlowCategory.Infrastructure && flowEvent.Stage != NPCFlowStage.SceneBootstrap)
+                flowEvent.Category = StageToCategory(flowEvent.Stage);
+            flowEvent.Source = flowEvent.Source ?? string.Empty;
+            flowEvent.RequestId = flowEvent.RequestId ?? string.Empty;
+            flowEvent.NpcSlug = flowEvent.NpcSlug ?? string.Empty;
+            flowEvent.Message = flowEvent.Message ?? string.Empty;
+        }
+
+        /// <summary>
+        /// Retry suppression: limits duplicate events per source+stage+message combos
+        /// to MaxDuplicateEventsPerMinute, preventing log storms during retry storms.
+        /// </summary>
+        bool IsSuppressed(NPCFlowEvent flowEvent)
+        {
+            if (MaxDuplicateEventsPerMinute <= 0)
+                return false;
+
+            // Only suppress Warning and Error levels in retry loops
+            if (flowEvent.Level != NPCFlowLogLevel.Warning && flowEvent.Level != NPCFlowLogLevel.Error)
+                return false;
+
+            // Build a suppression key from source + stage + truncated message
+            string key = $"{flowEvent.Source}|{flowEvent.Stage}|{TruncateHash(flowEvent.Message, 60)}";
+
+            long nowTicks = DateTime.UtcNow.Ticks;
+            long windowTicks = TimeSpan.TicksPerMinute;
+
+            lock (_sync)
+            {
+                if (!_suppressionCounters.TryGetValue(key, out var counter))
+                {
+                    counter = new SuppressionCounter();
+                    _suppressionCounters[key] = counter;
+                }
+
+                // Prune expired timestamps
+                counter.timestamps.RemoveAll(ts => nowTicks - ts > windowTicks);
+
+                if (counter.timestamps.Count >= MaxDuplicateEventsPerMinute)
+                {
+                    // Event is suppressed — silently dropped
+                    return true;
+                }
+
+                counter.timestamps.Add(nowTicks);
+
+                // Periodically clean stale entries to prevent dictionary bloat
+                if (_suppressionCounters.Count > 200)
+                {
+                    var staleKeys = new List<string>();
+                    foreach (var kvp in _suppressionCounters)
+                    {
+                        kvp.Value.timestamps.RemoveAll(ts => nowTicks - ts > windowTicks);
+                        if (kvp.Value.timestamps.Count == 0)
+                            staleKeys.Add(kvp.Key);
+                    }
+                    foreach (var k in staleKeys)
+                        _suppressionCounters.Remove(k);
+                }
+
+                return false;
+            }
+        }
+
+        static string TruncateHash(string text, int maxLen)
+        {
+            if (string.IsNullOrEmpty(text))
+                return string.Empty;
+            return text.Length <= maxLen ? text : text.Substring(0, maxLen);
         }
 
         void AddToRingBuffer(NPCFlowEvent flowEvent)
@@ -376,7 +540,7 @@ namespace NPCSystem
             lock (_sync)
             {
                 _recentEvents.Add(flowEvent);
-                int maxEvents = Mathf.Max(1, maxInMemoryEvents);
+                int maxEvents = Mathf.Max(1, MaxInMemoryEvents);
                 if (_recentEvents.Count > maxEvents)
                 {
                     _recentEvents.RemoveRange(0, _recentEvents.Count - maxEvents);
@@ -387,7 +551,7 @@ namespace NPCSystem
         void WriteUnityConsole(NPCFlowEvent flowEvent)
         {
             string line = FormatConsoleLine(flowEvent);
-            switch (flowEvent.level)
+            switch (flowEvent.Level)
             {
                 case NPCFlowLogLevel.Error:
                     UnityEngine.Debug.LogError(line);
@@ -425,13 +589,13 @@ namespace NPCSystem
             if (!string.IsNullOrWhiteSpace(_currentLogPath))
                 return;
 
-            string directory = !string.IsNullOrWhiteSpace(overrideAbsoluteLogDirectory)
-                ? overrideAbsoluteLogDirectory.Trim()
+            string directory = !string.IsNullOrWhiteSpace(OverrideAbsoluteLogDirectory)
+                ? OverrideAbsoluteLogDirectory.Trim()
                 : Path.Combine(
                     Application.persistentDataPath,
-                    string.IsNullOrWhiteSpace(relativeLogDirectory)
+                    string.IsNullOrWhiteSpace(RelativeLogDirectory)
                         ? "NPCDialogue/Logs"
-                        : relativeLogDirectory.Trim()
+                        : RelativeLogDirectory.Trim()
                 );
 
             _currentLogPath = Path.Combine(directory, $"npc-flow-{SessionId}.jsonl")
@@ -465,8 +629,8 @@ namespace NPCSystem
                 if (logFiles.Count == 0)
                     return;
 
-                // Phase 1: delete files older than maxLogDays
-                DateTime cutoff = DateTime.UtcNow.AddDays(-Math.Max(1, maxLogDays));
+                // Phase 1: delete files older than MaxLogDays
+                DateTime cutoff = DateTime.UtcNow.AddDays(-Math.Max(1, MaxLogDays));
                 for (int i = logFiles.Count - 1; i >= 0; i--)
                 {
                     if (logFiles[i].LastWriteTimeUtc < cutoff)
@@ -483,9 +647,9 @@ namespace NPCSystem
                 }
 
                 // Phase 2: if still over size limit, delete oldest until under
-                if (maxLogDirectorySizeMB > 0 && logFiles.Count > 0)
+                if (MaxLogDirectorySizeMB > 0 && logFiles.Count > 0)
                 {
-                    long maxBytes = (long)maxLogDirectorySizeMB * 1024L * 1024L;
+                    long maxBytes = (long)MaxLogDirectorySizeMB * 1024L * 1024L;
                     long currentBytes = 0;
                     foreach (var fi in logFiles)
                     {
@@ -551,13 +715,14 @@ namespace NPCSystem
         {
             var flowEvent = new NPCFlowEvent
             {
-                sessionId = $"editor-{DateTime.UtcNow:yyyyMMdd}",
-                source = source ?? "EditorWorkflow",
-                stage = NPCFlowStage.EditorWorkflow,
-                status = status,
-                level = level,
-                message = message ?? string.Empty,
-                data = data,
+                SessionId = $"editor-{DateTime.UtcNow:yyyyMMdd}",
+                Source = source ?? "EditorWorkflow",
+                Stage = NPCFlowStage.EditorWorkflow,
+                Status = status,
+                Level = level,
+                Message = message ?? string.Empty,
+                Data = data,
+                Category = NPCFlowCategory.EditorWorkflow,
             };
 
             try
@@ -590,12 +755,13 @@ namespace NPCSystem
 
         static string FormatConsoleLine(NPCFlowEvent flowEvent)
         {
-            string request = string.IsNullOrWhiteSpace(flowEvent.requestId)
+            string request = string.IsNullOrWhiteSpace(flowEvent.RequestId)
                 ? "-"
-                : flowEvent.requestId;
-            string npc = string.IsNullOrWhiteSpace(flowEvent.npcSlug) ? "-" : flowEvent.npcSlug;
-            string source = string.IsNullOrWhiteSpace(flowEvent.source) ? "-" : flowEvent.source;
-            return $"[NPCFlow] {flowEvent.stage}/{flowEvent.status} level={flowEvent.level} source={source} request={request} npc={npc} durationMs={flowEvent.durationMs} :: {flowEvent.message}";
+                : flowEvent.RequestId;
+            string npc = string.IsNullOrWhiteSpace(flowEvent.NpcSlug) ? "-" : flowEvent.NpcSlug;
+            string source = string.IsNullOrWhiteSpace(flowEvent.Source) ? "-" : flowEvent.Source;
+            string conv = string.IsNullOrWhiteSpace(flowEvent.ConversationId) ? "" : $" conv={flowEvent.ConversationId}";
+            return $"[NPCFlow] {flowEvent.Stage}/{flowEvent.Status} level={flowEvent.Level} source={source} request={request} npc={npc}{conv} durationMs={flowEvent.DurationMs} :: {flowEvent.Message}";
         }
 
         static string CreateSessionId()
@@ -604,16 +770,22 @@ namespace NPCSystem
         }
 
         // ── Validation helpers for EditorAttributes ──
-        bool IncludeTextOrRaw() => includeTextSnippets || includeRawTextPayloads;
+        bool IncludeTextOrRaw() => IncludeTextSnippets || IncludeRawTextPayloads;
 
-        bool HasValidSnippetChars() => !IncludeTextOrRaw() || maxSnippetChars > 0;
+        bool HasValidSnippetChars() => !IncludeTextOrRaw() || MaxSnippetChars > 0;
 
-        bool HasValidMaxEvents() => maxInMemoryEvents > 0;
+        bool HasValidMaxEvents() => MaxInMemoryEvents > 0;
 
-        bool HasValidRelativeLogDir() => !string.IsNullOrWhiteSpace(relativeLogDirectory);
+        bool HasValidRelativeLogDir() => !string.IsNullOrWhiteSpace(RelativeLogDirectory);
 
-        bool HasValidMaxLogDays() => maxLogDays > 0;
+        bool HasValidMaxLogDays() => MaxLogDays > 0;
 
-        bool HasValidMaxDirMB() => maxLogDirectorySizeMB > 0;
+        bool HasValidMaxDirMB() => MaxLogDirectorySizeMB > 0;
+
+        // ── Suppression counter helper ──
+        class SuppressionCounter
+        {
+            public List<long> timestamps = new List<long>();
+        }
     }
 }

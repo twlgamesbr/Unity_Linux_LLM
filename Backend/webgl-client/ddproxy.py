@@ -8,16 +8,24 @@ import ssl
 import os
 import logging
 
+logger = logging.getLogger("ddproxy")
+
 # Initialize ddtrace if available
 try:
     from ddtrace import tracer, patch
     from ddtrace.contrib.trace_utils import set_http_meta
-    patch(http_client=True)
+    # Patch available libraries — httplib is the v4+ name for http.client
+    try:
+        patch(httplib=True)
+    except Exception:
+        try:
+            patch(http_client=True)
+        except Exception:
+            logger.warning("ddtrace patch failed, running without tracing")
     DDTRACE_AVAILABLE = True
 except ImportError:
     DDTRACE_AVAILABLE = False
 
-logger = logging.getLogger("ddproxy")
 if DDTRACE_AVAILABLE:
     logger.info("ddtrace instrumentation active")
 

@@ -134,8 +134,12 @@ namespace NPCSystem
             }
             catch (Exception e)
             {
-                Debug.LogError(
-                    $"[NPC] File {filePath} could not be saved: {e.GetType()}: {e.Message}"
+                NPCFlowLogger.FindOrCreate().Log(
+                    NPCFlowStage.LocalRagReady,
+                    NPCFlowStatus.Error,
+                    NPCFlowLogLevel.Error,
+                    $"[NPC] File {filePath} could not be saved: {e.GetType()}: {e.Message}",
+                    source: nameof(NPCSearchable)
                 );
             }
         }
@@ -151,8 +155,12 @@ namespace NPCSystem
             }
             catch (Exception e)
             {
-                Debug.LogError(
-                    $"[NPC] File {filePath} could not be loaded: {e.GetType()}: {e.Message}"
+                NPCFlowLogger.FindOrCreate().Log(
+                    NPCFlowStage.LocalRagReady,
+                    NPCFlowStatus.Error,
+                    NPCFlowLogLevel.Error,
+                    $"[NPC] File {filePath} could not be loaded: {e.GetType()}: {e.Message}",
+                    source: nameof(NPCSearchable)
                 );
                 return Task.FromResult(false);
             }
@@ -220,12 +228,24 @@ namespace NPCSystem
         {
             if (vector1 == null || vector2 == null)
             {
-                Debug.LogError("Vectors cannot be null");
+                NPCFlowLogger.FindOrCreate().Log(
+                    NPCFlowStage.LocalRagSearch,
+                    NPCFlowStatus.Error,
+                    NPCFlowLogLevel.Error,
+                    "Vectors cannot be null",
+                    source: nameof(NPCSearchMethod)
+                );
                 return 0;
             }
             if (vector1.Length != vector2.Length)
             {
-                Debug.LogError("Vector lengths must be equal");
+                NPCFlowLogger.FindOrCreate().Log(
+                    NPCFlowStage.LocalRagSearch,
+                    NPCFlowStatus.Error,
+                    NPCFlowLogLevel.Error,
+                    "Vector lengths must be equal",
+                    source: nameof(NPCSearchMethod)
+                );
                 return 0;
             }
             float result = 0;
@@ -249,7 +269,13 @@ namespace NPCSystem
         {
             if (_llmEmbedder == null)
             {
-                Debug.LogError("[NPC] SearchMethod: _llmEmbedder is null, cannot encode.");
+                NPCFlowLogger.FindOrCreate().Log(
+                    NPCFlowStage.LocalRagSearch,
+                    NPCFlowStatus.Error,
+                    NPCFlowLogLevel.Error,
+                    "[NPC] SearchMethod: _llmEmbedder is null, cannot encode.",
+                    source: nameof(NPCSearchMethod)
+                );
                 return Array.Empty<float>();
             }
             return (await _llmEmbedder.Embeddings(inputString)).ToArray();

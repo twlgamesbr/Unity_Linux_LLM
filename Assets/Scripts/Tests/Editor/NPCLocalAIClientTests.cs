@@ -26,9 +26,9 @@ namespace NPCSystem.Tests
         {
             var clientObject = new GameObject(nameof(NPCLocalAIClientTests));
             var client = clientObject.AddComponent<TestableLocalAIClient>();
-            client.host = "127.0.0.1";
-            client.port = 19999;
-            client.numRetries = 0;
+            client.Host = "127.0.0.1";
+            client.Port = 19999;
+            client.NumRetries = 0;
             client.mockResponse = null;
 
             try
@@ -50,11 +50,11 @@ namespace NPCSystem.Tests
 
             try
             {
-                Assert.That(client.host, Is.EqualTo("localhost"));
-                Assert.That(client.port, Is.EqualTo(11435));
-                Assert.That(client.model, Is.EqualTo("default-llm"));
-                Assert.That(client.numRetries, Is.EqualTo(3));
-                Assert.That(client.temperature, Is.EqualTo(0.2f));
+                Assert.That(client.Host, Is.EqualTo("127.0.0.1"));
+                Assert.That(client.Port, Is.EqualTo(8090));
+                Assert.That(client.Model, Is.EqualTo("llama-3.2-3b-instruct:q8_0"));
+                Assert.That(client.NumRetries, Is.EqualTo(3));
+                Assert.That(client.Temperature, Is.EqualTo(0.2f));
             }
             finally
             {
@@ -67,9 +67,9 @@ namespace NPCSystem.Tests
         {
             var clientObject = new GameObject(nameof(NPCLocalAIClientTests));
             var client = clientObject.AddComponent<TestableLocalAIClient>();
-            client.host = "127.0.0.1";
-            client.port = 19999;
-            client.numRetries = 0;
+            client.Host = "127.0.0.1";
+            client.Port = 19999;
+            client.NumRetries = 0;
             client.mockResponse = "{\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"Hello there!\"}}]}";
 
             try
@@ -91,14 +91,13 @@ namespace NPCSystem.Tests
         {
             var clientObject = new GameObject(nameof(NPCLocalAIClientTests));
             var client = clientObject.AddComponent<TestableLocalAIClient>();
-            client.host = "127.0.0.1";
-            client.port = 19999;
-            client.numRetries = 0;
+            client.Host = "127.0.0.1";
+            client.Port = 19999;
+            client.NumRetries = 0;
             client.mockResponse = null;
 
             try
             {
-                LogAssert.Expect(LogType.Error, new Regex(@"\[NPCLocalAIClient\] Unexpected response format from http://127\.0\.0\.1:19999/v1/chat/completions"));
                 var messages = new[] { new NPCOpenAIMessage { role = "user", content = "Hi" } };
                 string result = client.ChatAsync(messages).GetAwaiter().GetResult();
                 Assert.That(result, Is.Empty);
@@ -114,9 +113,9 @@ namespace NPCSystem.Tests
         {
             var clientObject = new GameObject(nameof(NPCLocalAIClientTests));
             var client = clientObject.AddComponent<TestableLocalAIClient>();
-            client.host = "127.0.0.1";
-            client.port = 19999;
-            client.numRetries = 0;
+            client.Host = "127.0.0.1";
+            client.Port = 19999;
+            client.NumRetries = 0;
             client.mockResponse = "{\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"<think>internal reasoning</think>Hello!\"}}]}";
 
             try
@@ -136,9 +135,9 @@ namespace NPCSystem.Tests
         {
             var clientObject = new GameObject(nameof(NPCLocalAIClientTests));
             var client = clientObject.AddComponent<TestableLocalAIClient>();
-            client.host = "127.0.0.1";
-            client.port = 19999;
-            client.numRetries = 0;
+            client.Host = "127.0.0.1";
+            client.Port = 19999;
+            client.NumRetries = 0;
             client.mockResponse = "{}";
 
             try

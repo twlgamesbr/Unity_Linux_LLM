@@ -197,7 +197,7 @@ namespace NPCSystem
                     continue;
 
                 // Check if the NPC is allowed to reveal this
-                if (profile != null && !profile.canRevealSecrets && category == "motive")
+                if (profile != null && !profile.CanRevealSecrets && category == "motive")
                     continue;
 
                 // Record

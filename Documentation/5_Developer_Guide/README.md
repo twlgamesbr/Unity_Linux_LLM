@@ -18,6 +18,12 @@ Professional guidelines for extending and modifying the NPC Dialogue system.
 
 ## Code Organization & Standards
 
+> **Canonical rules live in [`AGENTS.md` §1](../../AGENTS.md#1-code-conventions).** That document is this project's
+> single source of truth for naming, formatting, and anti-pattern rules, and is verified automatically by
+> `Tools/NPCDialogueCodeReview`. Everything below is *supplementary* illustration (async patterns, nullable
+> reference types, event-vs-delegate preference, perf habits) — if anything here ever looks like it contradicts
+> `AGENTS.md` §1, `AGENTS.md` wins; treat the mismatch as a bug in this file, not in `AGENTS.md`.
+
 ### Namespace Discipline
 
 All runtime code must use the `NPCSystem` namespace:
@@ -80,8 +86,9 @@ public string? OptionalValue { get; set; }
 // 4. Use UnityEvent instead of custom delegates for public events
 public UnityEvent<string> OnResponseComplete = new();
 
-// 5. Use readonly for immutable fields
-private readonly Dictionary<string, NPCProfile> profiles = new();
+// 5. Use readonly for immutable fields, and the project's _camelCase private-field
+//    convention (AGENTS.md §1.1)
+private readonly Dictionary<string, NPCProfile> _profiles = new();
 ```
 
 **Logging**
@@ -89,10 +96,10 @@ private readonly Dictionary<string, NPCProfile> profiles = new();
 // ✓ Use NPCFlowLogger, not Debug.Log
 private static NPCFlowLogger Logger => NPCFlowLogger.FindOrCreate();
 
-Logger.LogEvent(new NPCFlowEvent
+Logger.Log(new NPCFlowEvent
 {
-    stage = NPCFlowStage.DialogueInput,
-    message = "Processing user input"
+    Stage = NPCFlowStage.DialogueInput,
+    Message = "Processing user input"
 });
 
 // ✗ Don't use Debug.Log directly
@@ -104,8 +111,8 @@ Debug.Log("This is wrong");  // Will be ignored in distributed logging
 // ✓ Use async for LLM calls
 var response = await llm.GenerateAsync(prompt);
 
-// ✓ Cache repeated lookups
-private readonly Dictionary<string, NPCProfile> profileCache = new();
+// ✓ Cache repeated lookups (again, _camelCase per AGENTS.md §1.1)
+private readonly Dictionary<string, NPCProfile> _profileCache = new();
 
 // ✗ Don't block the main thread
 var response = llm.Generate(prompt);  // Blocks!

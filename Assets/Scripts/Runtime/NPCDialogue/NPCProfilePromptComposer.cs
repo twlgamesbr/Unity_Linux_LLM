@@ -61,22 +61,22 @@ namespace NPCSystem
             AppendSection(
                 builder,
                 "Core role",
-                string.IsNullOrWhiteSpace(profile.systemPrompt)
+                string.IsNullOrWhiteSpace(profile.SystemPrompt)
                     ? "You are a helpful in-game NPC."
-                    : profile.systemPrompt.Trim()
+                    : profile.SystemPrompt.Trim()
             );
 
-            AppendSection(builder, "Personality brief", profile.personalityBrief);
-            AppendSection(builder, "Speaking style", profile.speakingStyle);
-            AppendSection(builder, "Boundaries", profile.boundaries);
+            AppendSection(builder, "Personality brief", profile.PersonalityBrief);
+            AppendSection(builder, "Speaking style", profile.SpeakingStyle);
+            AppendSection(builder, "Boundaries", profile.Boundaries);
 
-            if (!string.IsNullOrWhiteSpace(profile.secretKnowledge))
+            if (!string.IsNullOrWhiteSpace(profile.SecretKnowledge))
             {
                 AppendSection(
                     builder,
                     "Private knowledge",
-                    profile.canRevealSecrets
-                        ? profile.secretKnowledge
+                    profile.CanRevealSecrets
+                        ? profile.SecretKnowledge
                         : "This NPC has private knowledge, but should not reveal it directly unless the dialogue context justifies it."
                 );
             }
@@ -101,22 +101,22 @@ namespace NPCSystem
 
             List<string> rules = new List<string>
             {
-                profile.canGivePuzzleHints
+                profile.CanGivePuzzleHints
                     ? "May provide subtle puzzle hints."
                     : "Should not provide puzzle hints.",
-                profile.canAccuseSuspects
+                profile.CanAccuseSuspects
                     ? "May accuse or name suspects when evidence supports it."
                     : "Should avoid direct accusations without strong evidence.",
-                profile.canRevealSecrets
+                profile.CanRevealSecrets
                     ? "May reveal secrets when dramatically appropriate."
                     : "Should preserve secrets and reveal only implications.",
             };
 
-            string preferred = JoinClean(profile.preferredActionFunctions);
+            string preferred = JoinClean(profile.PreferredActionFunctions);
             if (!string.IsNullOrWhiteSpace(preferred))
                 rules.Add($"Preferred actions: {preferred}.");
 
-            string forbidden = JoinClean(profile.forbiddenActionFunctions);
+            string forbidden = JoinClean(profile.ForbiddenActionFunctions);
             if (!string.IsNullOrWhiteSpace(forbidden))
                 rules.Add($"Forbidden actions: {forbidden}.");
 
@@ -132,7 +132,7 @@ namespace NPCSystem
 
         static string BuildBehaviorSliderText(NPCProfile profile)
         {
-            return $"Suspicion={Format01(profile.suspicion)}, Helpfulness={Format01(profile.helpfulness)}, Sarcasm={Format01(profile.sarcasm)}. "
+            return $"Suspicion={Format01(profile.Suspicion)}, Helpfulness={Format01(profile.Helpfulness)}, Sarcasm={Format01(profile.Sarcasm)}. "
                 + "Higher suspicion means more guarded interpretations. Higher helpfulness means clearer guidance. Higher sarcasm means sharper phrasing without becoming hostile.";
         }
 

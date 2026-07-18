@@ -18,91 +18,179 @@ namespace NPCSystem
         [OnValueChanged(nameof(RefreshInspectorPreview))]
         [Header("Identity")]
         [FormerlySerializedAs("npcSlug")]
-        public string NpcSlug = "npc";
+        [SerializeField]
+        string _npcSlug = "npc";
+        public string NpcSlug { get => _npcSlug; set => _npcSlug = value; }
 
         [FormerlySerializedAs("displayName")]
-        public string DisplayName = "NPC";
+        [SerializeField]
+        string _displayName = "NPC";
+        public string DisplayName { get => _displayName; set => _displayName = value; }
+
         [FormerlySerializedAs("portraitTexture")]
-        public Texture2D PortraitTexture;
+        [SerializeField]
+        Texture2D _portraitTexture;
+        public Texture2D PortraitTexture { get => _portraitTexture; set => _portraitTexture = value; }
 
         [Title("Personality")]
         [Header("Personality")]
+        [FormerlySerializedAs("systemPrompt")]
+        [SerializeField]
         [TextArea(4, 12)]
-        public string systemPrompt = "You are a helpful in-game NPC.";
+        string _systemPrompt = "You are a helpful in-game NPC.";
+        public string SystemPrompt { get => _systemPrompt; set => _systemPrompt = value; }
 
         [Header("Behavior")]
+        [FormerlySerializedAs("personalityBrief")]
+        [SerializeField]
         [TextArea(2, 5)]
-        public string personalityBrief = "";
+        string _personalityBrief = "";
+        public string PersonalityBrief { get => _personalityBrief; set => _personalityBrief = value; }
 
+        [FormerlySerializedAs("speakingStyle")]
+        [SerializeField]
         [TextArea(2, 5)]
-        public string speakingStyle = "";
+        string _speakingStyle = "";
+        public string SpeakingStyle { get => _speakingStyle; set => _speakingStyle = value; }
 
+        [FormerlySerializedAs("boundaries")]
+        [SerializeField]
         [TextArea(2, 5)]
-        public string boundaries = "";
+        string _boundaries = "";
+        public string Boundaries { get => _boundaries; set => _boundaries = value; }
 
+        [FormerlySerializedAs("secretKnowledge")]
+        [SerializeField]
         [TextArea(2, 5)]
-        public string secretKnowledge = "";
+        string _secretKnowledge = "";
+        public string SecretKnowledge { get => _secretKnowledge; set => _secretKnowledge = value; }
 
+        [FormerlySerializedAs("suspicion")]
+        [SerializeField]
         [Range(0f, 1f)]
-        public float suspicion = 0.3f;
+        float _suspicion = 0.3f;
+        public float Suspicion { get => _suspicion; set => _suspicion = value; }
 
+        [FormerlySerializedAs("helpfulness")]
+        [SerializeField]
         [Range(0f, 1f)]
-        public float helpfulness = 0.7f;
+        float _helpfulness = 0.7f;
+        public float Helpfulness { get => _helpfulness; set => _helpfulness = value; }
 
+        [FormerlySerializedAs("sarcasm")]
+        [SerializeField]
         [Range(0f, 1f)]
-        public float sarcasm = 0.2f;
+        float _sarcasm = 0.2f;
+        public float Sarcasm { get => _sarcasm; set => _sarcasm = value; }
 
         [Header("Gameplay Actions")]
-        public bool canGivePuzzleHints = true;
-        public bool canAccuseSuspects = false;
-        public bool canRevealSecrets = false;
-        public string[] preferredActionFunctions = new string[0];
-        public string[] forbiddenActionFunctions = new string[0];
+        [FormerlySerializedAs("canGivePuzzleHints")]
+        [SerializeField]
+        bool _canGivePuzzleHints = true;
+        public bool CanGivePuzzleHints { get => _canGivePuzzleHints; set => _canGivePuzzleHints = value; }
+
+        [FormerlySerializedAs("canAccuseSuspects")]
+        [SerializeField]
+        bool _canAccuseSuspects = false;
+        public bool CanAccuseSuspects { get => _canAccuseSuspects; set => _canAccuseSuspects = value; }
+
+        [FormerlySerializedAs("canRevealSecrets")]
+        [SerializeField]
+        bool _canRevealSecrets = false;
+        public bool CanRevealSecrets { get => _canRevealSecrets; set => _canRevealSecrets = value; }
+
+        [FormerlySerializedAs("preferredActionFunctions")]
+        [SerializeField]
+        string[] _preferredActionFunctions = new string[0];
+        public string[] PreferredActionFunctions { get => _preferredActionFunctions; set => _preferredActionFunctions = value; }
+
+        [FormerlySerializedAs("forbiddenActionFunctions")]
+        [SerializeField]
+        string[] _forbiddenActionFunctions = new string[0];
+        public string[] ForbiddenActionFunctions { get => _forbiddenActionFunctions; set => _forbiddenActionFunctions = value; }
 
         [Title("Sampling")]
         [Header("Sampling")]
+        [FormerlySerializedAs("temperature")]
+        [SerializeField]
         [Range(0f, 2f)]
-        public float temperature = 0.7f;
+        float _temperature = 0.7f;
+        public float Temperature { get => _temperature; set => _temperature = value; }
 
+        [FormerlySerializedAs("topP")]
+        [SerializeField]
         [Range(0f, 1f)]
-        public float topP = 0.9f;
+        float _topP = 0.9f;
+        public float TopP { get => _topP; set => _topP = value; }
 
+        [FormerlySerializedAs("minP")]
+        [SerializeField]
         [Range(0f, 1f)]
-        public float minP = 0.05f;
+        float _minP = 0.05f;
+        public float MinP { get => _minP; set => _minP = value; }
 
+        [FormerlySerializedAs("topK")]
+        [SerializeField]
         [Range(0, 100)]
-        public int topK = 40;
+        int _topK = 40;
+        public int TopK { get => _topK; set => _topK = value; }
 
+        [FormerlySerializedAs("repeatPenalty")]
+        [SerializeField]
         [Range(0f, 2f)]
-        public float repeatPenalty = 1.1f;
+        float _repeatPenalty = 1.1f;
+        public float RepeatPenalty { get => _repeatPenalty; set => _repeatPenalty = value; }
+
+        [FormerlySerializedAs("maxTokens")]
+        [SerializeField]
         [Suffix("tokens")]
-        public int maxTokens = 150;
+        int _maxTokens = 150;
+        public int MaxTokens { get => _maxTokens; set => _maxTokens = value; }
 
         [Title("Knowledge")]
         [Header("Knowledge")]
-        public string ragCategory = "";
-        public int ragResults = 3;
+        [FormerlySerializedAs("ragCategory")]
+        [SerializeField]
+        string _ragCategory = "";
+        public string RagCategory { get => _ragCategory; set => _ragCategory = value; }
 
+        [FormerlySerializedAs("ragResults")]
+        [SerializeField]
+        int _ragResults = 3;
+        public int RagResults { get => _ragResults; set => _ragResults = value; }
+
+        [FormerlySerializedAs("knowledgeSourcePath")]
+        [SerializeField]
         [Tooltip("Path relative to StreamingAssets, e.g. NPCs/butler/knowledge.md")]
         [FilePath(true, "md")]
         [OnValueChanged(nameof(NormalizeProfilePaths))]
-        public string knowledgeSourcePath = "";
+        string _knowledgeSourcePath = "";
+        public string KnowledgeSourcePath { get => _knowledgeSourcePath; set => _knowledgeSourcePath = value; }
 
         [Title("LoRA")]
         [Header("LoRA")]
+        [FormerlySerializedAs("loraAdapterPath")]
+        [SerializeField]
         [Tooltip("Path relative to StreamingAssets, e.g. NPCs/butler/adapter.gguf")]
         [FilePath(true, "gguf")]
         [OnValueChanged(nameof(NormalizeProfilePaths))]
-        public string loraAdapterPath = "";
+        string _loraAdapterPath = "";
+        public string LoraAdapterPath { get => _loraAdapterPath; set => _loraAdapterPath = value; }
 
+        [FormerlySerializedAs("loraWeight")]
+        [SerializeField]
         [Range(0f, 1f)]
-        public float loraWeight = 0.8f;
+        float _loraWeight = 0.8f;
+        public float LoraWeight { get => _loraWeight; set => _loraWeight = value; }
 
         [Title("History")]
         [Header("History")]
+        [FormerlySerializedAs("historySaveFile")]
+        [SerializeField]
         [Tooltip("Path relative to Application.persistentDataPath, e.g. NPCDialogue/butler.json")]
         [OnValueChanged(nameof(NormalizeProfilePaths))]
-        public string historySaveFile = "";
+        string _historySaveFile = "";
+        public string HistorySaveFile { get => _historySaveFile; set => _historySaveFile = value; }
 
         [SerializeField, ReadOnly]
         string inspectorPreview = "Not validated yet.";
@@ -119,9 +207,9 @@ namespace NPCSystem
         [Button("Normalize Profile Paths")]
         void NormalizeProfilePaths()
         {
-            knowledgeSourcePath = NormalizeRelativePath(knowledgeSourcePath);
-            loraAdapterPath = NormalizeRelativePath(loraAdapterPath);
-            historySaveFile = NormalizeRelativePath(historySaveFile);
+            _knowledgeSourcePath = NormalizeRelativePath(_knowledgeSourcePath);
+            _loraAdapterPath = NormalizeRelativePath(_loraAdapterPath);
+            _historySaveFile = NormalizeRelativePath(_historySaveFile);
             RefreshInspectorPreview();
         }
 
@@ -140,55 +228,55 @@ namespace NPCSystem
 
         public string GetNpcSlug()
         {
-            if (!string.IsNullOrWhiteSpace(NpcSlug))
-                return NpcSlug.Trim().ToLowerInvariant();
-            if (!string.IsNullOrWhiteSpace(DisplayName))
-                return DisplayName.Trim().ToLowerInvariant().Replace(" ", "-");
+            if (!string.IsNullOrWhiteSpace(_npcSlug))
+                return _npcSlug.Trim().ToLowerInvariant();
+            if (!string.IsNullOrWhiteSpace(_displayName))
+                return _displayName.Trim().ToLowerInvariant().Replace(" ", "-");
             return name.Trim().ToLowerInvariant().Replace(" ", "-");
         }
 
         public string GetDisplayName()
         {
-            if (!string.IsNullOrWhiteSpace(DisplayName))
-                return DisplayName.Trim();
+            if (!string.IsNullOrWhiteSpace(_displayName))
+                return _displayName.Trim();
             return string.IsNullOrWhiteSpace(name) ? "NPC" : name.Trim();
         }
 
         public string GetRagCategory()
         {
-            return string.IsNullOrWhiteSpace(ragCategory) ? GetNpcSlug() : ragCategory.Trim();
+            return string.IsNullOrWhiteSpace(_ragCategory) ? GetNpcSlug() : _ragCategory.Trim();
         }
 
         public string GetKnowledgeSourcePath()
         {
-            return string.IsNullOrWhiteSpace(knowledgeSourcePath)
+            return string.IsNullOrWhiteSpace(_knowledgeSourcePath)
                 ? $"NPCs/{GetNpcSlug()}/knowledge.md"
-                : knowledgeSourcePath.Trim().Replace('\\', '/');
+                : _knowledgeSourcePath.Trim().Replace('\\', '/');
         }
 
         public string GetLoraAdapterPath()
         {
-            return string.IsNullOrWhiteSpace(loraAdapterPath)
+            return string.IsNullOrWhiteSpace(_loraAdapterPath)
                 ? string.Empty
-                : loraAdapterPath.Trim().Replace('\\', '/');
+                : _loraAdapterPath.Trim().Replace('\\', '/');
         }
 
         public string GetHistorySaveFile()
         {
-            return string.IsNullOrWhiteSpace(historySaveFile)
+            return string.IsNullOrWhiteSpace(_historySaveFile)
                 ? $"NPCDialogue/{GetNpcSlug()}.json"
-                : historySaveFile.Trim().Replace('\\', '/');
+                : _historySaveFile.Trim().Replace('\\', '/');
         }
 
         bool HasValidNpcSlug() => !string.IsNullOrWhiteSpace(GetNpcSlug());
 
         bool HasDisplayName() => !string.IsNullOrWhiteSpace(GetDisplayName());
 
-        bool HasSystemPrompt() => !string.IsNullOrWhiteSpace(systemPrompt);
+        bool HasSystemPrompt() => !string.IsNullOrWhiteSpace(_systemPrompt);
 
-        bool HasValidMaxTokens() => maxTokens > 0;
+        bool HasValidMaxTokens() => _maxTokens > 0;
 
-        bool HasValidRagResults() => ragResults > 0;
+        bool HasValidRagResults() => _ragResults > 0;
 
         static string NormalizeRelativePath(string path)
         {

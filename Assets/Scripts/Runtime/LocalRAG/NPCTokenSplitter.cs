@@ -11,7 +11,10 @@ namespace NPCSystem
     {
         [Tooltip("number of tokens by which to split phrases into chunks")]
         [FormerlySerializedAs("NumTokens")]
-        public int NumTokens = 10;
+        [SerializeField]
+        int _numTokens = 10;
+
+        public int NumTokens => _numTokens;
 
         protected int DetermineEndIndex(
             string input,

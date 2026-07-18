@@ -115,7 +115,7 @@ namespace NPCSystem
 
         void Awake()
         {
-            if (TransportConfig.port == 0)
+            if (TransportConfig.Port == 0)
             {
                 TransportConfig = NPCTransportConfig.CreateDefault();
             }
@@ -136,7 +136,7 @@ namespace NPCSystem
             // Detect dedicated server CLI arg and auto-configure to Server mode
             if (Application.isBatchMode && HasCommandLineArg("-npc-server"))
             {
-                TransportConfig.autoStartMode = NPCNetworkAutoStartMode.Server;
+                TransportConfig.AutoStartMode = NPCNetworkAutoStartMode.Server;
             }
 
             if (
@@ -144,7 +144,7 @@ namespace NPCSystem
                     AutoStartInPlayMode
                     || (
                         Application.isBatchMode
-                        && TransportConfig.autoStartMode != NPCNetworkAutoStartMode.Manual
+                        && TransportConfig.AutoStartMode != NPCNetworkAutoStartMode.Manual
                     )
                 ) && Application.isPlaying
             )
@@ -179,7 +179,7 @@ namespace NPCSystem
 
         void OnValidate()
         {
-            if (TransportConfig.port == 0)
+            if (TransportConfig.Port == 0)
             {
                 TransportConfig = NPCTransportConfig.CreateDefault();
             }
@@ -316,12 +316,12 @@ namespace NPCSystem
             using var netSpan = DatadogTracer.StartSpan(
                 "network.start",
                 service: "unity-dedicated-server",
-                resource: TransportConfig.autoStartMode.ToString(),
+                resource: TransportConfig.AutoStartMode.ToString(),
                 type: "networking",
                 tags: new[]
                 {
-                    $"mode:{TransportConfig.autoStartMode}",
-                    $"port:{TransportConfig.port}",
+                    $"mode:{TransportConfig.AutoStartMode}",
+                    $"port:{TransportConfig.Port}",
                 }
             );
 
@@ -351,7 +351,7 @@ namespace NPCSystem
                         source: nameof(NPCNetworkBootstrap),
                         data: new Dictionary<string, object>
                         {
-                            ["autoStartMode"] = TransportConfig.autoStartMode.ToString(),
+                            ["autoStartMode"] = TransportConfig.AutoStartMode.ToString(),
                         }
                     );
                 return true;
@@ -369,14 +369,14 @@ namespace NPCSystem
                     source: nameof(NPCNetworkBootstrap),
                     data: new Dictionary<string, object>
                     {
-                        ["autoStartMode"] = TransportConfig.autoStartMode.ToString(),
-                        ["connectAddress"] = TransportConfig.connectAddress ?? string.Empty,
-                        ["port"] = TransportConfig.port,
-                        ["listenAddress"] = TransportConfig.listenAddress ?? string.Empty,
+                        ["autoStartMode"] = TransportConfig.AutoStartMode.ToString(),
+                        ["connectAddress"] = TransportConfig.ConnectAddress ?? string.Empty,
+                        ["port"] = TransportConfig.Port,
+                        ["listenAddress"] = TransportConfig.ListenAddress ?? string.Empty,
                     }
                 );
 
-            switch (TransportConfig.autoStartMode)
+            switch (TransportConfig.AutoStartMode)
             {
                 case NPCNetworkAutoStartMode.Client:
                     DatadogMetricsService.Increment(

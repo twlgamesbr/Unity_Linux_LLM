@@ -159,8 +159,12 @@ namespace NPCSystem
 
             if (_playerMap == null)
             {
-                Debug.LogError(
-                    $"[{nameof(NPCMultiplayerInputActions)}] Action map '{_actionMapName}' not found in {_inputActions.name}."
+                NPCFlowLogger.FindOrCreate().Log(
+                    NPCFlowStage.SceneBootstrap,
+                    NPCFlowStatus.Error,
+                    NPCFlowLogLevel.Error,
+                    $"[{nameof(NPCMultiplayerInputActions)}] Action map '{_actionMapName}' not found in {_inputActions.name}.",
+                    source: nameof(NPCMultiplayerInputActions)
                 );
                 return;
             }
@@ -177,12 +181,20 @@ namespace NPCSystem
 
             // Optional: log missing non-critical actions
             if (_moveAction == null)
-                Debug.LogWarning(
-                    $"[{nameof(NPCMultiplayerInputActions)}] 'Move' action not found."
+                NPCFlowLogger.FindOrCreate().Log(
+                    NPCFlowStage.SceneBootstrap,
+                    NPCFlowStatus.Warning,
+                    NPCFlowLogLevel.Warning,
+                    $"[{nameof(NPCMultiplayerInputActions)}] 'Move' action not found.",
+                    source: nameof(NPCMultiplayerInputActions)
                 );
             if (_jumpAction == null)
-                Debug.LogWarning(
-                    $"[{nameof(NPCMultiplayerInputActions)}] 'Jump' action not found."
+                NPCFlowLogger.FindOrCreate().Log(
+                    NPCFlowStage.SceneBootstrap,
+                    NPCFlowStatus.Warning,
+                    NPCFlowLogLevel.Warning,
+                    $"[{nameof(NPCMultiplayerInputActions)}] 'Jump' action not found.",
+                    source: nameof(NPCMultiplayerInputActions)
                 );
         }
 

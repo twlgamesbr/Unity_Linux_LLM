@@ -82,7 +82,7 @@ namespace NPCSystem
         /// Start a dialogue turn for the currently active NPC.
         /// Validates state, sets responding flag, and fires the async LLM chain.
         /// </summary>
-        public void SendMessage(string playerMessage, NPCProfile currentNpc)
+        public void SendDialogueMessage(string playerMessage, NPCProfile currentNpc)
         {
             if (_isResponding || string.IsNullOrWhiteSpace(playerMessage))
                 return;
@@ -422,7 +422,7 @@ namespace NPCSystem
                 );
                 dialogueMessage = await _chatClient.ChatAsync(
                     messages.ToArray(),
-                    profile != null ? profile.temperature : (float?)null,
+                    profile != null ? profile.Temperature : (float?)null,
                     modelOverride: ResolvedModelName
                 );
                 requestSucceeded = !string.IsNullOrEmpty(dialogueMessage);

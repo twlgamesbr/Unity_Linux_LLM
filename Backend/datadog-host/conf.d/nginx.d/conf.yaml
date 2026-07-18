@@ -1,0 +1,21 @@
+## Nginx check for the WebGL client (Backend/webgl-client).
+## nginx.conf already exposes /nginx_status (stub_status) for this
+## exact purpose — this file was the missing piece that actually
+## wires it up to the Datadog Agent.
+init_config:
+
+instances:
+  - nginx_status_url: http://localhost:8085/nginx_status/
+    tags:
+      - service:webgl-client
+      - team:npc-platform
+      - env:production
+
+logs:
+  - type: docker
+    source: nginx
+    service: webgl-client
+    log_processing_rules:
+      - type: multi_line
+        name: log_start_with_date
+        pattern: \d{4}\/\d{2}\/\d{2}

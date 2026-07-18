@@ -1355,16 +1355,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40616f8064c3536209ade4831e63b1d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCServerCharacterSpawner
-  NetworkManager: {fileID: 1161870791}
-  NetworkBootstrap: {fileID: 774187519}
-  DialogueManager: {fileID: 1778380623}
-  NpcPrefab: {fileID: 6903247061848355748, guid: 3adc01a49d3d92f3eb81281b65e4b9c9, type: 3}
-  NpcPrefabResourcesPath: Networking/NPCServerCharacter
-  spawnOrigin: {x: -4, y: 0, z: 6}
-  spawnSpacing: {x: 2.75, y: 0, z: 2.5}
-  MaxColumns: 3
-  ClearExistingNpcCharactersBeforeSpawn: 1
-  SnapToGround: 1
+  _networkManager: {fileID: 1161870791}
+  _networkBootstrap: {fileID: 774187519}
+  _dialogueManager: {fileID: 1778380623}
+  _npcPrefab: {fileID: 6903247061848355748, guid: 3adc01a49d3d92f3eb81281b65e4b9c9, type: 3}
+  _npcPrefabResourcesPath: Networking/NPCServerCharacter
+  _spawnOrigin: {x: -4, y: 0, z: 6}
+  _spawnSpacing: {x: 2.75, y: 0, z: 2.5}
+  _maxColumns: 3
+  _clearExistingNpcCharactersBeforeSpawn: 1
+  _snapToGround: 1
   lastSpawnStatus: Idle
   lastSpawnedCount: 0
 --- !u!114 &276694094
@@ -1388,7 +1388,7 @@ MonoBehaviour:
   requireLocalAiBackend: 1
   failInitializationOnRequiredBackendFailure: 1
   lastReadinessStatus: References assigned. auth=http://localhost:8091/auth/v1/health
-    localai=http://127.0.0.1:8080/v1/models
+    localai=http://127.0.0.1:8090/v1/models
   lastAuthBackendStatus: AuthBackend reachable via http://localhost:8091/auth/v1/health
     (HTTP 404).
   lastLocalAiBackendStatus: LocalAI reachable via http://127.0.0.1:8080/v1/models
@@ -1406,11 +1406,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b102015a3ca455f528a8b0bea7206260, type: 3}
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCTransferableItemSpawner
-  NetworkManager: {fileID: 1161870791}
-  ItemPrefab: {fileID: 7291902954840310053, guid: a38d0f6a35d285b58a8264207005b243, type: 3}
-  ItemPrefabResourcesPath: Networking/NPCTransferableItem
-  InitialNpcSlug: butler
-  fallbackWorldPosition: {x: 0, y: 1, z: 4}
+  _networkManager: {fileID: 1161870791}
+  _itemPrefab: {fileID: 7291902954840310053, guid: a38d0f6a35d285b58a8264207005b243, type: 3}
+  _itemPrefabResourcesPath: Networking/NPCTransferableItem
+  _initialNpcSlug: butler
+  _fallbackWorldPosition: {x: 0, y: 1, z: 4}
   lastSpawnStatus: Idle
 --- !u!1 &283994677
 GameObject:
@@ -4193,12 +4193,12 @@ MonoBehaviour:
   TransferableItemPrefab: {fileID: 7291902954840310053, guid: a38d0f6a35d285b58a8264207005b243, type: 3}
   TransferableItemPrefabResourcesPath: Networking/NPCTransferableItem
   TransportConfig:
-    connectAddress: 127.0.0.1
-    listenAddress: 0.0.0.0
-    port: 11474
-    useWebSockets: 1
-    webSocketPath: /npc-dialogue
-    autoStartMode: 0
+    _connectAddress: 127.0.0.1
+    _listenAddress: 0.0.0.0
+    _port: 11474
+    _useWebSockets: 1
+    _webSocketPath: /npc-dialogue
+    _autoStartMode: 0
   ConfigureOnAwake: 1
   AutoStartInPlayMode: 0
   AutoAssignClientBindPort: 1
@@ -5060,7 +5060,7 @@ AudioListener:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 871034952}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!20 &871034954
 Camera:
   m_ObjectHideFlags: 0
@@ -8686,7 +8686,7 @@ MonoBehaviour:
   requestTimeoutSeconds: 15
   validateStoredSessionOnStart: 1
   restoreStoredSessionOnWebGLStart: 0
-  lastAuthStatus: SDK initialized. No active session.
+  lastAuthStatus: 'Supabase auth settings look valid: http://localhost:8091 | timeout=15s'
   lastAuthRoute: 
   lastAuthDurationMs: 0
 --- !u!114 &1351714797
@@ -9558,9 +9558,9 @@ Light:
   m_RenderMode: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 9
   m_RenderingLayerMask: 1
-  m_Lightmapping: 4
+  m_Lightmapping: 2
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
@@ -10959,34 +10959,32 @@ MonoBehaviour:
   EvidenceState: {fileID: 1778380644}
   SupabaseRepo: {fileID: 1778380637}
   _remoteHost: 127.0.0.1
-  _remotePort: 8080
+  _remotePort: 8090
   _remoteModel: llama-3.2-3b-instruct:q8_0
   _cachedModelNames:
-  - llama32-qdrant-safe-20260706-ckpt100-q4_k_m
-  - qwen2.5-1.5b-instruct-q4-k-m
-  - embeddinggemma-300m
-  - llama-3.2-3b-instruct:q4_k_m
-  - llama-3.2-3b-instruct:q8_0
-  - npc-codebase-v1
-  - npc-codebase-v4
-  - qwen3-tts-cpp-1.7b-base-q4
+  - llama-3.1-8b-q4-k-m-vulkan
   - llama-3.1-8b-q4-k-m
+  - llama-3.2-3b-instruct:q4_k_m
   - npc-codebase-v3
-  - intelligent-router
-  - llama32-unity-blended-20260707-q4_k_m
+  - qwen2.5-1.5b-instruct-q4-k-m
+  - qwen3-tts-cpp-1.7b-base-q4
+  - embeddinggemma-300m
+  - llama-3.2-3b-instruct:q8_0
   - modal-vllm-qwen
   - nomic-embed-text-v1.5
+  - npc-codebase-v1
+  - npc-codebase-v4
   - gemma-4-e2b-it
-  - llama-3.1-8b-q4-k-m-vulkan
+  - intelligent-router
   _remoteEmbeddingHost: 127.0.0.1
-  _remoteEmbeddingPort: 8080
+  _remoteEmbeddingPort: 8090
   _profiles:
   - {fileID: 11400000, guid: fee9805d1a4aff5de9e2b4c154fda9a7, type: 2}
   - {fileID: 11400000, guid: a2b00eea2a038c8d890b04ea76369e61, type: 2}
   - {fileID: 11400000, guid: aa3445a7aac99dbb2b3803972a0b9de1, type: 2}
   _persistHistory: 1
   _enableRAG: 0
-  _rebuildRagFromKnowledgeIfMissing: 0
+  _rebuildRagFromKnowledgeIfMissing: 1
   _maxHistoryPerNPC: 20
   _initializeOnStart: 0
   OnNpcChanged:
@@ -11002,7 +11000,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   _autoSelectDefaultNPC: 1
-  _defaultNpcSlug: 
+  _defaultNpcSlug: butler
 --- !u!4 &1778380624
 Transform:
   m_ObjectHideFlags: 0
@@ -11093,11 +11091,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fc1cc6216f8393fd94c3253333df4f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCLocalAIEmbedder
-  host: localhost
-  port: 8080
-  apiKey: 
-  model: nomic-embed-text-v1.5
-  numRetries: 3
+  _host: localhost
+  _port: 8090
+  _apiKey: 
+  _model: nomic-embed-text-v1.5
+  _numRetries: 3
 --- !u!114 &1778380642
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11127,7 +11125,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCLocalAIClient
   host: 127.0.0.1
-  port: 8080
+  port: 8090
   apiKey: 
   model: llama-3.2-3b-instruct:q8_0
   temperature: 0.2

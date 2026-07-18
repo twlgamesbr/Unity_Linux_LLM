@@ -1,5 +1,9 @@
 # System Architecture Overview
 
+> For the local backend/infrastructure topology (Docker containers, systemd services,
+> ports, endpoints, and known infra issues), see [Backend_Services_Topology.md](Backend_Services_Topology.md).
+> This document covers the Unity-internal application architecture only.
+
 **Table of Contents**
 - [High-Level System Context](#high-level-system-context)
 - [Layer Architecture](#layer-architecture)

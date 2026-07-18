@@ -12,7 +12,7 @@ namespace NPCSystem
     [DefaultExecutionOrder(-1500)]
     public class NPCDialogueManager : MonoBehaviour
     {
-        [FoldoutGroup("Chat Client", true, nameof(ChatClient))]
+        [FoldoutGroup("Chat Client", true, nameof(_chatClient))]
         [HelpBox(
             "All NPC dialogue goes through NPCLocalAIClient (HTTP to LocalAI). The local RAG (NPCLocalRAG) is an optional fallback when Qdrant is disabled.",
             MessageMode.Log,
@@ -21,24 +21,24 @@ namespace NPCSystem
         [SerializeField]
         EditorAttributes.Void chatClientGroup;
 
-        [FormerlySerializedAs("chatClient")]
+        [FormerlySerializedAs("ChatClient")]
         [SerializeField, HideProperty, Required]
-        public NPCLocalAIClient ChatClient;
+        public NPCLocalAIClient _chatClient;
 
         [FoldoutGroup(
             "RAG Services",
             true,
-            nameof(LocalRag),
+            nameof(_localRag),
             nameof(_ragEmbeddingPath),
             nameof(_useQdrantRag),
-            nameof(QdrantRag)
+            nameof(_qdrantRag)
         )]
         [SerializeField]
         EditorAttributes.Void ragServicesGroup;
 
-        [FormerlySerializedAs("localRag")]
+        [FormerlySerializedAs("LocalRag")]
         [SerializeField, HideProperty]
-        public NPCLocalRAG LocalRag;
+        public NPCLocalRAG _localRag;
 
         [FilePath(true, "rag")]
         [FormerlySerializedAs("RagEmbeddingPath")]
@@ -53,27 +53,27 @@ namespace NPCSystem
 
         [FormerlySerializedAs("qdrantRag")]
         [SerializeField, HideProperty, ShowField(nameof(_useQdrantRag))]
-        public QdrantRAGService QdrantRag;
+        public QdrantRAGService _qdrantRag;
 
-        [FoldoutGroup("Game Systems", true, nameof(ActionPlanner), nameof(EvidenceState))]
+        [FoldoutGroup("Game Systems", true, nameof(_actionPlanner), nameof(_evidenceState))]
         [SerializeField]
         EditorAttributes.Void gameSystemsGroup;
 
         [FormerlySerializedAs("actionPlanner")]
         [SerializeField, HideProperty]
-        public NPCDialogueActionPlanner ActionPlanner;
+        public NPCDialogueActionPlanner _actionPlanner;
 
         [FormerlySerializedAs("evidenceState")]
         [SerializeField, HideProperty]
-        public NPCEvidenceState EvidenceState;
+        public NPCEvidenceState _evidenceState;
 
-        [FoldoutGroup("Persistence", true, nameof(SupabaseRepo))]
+        [FoldoutGroup("Persistence", true, nameof(_supabaseRepo))]
         [SerializeField]
         EditorAttributes.Void persistenceGroup;
 
         [FormerlySerializedAs("supabaseRepo")]
         [SerializeField, HideProperty]
-        public SupabaseDialogueRepository SupabaseRepo;
+        public SupabaseDialogueRepository _supabaseRepo;
 
         [FoldoutGroup(
             "LLM Configuration",
@@ -97,7 +97,7 @@ namespace NPCSystem
         [FormerlySerializedAs("remotePort")]
         [FormerlySerializedAs("RemotePort")]
         [SerializeField]
-        int _remotePort = 8080;
+        int _remotePort = 8090;
 
         [Dropdown(nameof(_cachedModelNames))]
         [HideProperty]
@@ -107,7 +107,7 @@ namespace NPCSystem
         string _remoteModel = "llama-3.2-3b-instruct:q8_0";
 
         [SerializeField, HideInInspector]
-        string[] _cachedModelNames = new string[] { "default-llm" };
+        string[] _cachedModelNames = new string[] { "llama-3.2-3b-instruct:q8_0" };
 
         [HideProperty, Suffix("port")]
         [FormerlySerializedAs("remoteEmbeddingHost")]
@@ -119,7 +119,7 @@ namespace NPCSystem
         [FormerlySerializedAs("remoteEmbeddingPort")]
         [FormerlySerializedAs("RemoteEmbeddingPort")]
         [SerializeField]
-        int _remoteEmbeddingPort = 8080;
+        int _remoteEmbeddingPort = 8090;
 
         [FoldoutGroup(
             "Dialogue Settings",
@@ -187,7 +187,7 @@ namespace NPCSystem
         [ReadOnly]
         [ShowInInspector]
         string ActiveProfilePreview =>
-            currentProfile == null ? "<none>" : currentProfile.GetDisplayName();
+            _currentProfile == null ? "<none>" : _currentProfile.GetDisplayName();
 
         [FormerlySerializedAs("onNPCChanged")]
         [HideProperty]
@@ -238,7 +238,7 @@ namespace NPCSystem
 
         static NPCFlowLogger Logger => NPCFlowLogger.FindOrCreate();
 
-        public NPCProfile currentProfile => _currentNPC;
+        public NPCProfile CurrentProfile => _currentNPC;
         public NPCProfile[] Profiles
         {
             get => _profiles ?? Array.Empty<NPCProfile>();
@@ -396,15 +396,15 @@ namespace NPCSystem
                 AutoAssignReferencesIfNeeded();
                 ValidateReferences();
                 BuildProfileIndex();
-                _historyService?.Initialize(SupabaseRepo, PersistHistory, MaxHistoryPerNPC);
+                _historyService?.Initialize(_supabaseRepo, PersistHistory, MaxHistoryPerNPC);
                 if (_historyService != null)
                     await _historyService.LoadAllHistoriesAsync(Profiles);
                 _retrievalService?.Initialize(
-                    LocalRag,
+                    _localRag,
                     RagEmbeddingPath,
                     EnableRAG,
                     UseQdrantRag,
-                    QdrantRag,
+                    _qdrantRag,
                     RebuildRagFromKnowledgeIfMissing,
                     RemoteEmbeddingHost,
                     RemoteEmbeddingPort
@@ -413,16 +413,16 @@ namespace NPCSystem
                     await _retrievalService.LoadOrBuildIndexAsync(Profiles);
 
                 _sessionService?.Initialize(
-                    ChatClient,
+                    _chatClient,
                     _historyService,
                     _retrievalService,
-                    ActionPlanner,
-                    EvidenceState,
+                    _actionPlanner,
+                    _evidenceState,
                     _contextService,
                     RemoteHost,
                     RemotePort,
                     RemoteModel,
-                    Profiles
+                    _profiles
                 );
 
                 if (_sessionService != null)
@@ -480,31 +480,31 @@ namespace NPCSystem
         [Button("Auto Assign Dialogue References")]
         void AutoAssignReferencesIfNeeded()
         {
-            if (ChatClient == null)
+            if (_chatClient == null)
             {
-                ChatClient = FindAnyObjectByType<NPCLocalAIClient>(FindObjectsInactive.Include);
+                _chatClient = FindAnyObjectByType<NPCLocalAIClient>(FindObjectsInactive.Include);
             }
 
-            if (LocalRag == null)
+            if (_localRag == null)
             {
-                LocalRag = FindAnyObjectByType<NPCLocalRAG>(FindObjectsInactive.Include);
+                _localRag = FindAnyObjectByType<NPCLocalRAG>(FindObjectsInactive.Include);
             }
 
-            if (UseQdrantRag && QdrantRag == null)
+            if (UseQdrantRag && _qdrantRag == null)
             {
-                QdrantRag = FindAnyObjectByType<QdrantRAGService>(FindObjectsInactive.Include);
+                _qdrantRag = FindAnyObjectByType<QdrantRAGService>(FindObjectsInactive.Include);
             }
 
-            if (ActionPlanner == null)
+            if (_actionPlanner == null)
             {
-                ActionPlanner = FindAnyObjectByType<NPCDialogueActionPlanner>(
+                _actionPlanner = FindAnyObjectByType<NPCDialogueActionPlanner>(
                     FindObjectsInactive.Include
                 );
             }
 
-            if (EvidenceState == null)
+            if (_evidenceState == null)
             {
-                EvidenceState = FindAnyObjectByType<NPCEvidenceState>(FindObjectsInactive.Include);
+                _evidenceState = FindAnyObjectByType<NPCEvidenceState>(FindObjectsInactive.Include);
             }
 
             if (_historyService == null)
@@ -564,7 +564,7 @@ namespace NPCSystem
         [Button("Validate Dialogue References")]
         void ValidateReferences()
         {
-            if (ChatClient == null)
+            if (_chatClient == null)
                 Logger.Log(
                     NPCFlowStage.ConfigurationValidation,
                     NPCFlowStatus.Error,
@@ -572,7 +572,7 @@ namespace NPCSystem
                     "NPCLocalAIClient reference not set!",
                     source: nameof(NPCDialogueManager)
                 );
-            if (LocalRag == null)
+            if (_localRag == null)
                 Logger.Log(
                     NPCFlowStage.ConfigurationValidation,
                     NPCFlowStatus.Warning,
@@ -750,7 +750,7 @@ namespace NPCSystem
                 SetRuntimePlayerContext(activePlayerName);
             }
 
-            _sessionService?.SendMessage(playerMessage, _currentNPC);
+            _sessionService?.SendDialogueMessage(playerMessage, _currentNPC);
         }
 
         public void SetRuntimePlayerContext(string playerName, ulong? clientId = null)
@@ -810,16 +810,16 @@ namespace NPCSystem
 
         public NPCEvidenceStateSnapshot CaptureEvidenceSnapshot()
         {
-            return EvidenceState != null
-                ? EvidenceState.CreateSnapshot()
+            return _evidenceState != null
+                ? _evidenceState.CreateSnapshot()
                 : new NPCEvidenceStateSnapshot();
         }
 
         public void ApplyEvidenceSnapshot(NPCEvidenceStateSnapshot snapshot)
         {
-            if (EvidenceState == null)
+            if (_evidenceState == null)
                 return;
-            EvidenceState.ApplySnapshot(snapshot);
+            _evidenceState.ApplySnapshot(snapshot);
         }
 
         public async Task ClearHistory(string npcName)
@@ -858,9 +858,9 @@ namespace NPCSystem
                 return;
 
             // Discover optional service references without auto-adding or destroying scene components.
-            if (QdrantRag == null)
+            if (_qdrantRag == null)
             {
-                QdrantRag = GetComponent<QdrantRAGService>();
+                _qdrantRag = GetComponent<QdrantRAGService>();
             }
         }
 #endif

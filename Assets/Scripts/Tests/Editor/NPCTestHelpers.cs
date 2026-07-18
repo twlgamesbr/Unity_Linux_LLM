@@ -75,10 +75,10 @@ namespace NPCSystem.Tests
             var profile = ScriptableObject.CreateInstance<NPCProfile>();
             profile.NpcSlug = slug;
             profile.DisplayName = displayName;
-            profile.systemPrompt = "You are a helpful NPC.";
-            profile.maxTokens = 64;
-            profile.ragResults = 1;
-            profile.historySaveFile = $"NPCDialogue/{slug}.json";
+            profile.SystemPrompt = "You are a helpful NPC.";
+            profile.MaxTokens = 64;
+            profile.RagResults = 1;
+            profile.HistorySaveFile = $"NPCDialogue/{slug}.json";
             return profile;
         }
     }

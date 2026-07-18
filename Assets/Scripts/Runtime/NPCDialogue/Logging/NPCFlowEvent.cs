@@ -8,21 +8,47 @@ namespace NPCSystem
     [Serializable]
     public class NPCFlowEvent
     {
-        public int schemaVersion = 1;
-        public string timestampUtc = DateTime.UtcNow.ToString("o");
-        public string sessionId = string.Empty;
-        public string requestId = string.Empty;
-        public string conversationId = string.Empty;
-        public string npcSlug = string.Empty;
-        public string source = string.Empty;
-        public NPCFlowStage stage;
-        public NPCFlowStatus status;
-        public NPCFlowLogLevel level = NPCFlowLogLevel.Info;
-        public string message = string.Empty;
-        public long durationMs;
+        [JsonProperty("schemaVersion")]
+        public int SchemaVersion { get; set; } = 1;
+
+        [JsonProperty("timestampUtc")]
+        public string TimestampUtc { get; set; } = DateTime.UtcNow.ToString("o");
+
+        [JsonProperty("sessionId")]
+        public string SessionId { get; set; } = string.Empty;
+
+        [JsonProperty("requestId")]
+        public string RequestId { get; set; } = string.Empty;
+
+        [JsonProperty("conversationId")]
+        public string ConversationId { get; set; } = string.Empty;
+
+        [JsonProperty("npcSlug")]
+        public string NpcSlug { get; set; } = string.Empty;
+
+        [JsonProperty("source")]
+        public string Source { get; set; } = string.Empty;
+
+        [JsonProperty("stage")]
+        public NPCFlowStage Stage { get; set; }
+
+        [JsonProperty("status")]
+        public NPCFlowStatus Status { get; set; }
+
+        [JsonProperty("level")]
+        public NPCFlowLogLevel Level { get; set; } = NPCFlowLogLevel.Info;
+
+        [JsonProperty("message")]
+        public string Message { get; set; } = string.Empty;
+
+        [JsonProperty("durationMs")]
+        public long DurationMs { get; set; }
+
+        [JsonProperty("category")]
+        public NPCFlowCategory Category { get; set; } = NPCFlowCategory.Infrastructure;
 
         [JsonProperty("data")]
-        public Dictionary<string, object> data { get; set; }
+        public Dictionary<string, object> Data { get; set; }
 
         public string ToJson()
         {

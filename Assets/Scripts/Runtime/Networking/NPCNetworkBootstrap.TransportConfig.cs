@@ -25,7 +25,7 @@ namespace NPCSystem
 
                 if (arg == "-npc-server")
                 {
-                    TransportConfig.autoStartMode = NPCNetworkAutoStartMode.Server;
+                    TransportConfig.AutoStartMode = NPCNetworkAutoStartMode.Server;
                     NPCFlowLogger
                         .FindOrCreate()
                         ?.Log(
@@ -38,7 +38,7 @@ namespace NPCSystem
                 }
                 else if (arg == "-npc-websockets")
                 {
-                    TransportConfig.useWebSockets = true;
+                    TransportConfig.UseWebSockets = true;
                     NPCFlowLogger
                         .FindOrCreate()
                         ?.Log(
@@ -51,7 +51,7 @@ namespace NPCSystem
                 }
                 else if (arg == "-npc-host")
                 {
-                    TransportConfig.autoStartMode = NPCNetworkAutoStartMode.Host;
+                    TransportConfig.AutoStartMode = NPCNetworkAutoStartMode.Host;
                     NPCFlowLogger
                         .FindOrCreate()
                         ?.Log(
@@ -64,7 +64,7 @@ namespace NPCSystem
                 }
                 else if (arg == "-npc-client")
                 {
-                    TransportConfig.autoStartMode = NPCNetworkAutoStartMode.Client;
+                    TransportConfig.AutoStartMode = NPCNetworkAutoStartMode.Client;
                     NPCFlowLogger
                         .FindOrCreate()
                         ?.Log(
@@ -79,7 +79,7 @@ namespace NPCSystem
                 {
                     if (ushort.TryParse(args[i + 1], out ushort port))
                     {
-                        TransportConfig.port = port;
+                        TransportConfig.Port = port;
                         NPCFlowLogger
                             .FindOrCreate()
                             ?.Log(
@@ -94,14 +94,14 @@ namespace NPCSystem
                 }
                 else if (arg == "-address" && i + 1 < args.Length)
                 {
-                    TransportConfig.connectAddress = args[i + 1];
+                    TransportConfig.ConnectAddress = args[i + 1];
                     NPCFlowLogger
                         .FindOrCreate()
                         ?.Log(
                             NPCFlowStage.ConfigurationValidation,
                             NPCFlowStatus.Success,
                             NPCFlowLogLevel.Info,
-                            $"CLI override applied: connectAddress = {TransportConfig.connectAddress}.",
+                            $"CLI override applied: connectAddress = {TransportConfig.ConnectAddress}.",
                             source: nameof(NPCNetworkBootstrap)
                         );
                     i++;
@@ -140,7 +140,7 @@ namespace NPCSystem
 
             TransportConfig.NormalizeInPlace();
 #if UNITY_WEBGL && !UNITY_EDITOR
-            TransportConfig.useWebSockets = true;
+            TransportConfig.UseWebSockets = true;
 #endif
             if (!TransportConfig.TryValidate(out string errorMessage))
             {
@@ -156,13 +156,13 @@ namespace NPCSystem
                 return;
             }
 
-            UnityTransport.UseWebSockets = TransportConfig.useWebSockets;
+            UnityTransport.UseWebSockets = TransportConfig.UseWebSockets;
 
             UnityTransport.ConnectionAddressData connectionData = UnityTransport.ConnectionData;
-            connectionData.Address = TransportConfig.connectAddress;
-            connectionData.Port = TransportConfig.port;
-            connectionData.ServerListenAddress = TransportConfig.listenAddress;
-            connectionData.WebSocketPath = TransportConfig.webSocketPath;
+            connectionData.Address = TransportConfig.ConnectAddress;
+            connectionData.Port = TransportConfig.Port;
+            connectionData.ServerListenAddress = TransportConfig.ListenAddress;
+            connectionData.WebSocketPath = TransportConfig.WebSocketPath;
             connectionData.ClientBindPort = ResolveClientBindPort();
             UnityTransport.ConnectionData = connectionData;
 
@@ -180,7 +180,7 @@ namespace NPCSystem
                         ["port"] = connectionData.Port,
                         ["listenAddress"] = connectionData.ServerListenAddress,
                         ["clientBindPort"] = connectionData.ClientBindPort,
-                        ["autoStartMode"] = TransportConfig.autoStartMode.ToString(),
+                        ["autoStartMode"] = TransportConfig.AutoStartMode.ToString(),
                         ["player"] = NPCPlayModeInstanceResolver.TryGetPlayerName(
                             out string playerName
                         )
@@ -213,7 +213,7 @@ namespace NPCSystem
 
             return NPCPlayModeInstanceResolver.ResolveClientBindPortForPlayerIndex(
                 playerIndex,
-                TransportConfig.port,
+                TransportConfig.Port,
                 ClientBindPortOverride
             );
         }

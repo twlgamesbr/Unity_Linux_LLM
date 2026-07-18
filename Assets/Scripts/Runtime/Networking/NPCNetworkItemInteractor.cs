@@ -25,10 +25,16 @@ namespace NPCSystem
 
         [Header("Range")]
         [FormerlySerializedAs("PickupRange")]
-        public float PickupRange = 3f;
+        [SerializeField]
+        float _pickupRange = 3f;
+
+        public float PickupRange => _pickupRange;
 
         [FormerlySerializedAs("TransferRange")]
-        public float TransferRange = 4f;
+        [SerializeField]
+        float _transferRange = 4f;
+
+        public float TransferRange => _transferRange;
 
         void Awake()
         {

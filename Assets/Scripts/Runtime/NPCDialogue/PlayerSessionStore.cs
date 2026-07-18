@@ -17,6 +17,24 @@ namespace NPCSystem
     {
         const string RelativePath = "NPCDialogue/player-auth-session.json";
 
+        /// <summary>
+        /// Cached persistentDataPath — read once from the main thread to
+        /// avoid calling <c>Application.persistentDataPath</c> on a background
+        /// thread when the Supabase SDK auto-persists the session after a
+        /// token refresh (<c>RefreshToken</c> completes on a threadpool thread).
+        /// </summary>
+        static string _cachedPersistentDataPath;
+        static bool _pathCached;
+
+        static string GetPersistentDataPath()
+        {
+            if (_pathCached)
+                return _cachedPersistentDataPath;
+            _cachedPersistentDataPath = Application.persistentDataPath;
+            _pathCached = true;
+            return _cachedPersistentDataPath;
+        }
+
         // ── IGotrueSessionPersistence<Session> ─────────────────────
 
         public void SaveSession(Session session)
@@ -169,7 +187,7 @@ namespace NPCSystem
 
         static string GetFullPath()
         {
-            return Path.Combine(Application.persistentDataPath, RelativePath).Replace('\\', '/');
+            return Path.Combine(GetPersistentDataPath(), RelativePath).Replace('\\', '/');
         }
     }
 }

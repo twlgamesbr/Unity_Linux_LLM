@@ -326,8 +326,8 @@ def build_parser() -> argparse.ArgumentParser:
 def add_common_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--root", default="../..")
     parser.add_argument("--qdrant-url", default="http://localhost:6333")
-    parser.add_argument("--collection", default="unity_linux_llm_codebase_v1")
-    parser.add_argument("--profile", default="baseline", choices=["baseline", "hierarchy", "runtime"])
+    parser.add_argument("--collection", default="unity_linux_llm_codebase_v2")
+    parser.add_argument("--profile", default="runtime", choices=["baseline", "hierarchy", "runtime"])
     parser.add_argument("--include-scenes", action="store_true")
     parser.add_argument("--localai-url", default="http://localhost:8080/v1")
     parser.add_argument("--embedding-model", default="nomic-embed-text-v1.5")

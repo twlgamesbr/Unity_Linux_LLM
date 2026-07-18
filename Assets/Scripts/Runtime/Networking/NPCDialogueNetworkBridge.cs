@@ -209,7 +209,7 @@ namespace NPCSystem
             SubmitDialogueServerRpc(request);
         }
 
-        public new void SendMessage(string playerMessage)
+        public void SendDialogueMessage(string playerMessage)
         {
             SubmitPlayerMessage(playerMessage);
         }

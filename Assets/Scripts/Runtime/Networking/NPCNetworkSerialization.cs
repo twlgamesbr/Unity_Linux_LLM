@@ -42,8 +42,12 @@ namespace NPCSystem
                 duplicatedValue = value;
             };
 
-            Debug.Log(
-                "[NPCNetworkSerialization] Registered NetworkVariable<string> serialization."
+            NPCFlowLogger.FindOrCreate().Log(
+                NPCFlowStage.SceneBootstrap,
+                NPCFlowStatus.Success,
+                NPCFlowLogLevel.Info,
+                "[NPCNetworkSerialization] Registered NetworkVariable<string> serialization.",
+                source: nameof(NPCNetworkSerialization)
             );
         }
     }

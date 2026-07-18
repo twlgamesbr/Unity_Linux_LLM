@@ -282,10 +282,10 @@ namespace NPCSystem.Tests
             var profile = ScriptableObject.CreateInstance<NPCProfile>();
             profile.NpcSlug = "test-npc";
             profile.DisplayName = "Test NPC";
-            profile.systemPrompt = "Test";
-            profile.maxTokens = 64;
-            profile.ragResults = 1;
-            profile.historySaveFile = "NPCDialogue/test.json";
+            profile.SystemPrompt = "Test";
+            profile.MaxTokens = 64;
+            profile.RagResults = 1;
+            profile.HistorySaveFile = "NPCDialogue/test.json";
             manager.Profiles = new[] { profile };
 
             try

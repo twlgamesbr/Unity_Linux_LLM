@@ -4,6 +4,8 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.Serialization;
+
 
 namespace NPCSystem
 {
@@ -11,13 +13,38 @@ namespace NPCSystem
     public class NPCLocalAIEmbedder : MonoBehaviour
     {
         [Header("LocalAI Embedding Endpoint")]
-        public string host = "localhost";
-        public int port = 8080;
-        public string apiKey = "";
-        public string model = "default-embedding";
+        [FormerlySerializedAs("host")]
+        [SerializeField]
+        string _host = "localhost";
+        public string Host { get => _host; set => _host = value; }
+
+        [FormerlySerializedAs("port")]
+        [SerializeField]
+        int _port = 8080;
+        public int Port { get => _port; set => _port = value; }
+
+        [FormerlySerializedAs("apiKey")]
+        [SerializeField]
+        string _apiKey = "";
+        public string ApiKey => _apiKey;
+
+        [FormerlySerializedAs("model")]
+        [SerializeField]
+        string _model = "default-embedding";
+        public string Model => _model;
 
         [Header("Settings")]
-        public int numRetries = 3;
+        [FormerlySerializedAs("numRetries")]
+        [SerializeField]
+        int _numRetries = 3;
+        public int NumRetries { get => _numRetries; set => _numRetries = value; }
+
+        NPCFlowLogger _logger;
+
+        void Awake()
+        {
+            _logger = NPCFlowLogger.FindOrCreate();
+        }
 
         /// <summary>
         /// Embed a query string using LocalAI's /v1/embeddings endpoint.
@@ -27,17 +54,30 @@ namespace NPCSystem
             if (string.IsNullOrWhiteSpace(query))
                 return new List<float>();
 
-            string uri = $"http://{host}:{port}/v1/embeddings";
+            string uri = $"http://{_host}:{_port}/v1/embeddings";
 
-            for (int attempt = 0; attempt <= numRetries; attempt++)
+            _logger?.Log(
+                NPCFlowStage.QdrantEmbedding,
+                NPCFlowStatus.Start,
+                NPCFlowLogLevel.Info,
+                $"Embedding query ({query.Length} chars).",
+                source: nameof(NPCLocalAIEmbedder),
+                data: new Dictionary<string, object>
+                {
+                    ["queryLength"] = query.Length,
+                    ["uri"] = uri,
+                }
+            );
+
+            for (int attempt = 0; attempt <= _numRetries; attempt++)
             {
                 try
                 {
                     var payload = new LocalAIEmbeddingRequest
                     {
-                        model = string.IsNullOrWhiteSpace(model)
+                        model = string.IsNullOrWhiteSpace(Model)
                             ? "default-embedding"
-                            : model.Trim(),
+                            : Model.Trim(),
                         input = query,
                     };
 
@@ -46,11 +86,30 @@ namespace NPCSystem
 
                     if (string.IsNullOrEmpty(responseText))
                     {
-                        if (attempt < numRetries)
+                        if (attempt < _numRetries)
                         {
+                            _logger?.Log(
+                                NPCFlowStage.QdrantEmbedding,
+                                NPCFlowStatus.Warning,
+                                NPCFlowLogLevel.Warning,
+                                $"Empty embedding response (attempt {attempt + 1}/{_numRetries + 1}), retrying...",
+                                source: nameof(NPCLocalAIEmbedder),
+                                data: new Dictionary<string, object>
+                                {
+                                    ["attempt"] = attempt,
+                                    ["maxAttempts"] = _numRetries,
+                                }
+                            );
                             await Task.Delay(500 * (attempt + 1));
                             continue;
                         }
+                        _logger?.Log(
+                            NPCFlowStage.QdrantEmbedding,
+                            NPCFlowStatus.Error,
+                            NPCFlowLogLevel.Error,
+                            $"All retries exhausted — empty embedding response from {uri}",
+                            source: nameof(NPCLocalAIEmbedder)
+                        );
                         return new List<float>();
                     }
 
@@ -62,18 +121,47 @@ namespace NPCSystem
                         && response.data[0].embedding != null
                     )
                     {
+                        int dims = response.data[0].embedding.Length;
+                        _logger?.Log(
+                            NPCFlowStage.QdrantEmbedding,
+                            NPCFlowStatus.Success,
+                            NPCFlowLogLevel.Info,
+                            $"Embedding generated ({dims} dims).",
+                            source: nameof(NPCLocalAIEmbedder),
+                            durationMs: 0,
+                            data: new Dictionary<string, object>
+                            {
+                                ["dimensions"] = dims,
+                                ["attempt"] = attempt,
+                            }
+                        );
                         return new List<float>(response.data[0].embedding);
                     }
 
-                    Debug.LogError($"[NPCLocalAIEmbedder] Unexpected response format from {uri}");
+                    _logger?.Log(
+                        NPCFlowStage.QdrantEmbedding,
+                        NPCFlowStatus.Error,
+                        NPCFlowLogLevel.Error,
+                        $"Unexpected response format from {uri}",
+                        source: nameof(NPCLocalAIEmbedder)
+                    );
                     return new List<float>();
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogError(
-                        $"[NPCLocalAIEmbedder] Exception (attempt {attempt + 1}/{numRetries + 1}): {ex.Message}"
+                    _logger?.Log(
+                        NPCFlowStage.QdrantEmbedding,
+                        NPCFlowStatus.Error,
+                        NPCFlowLogLevel.Error,
+                        $"Exception (attempt {attempt + 1}/{_numRetries + 1}): {ex.Message}",
+                        source: nameof(NPCLocalAIEmbedder),
+                        data: new Dictionary<string, object>
+                        {
+                            ["exceptionType"] = ex.GetType().Name,
+                            ["attempt"] = attempt,
+                        }
                     );
-                    if (attempt < numRetries)
+                    if (attempt < _numRetries)
                     {
                         await Task.Delay(500 * (attempt + 1));
                         continue;
@@ -94,8 +182,8 @@ namespace NPCSystem
                 request.downloadHandler = new DownloadHandlerBuffer();
                 request.timeout = 30;
                 request.SetRequestHeader("Content-Type", "application/json");
-                if (!string.IsNullOrEmpty(apiKey))
-                    request.SetRequestHeader("Authorization", $"Bearer {apiKey}");
+                if (!string.IsNullOrEmpty(_apiKey))
+                    request.SetRequestHeader("Authorization", $"Bearer {_apiKey}");
 
                 var operation = request.SendWebRequest();
                 while (!operation.isDone)
@@ -106,7 +194,18 @@ namespace NPCSystem
                     || request.result == UnityWebRequest.Result.ProtocolError
                 )
                 {
-                    Debug.LogError($"[NPCLocalAIEmbedder] Request failed: {request.error}");
+                    _logger?.Log(
+                        NPCFlowStage.QdrantEmbedding,
+                        NPCFlowStatus.Error,
+                        NPCFlowLogLevel.Error,
+                        $"Request failed: {request.error}",
+                        source: nameof(NPCLocalAIEmbedder),
+                        data: new Dictionary<string, object>
+                        {
+                            ["responseCode"] = (int)request.responseCode,
+                            ["uri"] = uri,
+                        }
+                    );
                     return null;
                 }
 

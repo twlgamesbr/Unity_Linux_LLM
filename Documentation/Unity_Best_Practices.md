@@ -1,3 +1,11 @@
+> **This is Unity Technologies' generic, publicly-published C# style guide e-book, kept here for background
+> rationale/inspiration only.** It is **not** project-specific and is **not** an enforced rule set for
+> `Unity_Linux_LLM`. The actual, enforced, project-specific conventions live in **[`AGENTS.md` §1 (Code
+> Conventions)](../AGENTS.md#1-code-conventions)** — that document is the single source of truth, verified
+> automatically by `Tools/NPCDialogueCodeReview`. Where this e-book's generic advice differs from `AGENTS.md`
+> §1 (for example, `AGENTS.md` requires a `_camelCase` leading underscore on private fields, which this generic
+> guide does not), `AGENTS.md` wins for this codebase.
+
 ⟶ E-BOOK
 
 ## Use a C# style guide for clean and scalable game code

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace NPCSystem
 {
@@ -9,7 +10,11 @@ namespace NPCSystem
     public class NPCWordSplitter : NPCChunking
     {
         [Tooltip("number of words by which to split phrases into chunks")]
-        public int numWords = 10;
+        [FormerlySerializedAs("numWords")]
+        [SerializeField]
+        int _numWords = 10;
+
+        public int NumWords => _numWords;
 
         bool IsBoundary(char c) => char.IsPunctuation(c) || char.IsWhiteSpace(c);
 
@@ -33,9 +38,9 @@ namespace NPCSystem
                     }
                 }
 
-                for (int i = 0; i < wordIndices.Count; i += numWords)
+                for (int i = 0; i < wordIndices.Count; i += _numWords)
                 {
-                    int iTo = Math.Min(wordIndices.Count - 1, i + numWords - 1);
+                    int iTo = Math.Min(wordIndices.Count - 1, i + _numWords - 1);
                     indices.Add((wordIndices[i].Item1, wordIndices[iTo].Item2));
                 }
             });

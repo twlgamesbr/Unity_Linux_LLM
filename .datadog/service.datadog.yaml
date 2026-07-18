@@ -45,8 +45,8 @@ dd-service:
         url: https://your-org.slack.com/archives/npc-platform
 
   - name: localai-proxy
-    display-name: LocalAI Trace Proxy
-    description: "FastAPI proxy between Unity and LocalAI — instruments all LLM requests with Datadog APM traces and LLM Observability."
+    display-name: LocalAI Proxy (Consolidated)
+    description: "FastAPI proxy between Unity and LocalAI — single consolidated Datadog proxy for all LocalAI traffic. Chat completions get rich LLM Observability tracing (tokens, latency, prompt/response); every other LocalAI endpoint gets generic APM passthrough tracing. Absorbed the formerly separate localai-trace-proxy sidecar."
     team: npc-platform
     application: NPC System
     tags:

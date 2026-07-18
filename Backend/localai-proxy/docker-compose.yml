@@ -1,3 +1,8 @@
+# Consolidated Datadog proxy for all LocalAI traffic (chat completions get
+# rich LLM-Obs instrumentation, everything else gets generic APM passthrough
+# tracing). This replaces the standalone `localai-trace-proxy` sidecar that
+# used to live in /mnt/data/Projects_SSD/LocalAI/docker-compose.yaml — see
+# Documentation/2_Architecture/Backend_Services_Topology.md §7.5.
 services:
   localai-proxy:
     build: .
@@ -20,6 +25,7 @@ services:
       - DD_PROCESS_AGENT_ENABLED=true
       - DD_LLM_OBS_ENABLED=true
       - DD_API_KEY=${DD_API_KEY:?err}
+      - DD_GPU_ENABLED=true
     restart: unless-stopped
     stop_grace_period: 10s
     logging:

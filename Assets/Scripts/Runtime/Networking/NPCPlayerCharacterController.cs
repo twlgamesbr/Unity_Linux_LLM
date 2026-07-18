@@ -58,10 +58,6 @@ namespace NPCSystem
         [SerializeField]
         private bool _lockCursorForOwner = true;
 
-        [FormerlySerializedAs("LogSpawnDiagnostics")]
-        [SerializeField]
-        private bool _logSpawnDiagnostics = true;
-
         // ─── Singleton-style access for the owning client ───
         public static NPCPlayerCharacterController LocalInstance { get; private set; }
 

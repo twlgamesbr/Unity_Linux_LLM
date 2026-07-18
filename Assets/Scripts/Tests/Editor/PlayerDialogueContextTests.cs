@@ -63,9 +63,9 @@ namespace NPCSystem.Tests
             var managerObject = new GameObject("ContextLeakTest");
             var manager = managerObject.AddComponent<NPCDialogueManager>();
             var chatClient = managerObject.AddComponent<NPCLocalAIClient>();
-            chatClient.numRetries = 0;
-            chatClient.host = "127.0.0.1";
-            chatClient.port = 19999;
+            chatClient.NumRetries = 0;
+            chatClient.Host = "127.0.0.1";
+            chatClient.Port = 19999;
             manager.ChatClient = chatClient;
 
             var profile = CreateProfile("butler", "Butler");
@@ -158,9 +158,9 @@ namespace NPCSystem.Tests
             var go = new GameObject("NoQdrantTest");
             var manager = go.AddComponent<NPCDialogueManager>();
             var chatClient = go.AddComponent<NPCLocalAIClient>();
-            chatClient.numRetries = 0;
-            chatClient.host = "127.0.0.1";
-            chatClient.port = 19999;
+            chatClient.NumRetries = 0;
+            chatClient.Host = "127.0.0.1";
+            chatClient.Port = 19999;
             manager.ChatClient = chatClient;
             manager.Profiles = Array.Empty<NPCProfile>();
             manager.UseQdrantRag = false;
@@ -185,9 +185,9 @@ namespace NPCSystem.Tests
             var go = new GameObject("NoPlannerTest");
             var manager = go.AddComponent<NPCDialogueManager>();
             var chatClient = go.AddComponent<NPCLocalAIClient>();
-            chatClient.numRetries = 0;
-            chatClient.host = "127.0.0.1";
-            chatClient.port = 19999;
+            chatClient.NumRetries = 0;
+            chatClient.Host = "127.0.0.1";
+            chatClient.Port = 19999;
             manager.ChatClient = chatClient;
             manager.Profiles = Array.Empty<NPCProfile>();
             manager.ActionPlanner = null;
@@ -211,9 +211,9 @@ namespace NPCSystem.Tests
             var go = new GameObject("NoCogneeTest");
             var manager = go.AddComponent<NPCDialogueManager>();
             var chatClient = go.AddComponent<NPCLocalAIClient>();
-            chatClient.numRetries = 0;
-            chatClient.host = "127.0.0.1";
-            chatClient.port = 19999;
+            chatClient.NumRetries = 0;
+            chatClient.Host = "127.0.0.1";
+            chatClient.Port = 19999;
             manager.ChatClient = chatClient;
             manager.Profiles = Array.Empty<NPCProfile>();
             manager.UseQdrantRag = false;
@@ -257,10 +257,10 @@ namespace NPCSystem.Tests
             var profile = ScriptableObject.CreateInstance<NPCProfile>();
             profile.NpcSlug = slug;
             profile.DisplayName = displayName;
-            profile.systemPrompt = "You are a helpful NPC.";
-            profile.maxTokens = 64;
-            profile.ragResults = 1;
-            profile.historySaveFile = $"NPCDialogue/{slug}.json";
+            profile.SystemPrompt = "You are a helpful NPC.";
+            profile.MaxTokens = 64;
+            profile.RagResults = 1;
+            profile.HistorySaveFile = $"NPCDialogue/{slug}.json";
             return profile;
         }
 

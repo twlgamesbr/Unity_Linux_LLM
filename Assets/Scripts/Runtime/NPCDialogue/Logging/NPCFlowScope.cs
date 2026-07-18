@@ -17,6 +17,12 @@ namespace NPCSystem
         public string RequestId => _requestId;
         public long ElapsedMilliseconds => _stopwatch.ElapsedMilliseconds;
 
+        // ── Datadog bridge ──
+        // External consumers (e.g. DatadogTracer) can subscribe to this callback
+        // to automatically create APM spans when flow scopes complete.
+        // Args: stage, status, source, durationMs, npcSlug, requestId, data
+        public static Action<NPCFlowStage, NPCFlowStatus, string, long, string, string, Dictionary<string, object>> OnScopeComplete;
+
         NPCFlowScope(
             NPCFlowLogger logger,
             NPCFlowStage stage,
@@ -134,6 +140,8 @@ namespace NPCSystem
                 return;
             _completed = true;
             _stopwatch.Stop();
+
+            long elapsedMs = _stopwatch.ElapsedMilliseconds;
             _logger?.Log(
                 _stage,
                 status,
@@ -142,9 +150,27 @@ namespace NPCSystem
                 _source,
                 _requestId,
                 _npcSlug,
-                _stopwatch.ElapsedMilliseconds,
+                elapsedMs,
                 data
             );
+
+            // Fire Datadog bridge callback if subscribed
+            try
+            {
+                OnScopeComplete?.Invoke(
+                    _stage,
+                    status,
+                    _source,
+                    elapsedMs,
+                    _npcSlug,
+                    _requestId,
+                    data
+                );
+            }
+            catch
+            {
+                // Bridge errors must never break flow scope completion
+            }
         }
     }
 }

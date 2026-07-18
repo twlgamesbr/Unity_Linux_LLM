@@ -9,6 +9,7 @@
 This documentation provides comprehensive technical guidance for understanding and extending the NPC LLM Dialogue Automation system. Start here based on your role:
 
 - **Architecture Overview**: [System Architecture](2_Architecture/README.md) - Start here for system-level design
+- **Backend Services Topology**: [Backend Services Topology](2_Architecture/Backend_Services_Topology.md) - Full local Docker/systemd infrastructure graph (WebGL client, dedicated server, LocalAI, Qdrant, Supabase, Cognee, Datadog), live endpoints, config file map, and known infra issues
 - **Core Systems**: [Understanding the Core Systems](3_Core_Systems/README.md) - Deep-dives into each subsystem
 - **Integration**: [Integration Guides](4_Integration_Guides/README.md) - Working with external systems (LLMUnity, LocalAI, Qdrant, Cognee)
 - **Developer Guide**: [Development Guidelines](5_Developer_Guide/README.md) - Extending and modifying the system

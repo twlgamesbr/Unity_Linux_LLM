@@ -62,11 +62,24 @@ namespace NPCSystem
                 _senderThread.Start();
 
                 _initialized = true;
-                Debug.Log($"[DatadogMetrics] Initialized — sending to {host}:{port}");
+
+                NPCFlowLogger.FindOrCreate().Log(
+                    NPCFlowStage.SceneBootstrap,
+                    NPCFlowStatus.Success,
+                    NPCFlowLogLevel.Info,
+                    $"[DatadogMetrics] Initialized — sending to {host}:{port}",
+                    source: nameof(DatadogMetricsService)
+                );
             }
             catch (Exception ex)
             {
-                Debug.LogError($"[DatadogMetrics] Failed to initialize: {ex.Message}");
+                NPCFlowLogger.FindOrCreate().Log(
+                    NPCFlowStage.SceneBootstrap,
+                    NPCFlowStatus.Error,
+                    NPCFlowLogLevel.Error,
+                    $"[DatadogMetrics] Failed to initialize: {ex.Message}",
+                    source: nameof(DatadogMetricsService)
+                );
             }
         }
 
@@ -84,7 +97,13 @@ namespace NPCSystem
             _udpClient = null;
             _initialized = false;
 
-            Debug.Log("[DatadogMetrics] Shutdown complete.");
+            NPCFlowLogger.FindOrCreate().Log(
+                NPCFlowStage.SceneBootstrap,
+                NPCFlowStatus.Success,
+                NPCFlowLogLevel.Info,
+                "[DatadogMetrics] Shutdown complete.",
+                source: nameof(DatadogMetricsService)
+            );
         }
 
         // ──────────────────────────────────────────────
@@ -149,7 +168,17 @@ namespace NPCSystem
             // Drop oldest if queue overflows to avoid OOM
             if (_metricQueue.Count > MaxQueueSize && _metricQueue.TryDequeue(out _))
             {
-                Debug.LogWarning("[DatadogMetrics] Queue overflow — dropping oldest metric.");
+                NPCFlowLogger.FindOrCreate().Log(
+                    NPCFlowStage.SceneBootstrap,
+                    NPCFlowStatus.Warning,
+                    NPCFlowLogLevel.Warning,
+                    "[DatadogMetrics] Queue overflow — dropping oldest metric.",
+                    source: nameof(DatadogMetricsService),
+                    data: new Dictionary<string, object>
+                    {
+                        ["queueSize"] = MaxQueueSize,
+                    }
+                );
             }
         }
 
@@ -237,7 +266,13 @@ namespace NPCSystem
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogError($"[DatadogMetrics] Sender error: {ex.Message}");
+                    NPCFlowLogger.FindOrCreate().Log(
+                        NPCFlowStage.SceneBootstrap,
+                        NPCFlowStatus.Error,
+                        NPCFlowLogLevel.Error,
+                        $"[DatadogMetrics] Sender error: {ex.Message}",
+                        source: nameof(DatadogMetricsService)
+                    );
                     Thread.Sleep(1000);
                 }
             }
@@ -256,7 +291,13 @@ namespace NPCSystem
             }
             catch (Exception ex)
             {
-                Debug.LogError($"[DatadogMetrics] Send error: {ex.Message}");
+                NPCFlowLogger.FindOrCreate().Log(
+                    NPCFlowStage.SceneBootstrap,
+                    NPCFlowStatus.Error,
+                    NPCFlowLogLevel.Error,
+                    $"[DatadogMetrics] Send error: {ex.Message}",
+                    source: nameof(DatadogMetricsService)
+                );
             }
         }
     }

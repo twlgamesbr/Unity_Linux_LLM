@@ -1,0 +1,73 @@
+name: unity-linux-llm
+
+# ───────────────────────────────────────────────────────────────────
+# Unity Linux LLM — Docker Stack Orchestrator
+# ───────────────────────────────────────────────────────────────────
+# This is the meta-compose for starting all backend services.
+# Use scripts/start-stack.sh for the recommended start/stop/status
+# workflow, which handles dependency ordering and health checks.
+#
+# Direct use:
+#   docker compose --profile core -f docker-compose.yml up -d
+#   docker compose --profile all  -f docker-compose.yml up -d
+#
+# Available profiles:
+#   core       — Qdrant, LocalAI proxy, Supabase stack
+#   monitoring — Datadog Agent
+#   game       — Dedicated server, WebGL client
+#   devtools   — Codebase watchdog
+#
+# Before first start, copy .env.template to .env and fill in secrets.
+# ───────────────────────────────────────────────────────────────────
+
+services:
+  # ── Profile reference (no-op containers that document the system) ─
+  core:
+    image: alpine:3.20
+    profiles: ["core", "all"]
+    command: ["echo", "Core profile selected. Start individual services with docker compose -f Backend/<name>/docker-compose.yml up -d"]
+    restart: no
+
+  monitoring:
+    image: alpine:3.20
+    profiles: ["monitoring", "all"]
+    command: ["echo", "Monitoring profile selected. Start with: docker compose -f Backend/datadog-host/docker-compose.yml up -d"]
+    restart: no
+
+  game:
+    image: alpine:3.20
+    profiles: ["game", "all"]
+    command: ["echo", "Game profile selected."]
+    restart: no
+
+  devtools:
+    image: alpine:3.20
+    profiles: ["devtools", "all"]
+    command: ["echo", "DevTools profile selected."]
+    restart: no
+
+  # ── Health Check ────────────────────────────────────────────────
+  health-check:
+    image: alpine:3.20
+    container_name: unity-health-check
+    profiles: ["core", "all"]
+    command:
+      - sh
+      - -c
+      - |
+        echo "=== Unity Linux LLM — Health Check ==="
+        for url in \
+          "http://localhost:6333/healthz:Qdrant" \
+          "http://localhost:8090/health:LocalAI Proxy" \
+          "http://localhost:8091/health:Supabase Auth"; do
+          name=$${url#*:}; addr=$${url%:*}
+          printf "  %-30s " "$$name"
+          for i in $$(seq 1 20); do
+            wget -qO- "$$addr" >/dev/null 2>&1 && { echo "OK"; break; }
+            sleep 2
+          done
+          wget -qO- "$$addr" >/dev/null 2>&1 || { echo "FAIL"; exit 1; }
+        done
+        echo ""
+        echo "All core services healthy."
+    restart: no

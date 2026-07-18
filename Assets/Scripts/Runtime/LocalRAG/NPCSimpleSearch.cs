@@ -51,7 +51,13 @@ namespace NPCSystem
         {
             if (!incrementalSearchCache.ContainsKey(fetchKey))
             {
-                Debug.LogError($"[NPC] No IncrementalSearch cached with key: {fetchKey}");
+                NPCFlowLogger.FindOrCreate().Log(
+                    NPCFlowStage.LocalRagSearch,
+                    NPCFlowStatus.Error,
+                    NPCFlowLogLevel.Error,
+                    $"[NPC] No IncrementalSearch cached with key: {fetchKey}",
+                    source: nameof(NPCSimpleSearch)
+                );
                 return (new int[0], new float[0], true);
             }
 

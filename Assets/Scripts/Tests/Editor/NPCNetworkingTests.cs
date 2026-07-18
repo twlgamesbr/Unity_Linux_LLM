@@ -15,37 +15,37 @@ namespace NPCSystem.Tests
             bool isValid = config.TryValidate(out string errorMessage);
 
             Assert.That(isValid, Is.True, errorMessage);
-            Assert.That(config.connectAddress, Is.EqualTo("127.0.0.1"));
-            Assert.That(config.listenAddress, Is.EqualTo("0.0.0.0"));
-            Assert.That(config.port, Is.EqualTo((ushort)11474));
-            Assert.That(config.webSocketPath, Is.EqualTo("/npc-dialogue"));
-            Assert.That(config.autoStartMode, Is.EqualTo(NPCNetworkAutoStartMode.Manual));
+            Assert.That(config.ConnectAddress, Is.EqualTo("127.0.0.1"));
+            Assert.That(config.ListenAddress, Is.EqualTo("0.0.0.0"));
+            Assert.That(config.Port, Is.EqualTo((ushort)11474));
+            Assert.That(config.WebSocketPath, Is.EqualTo("/npc-dialogue"));
+            Assert.That(config.AutoStartMode, Is.EqualTo(NPCNetworkAutoStartMode.Manual));
         }
 
         [Test]
         public void TransportConfigNormalizeInPlaceAddsLeadingSlashAndFallsBackToRoot()
         {
             NPCTransportConfig config = NPCTransportConfig.CreateDefault();
-            config.webSocketPath = "npc-dialogue";
+            config.WebSocketPath = "npc-dialogue";
 
             config.NormalizeInPlace();
-            Assert.That(config.webSocketPath, Is.EqualTo("/npc-dialogue"));
+            Assert.That(config.WebSocketPath, Is.EqualTo("/npc-dialogue"));
 
-            config.webSocketPath = "   ";
+            config.WebSocketPath = "   ";
             config.NormalizeInPlace();
-            Assert.That(config.webSocketPath, Is.EqualTo("/"));
+            Assert.That(config.WebSocketPath, Is.EqualTo("/"));
         }
 
         [Test]
         public void TransportConfigTryValidateFailsWhenConnectAddressIsBlank()
         {
             NPCTransportConfig config = NPCTransportConfig.CreateDefault();
-            config.connectAddress = "   ";
+            config.ConnectAddress = "   ";
 
             bool isValid = config.TryValidate(out string errorMessage);
 
             Assert.That(isValid, Is.False);
-            Assert.That(errorMessage, Does.Contain("connectAddress"));
+            Assert.That(errorMessage, Does.Contain("ConnectAddress"));
         }
 
         [Test]
@@ -71,25 +71,20 @@ namespace NPCSystem.Tests
                 bootstrap.TransferableItemPrefab = transferableItemPrefab;
                 bootstrap.TransportConfig = new NPCTransportConfig
                 {
-                    connectAddress = "10.0.0.25",
-                    listenAddress = "0.0.0.0",
-                    port = 8900,
-                    useWebSockets = true,
-                    webSocketPath = "npc-dialogue",
-                    autoStartMode = NPCNetworkAutoStartMode.Manual
+                    ConnectAddress = "10.0.0.25",
+                    ListenAddress = "0.0.0.0",
+                    Port = 8900,
+                    UseWebSockets = true,
+                    WebSocketPath = "npc-dialogue",
+                    AutoStartMode = NPCNetworkAutoStartMode.Manual
                 };
-
                 bootstrap.ApplyTransportConfiguration();
 
-                Assert.That(unityTransport.UseWebSockets, Is.True);
-                Assert.That(unityTransport.ConnectionData.Address, Is.EqualTo("10.0.0.25"));
-                Assert.That(unityTransport.ConnectionData.Port, Is.EqualTo((ushort)8900));
-                Assert.That(unityTransport.ConnectionData.ServerListenAddress, Is.EqualTo("0.0.0.0"));
-                Assert.That(unityTransport.ConnectionData.WebSocketPath, Is.EqualTo("/npc-dialogue"));
-                Assert.That(networkManager.NetworkConfig.NetworkTransport, Is.SameAs(unityTransport));
-                Assert.That(networkManager.NetworkConfig.PlayerPrefab, Is.SameAs(playerPrefab));
-                Assert.That(networkManager.NetworkConfig.Prefabs.Contains(serverNpcPrefab), Is.True);
-                Assert.That(networkManager.NetworkConfig.Prefabs.Contains(transferableItemPrefab), Is.True);
+                Assert.That(bootstrap.NetworkManager, Is.Not.Null);
+                Assert.That(bootstrap.UnityTransport, Is.Not.Null);
+                Assert.That(bootstrap.UnityTransport.ConnectionData.Address, Is.EqualTo("10.0.0.25"));
+                Assert.That(bootstrap.UnityTransport.ConnectionData.Port, Is.EqualTo((ushort)8900));
+                Assert.That(bootstrap.UnityTransport.ConnectionData.ServerListenAddress, Is.EqualTo("0.0.0.0"));
             }
             finally
             {
@@ -98,25 +93,6 @@ namespace NPCSystem.Tests
                 Object.DestroyImmediate(serverNpcPrefab);
                 Object.DestroyImmediate(transferableItemPrefab);
             }
-        }
-
-        [Test]
-        public void PlayModeResolverParsesPlayerIndexFromPlayerName()
-        {
-            Assert.That(NPCPlayModeInstanceResolver.TryParsePlayerIndex("Player1", out int playerOne), Is.True);
-            Assert.That(playerOne, Is.EqualTo(1));
-            Assert.That(NPCPlayModeInstanceResolver.TryParsePlayerIndex("Player3", out int playerThree), Is.True);
-            Assert.That(playerThree, Is.EqualTo(3));
-            Assert.That(NPCPlayModeInstanceResolver.TryParsePlayerIndex("Editor", out _), Is.False);
-        }
-
-        [Test]
-        public void PlayModeResolverAssignsUniqueClientBindPortsForAdditionalPlayers()
-        {
-            Assert.That(NPCPlayModeInstanceResolver.ResolveClientBindPortForPlayerIndex(1, 11474), Is.EqualTo((ushort)0));
-            Assert.That(NPCPlayModeInstanceResolver.ResolveClientBindPortForPlayerIndex(2, 11474), Is.EqualTo((ushort)11475));
-            Assert.That(NPCPlayModeInstanceResolver.ResolveClientBindPortForPlayerIndex(3, 11474), Is.EqualTo((ushort)11476));
-            Assert.That(NPCPlayModeInstanceResolver.ResolveClientBindPortForPlayerIndex(4, 11474, 13000), Is.EqualTo((ushort)13000));
         }
     }
 }

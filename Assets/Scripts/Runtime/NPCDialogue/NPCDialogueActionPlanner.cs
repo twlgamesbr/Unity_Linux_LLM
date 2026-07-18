@@ -20,17 +20,17 @@ namespace NPCSystem
     [Serializable]
     public sealed class NPCDialogueActionPlan
     {
-        public NPCDialogueActionType actionType = NPCDialogueActionType.None;
-        public string reason = string.Empty;
-        public string contextPrompt = string.Empty;
+        public NPCDialogueActionType ActionType = NPCDialogueActionType.None;
+        public string Reason = string.Empty;
+        public string ContextPrompt = string.Empty;
 
         public static NPCDialogueActionPlan None(string reason = "No action planning rule matched.")
         {
             return new NPCDialogueActionPlan
             {
-                actionType = NPCDialogueActionType.None,
-                reason = reason,
-                contextPrompt = string.Empty,
+                ActionType = NPCDialogueActionType.None,
+                Reason = reason,
+                ContextPrompt = string.Empty,
             };
         }
     }
@@ -130,7 +130,7 @@ namespace NPCSystem
                 );
             }
 
-            if (Matches(lower, HintKeywords) && (profile == null || profile.canGivePuzzleHints))
+            if (Matches(lower, HintKeywords) && (profile == null || profile.CanGivePuzzleHints))
             {
                 return BuildPlan(
                     NPCDialogueActionType.PuzzleHint,
@@ -150,7 +150,7 @@ namespace NPCSystem
 
             if (
                 profile != null
-                && profile.canAccuseSuspects
+                && profile.CanAccuseSuspects
                 && (lower.Contains("who") || lower.Contains("suspect") || lower.Contains("culprit"))
             )
             {
@@ -168,11 +168,11 @@ namespace NPCSystem
         {
             if (
                 plan == null
-                || plan.actionType == NPCDialogueActionType.None
-                || string.IsNullOrWhiteSpace(plan.contextPrompt)
+                || plan.ActionType == NPCDialogueActionType.None
+                || string.IsNullOrWhiteSpace(plan.ContextPrompt)
             )
                 return string.Empty;
-            return $"Action guidance ({plan.actionType}): {plan.contextPrompt}";
+            return $"Action guidance ({plan.ActionType}): {plan.ContextPrompt}";
         }
 
         static NPCDialogueActionPlan BuildPlan(
@@ -183,9 +183,9 @@ namespace NPCSystem
         {
             return new NPCDialogueActionPlan
             {
-                actionType = actionType,
-                reason = reason,
-                contextPrompt = contextPrompt,
+                ActionType = actionType,
+                Reason = reason,
+                ContextPrompt = contextPrompt,
             };
         }
 

@@ -17,10 +17,10 @@ namespace NPCSystem.Tests
 
             try
             {
-                Assert.That(embedder.host, Is.EqualTo("localhost"));
-                Assert.That(embedder.port, Is.EqualTo(8080));
-                Assert.That(embedder.model, Is.EqualTo("default-embedding"));
-                Assert.That(embedder.numRetries, Is.EqualTo(3));
+                Assert.That(embedder.Host, Is.EqualTo("localhost"));
+                Assert.That(embedder.Port, Is.EqualTo(8080));
+                Assert.That(embedder.Model, Is.EqualTo("default-embedding"));
+                Assert.That(embedder.NumRetries, Is.EqualTo(3));
             }
             finally
             {
@@ -67,9 +67,9 @@ namespace NPCSystem.Tests
         {
             var embedderObject = new GameObject(nameof(NPCLocalAIEmbedderTests));
             var embedder = embedderObject.AddComponent<TestableLocalAIEmbedder>();
-            embedder.host = "127.0.0.1";
-            embedder.port = 19999;
-            embedder.numRetries = 0;
+            embedder.Host = "127.0.0.1";
+            embedder.Port = 19999;
+            embedder.NumRetries = 0;
             embedder.mockResponse = "{\"data\":[{\"embedding\":[0.1,0.2,0.3],\"index\":0}]}";
 
             try
@@ -93,9 +93,9 @@ namespace NPCSystem.Tests
         {
             var embedderObject = new GameObject(nameof(NPCLocalAIEmbedderTests));
             var embedder = embedderObject.AddComponent<TestableLocalAIEmbedder>();
-            embedder.host = "127.0.0.1";
-            embedder.port = 19999;
-            embedder.numRetries = 0;
+            embedder.Host = "127.0.0.1";
+            embedder.Port = 19999;
+            embedder.NumRetries = 0;
             embedder.mockResponse = null;
 
             try
@@ -115,9 +115,9 @@ namespace NPCSystem.Tests
         {
             var embedderObject = new GameObject(nameof(NPCLocalAIEmbedderTests));
             var embedder = embedderObject.AddComponent<TestableLocalAIEmbedder>();
-            embedder.host = "127.0.0.1";
-            embedder.port = 19999;
-            embedder.numRetries = 0;
+            embedder.Host = "127.0.0.1";
+            embedder.Port = 19999;
+            embedder.NumRetries = 0;
             embedder.mockResponse = "{}";
 
             try
@@ -136,9 +136,9 @@ namespace NPCSystem.Tests
         {
             var embedderObject = new GameObject(nameof(NPCLocalAIEmbedderTests));
             var embedder = embedderObject.AddComponent<TestableLocalAIEmbedder>();
-            embedder.host = "127.0.0.1";
-            embedder.port = 19999;
-            embedder.numRetries = 0;
+            embedder.Host = "127.0.0.1";
+            embedder.Port = 19999;
+            embedder.NumRetries = 0;
             embedder.mockResponse = "{\"data\":[{\"embedding\":[0.5],\"index\":0}]}";
 
             try

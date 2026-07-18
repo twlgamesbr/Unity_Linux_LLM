@@ -25,9 +25,9 @@ namespace NPCSystem.Tests
         {
             return new NPCProfile
             {
-                canGivePuzzleHints = canGiveHints,
-                canAccuseSuspects = canAccuse,
-                canRevealSecrets = canReveal,
+                CanGivePuzzleHints = canGiveHints,
+                CanAccuseSuspects = canAccuse,
+                CanRevealSecrets = canReveal,
             };
         }
 

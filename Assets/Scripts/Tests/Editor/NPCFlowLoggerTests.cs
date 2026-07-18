@@ -13,16 +13,16 @@ namespace NPCSystem.Tests
         {
             var flowEvent = new NPCFlowEvent
             {
-                sessionId = "session-test",
-                requestId = "req-000001",
-                npcSlug = "butler",
-                source = "NPCFlowLoggerTests",
-                stage = NPCFlowStage.LocalRagSearch,
-                status = NPCFlowStatus.Success,
-                level = NPCFlowLogLevel.Info,
-                message = "Local RAG returned results",
-                durationMs = 42,
-                data = new Dictionary<string, object>
+                SessionId = "session-test",
+                RequestId = "req-000001",
+                NpcSlug = "butler",
+                Source = "NPCFlowLoggerTests",
+                Stage = NPCFlowStage.LocalRagSearch,
+                Status = NPCFlowStatus.Success,
+                Level = NPCFlowLogLevel.Info,
+                Message = "Local RAG returned results",
+                DurationMs = 42,
+                Data = new Dictionary<string, object>
                 {
                     ["resultCount"] = 3,
                     ["embeddingLength"] = 384
@@ -62,10 +62,10 @@ namespace NPCSystem.Tests
             string tempDirectory = Path.Combine(Path.GetTempPath(), "NPCFlowLoggerTests", Guid.NewGuid().ToString("N"));
             var gameObject = new GameObject("NPCFlowLoggerTests");
             var logger = gameObject.AddComponent<NPCFlowLogger>();
-            logger.logToUnityConsole = false;
-            logger.logToJsonlFile = true;
-            logger.overrideAbsoluteLogDirectory = tempDirectory;
-            logger.maxInMemoryEvents = 2;
+            logger.LogToUnityConsole = false;
+            logger.LogToJsonlFile = true;
+            logger.OverrideAbsoluteLogDirectory = tempDirectory;
+            logger.MaxInMemoryEvents = 2;
 
             try
             {
@@ -93,9 +93,9 @@ namespace NPCSystem.Tests
         {
             var gameObject = new GameObject("NPCFlowScopeTests");
             var logger = gameObject.AddComponent<NPCFlowLogger>();
-            logger.logToUnityConsole = false;
-            logger.logToJsonlFile = false;
-            logger.maxInMemoryEvents = 10;
+            logger.LogToUnityConsole = false;
+            logger.LogToJsonlFile = false;
+            logger.MaxInMemoryEvents = 10;
 
             try
             {
@@ -106,10 +106,10 @@ namespace NPCSystem.Tests
 
                 var events = logger.GetRecentEvents();
                 Assert.That(events.Count, Is.EqualTo(2));
-                Assert.That(events[0].requestId, Is.EqualTo("req-scope"));
-                Assert.That(events[1].requestId, Is.EqualTo("req-scope"));
-                Assert.That(events[0].status, Is.EqualTo(NPCFlowStatus.Start));
-                Assert.That(events[1].status, Is.EqualTo(NPCFlowStatus.Success));
+                Assert.That(events[0].RequestId, Is.EqualTo("req-scope"));
+                Assert.That(events[1].RequestId, Is.EqualTo("req-scope"));
+                Assert.That(events[0].Status, Is.EqualTo(NPCFlowStatus.Start));
+                Assert.That(events[1].Status, Is.EqualTo(NPCFlowStatus.Success));
             }
             finally
             {

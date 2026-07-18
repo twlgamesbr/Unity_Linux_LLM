@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.Serialization;
 
 namespace NPCSystem
 {
@@ -12,23 +13,76 @@ namespace NPCSystem
     public class NPCLocalAIClient : MonoBehaviour
     {
         [Header("LocalAI Chat Endpoint")]
-        public string host = "127.0.0.1";
-        public int port = 8080;
-        public string apiKey = "";
-        public string model = "";
+        [FormerlySerializedAs("host")]
+        [SerializeField]
+        string _host = "127.0.0.1";
+        public string Host { get => _host; set => _host = value; }
+
+        [FormerlySerializedAs("port")]
+        [SerializeField]
+        int _port = 8090;
+        public int Port { get => _port; set => _port = value; }
+
+        [FormerlySerializedAs("apiKey")]
+        [SerializeField]
+        string _apiKey = "";
+        public string ApiKey => _apiKey;
+
+        [FormerlySerializedAs("model")]
+        [SerializeField]
+        string _model = "llama-3.2-3b-instruct:q8_0";
+        public string Model => _model;
 
         [Header("Generation Parameters")]
-        public float temperature = 0.2f;
-        public float topP = 0.9f;
-        public int topK = 40;
-        public float minP = 0.05f;
-        public float repeatPenalty = 1.1f;
-        public int maxTokens = 256;
-        public int numRetries = 3;
-        public int requestTimeoutSeconds = 120;
+        [FormerlySerializedAs("temperature")]
+        [SerializeField]
+        float _temperature = 0.2f;
+        public float Temperature => _temperature;
+
+        [FormerlySerializedAs("topP")]
+        [SerializeField]
+        float _topP = 0.9f;
+        public float TopP => _topP;
+
+        [FormerlySerializedAs("topK")]
+        [SerializeField]
+        int _topK = 40;
+        public int TopK => _topK;
+
+        [FormerlySerializedAs("minP")]
+        [SerializeField]
+        float _minP = 0.05f;
+        public float MinP => _minP;
+
+        [FormerlySerializedAs("repeatPenalty")]
+        [SerializeField]
+        float _repeatPenalty = 1.1f;
+        public float RepeatPenalty => _repeatPenalty;
+
+        [FormerlySerializedAs("maxTokens")]
+        [SerializeField]
+        int _maxTokens = 256;
+        public int MaxTokens => _maxTokens;
+
+        [FormerlySerializedAs("numRetries")]
+        [SerializeField]
+        int _numRetries = 3;
+        public int NumRetries { get => _numRetries; set => _numRetries = value; }
+
+        [FormerlySerializedAs("requestTimeoutSeconds")]
+        [SerializeField]
+        int _requestTimeoutSeconds = 120;
+        public int RequestTimeoutSeconds => _requestTimeoutSeconds;
 
         UnityWebRequest _activeRequest;
         bool _activeRequestCanceled;
+
+        NPCFlowLogger _logger;
+
+        void Awake()
+        {
+            _logger = NPCFlowLogger.FindOrCreate();
+        }
 
         /// <summary>
         /// Cancels the currently active LocalAI request, if any.
@@ -37,7 +91,13 @@ namespace NPCSystem
         {
             if (_activeRequest != null && !_activeRequest.isDone)
             {
-                Debug.Log("[NPCLocalAIClient] Aborting active LocalAI request.");
+                _logger?.Log(
+                    NPCFlowStage.LLMChat,
+                    NPCFlowStatus.Success,
+                    NPCFlowLogLevel.Info,
+                    "Aborting active LocalAI request.",
+                    source: nameof(NPCLocalAIClient)
+                );
                 _activeRequestCanceled = true;
                 _activeRequest.Abort();
             }
@@ -47,54 +107,71 @@ namespace NPCSystem
 
         /// <summary>
         /// Send a chat completion request to LocalAI with message history.
-        /// Returns the assistant response text. Strips <think> blocks if present.
+        /// Returns the assistant response text. Strips &lt;think&gt; blocks if present.
         /// </summary>
         public async Task<string> ChatAsync(
             NPCOpenAIMessage[] messages,
             float? temperatureOverride = null,
-            string modelOverride = null
+            string modelOverride = null,
+            string requestId = null
         )
         {
-            string uri = $"http://{host}:{port}/v1/chat/completions";
+            string uri = $"http://{_host}:{_port}/v1/chat/completions";
+            string reqId = requestId ?? _logger?.NextRequestId() ?? "req-unknown";
 
-            // Use modelOverride if provided; fall back to this.model (for standalone use).
+            // Use modelOverride if provided; fall back to this.Model (for standalone use).
             // modelOverride is the primary path — callers like NPCDialogueSessionService pass
             // the model string directly, eliminating sync dependencies.
             string modelName =
                 !string.IsNullOrWhiteSpace(modelOverride) ? modelOverride.Trim()
-                : !string.IsNullOrWhiteSpace(model) ? model.Trim()
+                : !string.IsNullOrWhiteSpace(_model) ? _model.Trim()
                 : "";
             if (string.IsNullOrWhiteSpace(modelName))
             {
-                Debug.LogError(
-                    "[NPCLocalAIClient] ChatAsync: no model specified. "
-                        + "Pass modelOverride or set the model field."
+                _logger?.Log(
+                    NPCFlowStage.LLMChat,
+                    NPCFlowStatus.Error,
+                    NPCFlowLogLevel.Error,
+                    "ChatAsync: no model specified. Pass modelOverride or set the Model field.",
+                    source: nameof(NPCLocalAIClient),
+                    requestId: reqId
                 );
                 return string.Empty;
             }
 
-            Debug.Log(
-                $"[NPCLocalAIClient] Sending chat request — model='{modelName}' uri={uri} messages={messages?.Length ?? 0}"
+            _logger?.Log(
+                NPCFlowStage.LLMChat,
+                NPCFlowStatus.Start,
+                NPCFlowLogLevel.Info,
+                $"Sending chat request — model='{modelName}' messages={messages?.Length ?? 0}",
+                source: nameof(NPCLocalAIClient),
+                requestId: reqId,
+                data: new Dictionary<string, object>
+                {
+                    ["modelName"] = modelName,
+                    ["messageCount"] = messages?.Length ?? 0,
+                    ["uri"] = uri,
+                }
             );
 
             var payload = new NPCOpenAIChatRequest
             {
                 model = modelName,
                 messages = messages ?? Array.Empty<NPCOpenAIMessage>(),
-                temperature = temperatureOverride ?? temperature,
-                top_p = topP,
-                top_k = topK,
-                max_tokens = maxTokens,
+                temperature = temperatureOverride ?? _temperature,
+                top_p = _topP,
+                top_k = _topK,
+                max_tokens = _maxTokens,
             };
 
-            for (int attempt = 0; attempt <= numRetries; attempt++)
+            for (int attempt = 0; attempt <= _numRetries; attempt++)
             {
                 using var llmSpan = DatadogTracer.StartSpan(
                     "llm.chat",
                     service: "unity-dedicated-server",
                     resource: $"LocalAI/{modelName}",
                     type: "llm",
-                    tags: new[] { $"model:{modelName}", $"attempt:{attempt}" }
+                    tags: new[] { $"model:{modelName}", $"attempt:{attempt}", $"request_id:{reqId}" }
                 );
 
                 var sw = System.Diagnostics.Stopwatch.StartNew();
@@ -105,9 +182,22 @@ namespace NPCSystem
 
                     if (string.IsNullOrEmpty(responseJson))
                     {
-                        if (attempt < numRetries)
+                        if (attempt < _numRetries)
                         {
                             llmSpan.Dispose();
+                            _logger?.Log(
+                                NPCFlowStage.LLMChat,
+                                NPCFlowStatus.Warning,
+                                NPCFlowLogLevel.Warning,
+                                $"Empty response (attempt {attempt + 1}/{_numRetries + 1}), retrying...",
+                                source: nameof(NPCLocalAIClient),
+                                requestId: reqId,
+                                data: new Dictionary<string, object>
+                                {
+                                    ["attempt"] = attempt,
+                                    ["maxAttempts"] = _numRetries,
+                                }
+                            );
                             await Task.Delay(500 * (attempt + 1));
                             continue;
                         }
@@ -118,6 +208,19 @@ namespace NPCSystem
                         DatadogMetricsService.Increment(
                             "llm.request.error",
                             tags: new[] { $"model:{modelName}", $"reason:empty_response" }
+                        );
+                        _logger?.Log(
+                            NPCFlowStage.LLMChat,
+                            NPCFlowStatus.Error,
+                            NPCFlowLogLevel.Error,
+                            $"All retries exhausted — empty response from {uri}",
+                            source: nameof(NPCLocalAIClient),
+                            requestId: reqId,
+                            durationMs: sw.ElapsedMilliseconds,
+                            data: new Dictionary<string, object>
+                            {
+                                ["attempts"] = _numRetries + 1,
+                            }
                         );
                         return string.Empty;
                     }
@@ -146,6 +249,19 @@ namespace NPCSystem
                         rawContent = Regex
                             .Replace(rawContent, @"<think>.*?</think>", "", RegexOptions.Singleline)
                             .Trim();
+
+                        _logger?.Log(
+                            NPCFlowStage.LLMChat,
+                            NPCFlowStatus.Success,
+                            NPCFlowLogLevel.Info,
+                            $"Chat response received ({rawContent.Length} chars, attempt {attempt}).",
+                            source: nameof(NPCLocalAIClient),
+                            requestId: reqId,
+                            durationMs: sw.ElapsedMilliseconds,
+                            npcSlug: null,
+                            data: _logger?.SummarizeText("responsePreview", rawContent)
+                        );
+
                         return rawContent;
                     }
 
@@ -155,7 +271,14 @@ namespace NPCSystem
                         "llm.request.error",
                         tags: new[] { $"model:{modelName}", $"reason:unexpected_format" }
                     );
-                    Debug.LogError($"[NPCLocalAIClient] Unexpected response format from {uri}");
+                    _logger?.Log(
+                        NPCFlowStage.LLMChat,
+                        NPCFlowStatus.Error,
+                        NPCFlowLogLevel.Error,
+                        $"Unexpected response format from {uri}",
+                        source: nameof(NPCLocalAIClient),
+                        requestId: reqId
+                    );
                     return string.Empty;
                 }
                 catch (Exception ex)
@@ -171,7 +294,23 @@ namespace NPCSystem
                             $"attempt:{attempt}",
                         }
                     );
-                    if (attempt < numRetries)
+
+                    _logger?.Log(
+                        NPCFlowStage.LLMChat,
+                        NPCFlowStatus.Error,
+                        NPCFlowLogLevel.Error,
+                        $"Exception on attempt {attempt + 1}/{_numRetries + 1}: {ex.Message}",
+                        source: nameof(NPCLocalAIClient),
+                        requestId: reqId,
+                        durationMs: sw.ElapsedMilliseconds,
+                        data: new Dictionary<string, object>
+                        {
+                            ["exceptionType"] = ex.GetType().Name,
+                            ["attempt"] = attempt,
+                        }
+                    );
+
+                    if (attempt < _numRetries)
                     {
                         await Task.Delay(500 * (attempt + 1));
                         continue;
@@ -190,10 +329,10 @@ namespace NPCSystem
             {
                 request.uploadHandler = new UploadHandlerRaw(bodyRaw);
                 request.downloadHandler = new DownloadHandlerBuffer();
-                request.timeout = Mathf.Max(1, requestTimeoutSeconds);
+                request.timeout = Mathf.Max(1, _requestTimeoutSeconds);
                 request.SetRequestHeader("Content-Type", "application/json");
-                if (!string.IsNullOrEmpty(apiKey))
-                    request.SetRequestHeader("Authorization", $"Bearer {apiKey}");
+                if (!string.IsNullOrEmpty(_apiKey))
+                    request.SetRequestHeader("Authorization", $"Bearer {_apiKey}");
 
                 _activeRequest = request;
                 _activeRequestCanceled = false;
@@ -203,8 +342,12 @@ namespace NPCSystem
                     await Task.Yield();
                     if (_activeRequestCanceled)
                     {
-                        Debug.LogWarning(
-                            "[NPCLocalAIClient] LocalAI request was canceled during execution."
+                        _logger?.Log(
+                            NPCFlowStage.LLMChat,
+                            NPCFlowStatus.Warning,
+                            NPCFlowLogLevel.Warning,
+                            "LocalAI request was canceled during execution.",
+                            source: nameof(NPCLocalAIClient)
                         );
                         return null;
                     }
@@ -217,16 +360,29 @@ namespace NPCSystem
                     || request.result == UnityWebRequest.Result.ProtocolError
                 )
                 {
-                    Debug.LogError(
-                        $"[NPCLocalAIClient] Request failed ({request.responseCode}): {request.error}"
+                    _logger?.Log(
+                        NPCFlowStage.LLMChat,
+                        NPCFlowStatus.Error,
+                        NPCFlowLogLevel.Error,
+                        $"Request failed ({request.responseCode}): {request.error}",
+                        source: nameof(NPCLocalAIClient),
+                        data: new Dictionary<string, object>
+                        {
+                            ["responseCode"] = (int)request.responseCode,
+                            ["uri"] = uri,
+                        }
                     );
                     return null;
                 }
 
                 if (request.result == UnityWebRequest.Result.DataProcessingError)
                 {
-                    Debug.LogError(
-                        $"[NPCLocalAIClient] Response processing failed: {request.error}"
+                    _logger?.Log(
+                        NPCFlowStage.LLMChat,
+                        NPCFlowStatus.Error,
+                        NPCFlowLogLevel.Error,
+                        $"Response processing failed: {request.error}",
+                        source: nameof(NPCLocalAIClient)
                     );
                     return null;
                 }

@@ -100,9 +100,11 @@ namespace NPCSystem
         public float AvgTurnsPerSession;
 
         [JsonProperty("first_session_at")]
+        [NonSerialized]
         public DateTime? FirstSessionAt;
 
         [JsonProperty("last_session_at")]
+        [NonSerialized]
         public DateTime? LastSessionAt;
     }
 
@@ -140,9 +142,11 @@ namespace NPCSystem
         public int TurnCount;
 
         [JsonProperty("started_at")]
+        [NonSerialized]
         public DateTime? StartedAt;
 
         [JsonProperty("ended_at")]
+        [NonSerialized]
         public DateTime? EndedAt;
 
         [JsonProperty("summary")]

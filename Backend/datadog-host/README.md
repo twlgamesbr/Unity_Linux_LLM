@@ -41,12 +41,15 @@ The agent auto-discovers Docker containers and starts collecting:
 
 ## Integration Configs
 
+Verified against the live agent (`docker exec dd-agent agent status`) on 2026-07-17:
+
 | Directory | Service | Purpose |
 |-----------|---------|---------|
-| `conf.d/localai.d/` | LocalAI | LLM inference metrics + log parsing |
-| `conf.d/qdrant.d/` | Qdrant | Vector DB collection/search metrics |
-| `conf.d/nginx.d/` | Nginx | WebGL client access log parsing |
-| `conf.d/unity.d/` | Unity Server | DogStatsD custom metrics (auto-discovered) |
+| `conf.d/openmetrics.d/conf.yaml` | LocalAI + Qdrant | Single OpenMetrics check instance per service — LLM inference metrics (`localai` namespace) and vector DB collection/search metrics (`qdrant` namespace) |
+| `conf.d/nginx.d/conf.yaml` | Nginx (WebGL client) | Built-in `nginx` check against `nginx.conf`'s `/nginx_status` stub_status endpoint, plus structured log tailing (source: `nginx`) |
+| *(none needed)* | Unity Dedicated Server | DogStatsD custom metrics arrive via UDP `:8125` with no check config required — they show up automatically under **Metrics → Summary** once `DatadogMetricsService.Initialize()` runs. There is no `unity.d/` integration folder because DogStatsD metrics aren't a "check"; this row previously implied a config file that doesn't exist. |
+
+There is no dedicated `localai.d/` or `qdrant.d/` folder — both are covered by the single `openmetrics.d/conf.yaml` (one Agent check, two `instances:` entries). Split them into separate folders only if you need independent `min_collection_interval` or tagging per service.
 
 ---
 

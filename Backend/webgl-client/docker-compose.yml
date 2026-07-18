@@ -30,7 +30,7 @@ services:
     build:
       context: .
       dockerfile_inline: |
-        FROM python:3.12-alpine
+        FROM python:3.12-slim
         RUN pip install ddtrace
         COPY ddproxy.py /ddproxy.py
         CMD ["python3", "/ddproxy.py"]

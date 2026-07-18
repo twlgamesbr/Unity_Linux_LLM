@@ -51,11 +51,42 @@
         "temp/": true,
         "Temp/": true
     },
+    "files.watcherExclude": {
+        "**/.git/**": true,
+        "**/.vs/**": true,
+        "**/bin/**": true,
+        "**/obj/**": true,
+        "**/Build/**": true,
+        "**/build/**": true,
+        "**/Builds/**": true,
+        "**/Library/**": true,
+        "**/Logs/**": true,
+        "**/Packages/**": true,
+        "**/Temp/**": true,
+        "**/UserSettings/**": true
+    },
+    "search.exclude": {
+        "**/.git/**": true,
+        "**/.vs/**": true,
+        "**/bin/**": true,
+        "**/obj/**": true,
+        "**/Build/**": true,
+        "**/build/**": true,
+        "**/Builds/**": true,
+        "**/Library/**": true,
+        "**/Logs/**": true,
+        "**/Packages/**": true,
+        "**/Temp/**": true,
+        "**/UserSettings/**": true
+    },
     "files.associations": {
         "*.asset": "yaml",
         "*.meta": "yaml",
         "*.prefab": "yaml",
         "*.unity": "yaml",
+    },
+    "[csharp]": {
+        "editor.colorDecorators": false
     },
     "explorer.fileNesting.enabled": true,
     "explorer.fileNesting.patterns": {

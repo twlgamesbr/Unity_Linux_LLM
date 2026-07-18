@@ -98,7 +98,13 @@ namespace NPCSystem
                 return _chunking;
             if (_search != null)
                 return _search;
-            Debug.LogError("[NPC] Local RAG search GameObject is null");
+            NPCFlowLogger.FindOrCreate().Log(
+                NPCFlowStage.LocalRagReady,
+                NPCFlowStatus.Error,
+                NPCFlowLogLevel.Error,
+                "[NPC] Local RAG search GameObject is null",
+                source: nameof(NPCLocalRAG)
+            );
             return null;
         }
 

@@ -70,10 +70,10 @@ namespace NPCSystem.Tests
             // by manually setting the flag — the actual code path is verified
             // in NPCNetworkingTests.TransportConfigCreateDefaultProducesValidConfig.
             var config = NPCTransportConfig.CreateDefault();
-            config.useWebSockets = true;
+            config.UseWebSockets = true;
 
-            Assert.That(config.useWebSockets, Is.True);
-            Assert.That(config.webSocketPath, Is.EqualTo("/npc-dialogue"));
+            Assert.That(config.UseWebSockets, Is.True);
+            Assert.That(config.WebSocketPath, Is.EqualTo("/npc-dialogue"));
         }
 
         [Test]

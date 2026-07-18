@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Serialization;
+
 
 namespace NPCSystem
 {
@@ -71,15 +73,15 @@ namespace NPCSystem
                     _localRag.UpdateGameObjects();
                 if (_localRag.SearchMethod != null && _localRag.SearchMethod.LlmEmbedder != null)
                 {
-                    _localRag.SearchMethod.LlmEmbedder.host = _remoteEmbeddingHost;
-                    _localRag.SearchMethod.LlmEmbedder.port = _remoteEmbeddingPort;
+                    _localRag.SearchMethod.LlmEmbedder.Host = _remoteEmbeddingHost;
+                    _localRag.SearchMethod.LlmEmbedder.Port = _remoteEmbeddingPort;
                 }
             }
 
             if (_useQdrantRag && _qdrantRag != null && _qdrantRag.Embedder != null)
             {
-                _qdrantRag.Embedder.host = _remoteEmbeddingHost;
-                _qdrantRag.Embedder.port = _remoteEmbeddingPort;
+                _qdrantRag.Embedder.Host = _remoteEmbeddingHost;
+                _qdrantRag.Embedder.Port = _remoteEmbeddingPort;
             }
         }
 
@@ -105,7 +107,7 @@ namespace NPCSystem
                 {
                     string qdrantResult = await _qdrantRag.SearchMemoryAsync(
                         playerMessage,
-                        Mathf.Max(1, profile.ragResults),
+                        Mathf.Max(1, profile.RagResults),
                         reqId,
                         profile.GetNpcSlug()
                     );
@@ -147,9 +149,9 @@ namespace NPCSystem
                 {
                     await EnsureReadyAsync();
 
-                    (string[] similarResults, _) = await _localRag.Search(
+                    (string[] similarResults, float[] _) = await _localRag.Search(
                         playerMessage,
-                        Mathf.Max(1, profile.ragResults),
+                        Mathf.Max(1, profile.RagResults),
                         profile.GetRagCategory()
                     );
 

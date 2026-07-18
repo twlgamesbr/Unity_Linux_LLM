@@ -1,6 +1,14 @@
 # Unity_Linux_LLM — Comprehensive Agent Reference
 
-This document is the single source of truth for every LLM agent working on this project. It covers code conventions, project structure, backend services, scene wiring, testing, and embedder configuration.
+This document is **the single, unique source of truth** for every LLM agent (and human) working on this project. It covers code conventions, project structure, backend services, scene wiring, testing, and embedder configuration.
+
+**§1 (Code Conventions) is the canonical, enforced rule set — nothing else.** Other documents that mention coding style
+(`Documentation/5_Developer_Guide/README.md`'s "Code Organization & Standards", `Documentation/Unity_Best_Practices.md`)
+are either supplementary illustration or generic external reference material, and both explicitly defer back to §1 —
+see the disclaimers at the top of each. If any doc appears to contradict §1, §1 wins; file it as a doc bug and fix the
+other doc, not §1. §1 is verified automatically by `Tools/NPCDialogueCodeReview` (see §7.4) — run
+`dotnet run --project Tools/NPCDialogueCodeReview -- --verify-docs` after editing §1 to confirm every rule's section
+reference still resolves.
 
 ---
 
@@ -8,16 +16,20 @@ This document is the single source of truth for every LLM agent working on this 
 
 | Section | What You Need |
 |---------|---------------|
-| [1. Code Conventions](#1-code-conventions) | Naming, patterns, editorconfig, safety gates |
+| [Backend Services Topology](Documentation/2_Architecture/Backend_Services_Topology.md) | Full live Docker/systemd graph, ports, endpoints, config paths, known infra issues, Herdr log-tracking plan |
+| [1. Code Conventions](#1-code-conventions) | Naming, patterns, editorconfig, safety gates — **the canonical rule set** |
 | [2. Project Structure](#2-project-structure) | Folders, asmdefs, namespace hierarchy |
 | [3. Scene Wiring (Current)](#3-scene-wiring-current) | What's actually in the active scene |
 | [4. Backend Services](#4-backend-services) | LocalAI, Supabase, Qdrant, Cognee |
 | [5. Codebase Embedder](#5-codebase-embedder) | Qdrant indexing, querying, profiles |
 | [6. Datadog Monitoring](#6-datadog-monitoring) | Metrics, log collection, dashboards |
-| [7. Testing](#7-testing) | Test files, patterns, coverage |
+| [7. Testing](#7-testing) | Test files, patterns, coverage, automated code rule review (`Tools/NPCDialogueCodeReview`) |
 | [8. Networking & Auth](#8-networking--auth) | Transport config, startup modes, auth flow |
 | [9. Editor Tooling](#9-editor-tooling) | GladeKit MCP, NPCFactory, automation |
 | [10. Safety Gates](#10-safety-gates) | What requires explicit approval |
+| [11. Known Compile Warnings](#11-known-compile-warnings-non-blocking) | Non-blocking warnings tracked on purpose |
+| [12. Dedicated Server](#12-dedicated-server) | Build/runtime flags, Docker |
+| [13. Addressables & Compatibility Level](#13-addressables--compatibility-level) | apiCompatibilityLevel gotchas |
 
 ---
 
@@ -34,7 +46,7 @@ This document is the single source of truth for every LLM agent working on this 
 | Methods | PascalCase | `HandleAuthSuccess()`, `ProbeAsync()` |
 | Local variables | `camelCase` | `playerCount`, `result` |
 | Parameters | `camelCase` | `string username`, `int port` |
-| Events | PascalCase | `onLoginSuccess`, `onHostStarted` |
+| Events | PascalCase | `OnLoginSuccess`, `OnHostStarted` (old pre-migration camelCase names like `onLoginSuccess` live on in `[FormerlySerializedAs("onLoginSuccess")]`, per §1.2) |
 | Constants | PascalCase | `DefaultPort`, `MaxRetries` |
 | Namespaces | PascalCase, `NPCSystem.*` | `NPCSystem`, `NPCSystem.Tests` |
 
@@ -90,7 +102,7 @@ Public API surface should have `/// <summary>` and `/// <param>` / `/// <returns
 ### 1.6 Key Anti-Pattern Rules (Phase 7)
 
 - **No boolean flag parameters** on methods — split into named methods instead.
-- **No hard-coded `"localhost"` strings** — use `NPCFlowLogger.IsLocalHost(host)` which checks both `"localhost"` and `"127.0.0.1"` case-insensitively.
+- **No hard-coded `"localhost"` strings** — use `NPCNetworkUtils.IsLocalHost(host)` (in `Assets/Scripts/Runtime/Utilities/NPCNetworkUtils.cs`) which checks both `"localhost"` and `"127.0.0.1"` case-insensitively.
 - **No commented-out code** — delete it.
 - **No TODO/FIXME/HACK** — address or remove.
 - **No single-letter variables** outside `for` loop counters.
@@ -247,7 +259,7 @@ docker/
 
 **Unity SDK packages:** `Supabase.dll`, `Supabase.Core.dll`, `Supabase.Gotrue.dll`, `Supabase.Postgrest.dll`, `Supabase.Realtime.dll`, etc. (precompiled refs in asmdef)
 
-**Auth flow:** `PlayerAuthService` → `Supabase.Gotrue` → REST API. Local development addresses are auto-replaced from `localhost` to page host in WebGL builds via `NPCFlowLogger.IsLocalHost()`.
+**Auth flow:** `PlayerAuthService` → `Supabase.Gotrue` → REST API. Local development addresses are auto-replaced from `localhost` to page host in WebGL builds via `NPCNetworkUtils.IsLocalHost()`.
 
 ### 4.3 Qdrant
 
@@ -315,8 +327,9 @@ env UV_CACHE_DIR=/tmp/uv-cache UV_TOOL_DIR=/tmp/uv-tools uv run ...
 
 - **Named vectors:** `dense` (768d Cosine) + `code_keywords` (sparse)
 - **Sparse vectors:** deterministic SHA-256 token hashing into 2M-dim space with TF normalization
-- **Active profile:** `runtime` (promoted to default)
-- **Default collection:** `unity_linux_llm_codebase_v1`
+- **Active profile:** `runtime` (promoted to default; CLI `--profile` default and `CodebaseEmbedderConfig.collection_profile` default both match as of 2026-07-17)
+- **Default collection:** `unity_linux_llm_codebase_v2` (CLI `--collection` default, `CodebaseEmbedderConfig.collection_name` default, and `codebase-watchdog`'s `COLLECTION_NAME` env var all match as of 2026-07-17 — the CLI default was previously stuck on the retired `_v1` name and was corrected in `Tools/CodebaseEmbedder/codebase_embedder/cli.py`)
+- **Live Qdrant collections (verified 2026-07-17):** `npc_knowledge` (NPC dialogue RAG, managed by `QdrantRAGService`) and `unity_linux_llm_codebase_v2` (this embedder). No `_structural_v1`/`_hierarchy_v1` collections currently exist in Qdrant — treat those as design intent, not live state, until an audit run creates them.
 - **Experimental:** structural (boosted namespace/assembly records), hierarchy (namespace_summary aggregation)
 
 ### 5.4 CodebaseEmbedder Profile
@@ -457,7 +470,7 @@ the batch reaches 50 spans). Set `span.SetError(message)` to mark failures.
 
 ## 7. Testing
 
-### 6.1 Test Suite (23 files, 149 tests)
+### 7.1 Test Suite (23 files, 149 tests)
 
 All tests are `[NUnit.Framework]` Editor tests under `Assets/Scripts/Tests/Editor/`.
 
@@ -487,7 +500,7 @@ All tests are `[NUnit.Framework]` Editor tests under `Assets/Scripts/Tests/Edito
 | `QdrantRAGServiceTests.cs` | 13 | RAG query/response |
 | `NPCTestHelpers.cs` | — | Test utility class (0 tests) |
 
-### 6.2 Test Patterns
+### 7.2 Test Patterns
 
 **Standard setup — instantiate in-memory:**
 ```csharp
@@ -524,7 +537,7 @@ public void MyParamTest(string input)
 }
 ```
 
-### 6.3 Test Clarity Rules
+### 7.3 Test Clarity Rules
 
 1. Every test file is in `namespace NPCSystem.Tests`
 2. `Object.DestroyImmediate()` in `finally` block to prevent leak
@@ -532,11 +545,31 @@ public void MyParamTest(string input)
 4. No magic strings — use well-named constants or inline documentation
 5. Tests are first-class citizens — maintain alongside production code
 
+### 7.4 Automated Code Rule Review
+
+`Tools/NPCDialogueCodeReview` is a standalone Roslyn-based static analyzer (plain
+.NET console app, no Unity Editor required) that scans `.cs` files against the
+code conventions in §1 above and reports findings with file:line references and
+an AGENTS.md section citation per rule. Every rule has a companion self-test
+proving it fires on a violating snippet and stays silent on a compliant one.
+
+```bash
+# Verify the verifier (should be 100% pass)
+dotnet run --project Tools/NPCDialogueCodeReview -- --self-test
+
+# Review NPCDialogue scripts, print to console and write a markdown report
+dotnet run --project Tools/NPCDialogueCodeReview -- --path Assets/Scripts/Runtime/NPCDialogue
+```
+
+See `Tools/NPCDialogueCodeReview/README.md` for the full CLI reference, rule
+catalog, severity model, and how to add new rules. Not yet wired into CI —
+run it manually after touching `NPCDialogue` scripts, or before a review pass.
+
 ---
 
-## 7. Networking & Auth
+## 8. Networking & Auth
 
-### 7.1 NPCNetworkBootstrap
+### 8.1 NPCNetworkBootstrap
 
 **Source:** `Assets/Scripts/Runtime/Networking/NPCNetworkBootstrap.cs`
 
@@ -548,7 +581,7 @@ public void MyParamTest(string input)
 - `ApplyTransportConfiguration()`: Transfers `NPCTransportConfig` → `UnityTransport`
 - CLI args: `-npc-server`, `-npc-websockets`, `-port`, `-address`, `-npc-client`, `-npc-host`
 
-### 7.2 NPCTransportConfig
+### 8.2 NPCTransportConfig
 
 | Field | Default | Description |
 |-------|---------|-------------|
@@ -559,7 +592,7 @@ public void MyParamTest(string input)
 | `webSocketPath` | `"/npc-dialogue"` | WebSocket path |
 | `autoStartMode` | `Manual` | Auto-start behaviour |
 
-### 7.3 WebGL Transport
+### 8.3 WebGL Transport
 
 In `ApplyTransportConfiguration()`:
 ```csharp
@@ -569,7 +602,7 @@ In `ApplyTransportConfiguration()`:
 ```
 WebGL uses UnityTransport with WebSockets — forced at compile time for builds, but NOT in Editor (so Editor tests can test without WebSockets).
 
-### 7.4 Auth Flow
+### 8.4 Auth Flow
 
 1. `PlayerAuthService.InitializeAsync()` — sets up Supabase Gotrue client
 2. `AuthUIController` captures login/register UI events
@@ -581,15 +614,15 @@ WebGL uses UnityTransport with WebSockets — forced at compile time for builds,
    - `_startAsHost` boolean → final fallback
 5. `StartHostAndRegisterPlayerName()` or `StartClientAndRegisterPlayerName()`
 
-### 7.5 Cross-Platform URL Resolution
+### 8.5 Cross-Platform URL Resolution
 
 In WebGL builds, `"localhost"` inside the browser refers to the browser's own machine, not the server. The runtime auto-detects this:
 
 ```csharp
-if (NPCFlowLogger.IsLocalHost(RemoteHost))
+if (NPCNetworkUtils.IsLocalHost(RemoteHost))
 {
     Uri pageUri = new Uri(Application.absoluteURL);
-    if (!NPCFlowLogger.IsLocalHost(pageUri.Host))
+    if (!NPCNetworkUtils.IsLocalHost(pageUri.Host))
         RemoteHost = pageUri.Host;  // Replace with real host
 }
 ```
@@ -598,9 +631,9 @@ Applied in `NPCDialogueManager.cs` (RemoteHost + RemoteEmbeddingHost), `PlayerAu
 
 ---
 
-## 8. Editor Tooling
+## 9. Editor Tooling
 
-### 8.1 GladeKit MCP
+### 9.1 GladeKit MCP
 
 **Primary Unity Inspector/Scene access path.** Always use GladeKit MCP tools (via `mcp__gladekit_mcp__*`) for:
 - Scene hierarchy (`get_scene_hierarchy`, `find_game_objects`)
@@ -615,7 +648,7 @@ Applied in `NPCDialogueManager.cs` (RemoteHost + RemoteEmbeddingHost), `PlayerAu
 - `create_game_object` creates EMPTY (invisible) objects — use `create_primitive` for visible geometry
 - Never manually edit `.unity` scene files — GladeKit handles scene mutation safely
 
-### 8.2 Editor Scripts
+### 9.2 Editor Scripts
 
 | Script | Location | Purpose |
 |--------|----------|---------|
@@ -625,13 +658,13 @@ Applied in `NPCDialogueManager.cs` (RemoteHost + RemoteEmbeddingHost), `PlayerAu
 | `TestQdrantRAG.cs` | `Assets/Scripts/Editor/` | Qdrant RAG test tool |
 | `CreateNPCTool.cs` | `Assets/Scripts/Editor/Tools/` | Auto-registers with Glade, creates profile + knowledge |
 
-### 8.3 GladeKit Bridge Safety
+### 9.3 GladeKit Bridge Safety
 
 In `Unity_Linux_LLM`, the GladeKit bridge should NOT auto-start in secondary Multiplayer Play Mode editor instances. Only the primary editor instance should host the bridge.
 
 ---
 
-## 9. Safety Gates
+## 10. Safety Gates
 
 The following require explicit user approval before proceeding:
 
@@ -648,7 +681,7 @@ The following require explicit user approval before proceeding:
 
 ---
 
-## 10. Known Compile Warnings (Non-Blocking)
+## 11. Known Compile Warnings (Non-Blocking)
 
 | Code | Location | Issue |
 |------|----------|-------|
@@ -657,14 +690,14 @@ The following require explicit user approval before proceeding:
 
 ---
 
-## 11. Dedicated Server
+## 12. Dedicated Server
 
 **Build:** Server binary outputs to `Builds/Server/`
 **Runtime flags:** `-batchmode -npc-server -port 11474 -address 0.0.0.0 -npc-websockets`
 **Docker:** `docker/Dockerfile` (ubuntu:22.04), `docker-compose.yml` (network_mode: host reaches host LocalAI at `localhost:8080`/`:11435`)
 **Architecture key:** `NPCNetworkBootstrap` auto-starts in `Start()` (not `Awake()`) to avoid NRE — `NetworkManager`'s `Awake` at order 0 runs first.
 
-## 12. Addressables & Compatibility Level
+## 13. Addressables & Compatibility Level
 
 **Critical:** All build profiles must use `apiCompatibilityLevel: 2` (.NET Standard 2.1). Level 6 (.NET) breaks Addressables, Unity Transport, Serialization, and RP Core packages.
 

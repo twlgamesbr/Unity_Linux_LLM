@@ -243,8 +243,7 @@ namespace NPCSystem
 #if UNITY_WEBGL && !UNITY_EDITOR
             if (
                 string.IsNullOrWhiteSpace(_hostAddress)
-                || _hostAddress == "127.0.0.1"
-                || _hostAddress == "localhost"
+                || NPCNetworkUtils.IsLocalHost(_hostAddress)
             )
             {
                 try
@@ -482,7 +481,7 @@ namespace NPCSystem
             }
 
             // Bootstrap already configured transport in Awake; just set host mode
-            _networkBootstrap.TransportConfig.autoStartMode = NPCNetworkAutoStartMode.Host;
+            _networkBootstrap.TransportConfig.AutoStartMode = NPCNetworkAutoStartMode.Host;
             bool started = _networkBootstrap.StartConfiguredMode();
             if (!started)
             {
@@ -491,16 +490,16 @@ namespace NPCSystem
                     NPCFlowStage.NetworkHost,
                     NPCFlowStatus.Error,
                     NPCFlowLogLevel.Error,
-                    $"Failed to start host on port {cfg.port} via bootstrap.",
+                    $"Failed to start host on port {cfg.Port} via bootstrap.",
                     source: nameof(AuthNetworkBridge),
                     data: new Dictionary<string, object>
                     {
-                        ["_hostAddress"] = cfg.connectAddress ?? "unknown",
-                        ["_hostPort"] = cfg.port,
-                        ["listenAddress"] = cfg.listenAddress ?? "unknown",
+                        ["_hostAddress"] = cfg.ConnectAddress ?? "unknown",
+                        ["_hostPort"] = cfg.Port,
+                        ["listenAddress"] = cfg.ListenAddress ?? "unknown",
                     }
                 );
-                lastBridgeStatus = $"Failed to start host on {cfg.connectAddress}:{cfg.port}.";
+                lastBridgeStatus = $"Failed to start host on {cfg.ConnectAddress}:{cfg.Port}.";
                 return;
             }
 
@@ -588,15 +587,15 @@ namespace NPCSystem
             }
 
             // Override bootstrap's connect address if specified, then delegate to bootstrap
-            _networkBootstrap.TransportConfig.connectAddress = string.IsNullOrWhiteSpace(
+            _networkBootstrap.TransportConfig.ConnectAddress = string.IsNullOrWhiteSpace(
                 _hostAddress
             )
                 ? "127.0.0.1"
                 : _hostAddress.Trim();
             if (_hostPort > 0)
-                _networkBootstrap.TransportConfig.port = _hostPort;
+                _networkBootstrap.TransportConfig.Port = _hostPort;
 
-            _networkBootstrap.TransportConfig.autoStartMode = NPCNetworkAutoStartMode.Client;
+            _networkBootstrap.TransportConfig.AutoStartMode = NPCNetworkAutoStartMode.Client;
             bool started = _networkBootstrap.StartConfiguredMode();
             if (!started)
             {
@@ -611,8 +610,8 @@ namespace NPCSystem
                 return;
             }
 
-            string effectiveAddress = _networkBootstrap.TransportConfig.connectAddress;
-            ushort effectivePort = _networkBootstrap.TransportConfig.port;
+            string effectiveAddress = _networkBootstrap.TransportConfig.ConnectAddress;
+            ushort effectivePort = _networkBootstrap.TransportConfig.Port;
             _logger?.Log(
                 NPCFlowStage.NetworkHost,
                 NPCFlowStatus.Success,
@@ -626,7 +625,7 @@ namespace NPCSystem
                 }
             );
             lastBridgeStatus =
-                $"Client started to {_hostAddress}:{(_hostPort > 0 ? _hostPort : _networkBootstrap.TransportConfig.port)} as {_authenticatedPlayerName}.";
+                $"Client started to {_hostAddress}:{(_hostPort > 0 ? _hostPort : _networkBootstrap.TransportConfig.Port)} as {_authenticatedPlayerName}.";
 
             // Name will be registered automatically by NPCPlayerNetworkAvatar.OnNetworkSpawn
             // which reads AuthNetworkBridge.ActivePlayerName and calls RegisterPlayerNameServerRpc.
