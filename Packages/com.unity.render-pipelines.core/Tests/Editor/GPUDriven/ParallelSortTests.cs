@@ -1,10 +1,8 @@
 using System;
 using NUnit.Framework;
 using Unity.Collections;
-using UnityEngine.Rendering;
 
 #if UNITY_EDITOR
-using UnityEditor.Rendering;
 #endif
 
 namespace UnityEngine.Rendering.Tests

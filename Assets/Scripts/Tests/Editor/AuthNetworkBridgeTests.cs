@@ -1,4 +1,3 @@
-using System.Reflection;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -37,7 +36,7 @@ namespace NPCSystem.Tests
         public void TryGetCommandLineStartupMode_NoArgs_ReturnsFalse()
         {
             bool result = AuthNetworkBridge.TryGetCommandLineStartupMode(
-                out AuthNetworkBridge.ResolvedNetworkStartupMode mode
+                out AuthNetworkBridge.ResolvedNetworkStartupMode
             );
             Assert.That(result, Is.False);
         }

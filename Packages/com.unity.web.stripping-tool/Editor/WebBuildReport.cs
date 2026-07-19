@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using UnityEngine; // GUID is here beginning in 6000.4.0a4
-using UnityEditor; // GUID was here until 6000.4.0a4
 
 namespace Unity.Web.Stripping.Editor
 {

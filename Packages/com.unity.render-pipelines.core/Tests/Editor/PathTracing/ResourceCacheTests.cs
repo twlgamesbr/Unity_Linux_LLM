@@ -1,12 +1,10 @@
 using NUnit.Framework;
 using System;
-using System.IO;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine.PathTracing.Integration;
 using UnityEngine.PathTracing.Lightmapping;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.UnifiedRayTracing;
-using UnityEditor;
 
 namespace UnityEngine.PathTracing.Tests
 {

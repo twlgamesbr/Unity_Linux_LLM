@@ -9,7 +9,6 @@ using UnityEditor.Profiling;
 using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.Profiling;
-using UnityEngine.TestTools;
 using static Unity.Entities.EntitiesProfiler;
 using static Unity.Entities.MemoryProfiler;
 

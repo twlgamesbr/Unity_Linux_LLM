@@ -3,8 +3,6 @@ using UnityEngine.Rendering.RenderGraphModule;
 using Unity.RenderPipelines.Core.Runtime.Shared;
 
 #if UNITY_EDITOR
-using UnityEditor;
-using UnityEditor.Rendering;
 #endif
 
 namespace UnityEngine.Rendering.Tests

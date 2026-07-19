@@ -1,8 +1,6 @@
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.TestTools;
 
 namespace NPCSystem.Tests
 {
@@ -13,12 +11,12 @@ namespace NPCSystem.Tests
         {
             var msg = new NPCOpenAIMessage
             {
-                role = "system",
-                content = "You are an NPC."
+                Role = "system",
+                Content = "You are an NPC."
             };
 
-            Assert.That(msg.role, Is.EqualTo("system"));
-            Assert.That(msg.content, Is.EqualTo("You are an NPC."));
+            Assert.That(msg.Role, Is.EqualTo("system"));
+            Assert.That(msg.Content, Is.EqualTo("You are an NPC."));
         }
 
         [Test]
@@ -74,7 +72,7 @@ namespace NPCSystem.Tests
 
             try
             {
-                var messages = new[] { new NPCOpenAIMessage { role = "user", content = "Hi" } };
+                var messages = new[] { new NPCOpenAIMessage { Role = "user", Content = "Hi" } };
                 string result = client.ChatAsync(messages).GetAwaiter().GetResult();
                 Assert.That(result, Is.EqualTo("Hello there!"));
                 Assert.That(client.lastRequestedUri, Does.Contain("127.0.0.1:19999"));
@@ -98,7 +96,7 @@ namespace NPCSystem.Tests
 
             try
             {
-                var messages = new[] { new NPCOpenAIMessage { role = "user", content = "Hi" } };
+                var messages = new[] { new NPCOpenAIMessage { Role = "user", Content = "Hi" } };
                 string result = client.ChatAsync(messages).GetAwaiter().GetResult();
                 Assert.That(result, Is.Empty);
             }
@@ -120,7 +118,7 @@ namespace NPCSystem.Tests
 
             try
             {
-                var messages = new[] { new NPCOpenAIMessage { role = "user", content = "Hi" } };
+                var messages = new[] { new NPCOpenAIMessage { Role = "user", Content = "Hi" } };
                 string result = client.ChatAsync(messages).GetAwaiter().GetResult();
                 Assert.That(result, Is.EqualTo("Hello!"));
             }
@@ -142,7 +140,7 @@ namespace NPCSystem.Tests
 
             try
             {
-                var messages = new[] { new NPCOpenAIMessage { role = "user", content = "Hi" } };
+                var messages = new[] { new NPCOpenAIMessage { Role = "user", Content = "Hi" } };
                 string result = client.ChatAsync(messages).GetAwaiter().GetResult();
                 Assert.That(result, Is.Empty);
             }

@@ -1,7 +1,5 @@
 using NUnit.Framework;
-using System.Collections.Generic;
 using UnityEngine.Experimental.Rendering;
-using UnityEngine.XR;
 
 namespace UnityEngine.Rendering.Experimental.Tests.XR
 {

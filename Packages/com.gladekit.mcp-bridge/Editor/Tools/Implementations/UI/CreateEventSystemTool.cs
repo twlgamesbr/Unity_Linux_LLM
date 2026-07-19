@@ -1,14 +1,3 @@
-
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.InputSystem.UI;
-using UnityEditor;
-using System.Text;
-using System;
-using System.Globalization;
-using UnityEngine.UI;
-using UnityEngine.Events;
 #if GLADE_INPUT_SYSTEM
 #endif
 

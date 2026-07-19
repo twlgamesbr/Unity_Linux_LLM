@@ -11,8 +11,6 @@ namespace NPCSystem
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-    using Newtonsoft.Json;
-    using UnityEngine;
 
     /// <summary>
     /// Sends APM trace spans from Unity to the Datadog Trace Agent (port 8126).
@@ -79,7 +77,7 @@ namespace NPCSystem
                 // Seed trace ID from process start ticks for uniqueness
                 _nextTraceId =
                     (Stopwatch.GetTimestamp() & 0x7FFFFFFFFFFFFFFF)
-                    ^ (long)(DateTime.UtcNow.Ticks & 0x7FFFFFFFFFFFFFFF);
+                    ^ DateTime.UtcNow.Ticks & 0x7FFFFFFFFFFFFFFF;
 
                 _flushTimer = new Timer(
                     async _ =>

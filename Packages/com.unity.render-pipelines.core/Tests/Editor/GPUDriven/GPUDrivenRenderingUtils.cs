@@ -1,8 +1,5 @@
 using System;
-using Unity.Collections;
 using System.Collections.Generic;
-using Unity.Collections.LowLevel.Unsafe;
-using UnityEngine.Assertions;
 using Unity.Mathematics;
 
 namespace UnityEngine.Rendering.Tests

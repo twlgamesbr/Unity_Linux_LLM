@@ -1,15 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Globalization;
 using System.Threading.Tasks;
 using EditorAttributes;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Supabase;
 using Supabase.Gotrue;
-using Supabase.Gotrue.Interfaces;
 using UnityEngine;
-using UnityEngine.Networking;
 
 namespace NPCSystem
 {

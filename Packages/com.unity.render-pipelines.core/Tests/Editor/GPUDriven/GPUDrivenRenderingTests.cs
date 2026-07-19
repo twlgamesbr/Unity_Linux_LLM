@@ -7,7 +7,6 @@ using UnityEditor;
 using Unity.Mathematics;
 using NUnit.Framework.Internal;
 using System.Reflection;
-using System;
 
 #if UNITY_EDITOR
 using UnityEditor.Rendering;

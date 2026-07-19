@@ -11,9 +11,7 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.Profiling;
 #if UNITY_6000_5_OR_NEWER
-using UnityEngine.Assemblies;
 #endif
 
 namespace Unity.Entities

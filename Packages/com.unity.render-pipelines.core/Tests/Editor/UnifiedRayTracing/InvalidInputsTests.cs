@@ -1,6 +1,5 @@
 using System;
 using NUnit.Framework;
-using UnityEngine.TestTools;
 
 namespace UnityEngine.Rendering.UnifiedRayTracing.Tests
 {

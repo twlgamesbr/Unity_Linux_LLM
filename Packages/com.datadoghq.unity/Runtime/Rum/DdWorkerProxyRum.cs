@@ -5,7 +5,6 @@
 using System;
 using System.Collections.Generic;
 using Datadog.Unity.Worker;
-using UnityEngine;
 
 namespace Datadog.Unity.Rum
 {

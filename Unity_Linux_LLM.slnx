@@ -230,8 +230,8 @@
   <Project Path="Unity.DedicatedServer.CliArguments.Editor.csproj" />
   <Project Path="Unity.Multiplayer.Tools.Common.csproj" />
   <Project Path="Unity.Netcode.Editor.CodeGen.csproj" />
-  <Project Path="Unity.Transforms.Tests.csproj" />
   <Project Path="Unity.AssetManager.Upload.Editor.csproj" />
+  <Project Path="Unity.Transforms.Tests.csproj" />
   <Project Path="Unity.Cloud.Identity.Editor.Embedded.csproj" />
   <Project Path="Unity.Cloud.AppLinking.Embedded.csproj" />
   <Project Path="Unity.2D.Common.Runtime.csproj" />

@@ -3,7 +3,6 @@
 // Copyright 2025-Present Datadog, Inc.
 
 using System;
-using System.Collections.Generic;
 
 namespace Datadog.Unity.Flags
 {

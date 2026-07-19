@@ -384,7 +384,7 @@ namespace NPCSystem
             }
 
             messages.Add(
-                new NPCOpenAIMessage { role = "system", content = sysPrompt + "\n" + prompt }
+                new NPCOpenAIMessage { Role = "system", Content = sysPrompt + "\n" + prompt }
             );
 
             foreach (
@@ -399,10 +399,10 @@ namespace NPCSystem
                 )
                     ? "assistant"
                     : "user";
-                messages.Add(new NPCOpenAIMessage { role = role, content = entry.Content });
+                messages.Add(new NPCOpenAIMessage { Role = role, Content = entry.Content });
             }
 
-            messages.Add(new NPCOpenAIMessage { role = "user", content = playerMessage });
+            messages.Add(new NPCOpenAIMessage { Role = "user", Content = playerMessage });
 
             var localAiSw = System.Diagnostics.Stopwatch.StartNew();
             using var localAiSpan = DatadogTracer.StartSpan(

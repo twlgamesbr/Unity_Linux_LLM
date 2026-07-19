@@ -1,9 +1,7 @@
 #if ENABLE_VR && ENABLE_XR_MODULE
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using NUnit.Framework;
-using UnityEngine;
 using UnityEngine.TestTools;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.XR;

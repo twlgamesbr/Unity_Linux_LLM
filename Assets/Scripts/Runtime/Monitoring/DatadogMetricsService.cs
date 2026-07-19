@@ -10,7 +10,6 @@ namespace NPCSystem
     using System.Net.Sockets;
     using System.Text;
     using System.Threading;
-    using UnityEngine;
 
     /// <summary>
     /// Lightweight DogStatsD client for sending custom metrics from the Unity

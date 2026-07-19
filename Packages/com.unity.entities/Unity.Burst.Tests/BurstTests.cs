@@ -5,7 +5,6 @@ using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
 using Unity.Entities;
 using Unity.Jobs;
-using UnityEngine.TestTools;
 using static Unity.Burst.CompilerServices.Aliasing;
 
 public class BurstTestFixture

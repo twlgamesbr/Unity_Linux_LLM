@@ -1,5 +1,3 @@
-using Unity.Collections;
-
 namespace Unity.Networking.Transport
 {
     internal interface IUnderlyingConnectionList

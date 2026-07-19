@@ -2,7 +2,6 @@ using System.Text;
 using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.Rendering;
-using static UnityEngine.Rendering.ReloadAttribute;
 
 namespace UnityEditor.Rendering.Tools.Tests
 {

@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using NUnit.Framework.Internal;
-using System;
 using System.Linq;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;

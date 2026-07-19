@@ -1,6 +1,5 @@
 using System;
 using System.Runtime.InteropServices;
-using Datadog.Unity.Logs;
 
 namespace Datadog.Unity
 {

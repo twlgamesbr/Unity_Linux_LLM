@@ -4,9 +4,6 @@
 
 namespace NPCSystem
 {
-    using System.Runtime.InteropServices;
-    using UnityEngine;
-
     /// <summary>
     /// Manages Datadog Browser RUM tracking consent for the WebGL client.
     ///

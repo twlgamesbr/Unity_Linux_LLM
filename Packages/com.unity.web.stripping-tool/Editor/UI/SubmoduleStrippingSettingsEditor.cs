@@ -2,7 +2,6 @@ using UnityEngine.UIElements;
 using UnityEditor;
 using UnityEditor.UIElements;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Unity.Web.Stripping.Editor
 {

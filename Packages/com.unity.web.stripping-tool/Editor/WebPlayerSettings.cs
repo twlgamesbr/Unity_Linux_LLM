@@ -5,7 +5,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.Build;
-using UnityEditor.Build.Content;
 using UnityEngine.Rendering;
 
 namespace Unity.Web.Stripping.Editor

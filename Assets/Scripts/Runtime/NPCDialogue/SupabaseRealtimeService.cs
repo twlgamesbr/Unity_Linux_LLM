@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using EditorAttributes;
 using Postgrest.Exceptions;
-using Supabase.Interfaces;
 using Supabase.Realtime;
 using Supabase.Realtime.Interfaces;
 using Supabase.Realtime.Models;

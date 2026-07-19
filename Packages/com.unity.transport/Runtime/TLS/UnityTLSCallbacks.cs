@@ -2,11 +2,9 @@ using System;
 using AOT;
 using Unity.Burst;
 using Unity.Collections;
-using Unity.Collections.LowLevel.Unsafe;
 using Unity.Mathematics;
 using Unity.TLS.LowLevel;
 using UnityEngine;
-using System.Runtime.InteropServices;
 
 namespace Unity.Networking.Transport.TLS
 {

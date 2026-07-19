@@ -245,7 +245,7 @@ namespace NPCSystem
                             tags: new[] { $"model:{modelName}", $"status:success" }
                         );
 
-                        string rawContent = response.choices[0].message.content ?? string.Empty;
+                        string rawContent = response.choices[0].message.Content ?? string.Empty;
                         rawContent = Regex
                             .Replace(rawContent, @"<think>.*?</think>", "", RegexOptions.Singleline)
                             .Trim();
@@ -395,8 +395,8 @@ namespace NPCSystem
     [Serializable]
     public class NPCOpenAIMessage
     {
-        public string role;
-        public string content;
+        public string Role;
+        public string Content;
     }
 
     [Serializable]

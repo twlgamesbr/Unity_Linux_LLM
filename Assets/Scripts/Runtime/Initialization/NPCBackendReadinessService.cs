@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using EditorAttributes;
 using UnityEngine;
 using UnityEngine.Networking;
-using Void = EditorAttributes.Void;
 using UnityEngine.Serialization;
 
 namespace NPCSystem
@@ -43,7 +42,7 @@ namespace NPCSystem
         )]
         [FoldoutGroup("References", true, nameof(_authService), nameof(_dialogueManager))]
         [SerializeField]
-        private Void referencesGroup;
+        private EditorAttributes.Void referencesGroup;
 
         [SerializeField, HideProperty, FormerlySerializedAs("authService")]
         PlayerAuthService _authService;
@@ -66,7 +65,7 @@ namespace NPCSystem
             nameof(failInitializationOnRequiredBackendFailure)
         )]
         [SerializeField]
-        private Void probeTargetsGroup;
+        private EditorAttributes.Void probeTargetsGroup;
 
         [SerializeField, HideProperty]
         string authProbeRelativePath = "auth/v1/health";
@@ -98,7 +97,7 @@ namespace NPCSystem
             nameof(lastLocalAiBackendStatus)
         )]
         [SerializeField]
-        private Void diagnosticsGroup;
+        private EditorAttributes.Void diagnosticsGroup;
 
         [SerializeField, HideProperty, ReadOnly]
         string lastReadinessStatus = "Not checked.";

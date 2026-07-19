@@ -4,7 +4,6 @@
 using System.Runtime.InteropServices;
 using NUnit.Framework;
 using Unity.Mathematics;
-using UnityEditor;
 using UnityEngine.PathTracing.Core;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Sampling;

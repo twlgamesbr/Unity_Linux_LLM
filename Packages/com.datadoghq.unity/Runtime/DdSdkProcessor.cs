@@ -3,8 +3,6 @@
 // Copyright 2024-Present Datadog, Inc.
 
 using System.Collections.Generic;
-using Datadog.Unity.Logs;
-using UnityEngine.Pool;
 
 namespace Datadog.Unity.Worker
 {

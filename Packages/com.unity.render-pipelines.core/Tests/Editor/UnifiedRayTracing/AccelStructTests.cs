@@ -1,12 +1,9 @@
 using NUnit.Framework;
 using System;
-using UnityEditor;
 using System.Runtime.InteropServices;
 using Unity.Mathematics;
 using Unity.Collections.LowLevel.Unsafe;
 using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.TestTools;
 using UnityEngine.Rendering.RadeonRays;
 
 namespace UnityEngine.Rendering.UnifiedRayTracing.Tests

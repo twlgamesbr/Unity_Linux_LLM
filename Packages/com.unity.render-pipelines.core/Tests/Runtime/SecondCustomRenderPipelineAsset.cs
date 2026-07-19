@@ -1,5 +1,3 @@
-using UnityEngine;
-using UnityEngine.Rendering;
 using System.Collections.Generic;
 
 namespace UnityEngine.Rendering.Tests

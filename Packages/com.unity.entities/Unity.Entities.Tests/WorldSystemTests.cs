@@ -3,7 +3,6 @@ using NUnit.Framework;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Collections.LowLevel.Unsafe;
-using UnityEngine.TestTools;
 
 namespace Unity.Entities.Tests
 {

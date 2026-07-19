@@ -1,6 +1,5 @@
 using System;
 using NUnit.Framework;
-using UnityEngine;
 using UnityEngine.Rendering;
 
 namespace UnityEditor.Rendering

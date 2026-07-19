@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using EditorAttributes;
 using Newtonsoft.Json.Linq;
-using Supabase;
 using static Postgrest.Constants;
 using UnityEngine;
 using UnityEngine.Serialization;

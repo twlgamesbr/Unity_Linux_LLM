@@ -11,13 +11,11 @@ using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.AddressableAssets.Settings.GroupSchemas;
 using UnityEditor.Build.Content;
 using UnityEditor.Build.Pipeline;
-using UnityEditor.Build.Pipeline.Utilities;
 using UnityEditor.TestTools;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.AddressableAssets.ResourceLocators;
 using UnityEngine.ResourceManagement.ResourceProviders;
-using UnityEngine.ResourceManagement.Util;
 using UnityEngine.TestTools;
 
 namespace UnityEditor.AddressableAssets.Tests
