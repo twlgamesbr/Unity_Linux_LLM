@@ -10,13 +10,14 @@
       }
     },
     "com.gladekit.mcp-bridge": {
-      "version": "file:com.gladekit.mcp-bridge",
+      "version": "https://github.com/Glade-tool/glade-mcp.git?path=/unity-bridge",
       "depth": 0,
-      "source": "embedded",
+      "source": "git",
       "dependencies": {
         "com.unity.inputsystem": "1.0.0",
         "com.unity.ai.navigation": "1.0.0"
-      }
+      },
+      "hash": "4c3572086672672c3599cbb0cd454a87e49069f4"
     },
     "com.google.external-dependency-manager": {
       "version": "1.2.188",
