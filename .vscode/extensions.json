@@ -1,5 +1,10 @@
 {
     "recommendations": [
-      "visualstudiotoolsforunity.vstuc"
+        "visualstudiotoolsforunity.vstuc",
+        "kleber-swf.unity-code-snippets",
+        "tobiah.unity-tools",
+        "editorconfig.editorconfig",
+        "csharpier.csharpier-vscode",
+        "ms-dotnettools.csdevkit"
     ]
 }

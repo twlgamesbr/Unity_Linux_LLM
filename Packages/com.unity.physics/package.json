@@ -19,21 +19,5 @@
   "unity": "6000.5",
   "unityRelease": "0a2",
   "version": "6.5.0",
-  "samples": [
-    {
-      "displayName": "Custom Physics Authoring",
-      "description": "Provides a custom authoring experience for creating rigid bodies, colliders and joints for Unity Physics.",
-      "importPath": "Authoring",
-      "path": "Samples~/CustomPhysicsAuthoring"
-    },
-    {
-      "displayName": "Advanced Game Physics Sample - Chain and Gears",
-      "description": "Example of an advanced physics-based game element that leverages Unity Physics' Direct Solver to simulate a complex mechanism involving gears interacting with a chain. \n\nNotice: This sample has a dependency on Entities Graphics for the scene to render. \n\nThe simulation combines the Direct Solver for accurate simulation of the stiff chain links and the gears with the Iterative Solver for efficient simulation of all the collisions in the scene. This sample demonstrates how both solvers combined can capture exciting emerging physical behaviors at real-time simulation rates, such as the jamming of the gears caused by the chain getting stuck between the gears' teeth.",
-      "path": "Samples~/AdvancedGamePhysics-ChainAndGears",
-      "dependencies": [
-        "com.unity.physics/Samples~/Common"
-      ]
-    }
-  ],
   "_fingerprint": "a489d6434f278d2e2e52195bf404f9638238860a"
 }

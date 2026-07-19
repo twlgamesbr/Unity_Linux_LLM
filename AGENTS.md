@@ -27,7 +27,9 @@ Dual source of truth (do not duplicate rule text here):
 | Formatting + naming (IDE) | `.editorconfig` |
 | Unity-specific + architectural rules (CI) | `.codebaserules.yaml` |
 
-- Namespaces for project code: `NPCSystem.*` (Runtime / Editor / Tests).
+- Namespaces for project code: domain-specific (`NPCSystem.Auth`, `NPCSystem.Dialogue.Core`, etc.) — see §2 for full map.
+- All domain namespaces are under `NPCSystem.*` root. Files in `Monitoring/Core/` use `NPCSystem.Monitoring` (separate asmdef).
+- Editor code: `NPCSystem.Editor`. Tests: `NPCSystem.Tests`.
 - If conventions change: update `.editorconfig` first, then `.codebaserules.yaml` if needed.
 - After touching rules: `uv run --directory Tools/CodebaseEmbedder codebase-embedder check --root ..`.
 - Agents: retrieve policy via `codebase-embedder query` (`project_rule` records) or read the two files above.
@@ -35,16 +37,40 @@ Dual source of truth (do not duplicate rule text here):
 ## 2. Project map
 
 - Active scene: `Assets/Scenes/NPCDialoguePrototype1.unity`.
-- Main runtime folders: `Assets/Scripts/Runtime/` (`Initialization`, `LocalRAG`, `Networking`, `NPCDialogue`, `Supabase`), `Assets/Scripts/Editor/`, `Assets/Scripts/Tests/Editor/`.
-- Key asmdefs: `NPCSystem.Runtime`, `NPCSystem.Editor`, `NPCSystem.Tests`.
-- Namespaces: `NPCSystem`, `NPCSystem.Editor`, `NPCSystem.Tests`.
+- **Domain structure** (all under `Assets/Scripts/Runtime/`):
+
+| Domain | Path | Namespace |
+|---|---|---|
+| Auth | `Auth/` | `NPCSystem.Auth` |
+| Character (Animation) | `Character/Animation/` | `NPCSystem.Character.Animation` |
+| Character (NPC) | `Character/NPC/` | `NPCSystem.Character.NPC` |
+| Character (Player) | `Character/Player/` | `NPCSystem.Character.Player` |
+| Dialogue (Core) | `Dialogue/Core/` | `NPCSystem.Dialogue.Core` |
+| Dialogue (Persistence) | `Dialogue/Persistence/` | `NPCSystem.Dialogue.Persistence` |
+| Dialogue (RAG) | `Dialogue/RAG/` | `NPCSystem.Dialogue.RAG` |
+| Dialogue (Session) | `Dialogue/Session/` | `NPCSystem.Dialogue.Session` |
+| Dialogue (UI) | `Dialogue/UI/` | `NPCSystem.Dialogue.UI` |
+| Initialization | `Initialization/` | `NPCSystem.Initialization` |
+| Items | `Items/` | `NPCSystem.Items` |
+| LocalAI | `LocalAI/` | `NPCSystem.LocalAI` |
+| Monitoring (Core) | `Monitoring/Core/` | `NPCSystem.Monitoring` |
+| Monitoring (Datadog) | `Monitoring/Datadog/` | `NPCSystem.Monitoring.Datadog` |
+| Network (Bridges) | `Network/Bridges/` | `NPCSystem.Network.Bridges` |
+| Network (Core) | `Network/Core/` | `NPCSystem.Network.Core` |
+
+- Key asmdefs: `NPCSystem.Runtime` (root), `NPCSystem.Monitoring` (Monitoring/Core/).
 - Dedicated server output: `Builds/Server/`; Docker lives in `docker/`.
 
 ## 3. Scene wiring (current)
 
-- `NPCDialogueSystem`: `NPCDialogueManager`, `NPCDialogueBootstrapper`, `QdrantRAGService`, `NPCDialogueActionPlanner`.
-- `NPCNetworkSystem`: `NPCNetworkBootstrap`.
-- `AuthUI`: `AuthUIController`; `AuthBridge`: `AuthNetworkBridge`.
+- `NPCDialogueSystem` (root, 10 missing scripts — old refs, harmless):
+  - `Core` — `NPCDialogueManager`, `NPCDialogueSmokeValidator`
+  - `Backend` — `NPCBackendReadinessService`
+  - `Services` — `NPCDialogueHistoryService`, `NPCDialogueRetrievalService`, `NPCDialogueSessionService`, `PlayerDialogueContextService`
+  - `Network` — `NetworkObject`, `NPCDialogueNetworkBridge`, `ItemTradeService`
+- `NPCNetworkSystem` — `NPCNetworkBootstrap`
+- `Canvas` — `NPCDialogueUIController` (references Core→DialogueManager, Network→NetworkBridge, PlayerInput, AiText, StopButton)
+- `NPCSceneInitialization` — `NPCSceneInitializationController` (references FlowLogger, NetworkBootstrap, DialogueManager, BackendReadiness, NetworkBridge, SmokeValidator)
 - `LLM` and `LLMAgent` exist but are disabled; `NPCDialogueManager` currently uses HTTP to LocalAI **via port 8080** (direct, no proxy — see `NPCLocalAIConfig.LocalAIDirectPort`).
 - `LLMRAG` is the active local embedding model; `CogneeMemoryService` exists but is disabled in the scene.
 - `Assets/Scenes/NPCDialoguePrototype1.unity` is the only authoritative scene file. Do not edit `.unity` files by hand.

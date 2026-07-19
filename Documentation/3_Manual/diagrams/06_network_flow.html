@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Network Flow — Client ↔ Server ↔ LLM Bridge</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'JetBrains Mono', monospace;
+      background: #020617;
+      min-height: 100vh;
+      padding: 2rem;
+      color: white;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .header { margin-bottom: 2rem; }
+    .header-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem; }
+    .pulse-dot {
+      width: 12px; height: 12px; background: #22d3ee;
+      border-radius: 50%; animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.025em; }
+    .subtitle { color: #94a3b8; font-size: 0.875rem; margin-left: 1.75rem; }
+    .diagram-container {
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 1rem; border: 1px solid #1e293b;
+      padding: 1.5rem; overflow-x: auto;
+    }
+    svg { width: 100%; min-width: 1000px; display: block; }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem; margin-top: 2rem;
+    }
+    .card {
+      background: rgba(15, 23, 42, 0.5);
+      border-radius: 0.75rem; border: 1px solid #1e293b;
+      padding: 1.25rem;
+    }
+    .card-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .card-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .card-dot.cyan { background: #22d3ee; }
+    .card-dot.emerald { background: #34d399; }
+    .card-dot.rose { background: #fb7185; }
+    .card h3 { font-size: 0.875rem; font-weight: 600; }
+    .card ul { list-style: none; color: #94a3b8; font-size: 0.75rem; }
+    .card li { margin-bottom: 0.375rem; }
+    .footer { text-align: center; margin-top: 1.5rem; color: #475569; font-size: 0.75rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-row">
+        <div class="pulse-dot"></div>
+        <h1>Network Flow — Client ↔ Server ↔ LLM Bridge</h1>
+      </div>
+      <p class="subtitle">All LLM calls are server-authoritative; client only sends player input</p>
+    </div>
+
+    <!-- Main Diagram -->
+    <div class="diagram-container">
+      <svg viewBox="0 0 1100 680">
+        <defs>
+          <!-- Standard arrowhead -->
+          <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#64748b" />
+          </marker>
+          <!-- Cyan arrowhead (client flows) -->
+          <marker id="arrow-cyan" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#22d3ee" />
+          </marker>
+          <!-- Emerald arrowhead (server flows) -->
+          <marker id="arrow-emerald" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#34d399" />
+          </marker>
+          <!-- Violet arrowhead (DB flows) -->
+          <marker id="arrow-violet" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#a78bfa" />
+          </marker>
+          <!-- Orange arrowhead (LLM flows) -->
+          <marker id="arrow-orange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#fb923c" />
+          </marker>
+          <!-- Background grid pattern -->
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+
+        <!-- Background Grid -->
+        <rect width="100%" height="100%" fill="url(#grid)" />
+
+        <!-- =================================================================
+             ARROW FLOWS (drawn before boxes for correct z-order)
+             ================================================================= -->
+
+        <!-- 1. Client → Server: SubmitPlayerMessage (RPC) — WebSocket -->
+        <line x1="235" y1="242" x2="315" y2="148" stroke="#22d3ee" stroke-width="1.5" marker-end="url(#arrow-cyan)"/>
+
+        <!-- 6. Server → Client: OnResponseComplete (RPC) — WebSocket -->
+        <line x1="315" y1="162" x2="235" y2="258" stroke="#22d3ee" stroke-width="1.5" marker-end="url(#arrow-cyan)"/>
+
+        <!-- 2. Server → LocalAI: HTTP request with context-enriched prompt -->
+        <line x1="540" y1="242" x2="658" y2="200" stroke="#fb923c" stroke-width="1.5" marker-end="url(#arrow-orange)"/>
+
+        <!-- 4. LocalAI → Server: LLM response -->
+        <line x1="658" y1="218" x2="540" y2="262" stroke="#fb923c" stroke-width="1.5" marker-end="url(#arrow-orange)"/>
+
+        <!-- 3. Server → Qdrant: RAG retrieval (before LLM call) -->
+        <line x1="540" y1="270" x2="658" y2="298" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#arrow-violet)"/>
+
+        <!-- 5. Server → Supabase: Persist dialogue history -->
+        <line x1="540" y1="278" x2="658" y2="405" stroke="#a78bfa" stroke-width="1.5" marker-end="url(#arrow-violet)"/>
+
+        <!-- 7. Server → Datadog: Telemetry metrics -->
+        <line x1="540" y1="448" x2="658" y2="510" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+
+        <!-- Server-internal arrow: NetworkBridge → DialogueManager -->
+        <line x1="430" y1="175" x2="430" y2="218" stroke="#34d399" stroke-width="1.5" marker-end="url(#arrow-emerald)"/>
+        <text x="440" y="200" fill="#34d399" font-size="7">internal call</text>
+
+        <!-- =================================================================
+             FLOW LABELS (above the arrows)
+             ================================================================= -->
+
+        <!-- Arrow 1 label -->
+        <text x="275" y="190" fill="#22d3ee" font-size="8" text-anchor="middle" font-weight="600">SubmitPlayerMessage (RPC)</text>
+        <rect x="248" y="193" width="54" height="12" rx="2" fill="rgba(34,211,238,0.15)" stroke="#22d3ee" stroke-width="0.5"/>
+        <text x="275" y="202" fill="#22d3ee" font-size="7" text-anchor="middle">WebSocket</text>
+
+        <!-- Arrow 6 label -->
+        <text x="275" y="215" fill="#22d3ee" font-size="8" text-anchor="middle" font-weight="600">OnResponseComplete (RPC)</text>
+        <rect x="248" y="217" width="54" height="12" rx="2" fill="rgba(34,211,238,0.15)" stroke="#22d3ee" stroke-width="0.5"/>
+        <text x="275" y="226" fill="#22d3ee" font-size="7" text-anchor="middle">WebSocket</text>
+
+        <!-- Arrow 2 label -->
+        <text x="605" y="214" fill="#fb923c" font-size="8" text-anchor="middle" font-weight="600">HTTP /v1/completions</text>
+        <rect x="578" y="216" width="52" height="12" rx="2" fill="rgba(251,146,60,0.15)" stroke="#fb923c" stroke-width="0.5"/>
+        <text x="604" y="225" fill="#fb923c" font-size="7" text-anchor="middle">Direct</text>
+
+        <!-- Arrow 4 label -->
+        <text x="605" y="235" fill="#fb923c" font-size="8" text-anchor="middle" font-weight="600">LLM response</text>
+
+        <!-- Arrow 3 label -->
+        <text x="605" y="278" fill="#a78bfa" font-size="8" text-anchor="middle" font-weight="600">RAG retrieval</text>
+        <rect x="591" y="281" width="30" height="12" rx="2" fill="rgba(167,139,250,0.15)" stroke="#a78bfa" stroke-width="0.5"/>
+        <text x="606" y="290" fill="#a78bfa" font-size="7" text-anchor="middle">gRPC</text>
+
+        <!-- Arrow 5 label -->
+        <text x="615" y="350" fill="#a78bfa" font-size="8" text-anchor="middle" font-weight="600">Persist dialogue history</text>
+        <rect x="596" y="353" width="36" height="12" rx="2" fill="rgba(167,139,250,0.15)" stroke="#a78bfa" stroke-width="0.5"/>
+        <text x="614" y="362" fill="#a78bfa" font-size="7" text-anchor="middle">REST</text>
+
+        <!-- Arrow 7 label -->
+        <text x="610" y="474" fill="#94a3b8" font-size="8" text-anchor="middle" font-weight="600">Telemetry: latency, tokens, errors</text>
+        <rect x="586" y="477" width="50" height="12" rx="2" fill="rgba(100,116,139,0.15)" stroke="#64748b" stroke-width="0.5"/>
+        <text x="611" y="486" fill="#94a3b8" font-size="7" text-anchor="middle">DogStatsD</text>
+
+        <!-- =================================================================
+             LEGEND (bottom, outside boundaries)
+             ================================================================= -->
+        <rect x="30" y="595" width="1040" height="70" rx="8" fill="rgba(15, 23, 42, 0.6)" stroke="#1e293b" stroke-width="1"/>
+
+        <text x="50" y="615" fill="white" font-size="10" font-weight="600">Legend</text>
+
+        <!-- Column colors -->
+        <rect x="50" y="624" width="14" height="10" rx="2" fill="rgba(8, 51, 68, 0.4)" stroke="#22d3ee" stroke-width="1"/>
+        <text x="68" y="633" fill="#94a3b8" font-size="8">Frontend (Client)</text>
+
+        <rect x="190" y="624" width="14" height="10" rx="2" fill="rgba(6, 78, 59, 0.4)" stroke="#34d399" stroke-width="1"/>
+        <text x="208" y="633" fill="#94a3b8" font-size="8">Backend (Server)</text>
+
+        <rect x="340" y="624" width="14" height="10" rx="2" fill="rgba(251, 146, 60, 0.3)" stroke="#fb923c" stroke-width="1"/>
+        <text x="358" y="633" fill="#94a3b8" font-size="8">ML/LLM Service</text>
+
+        <rect x="490" y="624" width="14" height="10" rx="2" fill="rgba(76, 29, 149, 0.4)" stroke="#a78bfa" stroke-width="1"/>
+        <text x="508" y="633" fill="#94a3b8" font-size="8">Database</text>
+
+        <rect x="610" y="624" width="14" height="10" rx="2" fill="rgba(30, 41, 59, 0.5)" stroke="#94a3b8" stroke-width="1"/>
+        <text x="628" y="633" fill="#94a3b8" font-size="8">External / Monitoring</text>
+
+        <!-- Transport types -->
+        <line x1="800" y1="629" x2="820" y2="629" stroke="#22d3ee" stroke-width="1.5"/>
+        <text x="824" y="633" fill="#94a3b8" font-size="8">WebSocket (WebGL)</text>
+
+        <line x1="950" y1="629" x2="970" y2="629" stroke="#fb923c" stroke-width="1.5"/>
+        <text x="974" y="633" fill="#94a3b8" font-size="8">Direct (Editor)</text>
+
+        <!-- Arrow type key -->
+        <line x1="50" y1="648" x2="65" y2="648" stroke="#64748b" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+        <text x="70" y="652" fill="#94a3b8" font-size="8">Data flow direction</text>
+
+        <line x1="230" y1="648" x2="245" y2="648" stroke="#34d399" stroke-width="1.5" stroke-dasharray="3,3"/>
+        <text x="250" y="652" fill="#94a3b8" font-size="8">Internal call</text>
+
+        <!-- =================================================================
+             COLUMN BOUNDARIES
+             ================================================================= -->
+
+        <!-- Left Column: WebGL Client -->
+        <rect x="20" y="80" width="240" height="260" rx="8" fill="rgba(8, 51, 68, 0.06)" stroke="#22d3ee" stroke-width="1" stroke-opacity="0.35"/>
+        <rect x="20" y="70" width="240" height="20" rx="4" fill="rgba(8, 51, 68, 0.5)" stroke="#22d3ee" stroke-width="1"/>
+        <text x="140" y="84" fill="#22d3ee" font-size="10" font-weight="600" text-anchor="middle">WebGL Client (Unity)</text>
+
+        <!-- Middle Column: Network Server -->
+        <rect x="300" y="80" width="260" height="465" rx="8" fill="rgba(6, 78, 59, 0.06)" stroke="#34d399" stroke-width="1" stroke-opacity="0.35"/>
+        <rect x="300" y="70" width="260" height="20" rx="4" fill="rgba(6, 78, 59, 0.5)" stroke="#34d399" stroke-width="1"/>
+        <text x="430" y="84" fill="#34d399" font-size="10" font-weight="600" text-anchor="middle">Network Server (Unity)</text>
+
+        <!-- Right Column: Backend Services -->
+        <rect x="620" y="80" width="450" height="505" rx="8" fill="rgba(30, 41, 59, 0.06)" stroke="#64748b" stroke-width="1" stroke-opacity="0.35"/>
+        <rect x="620" y="70" width="450" height="20" rx="4" fill="rgba(30, 41, 59, 0.5)" stroke="#64748b" stroke-width="1"/>
+        <text x="845" y="84" fill="#94a3b8" font-size="10" font-weight="600" text-anchor="middle">Backend Services</text>
+
+        <!-- =================================================================
+             LEFT COLUMN — WebGL Client (Unity) — Frontend / Cyan
+             ================================================================= -->
+
+        <!-- NPCDialogueUIController -->
+        <rect x="40" y="120" width="200" height="55" rx="6" fill="#0f172a" stroke="#22d3ee" stroke-width="1.5"/>
+        <rect x="40" y="120" width="200" height="55" rx="6" fill="rgba(8, 51, 68, 0.4)" stroke="none"/>
+        <text x="140" y="143" fill="white" font-size="11" font-weight="600" text-anchor="middle">NPCDialogueUIController</text>
+        <text x="140" y="158" fill="#94a3b8" font-size="8" text-anchor="middle">player input · AI text · stop</text>
+
+        <!-- Client internal arrow: UI → Client Bridge -->
+        <line x1="140" y1="175" x2="140" y2="208" stroke="#22d3ee" stroke-width="1" stroke-dasharray="3,3" marker-end="url(#arrow-cyan)"/>
+        <text x="150" y="196" fill="#22d3ee" font-size="7">ref</text>
+
+        <!-- NPCDialogueNetworkBridge.Client -->
+        <rect x="40" y="210" width="200" height="55" rx="6" fill="#0f172a" stroke="#22d3ee" stroke-width="1.5"/>
+        <rect x="40" y="210" width="200" height="55" rx="6" fill="rgba(8, 51, 68, 0.4)" stroke="none"/>
+        <text x="140" y="233" fill="white" font-size="11" font-weight="600" text-anchor="middle">NPCDialogueNetworkBridge</text>
+        <text x="140" y="248" fill="#94a3b8" font-size="8" text-anchor="middle">.Client — RPC messages</text>
+
+        <!-- =================================================================
+             MIDDLE COLUMN — Network Server (Unity) — Backend / Emerald
+             ================================================================= -->
+
+        <!-- NPCDialogueNetworkBridge.Server -->
+        <rect x="320" y="120" width="220" height="55" rx="6" fill="#0f172a" stroke="#34d399" stroke-width="1.5"/>
+        <rect x="320" y="120" width="220" height="55" rx="6" fill="rgba(6, 78, 59, 0.4)" stroke="none"/>
+        <text x="430" y="143" fill="white" font-size="11" font-weight="600" text-anchor="middle">NPCDialogueNetworkBridge</text>
+        <text x="430" y="158" fill="#94a3b8" font-size="8" text-anchor="middle">.Server — RPC handler, state</text>
+
+        <!-- NPCDialogueManager -->
+        <rect x="320" y="220" width="220" height="55" rx="6" fill="#0f172a" stroke="#34d399" stroke-width="1.5"/>
+        <rect x="320" y="220" width="220" height="55" rx="6" fill="rgba(6, 78, 59, 0.4)" stroke="none"/>
+        <text x="430" y="243" fill="white" font-size="11" font-weight="600" text-anchor="middle">NPCDialogueManager</text>
+        <text x="430" y="258" fill="#94a3b8" font-size="8" text-anchor="middle">orchestrates dialogue, calls LLM</text>
+
+        <!-- ItemTradeService -->
+        <rect x="320" y="320" width="220" height="50" rx="6" fill="#0f172a" stroke="#34d399" stroke-width="1.5"/>
+        <rect x="320" y="320" width="220" height="50" rx="6" fill="rgba(6, 78, 59, 0.4)" stroke="none"/>
+        <text x="430" y="340" fill="white" font-size="11" font-weight="600" text-anchor="middle">ItemTradeService</text>
+        <text x="430" y="355" fill="#94a3b8" font-size="8" text-anchor="middle">server-authoritative item ops</text>
+
+        <!-- NPCNetworkBootstrap -->
+        <rect x="320" y="420" width="220" height="50" rx="6" fill="#0f172a" stroke="#34d399" stroke-width="1.5"/>
+        <rect x="320" y="420" width="220" height="50" rx="6" fill="rgba(6, 78, 59, 0.4)" stroke="none"/>
+        <text x="430" y="440" fill="white" font-size="11" font-weight="600" text-anchor="middle">NPCNetworkBootstrap</text>
+        <text x="430" y="455" fill="#94a3b8" font-size="8" text-anchor="middle">transport config + host mode</text>
+
+        <!-- =================================================================
+             RIGHT COLUMN — Backend Services
+             ================================================================= -->
+
+        <!-- LocalAI — Orange (ML/LLM Service) -->
+        <rect x="660" y="185" width="180" height="55" rx="6" fill="#0f172a" stroke="#fb923c" stroke-width="1.5"/>
+        <rect x="660" y="185" width="180" height="55" rx="6" fill="rgba(251, 146, 60, 0.2)" stroke="none"/>
+        <text x="750" y="208" fill="white" font-size="11" font-weight="600" text-anchor="middle">LocalAI</text>
+        <text x="750" y="223" fill="#94a3b8" font-size="8" text-anchor="middle">:8080 — LLM + embeddings</text>
+
+        <!-- Qdrant — Violet (Database) -->
+        <rect x="660" y="285" width="180" height="55" rx="6" fill="#0f172a" stroke="#a78bfa" stroke-width="1.5"/>
+        <rect x="660" y="285" width="180" height="55" rx="6" fill="rgba(76, 29, 149, 0.4)" stroke="none"/>
+        <text x="750" y="308" fill="white" font-size="11" font-weight="600" text-anchor="middle">Qdrant</text>
+        <text x="750" y="323" fill="#94a3b8" font-size="8" text-anchor="middle">:6333 — Vector DB (RAG)</text>
+
+        <!-- Supabase — Violet (Database) + Rose (Auth badge) -->
+        <rect x="660" y="385" width="180" height="65" rx="6" fill="#0f172a" stroke="#a78bfa" stroke-width="1.5"/>
+        <rect x="660" y="385" width="180" height="65" rx="6" fill="rgba(76, 29, 149, 0.4)" stroke="none"/>
+        <text x="750" y="408" fill="white" font-size="11" font-weight="600" text-anchor="middle">Supabase</text>
+        <text x="750" y="423" fill="#94a3b8" font-size="8" text-anchor="middle">Auth (GoTrue :8091)</text>
+        <text x="750" y="436" fill="#94a3b8" font-size="8" text-anchor="middle">DB (PostgREST :8092)</text>
+
+        <!-- Datadog Agent — Slate (External/Monitoring) -->
+        <rect x="660" y="498" width="180" height="55" rx="6" fill="#0f172a" stroke="#94a3b8" stroke-width="1.5"/>
+        <rect x="660" y="498" width="180" height="55" rx="6" fill="rgba(30, 41, 59, 0.5)" stroke="none"/>
+        <text x="750" y="521" fill="white" font-size="11" font-weight="600" text-anchor="middle">Datadog Agent</text>
+        <text x="750" y="536" fill="#94a3b8" font-size="8" text-anchor="middle">:8125/:8126 — metrics+traces</text>
+
+        <!-- =================================================================
+             SECURITY NOTE — Client never talks to LocalAI
+             ================================================================= -->
+        <!-- Cross-out zone: from Client to LocalAI (showing blocked path) -->
+        <line x1="200" y1="280" x2="700" y2="185" stroke="#fb7185" stroke-width="1" stroke-dasharray="5,5" opacity="0.5"/>
+        <text x="420" y="230" fill="#fb7185" font-size="7" opacity="0.6" transform="rotate(-20, 420, 230)">
+          ✗ no direct LLM access
+        </text>
+
+        <!-- =================================================================
+             BRIDGE PATTERN HIGHLIGHT
+             ================================================================= -->
+        <!-- Highlight the bridge components (both cyan and emerald bridge boxes) -->
+        <rect x="36" y="206" width="508" height="63" rx="8" fill="none" stroke="#fbbf24" stroke-width="1" stroke-dasharray="4,4" opacity="0.4"/>
+        <rect x="36" y="200" width="130" height="14" rx="3" fill="rgba(251, 191, 36, 0.2)" stroke="#fbbf24" stroke-width="0.5"/>
+        <text x="101" y="210" fill="#fbbf24" font-size="8" text-anchor="middle" font-weight="600">Bridge Pattern</text>
+      </svg>
+    </div>
+
+    <!-- Info Cards -->
+    <div class="cards">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot cyan"></div>
+          <h3>Client Path (WebGL)</h3>
+        </div>
+        <ul>
+          <li>• UI → NetworkBridge.RPC → Server → LLM → RAG → Response → UI</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot emerald"></div>
+          <h3>Bridge Pattern</h3>
+        </div>
+        <ul>
+          <li>• NPCDialogueNetworkBridge is the only cross-boundary component</li>
+          <li>• Handles RPCs, session state, profile sync</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot rose"></div>
+          <h3>Security Model</h3>
+        </div>
+        <ul>
+          <li>• Player never sees LocalAI URL</li>
+          <li>• API keys stay on server</li>
+          <li>• All state changes are server-validated</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <p class="footer">
+      NPCSystem • Network Flow Diagram • v1.0
+    </p>
+  </div>
+</body>
+</html>

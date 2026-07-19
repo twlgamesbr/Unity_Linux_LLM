@@ -1,4 +1,5 @@
 {
+    // ── File exclusions (Unity-heavy project) ──────────────────────
     "files.exclude": {
         "**/.DS_Store": true,
         "**/.git": true,
@@ -38,6 +39,9 @@
         "**/*.flare": true,
         "**/*.mat": true,
         "**/*.meta": true,
+        "**/*.a": true,
+        "**/*.so": true,
+        "**/*.pdb": true,
         "build/": true,
         "Build/": true,
         "Library/": true,
@@ -79,27 +83,83 @@
         "**/Temp/**": true,
         "**/UserSettings/**": true
     },
+
+    // ── File associations (Unity asset types + shaders) ───────────
     "files.associations": {
         "*.asset": "yaml",
         "*.meta": "yaml",
         "*.prefab": "yaml",
         "*.unity": "yaml",
+        "*.shader": "hlsl",
+        "*.hlsl": "hlsl",
+        "*.cginc": "hlsl",
+        "*.compute": "hlsl"
     },
-    "[csharp]": {
-        "editor.colorDecorators": false
-    },
+
+    // ── Explorer / file nesting ───────────────────────────────────
     "explorer.fileNesting.enabled": true,
     "explorer.fileNesting.patterns": {
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
+
+    // ── Performance: large Unity project tuning ───────────────────
+    "files.maxMemoryForLargeFilesMB": 4096,
+    "search.maxFileSize": 10485760,
+    "editor.maxTokenizationLineLength": 10000,
+
+    // ── Editor behaviour ──────────────────────────────────────────
+    "editor.suggestSelection": "first",
+    "editor.quickSuggestions": {
+        "other": true,
+        "comments": false,
+        "strings": true
+    },
+    "editor.stickyScroll.enabled": true,
+    "editor.bracketPairColorization.enabled": true,
+    "editor.guides.bracketPairs": "active",
+    "editor.inlineSuggest.enabled": true,
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "csharpier.csharpier-vscode",
+    "editor.minimap.maxColumn": 100,
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit",
+        "source.organizeImports": "explicit"
+    },
+
+    // ── C# / OmniSharp (editorconfig integration) ────────────────
+    "[csharp]": {
+        "editor.colorDecorators": false,
+        "editor.defaultFormatter": "csharpier.csharpier-vscode",
+        "editor.formatOnSave": true,
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true
+    },
+    "omnisharp.useEditorFormattingSettings": true,
     "dotnet.defaultSolution": "Unity_Linux_LLM.slnx",
+    "dotnet.completion.useSnippet": true,
+    "dotnet.automaticBracketPairs": true,
+    "dotnet.highlightingMode": "semanticAndRoslynBest",
+
+    // ── CSharpier (format-on-save via defaultFormatter above) ────
+    "csharpier.enableDebugLogs": false,
+
+    // ── YAML / shader tabs ────────────────────────────────────────
+    "[yaml]": {
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true
+    },
+    "[hlsl]": {
+        "editor.tabSize": 4,
+        "editor.insertSpaces": true
+    },
+
+    // ── Datadog integration ───────────────────────────────────────
     "datadog.ust.environment.setup.focusedName": "production",
     "datadog.ust.service.setup.linkedNames": [
         "localai-proxy",
         "node",
         "supa-storage",
         "supabase/postgres-meta"
-    ],
-    "csharpier.enableDebugLogs": true
+    ]
 }

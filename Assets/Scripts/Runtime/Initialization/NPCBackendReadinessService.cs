@@ -6,7 +6,21 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Serialization;
 
-namespace NPCSystem
+
+using NPCSystem.Monitoring;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Network.Core;
+using NPCSystem.Character.Player;
+using NPCSystem.Auth;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Initialization;
+using NPCSystem.Character.NPC;
+using NPCSystem.Dialogue.Session;
+using NPCSystem.Dialogue.UI;
+using NPCSystem.Dialogue.RAG;
+using NPCSystem.Dialogue.Persistence;
+namespace NPCSystem.Initialization
 {
     [Serializable]
     public sealed class NPCBackendProbeResult

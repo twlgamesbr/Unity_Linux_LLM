@@ -4,13 +4,6 @@
   "version": "2.1.1",
   "unity": "2022.3",
   "description": "A framework for making any serializable field a setting, complete with a pre-built settings interface.",
-  "samples": [
-    {
-      "displayName": "User Settings Example",
-      "description": "Example code showing use of the Settings Manager attributes.",
-      "path": "Samples~"
-    }
-  ],
   "hideInEditor": true,
   "_upm": {
     "changelog": "### Changes\n\n- Enable Auto Reference on main assembly.\n\n### Bug Fixes\n\n- [case: PBLD-56] Added tooltip to \"Options\" gear icon to specify that context menu items are relevant only to the selected category."

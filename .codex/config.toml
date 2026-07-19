@@ -14,6 +14,3 @@ url = "https://mcp.us5.datadoghq.com/v1/mcp"
 
 [features.multi_agent_v2]
 max_concurrent_threads_per_session = 1000
-
-[agents]
-max_threads = 1000

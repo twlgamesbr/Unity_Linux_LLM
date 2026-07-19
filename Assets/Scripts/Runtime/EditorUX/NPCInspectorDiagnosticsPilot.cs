@@ -3,6 +3,15 @@ using EditorAttributes;
 using UnityEngine.Serialization;
 using Void = EditorAttributes.Void;
 using UnityEngine;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Dialogue.RAG;
+using NPCSystem.Network.Bridges;
+using NPCSystem.Monitoring;
+using NPCSystem.Items;
+using NPCSystem.Auth;
+using NPCSystem.Character.Player;
+using NPCSystem.Initialization;
+using NPCSystem.LocalAI;
 
 namespace NPCSystem.EditorUX
 {

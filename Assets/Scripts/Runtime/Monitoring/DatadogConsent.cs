@@ -2,7 +2,7 @@
 // Copyright (c) NPC System. All rights reserved.
 // </copyright>
 
-namespace NPCSystem
+namespace NPCSystem.Monitoring
 {
     /// <summary>
     /// Manages Datadog Browser RUM tracking consent for the WebGL client.

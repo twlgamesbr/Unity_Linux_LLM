@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using NPCSystem.Dialogue.Core;
 
 namespace NPCSystem.Editor
 {
@@ -25,10 +26,6 @@ namespace NPCSystem.Editor
             public string personality_brief;
             public string speaking_style;
             public string boundaries;
-            public string secret_knowledge;
-            public bool can_give_puzzle_hints;
-            public bool can_accuse_suspects;
-            public bool can_reveal_secrets;
             public string[] preferred_action_functions;
             public string[] forbidden_action_functions;
             public string rag_category;
@@ -57,8 +54,12 @@ namespace NPCSystem.Editor
                 }
 
                 string knowledgeSourcePath = profile.GetKnowledgeSourcePath();
-                string resolvedKnowledgePath = NPCSearchable.ResolveAssetPath(knowledgeSourcePath);
                 string knowledgeText = string.Empty;
+                string projectRootForExport =
+                    Directory.GetParent(Application.dataPath)?.FullName ?? Application.dataPath;
+                string resolvedKnowledgePath = string.IsNullOrWhiteSpace(knowledgeSourcePath)
+                    ? null
+                    : Path.Combine(projectRootForExport, knowledgeSourcePath.TrimStart('/'));
                 if (
                     !string.IsNullOrWhiteSpace(resolvedKnowledgePath)
                     && File.Exists(resolvedKnowledgePath)
@@ -76,10 +77,6 @@ namespace NPCSystem.Editor
                         personality_brief = profile.PersonalityBrief,
                         speaking_style = profile.SpeakingStyle,
                         boundaries = profile.Boundaries,
-                        secret_knowledge = profile.SecretKnowledge,
-                        can_give_puzzle_hints = profile.CanGivePuzzleHints,
-                        can_accuse_suspects = profile.CanAccuseSuspects,
-                        can_reveal_secrets = profile.CanRevealSecrets,
                         preferred_action_functions =
                             profile.PreferredActionFunctions ?? Array.Empty<string>(),
                         forbidden_action_functions =

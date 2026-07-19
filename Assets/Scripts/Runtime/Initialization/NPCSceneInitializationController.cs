@@ -1,10 +1,26 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using NPCSystem.Monitoring;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace NPCSystem
+
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Network.Core;
+using NPCSystem.Character.Player;
+using NPCSystem.Auth;
+using NPCSystem.Items;
+using NPCSystem.LocalAI;
+using NPCSystem.Initialization;
+using NPCSystem.Network.Bridges;
+using NPCSystem.Dialogue.Core;
+using NPCSystem.Character.NPC;
+using NPCSystem.Dialogue.Session;
+using NPCSystem.Dialogue.UI;
+using NPCSystem.Dialogue.RAG;
+using NPCSystem.Dialogue.Persistence;
+namespace NPCSystem.Initialization
 {
     public enum NPCSceneInitializationPhase
     {
@@ -184,6 +200,14 @@ namespace NPCSystem
                         // set to "granted" when the user accepts the privacy dialog.
                         // On non-WebGL platforms this is a safe no-op.
                         DatadogConsent.Grant();
+
+                        // Initialize TelemetryRouter with file and Datadog sinks.
+                        TelemetryBootstrapper.Initialize(
+                            sessionId: SystemInfo.deviceUniqueIdentifier,
+                            metricPrefix: "npc",
+                            enableFileSink: true,
+                            enableDatadogSink: true
+                        );
                         break;
                     case NPCSceneInitializationPhase.SceneReferences:
                         ResolveReferences();

@@ -843,7 +843,7 @@ PlayerSettings:
   webEnableSubmoduleStrippingCompatibility: 1
   scriptingDefineSymbols:
     Standalone: GLADE_AI_NAVIGATION;GLADE_INPUT_SYSTEM;GLADE_UGUI;SENTIS_ANALYTICS_ENABLED;APP_UI_EDITOR_ONLY
-    WebGL: 
+    WebGL: SENTIS_ANALYTICS_ENABLED
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:

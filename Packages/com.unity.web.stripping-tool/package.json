@@ -9,18 +9,6 @@
     "com.unity.nuget.newtonsoft-json": "3.2.2",
     "com.unity.settings-manager": "2.0.1"
   },
-  "samples": [
-    {
-      "displayName": "Submodule Profiling",
-      "description": "Example of how to instrument a build for submodule profiling via scripting.",
-      "path": "Samples~/SubmoduleProfiling"
-    },
-    {
-      "displayName": "Submodule Stripping",
-      "description": "Example of how to perform all aspects of submodule stripping for a build via scripting.",
-      "path": "Samples~/SubmoduleStripping"
-    }
-  ],
   "relatedPackages": {
     "com.unity.web.stripping-tool.tests": "0.0.0"
   },

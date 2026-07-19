@@ -1,4 +1,4 @@
-namespace NPCSystem
+namespace NPCSystem.LocalAI
 {
     /// <summary>
     /// Central configuration constants for LocalAI connectivity.

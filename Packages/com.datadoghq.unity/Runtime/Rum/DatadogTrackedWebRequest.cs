@@ -3,6 +3,7 @@
 // Copyright 2023-Present Datadog, Inc.
 
 using System;
+using System.Collections.Generic;
 using UnityEngine.Networking;
 
 namespace Datadog.Unity.Rum

@@ -8,13 +8,6 @@
     "com.unity.nuget.mono-cecil": "1.11.4",
     "com.unity.transport": "2.6.0"
   },
-  "samples": [
-    {
-      "displayName": "Bootstrap",
-      "description": "A lightweight sample to get started",
-      "path": "Samples~/Bootstrap"
-    }
-  ],
   "_upm": {
     "changelog": "### Added\n\n- Added support for Unity's Fast Enter Play Mode with domain reload disabled. (#3956)\n- RPC messages now log any time they are not processed. (#3994)\n\n### Changed\n\n- Changed replaced define usages of `DEVELOPMENT_BUILD || UNITY_EDITOR` and a few niche uses of `DEVELOPMENT_BUILD` with `DEBUG`. (#4006)\n\n### Deprecated\n\n- Deprecated the nullable boolean `NetworkObject.IsSceneObject` and introduced `NetworkObject.InScenePlaced`. (#4000)"
   },

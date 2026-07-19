@@ -19,13 +19,6 @@
     "GameObjects",
     "Tools"
   ],
-  "samples": [
-    {
-      "displayName": "Network Scenario Samples",
-      "description": "Samples showcasing the different ways of building custom network simulator scenarios.\n\nNote: In order to use these Samples, make sure you have Netcode for GameObjects (com.unity.netcode.gameobjects) 1.1.0 or later and Unity Transport (com.unity.transport) 2.0.0 or later. For more info, please check the Network Simulator documentation: https://docs-multiplayer.unity3d.com/tools/current/tools-network-simulator",
-      "path": "Samples~/NetworkSimulator"
-    }
-  ],
   "_upm": {
     "changelog": "### Added\n- Support for fast enter playmode (no domain reload)\n\n### Changed\n- Replaced DEVELOPMENT_BUILD define with UNITY_ENABLE_CHECKS\n\n### Fixed\n- Updated NetStatsMonitor APIs to work properly on newer editors (6000.5+)"
   },

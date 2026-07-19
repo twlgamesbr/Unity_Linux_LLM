@@ -7,7 +7,8 @@
         "Unity.Netcode.Runtime",
         "Unity.DedicatedServer.MultiplayerRoles",
         "Unity.TextMeshPro",
-        "EditorAttributes"
+        "EditorAttributes",
+        "NPCSystem.Monitoring"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

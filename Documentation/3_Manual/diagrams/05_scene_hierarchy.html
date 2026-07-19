@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NPCDialoguePrototype1 Scene Hierarchy</title>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'JetBrains Mono', monospace;
+      background: #020617; min-height: 100vh; padding: 2rem; color: white;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    .header { margin-bottom: 1.5rem; }
+    .header-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem; }
+    .pulse-dot {
+      width: 12px; height: 12px; background: #34d399; border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.025em; }
+    .subtitle { color: #94a3b8; font-size: 0.875rem; margin-left: 1.75rem; }
+    .diagram-container {
+      background: rgba(15, 23, 42, 0.5); border-radius: 1rem;
+      border: 1px solid #1e293b; padding: 1.5rem; overflow-x: auto;
+    }
+    svg { width: 100%; min-width: 950px; display: block; }
+    .cards {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 2rem;
+    }
+    @media (max-width: 768px) { .cards { grid-template-columns: 1fr; } }
+    .card {
+      background: rgba(15, 23, 42, 0.5); border-radius: 0.75rem;
+      border: 1px solid #1e293b; padding: 1.25rem;
+    }
+    .card-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
+    .card-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .card-dot.cyan { background: #22d3ee; }
+    .card-dot.emerald { background: #34d399; }
+    .card-dot.violet { background: #a78bfa; }
+    .card-dot.amber { background: #fbbf24; }
+    .card-dot.rose { background: #fb7185; }
+    .card h3 { font-size: 0.875rem; font-weight: 600; }
+    .card ul { list-style: none; color: #94a3b8; font-size: 0.75rem; }
+    .card li { margin-bottom: 0.4rem; }
+    .card li strong { color: #e2e8f0; }
+    .card li .c-cyan { color: #22d3ee; }
+    .card li .c-emerald { color: #34d399; }
+    .card li .c-violet { color: #a78bfa; }
+    .card li .c-amber { color: #fbbf24; }
+    .card li .c-slate { color: #94a3b8; }
+    .footer { text-align: center; margin-top: 1.5rem; color: #475569; font-size: 0.75rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div class="header-row">
+        <div class="pulse-dot"></div>
+        <h1>NPCDialoguePrototype1 Scene Hierarchy</h1>
+      </div>
+      <p class="subtitle">GameObject tree with component annotations</p>
+    </div>
+
+    <!-- Main Diagram -->
+    <div class="diagram-container">
+      <svg viewBox="0 0 1060 1070">
+        <defs>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#1e293b" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+
+        <!-- Background Grid -->
+        <rect width="100%" height="100%" fill="url(#grid)" />
+
+        <!--
+          LAYOUT CONSTANTS:
+          Level 0: rect x=42, text x=58
+          Level 1: rect x=102, text x=118
+          Level 2: rect x=152, text x=168
+          Row indicator_y = 88 + row_index * 30
+          Row center_y    = indicator_y + 7
+        -->
+
+        <!-- ============== TREE CONNECTOR LINES ============== -->
+        <g stroke="#334155" stroke-width="1.2" fill="none">
+          <!-- Root-level tick marks (level 0, connecting to indicator x=42) -->
+          <path d="M 30 95 h 12" />  <!-- Row 0: Network_Manager -->
+          <path d="M 30 125 h 12" /> <!-- Row 1: NPCSceneInitialization -->
+          <path d="M 30 155 h 12" /> <!-- Row 2: Main Camera -->
+          <path d="M 30 185 h 12" /> <!-- Row 3: Directional Light -->
+          <path d="M 30 215 h 12" /> <!-- Row 4: EventSystem -->
+          <path d="M 30 245 h 12" /> <!-- Row 5: AuthPanel -->
+          <path d="M 30 305 h 12" /> <!-- Row 7: AuthUI -->
+          <path d="M 30 335 h 12" /> <!-- Row 8: Canvas -->
+          <path d="M 30 455 h 12" /> <!-- Row 12: NPCDialogueSystem -->
+          <path d="M 30 905 h 12" /> <!-- Row 27: NPCFlowLogger -->
+          <path d="M 30 935 h 12" /> <!-- Row 28: Ground -->
+          <path d="M 30 965 h 12" /> <!-- Row 29: WebGLGameplayLoadController -->
+          <path d="M 30 995 h 12" /> <!-- Row 30: NPCNetworkSystem -->
+
+          <!-- AuthPanel (row 5, center=245) → AuthContent (row 6, center=275) -->
+          <path d="M 52 245 v 30" />
+          <path d="M 52 275 h 50" />
+
+          <!-- Canvas (row 8, center=335) → StopButton (row 9, c=365), PlayerInput (row 10, c=395), AIImage/AIText (row 11, c=425) -->
+          <path d="M 52 335 v 90" />
+          <path d="M 52 365 h 50" />
+          <path d="M 52 395 h 50" />
+          <path d="M 52 425 h 50" />
+
+          <!-- NPCDialogueSystem (row 12, c=455) → Core (row 13, c=485), Backend (row 16, c=575), Services (row 18, c=635), Network (row 23, c=785) -->
+          <path d="M 52 455 v 330" />
+          <path d="M 52 485 h 50" />
+          <path d="M 52 575 h 50" />
+          <path d="M 52 635 h 50" />
+          <path d="M 52 785 h 50" />
+
+          <!-- Core (row 13, c=485) → NPCDialogueManager (row 14, c=515), NPCDialogueSmokeValidator (row 15, c=545) -->
+          <path d="M 102 485 v 60" />
+          <path d="M 102 515 h 50" />
+          <path d="M 102 545 h 50" />
+
+          <!-- Backend (row 16, c=575) → NPCBackendReadinessService (row 17, c=605) -->
+          <path d="M 102 575 v 30" />
+          <path d="M 102 605 h 50" />
+
+          <!-- Services (row 18, c=635) → 4 children (rows 19-22, centers 665, 695, 725, 755) -->
+          <path d="M 102 635 v 120" />
+          <path d="M 102 665 h 50" />
+          <path d="M 102 695 h 50" />
+          <path d="M 102 725 h 50" />
+          <path d="M 102 755 h 50" />
+
+          <!-- Network (row 23, c=785) → NetworkObject (row 24, c=815), NPCDialogueNetworkBridge (row 25, c=845), ItemTradeService (row 26, c=875) -->
+          <path d="M 102 785 v 90" />
+          <path d="M 102 815 h 50" />
+          <path d="M 102 845 h 50" />
+          <path d="M 102 875 h 50" />
+        </g>
+
+        <!-- ============== HIGHLIGHT STRIPES ============== -->
+        <!-- Alternating row backgrounds for readability -->
+        <g opacity="0.07">
+          <rect x="22" y="80"  width="750" height="30" fill="white" rx="2" />
+          <rect x="22" y="140" width="750" height="30" fill="white" rx="2" />
+          <rect x="22" y="200" width="750" height="30" fill="white" rx="2" />
+          <rect x="22" y="260" width="750" height="30" fill="white" rx="2" />
+          <rect x="22" y="320" width="750" height="30" fill="white" rx="2" />
+          <rect x="22" y="380" width="750" height="30" fill="white" rx="2" />
+          <rect x="22" y="440" width="750" height="30" fill="white" rx="2" />
+          <rect x="22" y="500" width="750" height="30" fill="white" rx="2" />
+          <rect x="22" y="560" width="750" height="30" fill="white" rx="2" />
+          <rect x="22" y="620" width="750" height="30" fill="white" rx="2" />
+          <rect x="22" y="680" width="750" height="30" fill="white" rx="2" />
+          <rect x="22" y="740" width="750" height="30" fill="white" rx="2" />
+          <rect x="22" y="800" width="750" height="30" fill="white" rx="2" />
+          <rect x="22" y="860" width="750" height="30" fill="white" rx="2" />
+          <rect x="22" y="920" width="750" height="30" fill="white" rx="2" />
+          <rect x="22" y="980" width="750" height="30" fill="white" rx="2" />
+        </g>
+
+        <!-- ============== NODE ROWS ============== -->
+        <!--
+          Color scheme:
+            cyan    = rgba(8,51,68,0.6)  + #22d3ee stroke  → UI / frontend
+            emerald = rgba(6,78,59,0.6)  + #34d399 stroke  → services / managers
+            violet  = rgba(76,29,149,0.6) + #a78bfa stroke → network
+            amber   = rgba(120,53,15,0.5) + #fbbf24 stroke → initialization
+            slate   = rgba(30,41,59,0.6)  + #94a3b8 stroke → engine objects
+        -->
+
+        <!-- Row 0: Network_Manager — violet -->
+        <g>
+          <rect x="42" y="88" width="8" height="14" rx="3" fill="rgba(76,29,149,0.6)" stroke="#a78bfa" stroke-width="1"/>
+          <text x="58" y="100" fill="white" font-size="11" font-weight="600">Network_Manager</text>
+          <text x="58" y="114" fill="#a78bfa" font-size="8">NetworkManager component</text>
+        </g>
+
+        <!-- Row 1: NPCSceneInitialization — amber -->
+        <g>
+          <rect x="42" y="118" width="8" height="14" rx="3" fill="rgba(120,53,15,0.5)" stroke="#fbbf24" stroke-width="1"/>
+          <text x="58" y="130" fill="white" font-size="11" font-weight="600">NPCSceneInitialization</text>
+          <text x="58" y="144" fill="#fbbf24" font-size="8">NPCSceneInitializationController</text>
+        </g>
+
+        <!-- Row 2: Main Camera — slate -->
+        <g>
+          <rect x="42" y="148" width="8" height="14" rx="3" fill="rgba(30,41,59,0.6)" stroke="#94a3b8" stroke-width="1"/>
+          <text x="58" y="160" fill="white" font-size="11" font-weight="600">Main Camera</text>
+          <text x="58" y="174" fill="#94a3b8" font-size="8">Camera, AudioListener</text>
+        </g>
+
+        <!-- Row 3: Directional Light — slate -->
+        <g>
+          <rect x="42" y="178" width="8" height="14" rx="3" fill="rgba(30,41,59,0.6)" stroke="#94a3b8" stroke-width="1"/>
+          <text x="58" y="190" fill="white" font-size="11" font-weight="600">Directional Light</text>
+          <text x="58" y="204" fill="#94a3b8" font-size="8">Light (Directional)</text>
+        </g>
+
+        <!-- Row 4: EventSystem — slate -->
+        <g>
+          <rect x="42" y="208" width="8" height="14" rx="3" fill="rgba(30,41,59,0.6)" stroke="#94a3b8" stroke-width="1"/>
+          <text x="58" y="220" fill="white" font-size="11" font-weight="600">EventSystem</text>
+          <text x="58" y="234" fill="#94a3b8" font-size="8">EventSystem, StandaloneInputModule</text>
+        </g>
+
+        <!-- Row 5: AuthPanel — cyan (parent of AuthContent) -->
+        <g>
+          <rect x="42" y="238" width="8" height="14" rx="3" fill="rgba(8,51,68,0.6)" stroke="#22d3ee" stroke-width="1"/>
+          <text x="58" y="250" fill="white" font-size="11" font-weight="600">AuthPanel</text>
+          <text x="58" y="264" fill="#22d3ee" font-size="8">RectTransform, CanvasGroup</text>
+        </g>
+
+        <!-- Row 6: AuthContent — cyan (child of AuthPanel, level 1) -->
+        <g>
+          <rect x="102" y="268" width="8" height="14" rx="3" fill="rgba(8,51,68,0.6)" stroke="#22d3ee" stroke-width="1"/>
+          <text x="118" y="280" fill="white" font-size="11" font-weight="600">AuthContent</text>
+          <text x="118" y="294" fill="#22d3ee" font-size="8">RectTransform (child content)</text>
+        </g>
+
+        <!-- Row 7: AuthUI — cyan -->
+        <g>
+          <rect x="42" y="298" width="8" height="14" rx="3" fill="rgba(8,51,68,0.6)" stroke="#22d3ee" stroke-width="1"/>
+          <text x="58" y="310" fill="white" font-size="11" font-weight="600">AuthUI</text>
+          <text x="58" y="324" fill="#22d3ee" font-size="8">AuthUIController</text>
+        </g>
+
+        <!-- Row 8: Canvas — cyan (parent of StopButton, PlayerInput, AIImage/AIText) -->
+        <g>
+          <rect x="42" y="328" width="8" height="14" rx="3" fill="rgba(8,51,68,0.6)" stroke="#22d3ee" stroke-width="1"/>
+          <text x="58" y="340" fill="white" font-size="11" font-weight="600">Canvas</text>
+          <text x="58" y="354" fill="#22d3ee" font-size="8">NPCDialogueUIController, Canvas, CanvasScaler</text>
+        </g>
+
+        <!-- Row 9: StopButton — cyan (child of Canvas, level 1) -->
+        <g>
+          <rect x="102" y="358" width="8" height="14" rx="3" fill="rgba(8,51,68,0.6)" stroke="#22d3ee" stroke-width="1"/>
+          <text x="118" y="370" fill="white" font-size="11" font-weight="600">StopButton</text>
+          <text x="118" y="384" fill="#22d3ee" font-size="8">Button, TextMeshPro</text>
+        </g>
+
+        <!-- Row 10: PlayerInput — cyan (child of Canvas, level 1) -->
+        <g>
+          <rect x="102" y="388" width="8" height="14" rx="3" fill="rgba(8,51,68,0.6)" stroke="#22d3ee" stroke-width="1"/>
+          <text x="118" y="400" fill="white" font-size="11" font-weight="600">PlayerInput</text>
+          <text x="118" y="414" fill="#22d3ee" font-size="8">TMP_InputField</text>
+        </g>
+
+        <!-- Row 11: AIImage/AIText — cyan (child of Canvas, level 1) -->
+        <g>
+          <rect x="102" y="418" width="8" height="14" rx="3" fill="rgba(8,51,68,0.6)" stroke="#22d3ee" stroke-width="1"/>
+          <text x="118" y="430" fill="white" font-size="11" font-weight="600">AIImage / AIText</text>
+          <text x="118" y="444" fill="#22d3ee" font-size="8">RawImage (AI image) / TextMeshPro (AI text)</text>
+        </g>
+
+        <!-- Row 12: NPCDialogueSystem — emerald (root of subsystem tree) -->
+        <g>
+          <rect x="42" y="448" width="8" height="14" rx="3" fill="rgba(6,78,59,0.6)" stroke="#34d399" stroke-width="1"/>
+          <text x="58" y="460" fill="white" font-size="11" font-weight="600">NPCDialogueSystem</text>
+          <text x="58" y="474" fill="#34d399" font-size="8">Dialogue subsystem root — 4 children (Core, Backend, Services, Network)</text>
+        </g>
+
+        <!-- Row 13: Core — emerald (level 1, parent of 2 children) -->
+        <g>
+          <rect x="102" y="478" width="8" height="14" rx="3" fill="rgba(6,78,59,0.6)" stroke="#34d399" stroke-width="1"/>
+          <text x="118" y="490" fill="white" font-size="11" font-weight="600">Core</text>
+          <text x="118" y="504" fill="#34d399" font-size="8">Core dialogue logic</text>
+        </g>
+
+        <!-- Row 14: NPCDialogueManager — emerald (level 2, child of Core) -->
+        <g>
+          <rect x="152" y="508" width="8" height="14" rx="3" fill="rgba(6,78,59,0.6)" stroke="#34d399" stroke-width="1"/>
+          <text x="168" y="520" fill="white" font-size="11" font-weight="600">NPCDialogueManager</text>
+          <text x="168" y="534" fill="#34d399" font-size="8">Dialogue state machine</text>
+        </g>
+
+        <!-- Row 15: NPCDialogueSmokeValidator — emerald (level 2, child of Core) -->
+        <g>
+          <rect x="152" y="538" width="8" height="14" rx="3" fill="rgba(6,78,59,0.6)" stroke="#34d399" stroke-width="1"/>
+          <text x="168" y="550" fill="white" font-size="11" font-weight="600">NPCDialogueSmokeValidator</text>
+          <text x="168" y="564" fill="#34d399" font-size="8">Input text validation</text>
+        </g>
+
+        <!-- Row 16: Backend — emerald (level 1, parent of 1 child) -->
+        <g>
+          <rect x="102" y="568" width="8" height="14" rx="3" fill="rgba(6,78,59,0.6)" stroke="#34d399" stroke-width="1"/>
+          <text x="118" y="580" fill="white" font-size="11" font-weight="600">Backend</text>
+          <text x="118" y="594" fill="#34d399" font-size="8">Backend orchestration</text>
+        </g>
+
+        <!-- Row 17: NPCBackendReadinessService — emerald (level 2, child of Backend) -->
+        <g>
+          <rect x="152" y="598" width="8" height="14" rx="3" fill="rgba(6,78,59,0.6)" stroke="#34d399" stroke-width="1"/>
+          <text x="168" y="610" fill="white" font-size="11" font-weight="600">NPCBackendReadinessService</text>
+          <text x="168" y="624" fill="#34d399" font-size="8">API health &amp; readiness check</text>
+        </g>
+
+        <!-- Row 18: Services — emerald (level 1, parent of 4 children) -->
+        <g>
+          <rect x="102" y="628" width="8" height="14" rx="3" fill="rgba(6,78,59,0.6)" stroke="#34d399" stroke-width="1"/>
+          <text x="118" y="640" fill="white" font-size="11" font-weight="600">Services</text>
+          <text x="118" y="654" fill="#34d399" font-size="8">Data &amp; session management</text>
+        </g>
+
+        <!-- Row 19: NPCDialogueHistoryService — emerald (level 2, child of Services) -->
+        <g>
+          <rect x="152" y="658" width="8" height="14" rx="3" fill="rgba(6,78,59,0.6)" stroke="#34d399" stroke-width="1"/>
+          <text x="168" y="670" fill="white" font-size="11" font-weight="600">NPCDialogueHistoryService</text>
+          <text x="168" y="684" fill="#34d399" font-size="8">Conversation history</text>
+        </g>
+
+        <!-- Row 20: NPCDialogueRetrievalService — emerald (level 2) -->
+        <g>
+          <rect x="152" y="688" width="8" height="14" rx="3" fill="rgba(6,78,59,0.6)" stroke="#34d399" stroke-width="1"/>
+          <text x="168" y="700" fill="white" font-size="11" font-weight="600">NPCDialogueRetrievalService</text>
+          <text x="168" y="714" fill="#34d399" font-size="8">RAG context retrieval</text>
+        </g>
+
+        <!-- Row 21: NPCDialogueSessionService — emerald (level 2) -->
+        <g>
+          <rect x="152" y="718" width="8" height="14" rx="3" fill="rgba(6,78,59,0.6)" stroke="#34d399" stroke-width="1"/>
+          <text x="168" y="730" fill="white" font-size="11" font-weight="600">NPCDialogueSessionService</text>
+          <text x="168" y="744" fill="#34d399" font-size="8">Session lifecycle</text>
+        </g>
+
+        <!-- Row 22: PlayerDialogueContextService — emerald (level 2) -->
+        <g>
+          <rect x="152" y="748" width="8" height="14" rx="3" fill="rgba(6,78,59,0.6)" stroke="#34d399" stroke-width="1"/>
+          <text x="168" y="760" fill="white" font-size="11" font-weight="600">PlayerDialogueContextService</text>
+          <text x="168" y="774" fill="#34d399" font-size="8">Player session context</text>
+        </g>
+
+        <!-- Row 23: Network — violet (level 1, parent of 3 children) -->
+        <g>
+          <rect x="102" y="778" width="8" height="14" rx="3" fill="rgba(76,29,149,0.6)" stroke="#a78bfa" stroke-width="1"/>
+          <text x="118" y="790" fill="white" font-size="11" font-weight="600">Network</text>
+          <text x="118" y="804" fill="#a78bfa" font-size="8">Networking &amp; RPC layer</text>
+        </g>
+
+        <!-- Row 24: NetworkObject — violet (level 2, child of Network) -->
+        <g>
+          <rect x="152" y="808" width="8" height="14" rx="3" fill="rgba(76,29,149,0.6)" stroke="#a78bfa" stroke-width="1"/>
+          <text x="168" y="820" fill="white" font-size="11" font-weight="600">NetworkObject</text>
+          <text x="168" y="834" fill="#a78bfa" font-size="8">Netcode NetworkObject identity</text>
+        </g>
+
+        <!-- Row 25: NPCDialogueNetworkBridge — violet (level 2) -->
+        <g>
+          <rect x="152" y="838" width="8" height="14" rx="3" fill="rgba(76,29,149,0.6)" stroke="#a78bfa" stroke-width="1"/>
+          <text x="168" y="850" fill="white" font-size="11" font-weight="600">NPCDialogueNetworkBridge</text>
+          <text x="168" y="864" fill="#a78bfa" font-size="8">RPC bridge for dialogue sync</text>
+        </g>
+
+        <!-- Row 26: ItemTradeService — violet (level 2) -->
+        <g>
+          <rect x="152" y="868" width="8" height="14" rx="3" fill="rgba(76,29,149,0.6)" stroke="#a78bfa" stroke-width="1"/>
+          <text x="168" y="880" fill="white" font-size="11" font-weight="600">ItemTradeService</text>
+          <text x="168" y="894" fill="#a78bfa" font-size="8">Item trading RPC handlers</text>
+        </g>
+
+        <!-- Row 27: NPCFlowLogger — emerald -->
+        <g>
+          <rect x="42" y="898" width="8" height="14" rx="3" fill="rgba(6,78,59,0.6)" stroke="#34d399" stroke-width="1"/>
+          <text x="58" y="910" fill="white" font-size="11" font-weight="600">NPCFlowLogger</text>
+          <text x="58" y="924" fill="#34d399" font-size="8">Flow event logger</text>
+        </g>
+
+        <!-- Row 28: Ground — slate -->
+        <g>
+          <rect x="42" y="928" width="8" height="14" rx="3" fill="rgba(30,41,59,0.6)" stroke="#94a3b8" stroke-width="1"/>
+          <text x="58" y="940" fill="white" font-size="11" font-weight="600">Ground</text>
+          <text x="58" y="954" fill="#94a3b8" font-size="8">MeshRenderer, MeshFilter</text>
+        </g>
+
+        <!-- Row 29: WebGLGameplayLoadController — amber -->
+        <g>
+          <rect x="42" y="958" width="8" height="14" rx="3" fill="rgba(120,53,15,0.5)" stroke="#fbbf24" stroke-width="1"/>
+          <text x="58" y="970" fill="white" font-size="11" font-weight="600">WebGLGameplayLoadController</text>
+          <text x="58" y="984" fill="#fbbf24" font-size="8">WebGL platform load handler</text>
+        </g>
+
+        <!-- Row 30: NPCNetworkSystem — violet -->
+        <g>
+          <rect x="42" y="988" width="8" height="14" rx="3" fill="rgba(76,29,149,0.6)" stroke="#a78bfa" stroke-width="1"/>
+          <text x="58" y="1000" fill="white" font-size="11" font-weight="600">NPCNetworkSystem</text>
+          <text x="58" y="1014" fill="#a78bfa" font-size="8">NPCNetworkBootstrap</text>
+        </g>
+
+        <!-- ============== LEGEND ============== -->
+        <g transform="translate(820, 30)">
+          <rect x="-12" y="-8" width="220" height="120" rx="6" fill="rgba(15,23,42,0.7)" stroke="#1e293b" stroke-width="1"/>
+          <text x="0" y="6" fill="white" font-size="10" font-weight="600">Legend — Color Coding</text>
+
+          <rect x="0" y="20" width="14" height="8" rx="2" fill="rgba(8,51,68,0.6)" stroke="#22d3ee" stroke-width="1"/>
+          <text x="20" y="28" fill="#94a3b8" font-size="8">UI / Frontend (Cyan)</text>
+
+          <rect x="0" y="36" width="14" height="8" rx="2" fill="rgba(6,78,59,0.6)" stroke="#34d399" stroke-width="1"/>
+          <text x="20" y="44" fill="#94a3b8" font-size="8">Services / Managers (Emerald)</text>
+
+          <rect x="0" y="52" width="14" height="8" rx="2" fill="rgba(76,29,149,0.6)" stroke="#a78bfa" stroke-width="1"/>
+          <text x="20" y="60" fill="#94a3b8" font-size="8">Network / Data (Violet)</text>
+
+          <rect x="0" y="68" width="14" height="8" rx="2" fill="rgba(120,53,15,0.5)" stroke="#fbbf24" stroke-width="1"/>
+          <text x="20" y="76" fill="#94a3b8" font-size="8">Initialization (Amber)</text>
+
+          <rect x="0" y="84" width="14" height="8" rx="2" fill="rgba(30,41,59,0.6)" stroke="#94a3b8" stroke-width="1"/>
+          <text x="20" y="92" fill="#94a3b8" font-size="8">Engine Objects (Slate)</text>
+
+          <line x1="0" y1="106" x2="14" y2="106" stroke="#334155" stroke-width="1.2"/>
+          <text x="20" y="109" fill="#94a3b8" font-size="8">Parent → Child connection</text>
+        </g>
+
+        <!-- Scene Overview Box -->
+        <g transform="translate(820, 170)">
+          <rect x="-12" y="-8" width="220" height="110" rx="6" fill="rgba(15,23,42,0.7)" stroke="#1e293b" stroke-width="1"/>
+          <text x="0" y="6" fill="white" font-size="10" font-weight="600">Scene Overview</text>
+          <text x="0" y="24" fill="#94a3b8" font-size="8">Total GameObjects: <tspan fill="white" font-weight="600">31</tspan></text>
+          <text x="0" y="40" fill="#94a3b8" font-size="8">Root Objects: <tspan fill="white" font-weight="600">14</tspan></text>
+          <text x="0" y="56" fill="#94a3b8" font-size="8">Components Referenced: <tspan fill="white" font-weight="600">18+</tspan></text>
+          <text x="0" y="76" fill="#22d3ee" font-size="8">■ <tspan fill="#94a3b8">UI: 7 objects</tspan></text>
+          <text x="0" y="92" fill="#34d399" font-size="8">■ <tspan fill="#94a3b8">Services: 12 objects</tspan></text>
+          <text x="0" y="108" fill="#a78bfa" font-size="8">■ <tspan fill="#94a3b8">Network: 5 objects</tspan></text>
+        </g>
+      </svg>
+    </div>
+
+    <!-- Info Cards -->
+    <div class="cards">
+      <!-- Card 1: Root Objects -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot amber"></div>
+          <h3>Root Objects</h3>
+        </div>
+        <ul>
+          <li><span class="c-violet">Network_Manager</span> — Netcode NetworkManager singleton</li>
+          <li><span class="c-amber">NPCSceneInitialization</span> — Scene bootstrap controller</li>
+          <li><span class="c-slate">Main Camera</span> / <span class="c-slate">Directional Light</span> / <span class="c-slate">EventSystem</span> — Engine essentials</li>
+          <li><span class="c-cyan">AuthPanel</span> / <span class="c-cyan">AuthContent</span> / <span class="c-cyan">AuthUI</span> — Authentication UI</li>
+          <li><span class="c-cyan">Canvas</span> → StopButton, PlayerInput, AIImage/AIText — Dialogue UI</li>
+          <li><span class="c-emerald">NPCDialogueSystem</span> — Core subsystem root (see Card 2)</li>
+          <li><span class="c-emerald">NPCFlowLogger</span> — Flow event monitoring</li>
+          <li><span class="c-slate">Ground</span> — Scene terrain mesh</li>
+          <li><span class="c-amber">WebGLGameplayLoadController</span> — Platform-level loader</li>
+          <li><span class="c-violet">NPCNetworkSystem</span> — NPCNetworkBootstrap</li>
+        </ul>
+      </div>
+
+      <!-- Card 2: Service Hierarchy -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot emerald"></div>
+          <h3>Service Hierarchy</h3>
+        </div>
+        <ul>
+          <li><span class="c-emerald">NPCDialogueSystem</span> — Root subsystem container</li>
+          <li>&nbsp;&nbsp;└ <span class="c-emerald">Core</span></li>
+          <li>&nbsp;&nbsp;&nbsp;&nbsp;├ NPCDialogueManager — Dialogue state machine / API client</li>
+          <li>&nbsp;&nbsp;&nbsp;&nbsp;└ NPCDialogueSmokeValidator — Input text validation</li>
+          <li>&nbsp;&nbsp;└ <span class="c-emerald">Backend</span></li>
+          <li>&nbsp;&nbsp;&nbsp;&nbsp;└ NPCBackendReadinessService — API health &amp; readiness check</li>
+          <li>&nbsp;&nbsp;└ <span class="c-emerald">Services</span></li>
+          <li>&nbsp;&nbsp;&nbsp;&nbsp;├ NPCDialogueHistoryService — Conversation history</li>
+          <li>&nbsp;&nbsp;&nbsp;&nbsp;├ NPCDialogueRetrievalService — RAG context retrieval</li>
+          <li>&nbsp;&nbsp;&nbsp;&nbsp;├ NPCDialogueSessionService — Session lifecycle</li>
+          <li>&nbsp;&nbsp;&nbsp;&nbsp;└ PlayerDialogueContextService — Player context</li>
+          <li>&nbsp;&nbsp;└ <span class="c-violet">Network</span></li>
+          <li>&nbsp;&nbsp;&nbsp;&nbsp;├ NetworkObject — Netcode identity</li>
+          <li>&nbsp;&nbsp;&nbsp;&nbsp;├ NPCDialogueNetworkBridge — RPC bridge</li>
+          <li>&nbsp;&nbsp;&nbsp;&nbsp;└ ItemTradeService — Item trading RPCs</li>
+        </ul>
+      </div>
+
+      <!-- Card 3: Reference Wiring -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-dot violet"></div>
+          <h3>Reference Wiring</h3>
+        </div>
+        <ul>
+          <li><span class="c-amber">NPCSceneInitialization</span> references <strong>6</strong> components:</li>
+          <li>&nbsp;&nbsp;• NPCDialogueManager (Core)</li>
+          <li>&nbsp;&nbsp;• NPCBackendReadinessService (Backend)</li>
+          <li>&nbsp;&nbsp;• NPCDialogueNetworkBridge (Network)</li>
+          <li>&nbsp;&nbsp;• NPCDialogueSmokeValidator (Core)</li>
+          <li>&nbsp;&nbsp;• NPCNetworkBootstrap (NPCNetworkSystem)</li>
+          <li>&nbsp;&nbsp;• NPCFlowLogger</li>
+          <li><span class="c-cyan">Canvas (NPCDialogueUIController)</span> references <strong>5</strong>:</li>
+          <li>&nbsp;&nbsp;• NPCDialogueManager — send/receive messages</li>
+          <li>&nbsp;&nbsp;• NPCDialogueHistoryService — log messages</li>
+          <li>&nbsp;&nbsp;• NPCDialogueRetrievalService — fetch context</li>
+          <li>&nbsp;&nbsp;• PlayerDialogueContextService — player state</li>
+          <li>&nbsp;&nbsp;• NPCBackendReadinessService — readiness check</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <p class="footer">
+      NPCDialoguePrototype1.unity &bull; NPCSystem Manual &bull; Scene hierarchy analysis
+    </p>
+  </div>
+</body>
+</html>
