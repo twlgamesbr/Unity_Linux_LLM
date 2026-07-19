@@ -60,6 +60,10 @@ namespace NPCSystem
         bool _eventsBound;
         bool _disconnectCallbackRegistered;
         BaseRpcTarget _persistentClientTarget;
+        NPCNotebookStateMessage _currentNotebookState;
+        Dictionary<string, List<DialogueEntry>> _baselineHistorySnapshot =
+            new Dictionary<string, List<DialogueEntry>>(StringComparer.OrdinalIgnoreCase);
+        NPCEvidenceStateSnapshot _baselineEvidenceSnapshot;
         readonly Queue<PendingDialogueRequest> _pendingRequests =
             new Queue<PendingDialogueRequest>();
 
@@ -688,6 +692,142 @@ namespace NPCSystem
             {
                 Debug.LogError($"[{nameof(NPCDialogueNetworkBridge)}] {operationName} threw: {ex}");
             }
+        }
+
+        void CaptureBaselineState()
+        {
+            if (_dialogueManager == null)
+                return;
+            _baselineHistorySnapshot = CloneHistorySnapshot(_dialogueManager.CaptureHistorySnapshot());
+            _baselineEvidenceSnapshot = _dialogueManager.CaptureEvidenceSnapshot();
+        }
+
+        void UpdateNotebookStateLocal()
+        {
+            NPCNotebookStateMessage state = BuildNotebookStateMessage();
+            _currentNotebookState = state;
+            OnNotebookStateChanged?.Invoke(state);
+        }
+
+        NPCNotebookStateMessage BuildNotebookStateMessage()
+        {
+            string npcSlug = string.Empty;
+            string notesLeft = string.Empty;
+            string notesRight = string.Empty;
+
+            if (_dialogueManager != null && _dialogueManager.CurrentProfile != null)
+            {
+                npcSlug = _dialogueManager.CurrentProfile.GetNpcSlug();
+            }
+
+            NPCEvidenceStateSnapshot evidence = _dialogueManager != null
+                ? _dialogueManager.CaptureEvidenceSnapshot()
+                : null;
+
+            if (evidence != null)
+            {
+                notesLeft = BuildEvidencePageLeft(evidence);
+                notesRight = BuildEvidencePageRight(evidence);
+            }
+
+            return new NPCNotebookStateMessage
+            {
+                npcSlug = npcSlug,
+                notesPageLeft = notesLeft,
+                notesPageRight = notesRight,
+            };
+        }
+
+        NPCNotebookStateMessage BuildNotebookStateMessageForClient(ulong clientId)
+        {
+            if (_sessionManager == null)
+                return BuildNotebookStateMessage();
+
+            string npcSlug = string.Empty;
+            if (
+                _sessionManager.TryGetSelectedNpcSlug(clientId, out string selectedNpcSlug)
+                && !string.IsNullOrWhiteSpace(selectedNpcSlug)
+            )
+            {
+                npcSlug = selectedNpcSlug;
+            }
+
+            NPCEvidenceStateSnapshot evidence = _sessionManager.GetEvidenceSnapshot(clientId);
+
+            string notesLeft = string.Empty;
+            string notesRight = string.Empty;
+            if (evidence != null)
+            {
+                notesLeft = BuildEvidencePageLeft(evidence);
+                notesRight = BuildEvidencePageRight(evidence);
+            }
+
+            return new NPCNotebookStateMessage
+            {
+                npcSlug = npcSlug,
+                notesPageLeft = notesLeft,
+                notesPageRight = notesRight,
+            };
+        }
+
+        public void RefreshNotebookStateForClient(ulong clientId)
+        {
+            if (!IsSpawned || NetworkManager == null || !NetworkManager.IsListening || !IsServer)
+            {
+                if (ShouldRelayLocally())
+                {
+                    UpdateNotebookStateLocal();
+                }
+                return;
+            }
+
+            SendNotebookStateToClient(clientId, BuildNotebookStateMessageForClient(clientId));
+        }
+
+        static string BuildEvidencePageLeft(NPCEvidenceStateSnapshot evidence)
+        {
+            if (evidence == null)
+                return string.Empty;
+            var lines = new System.Text.StringBuilder();
+            if (evidence.discoveredClues != null)
+            {
+                foreach (ClueEntry clue in evidence.discoveredClues)
+                {
+                    if (clue != null && !string.IsNullOrWhiteSpace(clue.clueText))
+                    {
+                        lines.AppendLine(clue.clueText);
+                    }
+                }
+            }
+            if (evidence.visitedLocations != null)
+            {
+                foreach (string loc in evidence.visitedLocations)
+                {
+                    if (!string.IsNullOrWhiteSpace(loc))
+                    {
+                        lines.AppendLine($"Visited: {loc}");
+                    }
+                }
+            }
+            return lines.ToString().TrimEnd();
+        }
+
+        static string BuildEvidencePageRight(NPCEvidenceStateSnapshot evidence)
+        {
+            if (evidence == null)
+                return string.Empty;
+            var lines = new System.Text.StringBuilder();
+            if (evidence.obtainedItems != null)
+            {
+                foreach (string item in evidence.obtainedItems)
+                {
+                    if (!string.IsNullOrWhiteSpace(item))
+                    {
+                        lines.AppendLine($"Item: {item}");
+                    }
+                }
+            }
+            return lines.ToString().TrimEnd();
         }
     }
 }

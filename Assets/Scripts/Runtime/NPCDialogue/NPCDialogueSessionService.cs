@@ -26,6 +26,7 @@ namespace NPCSystem
         NPCDialogueRetrievalService _retrievalService;
         NPCDialogueActionPlanner _actionPlanner;
         PlayerDialogueContextService _contextService;
+        NPCEvidenceState _evidenceState;
 string _remoteHost;
         int _remotePort;
         NPCProfile[] _profiles;
@@ -111,6 +112,16 @@ string _remoteHost;
         {
             _activePlayerNameOverride = string.Empty;
             _activePlayerClientIdOverride = null;
+        }
+
+        public NPCEvidenceStateSnapshot CaptureEvidenceSnapshot()
+        {
+            return _evidenceState?.CaptureSnapshot() ?? new NPCEvidenceStateSnapshot();
+        }
+
+        public void ApplyEvidenceSnapshot(NPCEvidenceStateSnapshot snapshot)
+        {
+            _evidenceState?.ApplySnapshot(snapshot);
         }
 
         /// <summary>

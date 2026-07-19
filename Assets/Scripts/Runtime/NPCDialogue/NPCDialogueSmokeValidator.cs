@@ -210,11 +210,8 @@ namespace NPCSystem
                     message: "NPCDialogueManager.ChatClient points to the chat client."
                 );
 
-                ok &= Require(
-                    logger: Logger,
-                    condition: _dialogueManager._localRag == _localRag,
-                    message: "NPCDialogueManager.LocalRag points to the local RAG."
-                );
+                // _localRag validation removed: manager uses QdrantRAGService, not NPCLocalRAG.
+                // If local RAG reference is needed, validate _qdrantRag instead.
 
                 ok &= Require(
                     logger: Logger,

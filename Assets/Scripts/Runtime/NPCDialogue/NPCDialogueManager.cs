@@ -104,6 +104,11 @@ namespace NPCSystem
         [SerializeField]
         int _remoteEmbeddingPort = NPCLocalAIConfig.LocalAIDirectPort;
 
+        [HideProperty]
+        [FormerlySerializedAs("ragEmbeddingPath")]
+        [SerializeField]
+        string _ragEmbeddingPath = "RAG/NPCDialogues-minilm-chunked.rag";
+
         [FoldoutGroup(
             "Dialogue Settings",
             true,
@@ -515,6 +520,18 @@ namespace NPCSystem
         public void ApplyHistorySnapshot(Dictionary<string, List<DialogueEntry>> historyByNpc)
         {
             _historyService?.ApplyHistorySnapshot(historyByNpc, Profiles);
+        }
+
+        /// <summary>Network-bridge snapshot: capture the current evidence state.</summary>
+        public NPCEvidenceStateSnapshot CaptureEvidenceSnapshot()
+        {
+            return _sessionService?.CaptureEvidenceSnapshot() ?? new NPCEvidenceStateSnapshot();
+        }
+
+        /// <summary>Network-bridge snapshot: restore evidence state from a snapshot.</summary>
+        public void ApplyEvidenceSnapshot(NPCEvidenceStateSnapshot snapshot)
+        {
+            _sessionService?.ApplyEvidenceSnapshot(snapshot);
         }
 
         /// <summary>Clear history for a given NPC or all NPCs.</summary>

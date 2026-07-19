@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -123,7 +124,7 @@ namespace NPCSystem
         public static NPCEvidenceState FindEvidenceState(MonoBehaviour host)
         {
             return host.GetComponentInParent<NPCEvidenceState>()
-                ?? Object.FindAnyObjectByType<NPCEvidenceState>(FindObjectsInactive.Include);
+                ?? UnityEngine.Object.FindAnyObjectByType<NPCEvidenceState>(FindObjectsInactive.Include);
         }
     }
 }

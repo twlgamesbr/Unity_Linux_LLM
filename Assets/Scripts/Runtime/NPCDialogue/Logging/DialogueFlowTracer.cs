@@ -10,7 +10,7 @@ namespace NPCSystem
     /// Used to debug dialogue failures instantly by showing exactly where time is spent
     /// and which stage failed.
     /// </summary>
-    public sealed class DialogueFlowTracer
+    public sealed class DialogueFlowTracer : IDisposable
     {
         readonly NPCFlowLogger _logger;
         readonly string _requestId;
@@ -106,7 +106,7 @@ namespace NPCSystem
                 source: nameof(DialogueFlowTracer),
                 requestId: _requestId,
                 npcSlug: _npcSlug,
-                elapsedMs: durationMs,
+                durationMs: durationMs,
                 data: new Dictionary<string, object>
                 {
                     ["stage"] = "context",
@@ -136,7 +136,7 @@ namespace NPCSystem
                 source: nameof(DialogueFlowTracer),
                 requestId: _requestId,
                 npcSlug: _npcSlug,
-                elapsedMs: durationMs,
+                durationMs: durationMs,
                 data: new Dictionary<string, object>
                 {
                     ["stage"] = "prompt",
@@ -165,7 +165,7 @@ namespace NPCSystem
                 source: nameof(DialogueFlowTracer),
                 requestId: _requestId,
                 npcSlug: _npcSlug,
-                elapsedMs: durationMs,
+                durationMs: durationMs,
                 data: new Dictionary<string, object>
                 {
                     ["stage"] = "llm",
@@ -193,7 +193,7 @@ namespace NPCSystem
                 source: nameof(DialogueFlowTracer),
                 requestId: _requestId,
                 npcSlug: _npcSlug,
-                elapsedMs: durationMs,
+                durationMs: durationMs,
                 data: new Dictionary<string, object>
                 {
                     ["stage"] = "response",
@@ -232,7 +232,7 @@ namespace NPCSystem
                 source: nameof(DialogueFlowTracer),
                 requestId: _requestId,
                 npcSlug: _npcSlug,
-                elapsedMs: _totalStopwatch.ElapsedMilliseconds,
+                durationMs: _totalStopwatch.ElapsedMilliseconds,
                 data: data
             );
         }
@@ -267,9 +267,18 @@ namespace NPCSystem
                 source: nameof(DialogueFlowTracer),
                 requestId: _requestId,
                 npcSlug: _npcSlug,
-                elapsedMs: _totalStopwatch.ElapsedMilliseconds,
+                durationMs: _totalStopwatch.ElapsedMilliseconds,
                 data: data
             );
+        }
+
+        /// <summary>
+        /// IDisposable support — calls Complete() to emit the final pipeline summary.
+        /// </summary>
+        public void Dispose()
+        {
+            if (_totalStopwatch.IsRunning)
+                Complete();
         }
 
         long GetStageMs(string stage)
