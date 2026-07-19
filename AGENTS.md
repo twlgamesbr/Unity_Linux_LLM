@@ -170,31 +170,145 @@ uv run --extra test pytest -q
 - Never edit `.unity` scene files directly.
 - Editor scripts live in `Assets/Scripts/Editor/` and `Assets/Scripts/Editor/Tools/`.
 
+---
+
 ## 10. Safety gates
 
 - Explicit approval required for: mutating Unity scene files, changing runtime architecture, deleting/moving/archiving files, adding or removing Ollama, running LoRA training, committing, or pushing.
 - Docs-only changes are always allowed.
 
-## 11. Known compile warnings
+## 11. Scene audit checklist (mandatory before declaring "done")
+
+Before any scene-related task is marked complete, ALL of these must pass. Do NOT skip a step because the task seems small.
+
+### Step 1 — Full Hierarchy Scan
+Get the complete scene hierarchy with `get_scene_hierarchy(includeInactive=true)`. Note every root GameObject. Do not assume you know what's in the scene.
+
+### Step 2 — Component Audit on Every Root GO
+For each root GO, call `get_gameobject_components()`. Check:
+- `missingCount` — if > 0, those must be cleaned
+- Every component name looks correct for that object
+- No unexpected duplicates (e.g., two `NPCFlowLogger` GOs)
+
+### Step 3 — Read Source Scripts for Every Component
+For every MonoBehaviour on the GO, read the source script and identify ALL `[SerializeField]` fields + their types. This is the only way to know what fields *should* exist. Pay attention to:
+- `ObjectReference` fields that need other GOs/components
+- Arrays/lists (`_profiles`, `_definitions`, catalogs) that need items
+- Config fields (host, port, model, timeout) that need correct defaults
+
+### Step 4 — Trace Every Missing Script to Root Cause
+When `missingCount > 0`:
+1. Read the scene `.unity` file around the GameObject's YAML block
+2. Extract the stale GUID from each `MissingScript` component
+3. Search `.cs.meta` files for that GUID
+4. If found → it's a legitimate component, identify it
+5. If NOT found → determine why (deleted? renamed? moved? new assembly?)
+6. Clean with `GameObjectUtility.RemoveMonoBehavioursWithMissingScript`
+7. **CRITICAL: After cleaning, re-add the correct component types. Unity does NOT restore serialized fields — every field will be empty/default.** You must manually re-wire all references.
+
+### Step 5 — Verify Every Serialized Field (after re-add)
+For every custom MonoBehaviour, call `get_component_inspector_properties(onlyTopLevel=false)` — **do NOT use `onlyReferences=true` alone**, that misses empty arrays, config values, and non-reference fields. Check:
+- Every ObjectReference is assigned and points to the correct target
+- Every array/list has the expected number of items (profiles, catalogs, items)
+- Every config value matches the expected default (host, port, model, timeout)
+- No field that should be assigned is left at `null` or `[]`
+
+### Step 6 — Verify Compilation
+Call `compile_scripts()`. Wait until `isCompiling=false` and `hasErrors=false`.
+
+### Step 7 — Categorical Wiring Validation
+Check every category below. For each MonoBehaviour, verify ALL serialized fields are assigned and point to the correct object/asset. Read the scene YAML if `get_component_inspector_properties` shows unexpected nulls.
+
+**Category A: Network Infrastructure**
+| GameObject | Components | Verify |
+|---|---|---|
+| `Network_Manager` | NetworkManager, UnityTransport | TransportConfig port=11474, address config |
+| `NPCNetworkSystem` | NPCNetworkBootstrap | Refs: NetworkManager, UnityTransport, PlayerPrefab, ServerNpcPrefab; TransportConfig: connectAddress, port, useWebSockets |
+
+**Category B: Auth System (AuthUI)**
+| Component | Refs to Verify |
+|---|---|
+| `AuthUIController` | authPanel, authTitle, usernameInput, passwordInput, confirmPasswordGroup, submitButton, switchModeButton, errorText, authService (→PlayerAuthService on same GO) |
+| `PlayerAuthService` | supabaseUrl (localhost:8091), restApiUrl (localhost:8092), timeout, stored session config |
+| `AuthNetworkBridge` | _authController (→AuthUIController), _networkBootstrap (→NPCNetworkSystem), _gameplayLoadController (→WebGLGameplayLoadController) |
+
+**Category C: Dialogue System (NPCDialogueSystem)**
+| GO | Components | Serialized Refs |
+|---|---|---|
+| `Core` | NPCDialogueManager, NPCDialogueSmokeValidator, NPCLocalAIClient | Manager: _chatClient, _qdrantRag, _supabaseRepo, _profiles (≥1 NPCProfile asset). LocalAIClient: _host=127.0.0.1, _port=8080, _model |
+| `Backend` | NPCBackendReadinessService | Singleton, no duplicates |
+| `Services` | NPCDialogueHistoryService, NPCDialogueRetrievalService, NPCDialogueSessionService, PlayerDialogueContextService, QdrantRAGService, SupabaseDialogueRepository, NPCLocalAIEmbedder | All 7 present and unique |
+| `Network` | NetworkObject, NPCDialogueNetworkBridge, ItemTradeService, NPCNetworkSessionManager | NetworkBridge: _dialogueManager→Core, _sessionManager→Network (NPCNetworkSessionManager). ItemTradeService: _catalog→ItemCatalog asset |
+
+**Category D: Initialization**
+| GO | Components | Refs |
+|---|---|---|
+| `NPCSceneInitialization` | NPCSceneInitializationController | **6 refs**: _flowLogger, _networkBootstrap, _dialogueManager, _backendReadiness, _networkBridge, _smokeValidator — ALL must be non-null |
+| `WebGLGameplayLoadController` | WebGLGameplayLoadController | Self-contained |
+
+**Category E: UI System (Canvas)**
+| GO | Components | Refs |
+|---|---|---|
+| `Canvas` | Canvas, CanvasScaler, GraphicRaycaster, NPCDialogueUIController | UIController: DialogueManager, NetworkBridge, PlayerInput, AiText, StopButton. Unassigned refs (e.g. LegacyKnowledgeBaseController) are OK if unused. |
+| `StopButton` | Image, Button | Button wired to UIController.StopPressed? |
+| `PlayerInput` | TMP_InputField | Input field wired |
+| `AIImage` | Image | Visual container |
+| `AIImage/AIText` | TextMeshProUGUI | AI response text |
+
+**Category F: Engine/Environment**
+| GO | Components | Notes |
+|---|---|---|
+| `Main Camera` | Camera, AudioListener, URP data | Default config OK |
+| `Directional Light` | Light, URP data | Default config OK |
+| `EventSystem` | EventSystem, InputSystemUIInputModule | Required for UI input |
+| `Ground` | MeshFilter, MeshRenderer, MeshCollider, NavMeshSurface | Mesh assigned? Material assigned? |
+
+**Category G: Flow/Logging**
+| GO | Components | Notes |
+|---|---|---|
+| `NPCFlowLogger` | NPCFlowLogger | Singleton — exactly 1 instance |
+
+**Category H: Duplicate Prevention**
+Check every name at each hierarchy level. `get_scene_hierarchy` list must have unique entries for each root GO and each child under a parent. Duplicate names mean stale/multiple copies.
+
+### Step 7 — Save Scene
+`save_scene()` — always.
+
+### Root cause of "clean but not ready"
+The Phase 7 domain restructure regenerated `.meta` file GUIDs. The scene held stale GUIDs for:
+- 10 components on NPCDialogueSystem (old manager, services, repos)
+- 1 component on NPCSceneInitialization (old NPCNetworkBootstrap)
+- 3 components on AuthUI (old AuthUIController, PlayerAuthService, AuthNetworkBridge)
+
+After cleaning MissingScripts, **re-add any valid components** that were lost and re-wire their references. Also check `_profiles` arrays on managers (ScriptableObject asset refs don't auto-restore). Major missed items during first "clean" pass:
+- NPCSceneInitializationController._backendReadiness was null (fixed)
+- NPCDialogueManager._qdrantRag and _supabaseRepo were null (fixed)
+- NPCDialogueManager._profiles was empty (fixed)
+- QdrantRAGService, SupabaseDialogueRepository, NPCLocalAIEmbedder missing from Services (fixed)
+- ItemTradeService._catalog (ItemCatalog asset) was null (fixed — created empty ItemCatalog.asset)
+- NPCDialogueNetworkBridge._sessionManager was null (fixed — added NPCNetworkSessionManager to Network)
+- NPCDialogueSmokeValidator._logger was null (fixed — wired to NPCFlowLogger)
+
+## 12. Known compile warnings
 
 - `CS0618`: `FindFirstObjectByType` / `FindObjectOfType` usage in several scripts.
 - `CS0108`: `NPCDialogueManager.SendMessage(string)` hides `Component.SendMessage(string)`; avoid the inherited `Component.SendMessage()`.
 
-## 12. Dedicated server
+## 13. Dedicated server
 
 - Build output: `Builds/Server/`.
 - Runtime flags: `-batchmode -npc-server -port 11474 -address 0.0.0.0 -npc-websockets`.
 - Docker: `docker/Dockerfile`, `docker-compose.yml`, `docker/entrypoint.sh`.
 - `NPCNetworkBootstrap` starts in `Start()` so `NetworkManager.Awake()` runs first.
 
-## 13. Addressables / compatibility
+## 14. Addressables / compatibility
 
 - All build profiles must use `apiCompatibilityLevel: 2` (.NET Standard 2.1). Level 6 breaks Addressables, Unity Transport, Serialization, and RP Core packages.
 - After changing `apiCompatibilityLevel`, delete `Library/` and rebuild.
 - `m_BuildAddressablesWithPlayerBuild` should be `0` for iteration builds. Rebuild Addressables manually when needed.
 - If SBP errors appear, clear `Library/com.unity.addressables/`, `Temp/com.unity.addressables/`, and stale `addressables_content_state.bin` files, then rebuild.
 
-## 14. Code quality workflow
+## 15. Code quality workflow
 
 Repeatable audit → fix → verify cycle using existing tools:
 

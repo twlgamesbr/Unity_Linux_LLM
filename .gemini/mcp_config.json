@@ -1,0 +1,70 @@
+{
+  "mcpServers": {
+    "chrome-devtools-mcp": {
+      "args": [
+        "-y",
+        "chrome-devtools-mcp@latest",
+        "--browserUrl=http://127.0.0.1:9222"
+      ],
+      "command": "npx",
+      "env": {
+        "CHROME_PATH": "/home/athar/.gemini/antigravity/scratch/chrome-wrapper",
+        "PUPPETEER_EXECUTABLE_PATH": "/home/athar/.gemini/antigravity/scratch/chrome-wrapper"
+      },
+      "disabled": false
+    },
+    "gladekit-unity": {
+      "args": [
+        "gladekit-mcp"
+      ],
+      "command": "uvx"
+    },
+    "datadog": {
+      "command": "https://mcp.us5.datadoghq.com/v1/mcp"
+    },
+    "unity-mcp": {
+      "command": "/home/athar/.unity/relay/relay_linux",
+      "args": [
+        "--mcp"
+      ],
+      "env": {}
+    },
+    "google-developer-knowledge": {
+      "authProviderType": "google_credentials",
+      "serverUrl": "https://developerknowledge.googleapis.com/mcp"
+    },
+    "sequential-thinking": {
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ],
+      "command": "npx"
+    },
+    "notebooks": {
+      "command": "node",
+      "args": [
+        "/home/athar/.antigravity-ide/extensions/googlecloudtools.datacloud-0.6.1-universal/mcp_servers/cli/mcp_proxy_bundle.js",
+        "notebooks-antigravityide"
+      ]
+    },
+    "visualization": {
+      "command": "node",
+      "args": [
+        "/home/athar/.antigravity-ide/extensions/googlecloudtools.datacloud-0.6.1-universal/mcp_servers/cli/mcp_proxy_bundle.js",
+        "visualization-antigravityide"
+      ]
+    },
+    "datacloud_knowledge_catalog_remote": {
+      "serverUrl": "https://dataplex.googleapis.com/mcp",
+      "authProviderType": "google_credentials",
+      "headers": {
+        "User-Agent": "datacloud.antigravity ide"
+      },
+      "oauth": {
+        "scopes": [
+          "https://www.googleapis.com/auth/cloud-platform"
+        ]
+      }
+    }
+  }
+}
