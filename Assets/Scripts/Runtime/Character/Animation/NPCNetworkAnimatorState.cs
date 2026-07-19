@@ -3,6 +3,7 @@ using UnityEngine;
 
 
 using NPCSystem.Monitoring;
+using NPCSystem.Monitoring.Datadog;
 using NPCSystem.Dialogue.Core;
 using NPCSystem.Network.Core;
 using NPCSystem.Character.Player;
@@ -138,6 +139,12 @@ namespace NPCSystem.Character.Animation
                         Sprinting = estimatedSpeed > 0.7f,
                     };
                     _bridge.ApplySnapshot(fallbackSnapshot);
+
+                    // ── Datadog: server fallback activated (owner RPC late) ────
+                    DatadogMetricsService.Increment(
+                        "animation.fallback.activation",
+                        tags: new[] { $"netid:{NetworkObjectId}" }
+                    );
                 }
             }
         }
@@ -173,6 +180,17 @@ namespace NPCSystem.Character.Animation
             if (!IsServer)
                 return;
             ReplicatedState.Value = snapshot;
+
+            // ── Datadog: animation sync heartbeat ─────────────────────────────
+            DatadogMetricsService.Increment(
+                "animation.sync.count",
+                tags: new[] { $"npc_client:{rpcParams.Receive.SenderClientId}" }
+            );
+            DatadogMetricsService.Gauge(
+                "animation.sync.speed",
+                snapshot.Speed,
+                tags: new[] { $"npc_client:{rpcParams.Receive.SenderClientId}" }
+            );
         }
 
         /// <summary>

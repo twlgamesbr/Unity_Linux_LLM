@@ -150,9 +150,24 @@ namespace NPCSystem.Dialogue.RAG
                 if (response?.result?.config?.params_config?.vectors?.dense == null) return "Invalid response structure.";
 
                 int denseSize = response.result.config.params_config.vectors.dense.size;
-                bool hasSparse = response.result.config.params_config.sparse_vectors != null && 
+                bool hasSparse = response.result.config.params_config.sparse_vectors != null &&
                                  response.result.config.params_config.sparse_vectors.ContainsKey(_sparseVectorName);
-                
+
+                // ── Datadog: emit live dimension so dashboards catch mismatches instantly ──
+                DatadogMetricsService.Gauge(
+                    "rag.dimension.check",
+                    denseSize,
+                    tags: new[] { $"collection:{_collectionName}" }
+                );
+
+                // Expected dimension for nomic-embed-text-v1.5
+                const int expectedDim = 768;
+                bool dimOk = denseSize == expectedDim;
+                DatadogMetricsService.Increment(
+                    dimOk ? "rag.dimension.valid" : "rag.dimension.invalid",
+                    tags: new[] { $"collection:{_collectionName}", $"dim:{denseSize}" }
+                );
+
                 return $"Dense({denseSize}){(hasSparse ? $" + Sparse({_sparseVectorName})" : " [NO SPARSE]")}";
             }
             catch (Exception ex) { return $"Parse error: {ex.Message}"; }

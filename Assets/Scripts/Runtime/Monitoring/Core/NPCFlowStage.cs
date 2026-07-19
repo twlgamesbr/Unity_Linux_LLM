@@ -39,5 +39,21 @@ namespace NPCSystem.Monitoring
         NpcSpawn,
         PlayerNameRegistration,
         EditorWorkflow,
+
+        // ── Animation & Input ──────────────────────────────────────
+        /// <summary>Animator snapshot submitted from owner client to server (20 Hz).</summary>
+        AnimationSync,
+        /// <summary>Server-side velocity fallback activated when owner RPC is late.</summary>
+        AnimationFallback,
+        /// <summary>Player input system switched between Gameplay and UI dialogue mode.</summary>
+        InputModeSwitch,
+
+        // ── WebGL Lifecycle ────────────────────────────────────────
+        /// <summary>WebGLGameplayLoadController began or completed deferred scene load.</summary>
+        WebGLGameplayLoad,
+
+        // ── RAG Health ────────────────────────────────────────────
+        /// <summary>Embedding dimension validated against Qdrant collection at startup.</summary>
+        RagDimensionCheck,
     }
 }

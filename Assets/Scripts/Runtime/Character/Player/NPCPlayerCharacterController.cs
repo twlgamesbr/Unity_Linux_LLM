@@ -5,6 +5,7 @@ using UnityEngine.Serialization;
 
 
 using NPCSystem.Monitoring;
+using NPCSystem.Monitoring.Datadog;
 using NPCSystem.Dialogue.Core;
 using NPCSystem.Network.Core;
 using NPCSystem.Character.Player;
@@ -311,6 +312,12 @@ namespace NPCSystem.Character.Player
             }
 
             IsInUIMode = active;
+
+            // ── Datadog: player toggled between Gameplay ↔ UI/Dialogue mode ──
+            DatadogMetricsService.Increment(
+                "input.mode_switch",
+                tags: new[] { $"mode:{(active ? "ui" : "gameplay")}" }
+            );
         }
 
         void ResolveReferences()

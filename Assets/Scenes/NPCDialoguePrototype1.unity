@@ -808,7 +808,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &276694091
 Transform:
   m_ObjectHideFlags: 0
@@ -847,7 +847,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCServerCharacterSpawner
   _networkManager: {fileID: 1161870791}
   _networkBootstrap: {fileID: 774187519}
-  _dialogueManager: {fileID: 1778380623}
+  _dialogueManager: {fileID: 0}
   _npcPrefab: {fileID: 6903247061848355748, guid: 3adc01a49d3d92f3eb81281b65e4b9c9, type: 3}
   _npcPrefabResourcesPath: Networking/NPCServerCharacter
   _spawnOrigin: {x: -4, y: 0, z: 6}
@@ -2149,9 +2149,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.Network.Core.NPCNetworkBootstrap
   NetworkManager: {fileID: 1161870791}
   UnityTransport: {fileID: 1161870790}
-  PlayerPrefab: {fileID: 0}
+  PlayerPrefab: {fileID: 4442102780728157853, guid: af939554eec0434dbb3f6a2e162aea74, type: 3}
   PlayerPrefabResourcesPath: Networking/NPCPlayerAvatar
-  ServerNpcPrefab: {fileID: 0}
+  ServerNpcPrefab: {fileID: 6903247061848355748, guid: 3adc01a49d3d92f3eb81281b65e4b9c9, type: 3}
   ServerNpcPrefabResourcesPath: Networking/NPCServerCharacter
   TransportConfig:
     _connectAddress: 127.0.0.1
@@ -4709,6 +4709,7 @@ GameObject:
   - component: {fileID: 1555757779}
   - component: {fileID: 1555757780}
   - component: {fileID: 1555757781}
+  - component: {fileID: 1555757782}
   m_Layer: 0
   m_Name: Core
   m_TagString: Untagged
@@ -4783,6 +4784,30 @@ MonoBehaviour:
   _dialogueManager: {fileID: 0}
   _chatClient: {fileID: 0}
   _logger: {fileID: 0}
+--- !u!114 &1555757782
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1555757778}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a2e4b181559021ddab4f2cbdaf4b400, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.LocalAI.NPCLocalAIClient
+  _host: 127.0.0.1
+  _port: 8080
+  _apiKey: 
+  _model: llama-3.2-3b-instruct:q8_0
+  _temperature: 0.2
+  _topP: 0.9
+  _topK: 40
+  _minP: 0.05
+  _repeatPenalty: 1.1
+  _maxTokens: 256
+  _numRetries: 3
+  _requestTimeoutSeconds: 120
 --- !u!1 &1597061035
 GameObject:
   m_ObjectHideFlags: 0
@@ -5278,78 +5303,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1778380624}
-  - component: {fileID: 1778380623}
-  - component: {fileID: 1778380637}
-  - component: {fileID: 1778380640}
-  - component: {fileID: 1778380639}
-  - component: {fileID: 1778380638}
-  - component: {fileID: 1778380642}
-  - component: {fileID: 1778380641}
-  - component: {fileID: 1778380643}
-  - component: {fileID: 1778380645}
-  - component: {fileID: 1778380644}
-  - component: {fileID: 1778380646}
   m_Layer: 0
   m_Name: NPCDialogueSystem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!114 &1778380623
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1778380622}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 32852d652d4bd17afa0f0b195a43165b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NPCSystem.NPCDialogueManager
-  chatClientGroup: {}
-  _chatClient: {fileID: 1778380643}
-  ragServicesGroup: {}
-  _useQdrantRag: 1
-  _qdrantRag: {fileID: 1778380642}
-  persistenceGroup: {}
-  _supabaseRepo: {fileID: 1778380637}
-  llmConfigGroup: {}
-  _remoteHost: 127.0.0.1
-  _remotePort: 8080
-  _remoteModel: llama-3.2-3b-instruct:q8_0
-  _remoteEmbeddingHost: 127.0.0.1
-  _remoteEmbeddingPort: 8080
-  _ragEmbeddingPath: RAG/NPCDialogues.rag
-  _profiles:
-  - {fileID: 11400000, guid: fee9805d1a4aff5de9e2b4c154fda9a7, type: 2}
-  - {fileID: 11400000, guid: a2b00eea2a038c8d890b04ea76369e61, type: 2}
-  - {fileID: 11400000, guid: aa3445a7aac99dbb2b3803972a0b9de1, type: 2}
-  _maxHistoryPerNPC: 20
-  _initializeOnStart: 0
-  eventsGroup: {}
-  OnNpcChanged:
-    m_PersistentCalls:
-      m_Calls: []
-    m_CallsDirty: 1
-  OnResponseStart:
-    m_PersistentCalls:
-      m_Calls: []
-    m_CallsDirty: 1
-  OnResponseComplete:
-    m_PersistentCalls:
-      m_Calls: []
-    m_CallsDirty: 1
-  OnError:
-    m_PersistentCalls:
-      m_Calls: []
-    m_CallsDirty: 1
-  _currentNPC: {fileID: 0}
-  _historyService: {fileID: 0}
-  _retrievalService: {fileID: 0}
-  _sessionService: {fileID: 0}
-  _contextService: {fileID: 0}
+  m_IsActive: 1
 --- !u!4 &1778380624
 Transform:
   m_ObjectHideFlags: 0
@@ -5370,201 +5330,6 @@ Transform:
   - {fileID: 276694091}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1778380637
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1778380622}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 73162eddfe7ece41e8f7b4bb33778b79, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.SupabaseDialogueRepository
-  referencesGroup: {}
-  _authService: {fileID: 1351714796}
-  behaviourGroup: {}
-  requestTimeoutSeconds: 10
-  debugGroup: {}
-  lastStatus: Repository settings are incomplete. Check AuthService reference and
-    ensure authenticated.
-  lastOperation: ValidateRepositorySettings
-  lastOperationDurationMs: 0
-  _lastSessionId: 
-  _logger: {fileID: 0}
-  _analyticsService: {fileID: 0}
---- !u!114 &1778380638
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1778380622}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6b3deb4159d078137a4afe1e40a1b90c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCDialogueSessionService
-  _isResponding: 0
-  _responseNPC: {fileID: 0}
-  _activePlayerNameOverride: 
-  _chatClient: {fileID: 0}
-  _historyService: {fileID: 0}
-  _retrievalService: {fileID: 0}
-  _contextService: {fileID: 0}
-  _remoteHost: 
-  _remotePort: 0
-  _profiles: []
-  _chatModel: 
---- !u!114 &1778380639
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1778380622}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bfe3f9c7f728fc8e88b6a9c0dee91390, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCDialogueRetrievalService
-  _useQdrantRag: 0
-  _qdrantRag: {fileID: 0}
-  _remoteEmbeddingHost: 
-  _remoteEmbeddingPort: 0
---- !u!114 &1778380640
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1778380622}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3d3d8c6f0677f7f6bad1e541cea397cc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCDialogueHistoryService
-  _supabaseRepo: {fileID: 0}
-  _persistHistory: 1
-  _maxHistoryPerNPC: 20
---- !u!114 &1778380641
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1778380622}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4fc1cc6216f8393fd94c3253333df4f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCLocalAIEmbedder
-  _host: localhost
-  _port: 8090
-  _apiKey: 
-  _model: nomic-embed-text-v1.5
-  _numRetries: 3
-  _logger: {fileID: 0}
---- !u!114 &1778380642
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1778380622}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 307aa1d34162b1b759aeeac4d0b0ba14, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.QdrantRAGService
-  qdrantEndpointGroup: {}
-  _qdrantUrl: http://localhost:6333
-  _collectionName: unity_linux_llm_codebase_v2
-  _denseVectorName: dense
-  _sparseVectorName: code_keywords
-  embedderGroup: {}
-  _embedder: {fileID: 1778380641}
-  _expectedDenseDimension: 768
-  inspectorStatus: Qdrant is reachable but empty (no points).
---- !u!114 &1778380643
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1778380622}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2a2e4b181559021ddab4f2cbdaf4b400, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCLocalAIClient
-  _host: 127.0.0.1
-  _port: 8090
-  _apiKey: 
-  _model: llama-3.2-3b-instruct:q8_0
-  _temperature: 0.2
-  _topP: 0.9
-  _topK: 40
-  _minP: 0.05
-  _repeatPenalty: 1.1
-  _maxTokens: 256
-  _numRetries: 3
-  _requestTimeoutSeconds: 120
---- !u!114 &1778380644
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1778380622}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4dbc73d3966f70eacb6a3c1f868b15e4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCEvidenceState
---- !u!114 &1778380645
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1778380622}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 768834cce95a7c94fb343460934183f5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCDialogueActionPlanner
---- !u!114 &1778380646
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1778380622}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 48dcf98b290a05a02be6c56f7fc1feb0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.PlayerDialogueContextService
-  referencesGroup: {}
-  _authService: {fileID: 1351714796}
-  behaviourGroup: {}
-  _enableServerContext: 1
-  debugGroup: {}
-  _currentNpcSlug: 
-  _cachedContext: 
-  _lastLoadedContext:
-    _playerName: 
-    _playerId: 
-    _trustScore: 0
-    _currentMood: 
-    _dialogueCount: 0
-    _knownClues: []
-    _inventory: []
-    _visitedLocations: []
-    _loadedFromServer: 0
-  _logger: {fileID: 0}
 --- !u!1 &1779205794
 GameObject:
   m_ObjectHideFlags: 0
@@ -5641,80 +5406,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1779205794}
   m_CullTransparentMesh: 1
---- !u!1 &1788130157
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1788130159}
-  - component: {fileID: 1788130158}
-  - component: {fileID: 1788130160}
-  m_Layer: 0
-  m_Name: NPCFlowLogger
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1788130158
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1788130157}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f384f21a843533e249c443e33cb63cc1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.NPCFlowLogger
-  _logToUnityConsole: 1
-  _logToStdout: 1
-  _logToJsonlFile: 1
-  _includeTextSnippets: 0
-  _includeRawTextPayloads: 0
-  _maxSnippetChars: 80
-  cacheSettingsGroup: {}
-  _maxInMemoryEvents: 500
-  logFileStorageGroup: {}
-  _relativeLogDirectory: NPCDialogue/Logs
-  _overrideAbsoluteLogDirectory: 
-  _maxLogDays: 7
-  _maxLogDirectorySizeMB: 100
-  suppressionGroup: {}
-  _maxDuplicateEventsPerMinute: 5
-  _requestCounter: 0
-  _sessionId: 
-  _currentLogPath: 
-  _fileFailureWarned: 0
-  _currentConversationId: 
---- !u!4 &1788130159
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1788130157}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1652712579 &1788130160
-MultiplayerRolesData:
-  m_ObjectHideFlags: 2
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1788130157}
-  m_GameObjectRolesMask: 3
-  m_ComponentsRolesMasks: []
 --- !u!1 &1852906747
 GameObject:
   m_ObjectHideFlags: 0
@@ -6552,7 +6243,6 @@ SceneRoots:
   - {fileID: 1351714795}
   - {fileID: 898411689}
   - {fileID: 1778380624}
-  - {fileID: 1788130159}
   - {fileID: 1597061039}
   - {fileID: 985270264}
   - {fileID: 1675756819}
