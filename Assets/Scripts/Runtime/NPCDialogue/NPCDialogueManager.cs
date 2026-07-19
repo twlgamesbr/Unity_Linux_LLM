@@ -28,35 +28,21 @@ namespace NPCSystem
         [FoldoutGroup(
             "RAG Services",
             true,
-            nameof(_localRag),
-            nameof(_ragEmbeddingPath),
             nameof(_useQdrantRag),
             nameof(_qdrantRag)
         )]
         [SerializeField]
         EditorAttributes.Void ragServicesGroup;
 
-        [FormerlySerializedAs("LocalRag")]
+        [Tooltip("Use Qdrant vector database for NPC knowledge search. Requires QdrantRAGService + NPCLocalAIEmbedder on the GameObject.")]
         [SerializeField, HideProperty]
-        public NPCLocalRAG _localRag;
-
-        [FilePath(true, "rag")]
-        [FormerlySerializedAs("RagEmbeddingPath")]
-        [FormerlySerializedAs("ragEmbeddingPath")]
-        [SerializeField, HideProperty]
-        string _ragEmbeddingPath = "RAG/NPCDialogues.rag";
-
-        [Tooltip("Use Qdrant vector database for NPC knowledge search (vs local .rag file on disk). Requires QdrantRAGService + NPCLocalAIEmbedder on the GameObject.")]
-        [SerializeField, HideProperty]
-        [FormerlySerializedAs("useQdrantRag")]
-        [FormerlySerializedAs("UseQdrantRag")]
-        bool _useQdrantRag = false;
+        bool _useQdrantRag = true;
 
         [FormerlySerializedAs("qdrantRag")]
         [SerializeField, HideProperty, ShowField(nameof(_useQdrantRag))]
         public QdrantRAGService _qdrantRag;
 
-        [FoldoutGroup("Game Systems", true, nameof(_actionPlanner), nameof(_evidenceState))]
+        [FoldoutGroup("Game Systems", true, nameof(_actionPlanner))]
         [SerializeField]
         EditorAttributes.Void gameSystemsGroup;
 
@@ -64,12 +50,8 @@ namespace NPCSystem
         [SerializeField, HideProperty]
         public NPCDialogueActionPlanner _actionPlanner;
 
-        [FormerlySerializedAs("evidenceState")]
-        [SerializeField, HideProperty]
-        public NPCEvidenceState _evidenceState;
-
         [FoldoutGroup("Persistence", true, nameof(_supabaseRepo))]
-        [SerializeField]
+[SerializeField]
         EditorAttributes.Void persistenceGroup;
 
         [FormerlySerializedAs("supabaseRepo")]
@@ -336,8 +318,7 @@ namespace NPCSystem
                 if (_retrievalService != null)
                 {
                     _retrievalService.Initialize(
-                        _localRag, RagEmbeddingPath, EnableRAG, UseQdrantRag,
-                        _qdrantRag, RebuildRagFromKnowledgeIfMissing,
+                        _useQdrantRag, _qdrantRag,
                         RemoteEmbeddingHost, RemoteEmbeddingPort
                     );
                     _retrievalService.SyncEmbedderHost();
@@ -347,7 +328,7 @@ namespace NPCSystem
                 {
                     _sessionService.Initialize(
                         _chatClient, _historyService, _retrievalService,
-                        _actionPlanner, _evidenceState, _contextService,
+                        _actionPlanner, _contextService,
                         RemoteHost, RemotePort, RemoteModel, _profiles
                     );
                 }
@@ -536,22 +517,8 @@ namespace NPCSystem
             _historyService?.ApplyHistorySnapshot(historyByNpc, Profiles);
         }
 
-        /// <summary>Network-bridge snapshot: capture evidence state.</summary>
-        public NPCEvidenceStateSnapshot CaptureEvidenceSnapshot()
-        {
-            return _evidenceState != null
-                ? _evidenceState.CreateSnapshot()
-                : new NPCEvidenceStateSnapshot();
-        }
-
-        /// <summary>Network-bridge snapshot: restore evidence state.</summary>
-        public void ApplyEvidenceSnapshot(NPCEvidenceStateSnapshot snapshot)
-        {
-            _evidenceState?.ApplySnapshot(snapshot);
-        }
-
         /// <summary>Clear history for a given NPC or all NPCs.</summary>
-        public async Task ClearHistory(string npcName)
+public async Task ClearHistory(string npcName)
         {
             if (_historyService != null)
                 await _historyService.ClearHistoryAsync(npcName, Profiles);

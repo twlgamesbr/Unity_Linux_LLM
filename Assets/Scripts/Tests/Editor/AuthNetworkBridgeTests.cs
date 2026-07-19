@@ -36,7 +36,7 @@ namespace NPCSystem.Tests
         public void TryGetCommandLineStartupMode_NoArgs_ReturnsFalse()
         {
             bool result = AuthNetworkBridge.TryGetCommandLineStartupMode(
-                out AuthNetworkBridge.ResolvedNetworkStartupMode
+                out AuthNetworkBridge.ResolvedNetworkStartupMode mode
             );
             Assert.That(result, Is.False);
         }

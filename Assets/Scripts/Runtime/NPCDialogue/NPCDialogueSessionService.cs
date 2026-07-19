@@ -25,9 +25,8 @@ namespace NPCSystem
         NPCDialogueHistoryService _historyService;
         NPCDialogueRetrievalService _retrievalService;
         NPCDialogueActionPlanner _actionPlanner;
-        NPCEvidenceState _evidenceState;
         PlayerDialogueContextService _contextService;
-        string _remoteHost;
+string _remoteHost;
         int _remotePort;
         NPCProfile[] _profiles;
 
@@ -56,7 +55,6 @@ namespace NPCSystem
             NPCDialogueHistoryService historyService,
             NPCDialogueRetrievalService retrievalService,
             NPCDialogueActionPlanner actionPlanner,
-            NPCEvidenceState evidenceState,
             PlayerDialogueContextService contextService,
             string remoteHost,
             int remotePort,
@@ -68,7 +66,6 @@ namespace NPCSystem
             _historyService = historyService;
             _retrievalService = retrievalService;
             _actionPlanner = actionPlanner;
-            _evidenceState = evidenceState;
             _contextService = contextService;
             _remoteHost = remoteHost ?? "localhost";
             _remotePort = remotePort;
@@ -144,6 +141,8 @@ namespace NPCSystem
             string reqId = logger.NextRequestId();
             string slug = respondingProfile.GetNpcSlug();
 
+            using var tracer = DialogueFlowTracer.Start(slug, reqId, logger);
+
             using var scope = NPCFlowScope.Start(
                 logger,
                 NPCFlowStage.DialogueGeneration,
@@ -168,6 +167,9 @@ namespace NPCSystem
 
             try
             {
+                // Stage 1: Input received
+                tracer.TraceInput(playerMessage);
+
                 string prompt = await BuildRAGPromptAsync(respondingProfile, playerMessage, reqId);
                 string dialogueMessage = string.Empty;
 
@@ -191,11 +193,14 @@ namespace NPCSystem
                     playerMessage,
                     prompt,
                     reqId,
-                    slug
+                    slug,
+                    tracer
                 );
                 dialogueMessage = dialogueMessage?.Trim() ?? string.Empty;
                 dialogueMessage = NPCFlowTextSanitizer.CleanDialogueText(dialogueMessage);
 
+                // Stage 5: Response complete
+                var responseSw = System.Diagnostics.Stopwatch.StartNew();
                 if (!string.IsNullOrWhiteSpace(dialogueMessage))
                 {
                     await _historyService.AppendConversationAsync(
@@ -232,6 +237,8 @@ namespace NPCSystem
                         }
                     }
                 }
+                responseSw.Stop();
+                tracer.TraceResponse(dialogueMessage, responseSw.ElapsedMilliseconds);
 
                 turnSw.Stop();
                 turnSpan.SetTag("action_type", actionPlan.ActionType.ToString());
@@ -251,6 +258,9 @@ namespace NPCSystem
 
                 OnResponseComplete?.Invoke(respondingProfile.GetDisplayName(), dialogueMessage);
 
+                // Mark tracer as successfully completed
+                tracer.Complete();
+
                 var logData = new Dictionary<string, object>
                 {
                     ["playerMessage"] = logger.SummarizeText("player", playerMessage),
@@ -264,6 +274,7 @@ namespace NPCSystem
             {
                 turnSw.Stop();
                 turnSpan.SetError(ex.Message);
+                tracer.Failed(ex);
                 DatadogMetricsService.Increment("dialogue.session.error", tags: new[]
                 {
                     $"npc:{slug}",
@@ -315,7 +326,8 @@ namespace NPCSystem
             string playerMessage,
             string prompt,
             string reqId,
-            string slug
+            string slug,
+            DialogueFlowTracer tracer = null
         )
         {
             using var scope = NPCFlowScope.Start(
@@ -332,11 +344,9 @@ namespace NPCSystem
             );
 
             string dialogueMessage = string.Empty;
-
-            // Build conversation history messages
+            var contextSw = System.Diagnostics.Stopwatch.StartNew();
             List<NPCOpenAIMessage> messages = new List<NPCOpenAIMessage>();
 
-            // Gather runtime variables for template substitution in profile prompts
             string playerName = ResolveActivePlayerName();
             PromptVariables promptVars = PromptVariables.Default;
             promptVars.playerName = !string.IsNullOrEmpty(playerName) ? playerName : "Player";
@@ -352,7 +362,6 @@ namespace NPCSystem
                     promptVars.trustLabel = playerCtx.TrustLabel;
                     promptVars.mood = playerCtx.CurrentMood;
                     promptVars.dialogueCount = playerCtx.DialogueCount;
-                    // Use last visited location as current location; fall back to default
                     if (playerCtx.VisitedLocations.Count > 0)
                         promptVars.currentLocation = playerCtx.VisitedLocations[^1];
                 }
@@ -363,12 +372,14 @@ namespace NPCSystem
                     );
                 }
             }
+            contextSw.Stop();
+            tracer?.TraceContextLoad(playerCtx, fromServer: _contextService != null, contextSw.ElapsedMilliseconds);
 
+            var promptSw = System.Diagnostics.Stopwatch.StartNew();
             string sysPrompt = NPCProfilePromptComposer.BuildSystemPrompt(profile, promptVars);
             if (string.IsNullOrWhiteSpace(sysPrompt))
                 sysPrompt = "You are a helpful assistant.";
 
-            // Inject enriched player context (trust, mood, clues, items, locations)
             if (_contextService != null && profile != null && playerCtx.HasContext)
             {
                 try
@@ -387,6 +398,7 @@ namespace NPCSystem
                 new NPCOpenAIMessage { Role = "system", Content = sysPrompt + "\n" + prompt }
             );
 
+            int historyTurns = 0;
             foreach (
                 var entry in _historyService?.GetHistoryForSlug(slug)
                     ?? new List<DialogueEntry>()
@@ -400,9 +412,12 @@ namespace NPCSystem
                     ? "assistant"
                     : "user";
                 messages.Add(new NPCOpenAIMessage { Role = role, Content = entry.Content });
+                historyTurns++;
             }
 
             messages.Add(new NPCOpenAIMessage { Role = "user", Content = playerMessage });
+            promptSw.Stop();
+            tracer?.TracePromptBuild(sysPrompt.Length + prompt.Length, historyTurns, promptSw.ElapsedMilliseconds);
 
             var localAiSw = System.Diagnostics.Stopwatch.StartNew();
             using var localAiSpan = DatadogTracer.StartSpan(
@@ -446,6 +461,7 @@ namespace NPCSystem
 
             localAiSw.Stop();
             localAiSpan.SetTag("status", requestSucceeded ? "success" : "empty");
+            tracer?.TraceLLMCall(ResolvedModelName, dialogueMessage?.Length ?? 0, requestSucceeded, localAiSw.ElapsedMilliseconds);
             DatadogMetricsService.Timer("dialogue.localai.request.duration", localAiSw.ElapsedMilliseconds, tags: new[]
             {
                 $"npc:{slug}",
@@ -555,21 +571,6 @@ namespace NPCSystem
             {
                 basePrompt =
                     $"{combinedKnowledge}\nPlayer message: {playerMessage}\n\nReply in character. Use the knowledge above only if it is relevant and avoid mentioning this instruction block.";
-            }
-
-            // Inject evidence state context so the NPC remembers what it has shared
-            if (_evidenceState != null && profile != null)
-            {
-                string npcStateLine = _evidenceState.BuildNpcStateLine(profile.GetNpcSlug());
-                string stateContext = _evidenceState.BuildStateContextString();
-                if (
-                    !string.IsNullOrWhiteSpace(npcStateLine)
-                    || !string.IsNullOrWhiteSpace(stateContext)
-                )
-                {
-                    basePrompt +=
-                        $"\n\n{Environment.NewLine}{npcStateLine}{Environment.NewLine}{stateContext}";
-                }
             }
 
             return basePrompt;

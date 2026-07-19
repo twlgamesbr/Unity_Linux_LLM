@@ -30,8 +30,8 @@ namespace NPCSystem
 
         [FormerlySerializedAs("model")]
         [SerializeField]
-        string _model = "default-embedding";
-        public string Model => _model;
+        string _model = "nomic-embed-text-v1.5";
+public string Model => _model;
 
         [Header("Settings")]
         [FormerlySerializedAs("numRetries")]

@@ -196,16 +196,12 @@ namespace NPCSystem
 
         public void SetInputEnabled(bool enabled)
         {
-            if (PlayerInput != null)
-                PlayerInput.interactable = enabled;
-            if (StopButton != null)
-                StopButton.interactable = enabled;
+            DialogueDisplayHelper.SetInputEnabled(PlayerInput, StopButton, enabled);
         }
 
         public void SetAIText(string text)
         {
-            if (AiText != null)
-                AiText.text = text;
+            DialogueDisplayHelper.SetAIText(AiText, text);
         }
 
         public NPCProfile GetActiveProfile()
@@ -439,16 +435,15 @@ namespace NPCSystem
 
         void HandleNpcChanged(string displayName)
         {
-            UpdatePortrait(GetActiveProfile());
+            DialogueDisplayHelper.UpdatePortrait(GetActiveProfile(), ButlerImage, MaidImage, ChefImage);
 
             NPCProfile profile = GetActiveProfile();
             if (RelationshipUI != null && profile != null)
             {
                 string slug = profile.GetNpcSlug();
-                NPCEvidenceState evidence = GetComponentInParent<NPCEvidenceState>()
-                    ?? FindAnyObjectByType<NPCEvidenceState>(FindObjectsInactive.Include);
+                NPCEvidenceState evidence = DialogueDisplayHelper.FindEvidenceState(this);
                 int count = DialogueManager?.GetHistory(slug).Count ?? 0;
-                RelationshipUI.Refresh(evidence, slug, count);
+                DialogueDisplayHelper.UpdateRelationshipUI(RelationshipUI, evidence, slug, count);
             }
 
             _readyForInput = true;
@@ -505,18 +500,15 @@ namespace NPCSystem
 
             if (RelationshipUI != null)
             {
-                NPCEvidenceState evidence = GetComponentInParent<NPCEvidenceState>()
-                    ?? FindAnyObjectByType<NPCEvidenceState>(FindObjectsInactive.Include);
+                NPCEvidenceState evidence = DialogueDisplayHelper.FindEvidenceState(this);
                 int count = DialogueManager?.GetHistory(npcName).Count ?? 0;
-                RelationshipUI.Refresh(evidence, npcName, count);
+                DialogueDisplayHelper.UpdateRelationshipUI(RelationshipUI, evidence, npcName, count);
             }
         }
 
         void HandleError(string error)
         {
-            string normalizedError = string.IsNullOrWhiteSpace(error)
-                ? "Unknown dialogue error."
-                : error.Trim();
+            string normalizedError = DialogueDisplayHelper.NormalizeError(error);
             NPCFlowLogger
                 .FindOrCreate()
                 .Log(
@@ -527,7 +519,7 @@ namespace NPCSystem
                     source: nameof(NPCDialogueUIController),
                     data: new Dictionary<string, object> { ["error"] = normalizedError }
                 );
-            SetAIText($"Error: {normalizedError}");
+            SetAIText(DialogueDisplayHelper.FormatErrorForDisplay(error));
             if (GetActiveProfile() != null)
             {
                 _readyForInput = true;
@@ -537,8 +529,7 @@ namespace NPCSystem
 
         void HandleResponseUpdated(string partialResponse)
         {
-            if (AiText != null)
-                AiText.text = partialResponse;
+            DialogueDisplayHelper.SetAIText(AiText, partialResponse);
         }
 
         void OnCharacterSelectionChanged(int selection)
@@ -576,38 +567,7 @@ namespace NPCSystem
 
         void UpdatePortrait(NPCProfile profile)
         {
-            RawImage[] portraits = new[] { ButlerImage, MaidImage, ChefImage };
-            if (profile == null)
-            {
-                foreach (RawImage img in portraits)
-                {
-                    if (img != null)
-                        img.CrossFadeAlpha(0f, 0.15f, true);
-                }
-                return;
-            }
-
-            string slug = profile.GetNpcSlug();
-            for (int i = 0; i < portraits.Length; i++)
-            {
-                if (portraits[i] == null)
-                    continue;
-
-                if (
-                    (slug == "butler" && i == 0)
-                    || (slug == "maid" && i == 1)
-                    || (slug == "chef" && i == 2)
-                )
-                {
-                    if (profile.PortraitTexture != null)
-                        portraits[i].texture = profile.PortraitTexture;
-                    portraits[i].CrossFadeAlpha(1f, 0.15f, true);
-                }
-                else
-                {
-                    portraits[i].CrossFadeAlpha(0f, 0.15f, true);
-                }
-            }
+            DialogueDisplayHelper.UpdatePortrait(profile, ButlerImage, MaidImage, ChefImage);
         }
 
         void OnInputFieldSubmit(string text)

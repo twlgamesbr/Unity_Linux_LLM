@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EditorAttributes;
@@ -12,7 +13,7 @@ namespace NPCSystem
 {
     public class QdrantRAGService : MonoBehaviour
     {
-        [FoldoutGroup("Qdrant Endpoint", true, nameof(_qdrantUrl), nameof(_collectionName))]
+        [FoldoutGroup("Qdrant Endpoint", true, nameof(_qdrantUrl), nameof(_collectionName), nameof(_denseVectorName), nameof(_sparseVectorName))]
         [SerializeField]
         private EditorAttributes.Void qdrantEndpointGroup;
 
@@ -25,9 +26,15 @@ namespace NPCSystem
         string _qdrantUrl = "http://localhost:6333";
 
         [SerializeField, HideProperty, FormerlySerializedAs("collectionName")]
-        string _collectionName = "npc_knowledge";
+        string _collectionName = "unity_linux_llm_codebase_v2";
 
-        [FoldoutGroup("Embedder", true, nameof(_embedder))]
+        [SerializeField, HideProperty]
+        string _denseVectorName = "dense";
+
+        [SerializeField, HideProperty]
+        string _sparseVectorName = "code_keywords";
+
+        [FoldoutGroup("Embedder", true, nameof(_embedder), nameof(_expectedDenseDimension))]
         [SerializeField]
         private EditorAttributes.Void embedderGroup;
 
@@ -38,11 +45,14 @@ namespace NPCSystem
         [SerializeField, HideProperty, FormerlySerializedAs("embedder")]
         NPCLocalAIEmbedder _embedder;
 
+        [SerializeField, HideProperty]
+        int _expectedDenseDimension = 768;
+
         [SerializeField, ReadOnly]
         string inspectorStatus = "Not validated yet.";
 
         [ShowInInspector]
-        string SearchEndpointPreview => BuildSearchEndpoint();
+        string SearchEndpointPreview => BuildQueryEndpoint();
 
         // ─── Public accessors ───
         public string QdrantUrl
@@ -61,122 +71,137 @@ namespace NPCSystem
             set => _embedder = value;
         }
 
-        [Button("Validate Qdrant Inspector Settings")]
-        void ValidateInspectorSettings()
+        void Awake()
         {
-            inspectorStatus =
-                HasValidQdrantUrl() && HasValidCollectionName()
-                    ? $"Qdrant settings look valid: {BuildSearchEndpoint()}"
-                    : "Qdrant settings are invalid. Check URL and collection name.";
+#if UNITY_WEBGL && !UNITY_EDITOR
+            ResolveWebGlHost();
+#endif
         }
 
-        [Button("Log Qdrant Configuration")]
-        void LogQdrantConfiguration()
+        private void ResolveWebGlHost()
         {
-            NPCFlowLogger
-                .FindOrCreate()
-                .Log(
-                    NPCFlowStage.ConfigurationValidation,
-                    NPCFlowStatus.Success,
-                    NPCFlowLogLevel.Info,
-                    "Qdrant configuration logged.",
-                    data: new Dictionary<string, object>
+            try
+            {
+                Uri pageUri = new Uri(Application.absoluteURL);
+                if (pageUri.Host != "localhost" && pageUri.Host != "127.0.0.1")
+                {
+                    Uri qdrantUri = new Uri(_qdrantUrl);
+                    if (qdrantUri.Host == "localhost" || qdrantUri.Host == "127.0.0.1")
                     {
-                        ["qdrantUrl"] = _qdrantUrl,
-                        ["collectionName"] = _collectionName,
-                        ["searchEndpoint"] = BuildSearchEndpoint(),
-                    },
-                    source: nameof(QdrantRAGService)
-                );
-            inspectorStatus = $"Logged Qdrant configuration: {BuildSearchEndpoint()}";
+                        var builder = new UriBuilder(qdrantUri);
+                        builder.Host = pageUri.Host;
+                        _qdrantUrl = builder.ToString().TrimEnd('/');
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"[QdrantRAGService] Failed to resolve WebGL host: {ex.Message}");
+            }
+        }
+
+        [Button("Validate Qdrant Inspector Settings")]
+        async void ValidateInspectorSettings()
+        {
+            if (!HasValidQdrantUrl() || !HasValidCollectionName())
+            {
+                inspectorStatus = "Qdrant settings are invalid. Check URL and collection name.";
+                return;
+            }
+
+            inspectorStatus = "Validating...";
+            string collectionInfo = await GetCollectionInfo();
+            if (string.IsNullOrEmpty(collectionInfo))
+            {
+                inspectorStatus = "Failed to fetch collection info. Is Qdrant reachable?";
+            }
+            else
+            {
+                inspectorStatus = $"Validated: {collectionInfo}";
+            }
+        }
+
+        async Task<string> GetCollectionInfo()
+        {
+            string url = $"{_qdrantUrl}/collections/{_collectionName}";
+            using var request = UnityWebRequest.Get(url);
+            await request.SendWebRequest();
+
+            if (request.result != UnityWebRequest.Result.Success) return null;
+
+            try
+            {
+                var response = JsonConvert.DeserializeObject<QdrantCollectionInfoResponse>(request.downloadHandler.text);
+                if (response?.result?.config?.params_config?.vectors?.dense == null) return "Invalid response structure.";
+
+                int denseSize = response.result.config.params_config.vectors.dense.size;
+                bool hasSparse = response.result.config.params_config.sparse_vectors != null && 
+                                 response.result.config.params_config.sparse_vectors.ContainsKey(_sparseVectorName);
+                
+                return $"Dense({denseSize}){(hasSparse ? $" + Sparse({_sparseVectorName})" : " [NO SPARSE]")}";
+            }
+            catch (Exception ex) { return $"Parse error: {ex.Message}"; }
+        }
+
+        [Serializable]
+        class QdrantCollectionInfoResponse
+        {
+            public QdrantCollectionInfoResult result;
+        }
+
+        [Serializable]
+        class QdrantCollectionInfoResult
+        {
+            public QdrantCollectionConfig config;
+        }
+
+        [Serializable]
+        class QdrantCollectionConfig
+        {
+            public QdrantCollectionParams params_config;
+        }
+
+        [Serializable]
+        class QdrantCollectionParams
+        {
+            public QdrantVectorsConfig vectors;
+            public Dictionary<string, object> sparse_vectors;
+        }
+
+        [Serializable]
+        class QdrantVectorsConfig
+        {
+            public QdrantVectorParams dense;
+        }
+
+        [Serializable]
+        class QdrantVectorParams
+        {
+            public int size;
         }
 
         [Button("Test Qdrant Connection")]
         async void TestQdrantConnection()
         {
             NPCFlowLogger logger = NPCFlowLogger.FindOrCreate();
-
-            if (!HasValidQdrantUrl() || !HasValidCollectionName())
-            {
-                inspectorStatus = "Invalid Qdrant URL or collection name.";
-                logger.Log(
-                    NPCFlowStage.ConfigurationValidation,
-                    NPCFlowStatus.Error,
-                    NPCFlowLogLevel.Error,
-                    "Qdrant connection test skipped. Check URL and collection name.",
-                    data: new Dictionary<string, object>
-                    {
-                        ["endpoint"] = _qdrantUrl,
-                        ["collection"] = _collectionName,
-                    },
-                    source: nameof(QdrantRAGService)
-                );
-                return;
-            }
-
-            string endpoint = BuildSearchEndpoint();
-            int pointCount = await CountPoints(endpoint);
-
-            inspectorStatus =
-                pointCount > 0
-                    ? $"Qdrant is reachable. {pointCount} point(s) found in '{_collectionName}'."
-                    : "Qdrant is reachable but empty (no points).";
-
-            logger.Log(
-                NPCFlowStage.ConfigurationValidation,
-                pointCount > 0 ? NPCFlowStatus.Success : NPCFlowStatus.Warning,
-                pointCount > 0 ? NPCFlowLogLevel.Info : NPCFlowLogLevel.Warning,
-                inspectorStatus,
-                source: nameof(QdrantRAGService)
-            );
-        }
-
-        public string BuildSearchEndpoint() =>
-            $"{_qdrantUrl}/collections/{_collectionName}/points/search";
-
-        async Task<int> CountPoints(string endpoint)
-        {
-            string scrollEndpoint = endpoint.Replace("/points/search", "/points/scroll");
-
-            var scrollPayload = new Dictionary<string, object>
-            {
-                ["limit"] = 1,
-                ["with_payload"] = false,
-                ["with_vector"] = false,
-            };
-            string scrollJson = JsonConvert.SerializeObject(scrollPayload);
-
-            using var request = new UnityWebRequest(scrollEndpoint, "POST");
-            byte[] bytes = Encoding.UTF8.GetBytes(scrollJson);
-            request.uploadHandler = new UploadHandlerRaw(bytes);
-            request.downloadHandler = new DownloadHandlerBuffer();
-            request.SetRequestHeader("Content-Type", "application/json");
-
+            string endpoint = BuildQueryEndpoint();
+            
+            using var request = UnityWebRequest.Get($"{_qdrantUrl}/collections");
             await request.SendWebRequest();
 
             if (request.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogWarning(
-                    $"[QdrantRAGService] Count failed: {request.error}\n{request.downloadHandler.text}"
-                );
-                return -1;
+                inspectorStatus = $"Connection failed: {request.error}";
+                logger.Log(NPCFlowStage.ConfigurationValidation, NPCFlowStatus.Error, NPCFlowLogLevel.Error, inspectorStatus);
+                return;
             }
 
-            try
-            {
-                var scrollResult = JsonUtility.FromJson<QdrantScrollResult>(
-                    $"{{\"result\":{request.downloadHandler.text}}}"
-                );
-                return scrollResult?.result?.points?.Length ?? 0;
-            }
-            catch (Exception ex)
-            {
-                Debug.LogWarning(
-                    $"[QdrantRAGService] Count parse error: {ex.Message}\n{request.downloadHandler.text}"
-                );
-                return -1;
-            }
+            inspectorStatus = "Qdrant is reachable.";
+            logger.Log(NPCFlowStage.ConfigurationValidation, NPCFlowStatus.Success, NPCFlowLogLevel.Info, inspectorStatus);
         }
+
+        public string BuildQueryEndpoint() =>
+            $"{_qdrantUrl}/collections/{_collectionName}/points/query";
 
         public async Task<List<string>> SearchAsync(string query, int limit = 5)
         {
@@ -184,9 +209,9 @@ namespace NPCSystem
                 return new List<string>();
 
             using var searchSpan = DatadogTracer.StartSpan(
-                "qdrant.search",
+                "qdrant.search_hybrid",
                 service: "unity-dedicated-server",
-                resource: $"{_collectionName}.search",
+                resource: $"{_collectionName}.query",
                 type: "vector_db",
                 tags: new[]
                 {
@@ -196,133 +221,70 @@ namespace NPCSystem
             );
 
             var searchSw = System.Diagnostics.Stopwatch.StartNew();
-            string endpoint = BuildSearchEndpoint();
-
-            var searchPayload = new Dictionary<string, object>
-            {
-                ["limit"] = limit,
-                ["with_payload"] = true,
-                ["with_vector"] = false,
-            };
 
             if (_embedder == null)
             {
                 _embedder = FindAnyObjectByType<NPCLocalAIEmbedder>(FindObjectsInactive.Include);
-                if (_embedder == null)
-                {
-                    Debug.LogError(
-                        "[QdrantRAGService] No NPCLocalAIEmbedder found for query encoding."
-                    );
-                    searchSw.Stop();
-                    searchSpan.SetTag("status", "error_no_embedder");
-                    DatadogMetricsService.Increment(
-                        "qdrant.search.error",
-                        tags: new[] { "reason:no_embedder" }
-                    );
-                    return new List<string>();
-                }
+            }
+
+            if (_embedder == null)
+            {
+                Debug.LogError("[QdrantRAGService] No NPCLocalAIEmbedder found.");
+                return new List<string>();
             }
 
             try
             {
+                // 1. Dense Embedding
                 List<float> queryVector = await _embedder.Embeddings(query);
-                if (queryVector.Count == 0)
+                if (queryVector.Count == 0) return new List<string>();
+
+                // 2. Sparse Encoding
+                SparseVector sparseVector = NPCSparseVectorEncoder.Encode(query);
+
+                // 3. Hybrid Query Construction (RRF Fusion)
+                var payload = new QueryPayload
                 {
-                    searchSw.Stop();
-                    searchSpan.SetTag("status", "empty_embedding");
-                    DatadogMetricsService.Increment(
-                        "qdrant.search.error",
-                        tags: new[] { "reason:empty_embedding" }
-                    );
-                    return new List<string>();
-                }
+                    prefetch = new List<PrefetchQuery>
+                    {
+                        new PrefetchQuery { query = queryVector, @using = _denseVectorName, limit = 100 },
+                        new PrefetchQuery { query = sparseVector, @using = _sparseVectorName, limit = 100 }
+                    },
+                    query = new FusionQuery { fusion = "rrf" },
+                    limit = limit,
+                    with_payload = true
+                };
 
-                searchPayload["vector"] = queryVector;
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"[QdrantRAGService] Embedding failed: {ex.Message}");
-                searchSw.Stop();
-                searchSpan.SetError(ex.Message);
-                DatadogMetricsService.Increment(
-                    "qdrant.search.error",
-                    tags: new[] { "reason:embedding_failed", $"exception:{ex.GetType().Name}" }
-                );
-                return new List<string>();
-            }
+                string json = JsonConvert.SerializeObject(payload);
+                string responseText = await SendSearchRequestAsync(BuildQueryEndpoint(), json);
+                
+                if (string.IsNullOrWhiteSpace(responseText)) return new List<string>();
 
-            string searchJson = JsonConvert.SerializeObject(searchPayload);
-            string responseText = await SendSearchRequestAsync(endpoint, searchJson);
-            if (string.IsNullOrWhiteSpace(responseText))
-            {
-                searchSw.Stop();
-                searchSpan.SetTag("status", "http_error");
-                DatadogMetricsService.Increment(
-                    "qdrant.search.error",
-                    tags: new[] { "reason:http_error" }
-                );
-                return new List<string>();
-            }
-
-            try
-            {
-                var searchResult = JsonUtility.FromJson<QdrantSearchResult>(responseText);
+                var searchResult = JsonConvert.DeserializeObject<QdrantQueryResult>(responseText);
                 List<string> results = ExtractPayloadTexts(searchResult);
-                searchSw.Stop();
 
-                searchSpan.SetTag("result_count", results.Count.ToString());
-                searchSpan.SetTag("status", "success");
-                DatadogMetricsService.Timer(
-                    "qdrant.search.duration",
-                    searchSw.ElapsedMilliseconds,
-                    tags: new[] { $"limit:{limit}", $"result_count:{results.Count}" }
-                );
-                DatadogMetricsService.Increment(
-                    "qdrant.search.count",
-                    tags: new[] { $"result_count:{results.Count}" }
-                );
-                DatadogMetricsService.Gauge(
-                    "qdrant.search.result_count",
-                    results.Count,
-                    tags: new[] { $"collection:{_collectionName}" }
-                );
+                searchSw.Stop();
+                DatadogMetricsService.Timer("qdrant.search.duration", searchSw.ElapsedMilliseconds, 1.0, new[] { "mode:hybrid" });
 
                 return results;
             }
             catch (Exception ex)
             {
-                Debug.LogWarning(
-                    $"[QdrantRAGService] Search parse error: {ex.Message}\n{responseText}"
-                );
-                searchSw.Stop();
-                searchSpan.SetError(ex.Message);
-                DatadogMetricsService.Increment(
-                    "qdrant.search.error",
-                    tags: new[] { "reason:parse_error", $"exception:{ex.GetType().Name}" }
-                );
+                Debug.LogError($"[QdrantRAGService] Search failed: {ex.Message}");
                 return new List<string>();
             }
         }
 
-        /// <summary>
-        /// Search Qdrant and return results as a single concatenated string (legacy API).
-        /// </summary>
-        public async Task<string> SearchMemoryAsync(
-            string query,
-            int limit,
-            string requestId,
-            string npcSlug
-        )
+        public async Task<string> SearchMemoryAsync(string query, int limit, string requestId, string npcSlug)
         {
             List<string> results = await SearchAsync(query, limit);
             return results.Count > 0 ? string.Join("\n", results) : string.Empty;
         }
 
-        static List<string> ExtractPayloadTexts(QdrantSearchResult result)
+        static List<string> ExtractPayloadTexts(QdrantQueryResult result)
         {
             var texts = new List<string>();
-            if (result?.result == null)
-                return texts;
+            if (result?.result == null) return texts;
 
             foreach (var point in result.result)
             {
@@ -336,69 +298,57 @@ namespace NPCSystem
         protected virtual async Task<string> SendSearchRequestAsync(string endpoint, string json)
         {
             byte[] bodyRaw = Encoding.UTF8.GetBytes(json);
+            using UnityWebRequest request = new UnityWebRequest(endpoint, "POST");
+            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/json");
 
-            using (UnityWebRequest request = new UnityWebRequest(endpoint, "POST"))
+            var operation = request.SendWebRequest();
+            while (!operation.isDone) await Task.Yield();
+
+            if (request.result != UnityWebRequest.Result.Success)
             {
-                request.uploadHandler = new UploadHandlerRaw(bodyRaw);
-                request.downloadHandler = new DownloadHandlerBuffer();
-                request.SetRequestHeader("Content-Type", "application/json");
-
-                var operation = request.SendWebRequest();
-                while (!operation.isDone)
-                {
-                    await Task.Yield();
-                }
-
-                if (
-                    request.result == UnityWebRequest.Result.ConnectionError
-                    || request.result == UnityWebRequest.Result.ProtocolError
-                )
-                {
-                    Debug.LogError($"[QdrantRAGService] Request failed: {request.error}");
-                    return null;
-                }
-
-                return request.downloadHandler.text;
+                Debug.LogError($"[QdrantRAGService] Query failed: {request.error}\n{request.downloadHandler.text}");
+                return null;
             }
+
+            return request.downloadHandler.text;
         }
 
-        public bool HasValidQdrantUrl()
-        {
-            return !string.IsNullOrWhiteSpace(_qdrantUrl)
-                && (_qdrantUrl.StartsWith("http://") || _qdrantUrl.StartsWith("https://"));
-        }
+        public bool HasValidQdrantUrl() => !string.IsNullOrWhiteSpace(_qdrantUrl) && (_qdrantUrl.StartsWith("http://") || _qdrantUrl.StartsWith("https://"));
+        public bool HasValidCollectionName() => !string.IsNullOrWhiteSpace(_collectionName) && !_collectionName.Contains(" ");
 
-        public bool HasValidCollectionName()
+        [Serializable]
+        class QueryPayload
         {
-            return !string.IsNullOrWhiteSpace(_collectionName) && !_collectionName.Contains(" ");
+            public List<PrefetchQuery> prefetch;
+            public FusionQuery query;
+            public int limit;
+            public bool with_payload;
         }
 
         [Serializable]
-        class QdrantScrollResult
+        class PrefetchQuery
         {
-            public QdrantScrollData result;
+            public object query; // Can be List<float> or SparseVector
+            public string @using;
+            public int limit;
         }
 
         [Serializable]
-        class QdrantScrollData
+        class FusionQuery
         {
-            public QdrantScrollPoint[] points;
+            public string fusion;
         }
 
         [Serializable]
-        class QdrantScrollPoint
+        class QdrantQueryResult
         {
-            public string id;
+            public QdrantQueryPoint[] result;
         }
 
         [Serializable]
-        class QdrantSearchResult
-        {
-            public QdrantSearchPoint[] result;
-        }
-
-        [Serializable]
-        class QdrantSearchPoint
+        class QdrantQueryPoint
         {
             public string id;
             public float score;
@@ -412,3 +362,4 @@ namespace NPCSystem
         }
     }
 }
+
