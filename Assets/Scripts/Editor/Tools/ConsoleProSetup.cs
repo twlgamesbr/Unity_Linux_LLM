@@ -62,7 +62,9 @@ namespace NPCSystem.Editor.Tools
 
             if (allGood)
             {
-                Debug.Log("[ConsoleProSetup] ✅ Console Pro setup complete. See guide below for shared settings.");
+                Debug.Log(
+                    "[ConsoleProSetup] ✅ Console Pro setup complete. See guide below for shared settings."
+                );
             }
 
             // Print guide
@@ -74,14 +76,18 @@ namespace NPCSystem.Editor.Tools
         {
             // ConsoleProRemoteServer is a component inside the ConsolePro.Editor.dll
             // Add it via GameObject menu
-            var existing = UnityEngine.Object.FindObjectOfType(
+            var existing = UnityEngine.Object.FindAnyObjectByType(
                 Type.GetType("FlyingWormConsole3.ConsoleProRemoteServer, ConsolePro.Editor")
-                ?? Type.GetType("ConsoleProRemoteServer, Assembly-CSharp")
+                    ?? Type.GetType("ConsoleProRemoteServer, Assembly-CSharp")
             );
 
             if (existing != null)
             {
-                EditorUtility.DisplayDialog("Console Pro", "ConsoleProRemoteServer already exists in scene.", "OK");
+                EditorUtility.DisplayDialog(
+                    "Console Pro",
+                    "ConsoleProRemoteServer already exists in scene.",
+                    "OK"
+                );
                 return;
             }
 
@@ -96,16 +102,22 @@ namespace NPCSystem.Editor.Tools
             {
                 target.AddComponent(remoteType);
                 Debug.Log($"[ConsoleProSetup] ✅ ConsoleProRemoteServer added to '{target.name}'.");
-                EditorUtility.DisplayDialog("Console Pro",
-                    "ConsoleProRemoteServer added to scene.\n\n" +
-                    "Build with Development Build + DEBUG define to receive logs remotely.", "OK");
+                EditorUtility.DisplayDialog(
+                    "Console Pro",
+                    "ConsoleProRemoteServer added to scene.\n\n"
+                        + "Build with Development Build + DEBUG define to receive logs remotely.",
+                    "OK"
+                );
             }
             else
             {
-                EditorUtility.DisplayDialog("Console Pro",
-                    "Could not find ConsoleProRemoteServer type.\n" +
-                    "Ensure Console Pro is properly installed.\n" +
-                    "You can add it manually from Component > Console Pro > ConsoleProRemoteServer", "OK");
+                EditorUtility.DisplayDialog(
+                    "Console Pro",
+                    "Could not find ConsoleProRemoteServer type.\n"
+                        + "Ensure Console Pro is properly installed.\n"
+                        + "You can add it manually from Component > Console Pro > ConsoleProRemoteServer",
+                    "OK"
+                );
             }
         }
 
@@ -115,12 +127,17 @@ namespace NPCSystem.Editor.Tools
             var windowType = FindConsoleProWindowType();
             if (windowType != null)
             {
-                var getWindow = windowType.GetMethod("GetWindow", BindingFlags.Public | BindingFlags.Static);
+                var getWindow = windowType.GetMethod(
+                    "GetWindow",
+                    BindingFlags.Public | BindingFlags.Static
+                );
                 getWindow?.Invoke(null, null);
             }
             else
             {
-                Debug.LogWarning("[ConsoleProSetup] Could not open Console Pro window automatically. Use Window > Console Pro 3.");
+                Debug.LogWarning(
+                    "[ConsoleProSetup] Could not open Console Pro window automatically. Use Window > Console Pro 3."
+                );
             }
         }
 
@@ -140,7 +157,7 @@ namespace NPCSystem.Editor.Tools
 
         static void CheckWatcherInScene()
         {
-            var existing = UnityEngine.Object.FindObjectOfType(
+            var existing = UnityEngine.Object.FindAnyObjectByType(
                 Type.GetType("NPCSystem.Monitoring.ConsoleProBehaviour, NPCSystem.Monitoring")
             );
             if (existing != null)
@@ -149,8 +166,10 @@ namespace NPCSystem.Editor.Tools
             }
             else
             {
-                Debug.LogWarning("[ConsoleProSetup] ⚠️ No ConsoleProBehaviour in scene. " +
-                    "Add it to the NPCFlowLogger GameObject for live Watch panel updates.");
+                Debug.LogWarning(
+                    "[ConsoleProSetup] ⚠️ No ConsoleProBehaviour in scene. "
+                        + "Add it to the NPCFlowLogger GameObject for live Watch panel updates."
+                );
             }
         }
 
@@ -163,8 +182,10 @@ namespace NPCSystem.Editor.Tools
             var existing = UnityEngine.Object.FindObjectOfType(remoteType);
             if (existing == null)
             {
-                Debug.Log("[ConsoleProSetup] 💡 Use 'Tools > Console Pro > Add Remote Server to Scene' " +
-                    "to monitor builds remotely.");
+                Debug.Log(
+                    "[ConsoleProSetup] 💡 Use 'Tools > Console Pro > Add Remote Server to Scene' "
+                        + "to monitor builds remotely."
+                );
             }
         }
 
@@ -188,15 +209,27 @@ namespace NPCSystem.Editor.Tools
                     foreach (var t in types)
                     {
                         // Look for a settings/preferences class that has AddFilter or similar
-                        if (t.Name.Contains("Preferences") || t.Name.Contains("Settings") || t.Name.Contains("FilterData"))
+                        if (
+                            t.Name.Contains("Preferences")
+                            || t.Name.Contains("Settings")
+                            || t.Name.Contains("FilterData")
+                        )
                         {
                             // Try to find a method or field that allows adding custom filters
-                            var methods = t.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
+                            var methods = t.GetMethods(
+                                BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance
+                            );
                             foreach (var m in methods)
                             {
-                                if (m.Name.Contains("Add") || m.Name.Contains("Create") || m.Name.Contains("Import"))
+                                if (
+                                    m.Name.Contains("Add")
+                                    || m.Name.Contains("Create")
+                                    || m.Name.Contains("Import")
+                                )
                                 {
-                                    Debug.Log($"[ConsoleProSetup] Discovered Console Pro API: {t.Name}.{m.Name}()");
+                                    Debug.Log(
+                                        $"[ConsoleProSetup] Discovered Console Pro API: {t.Name}.{m.Name}()"
+                                    );
                                 }
                             }
                         }
@@ -205,16 +238,20 @@ namespace NPCSystem.Editor.Tools
             }
             catch (Exception ex)
             {
-                Debug.Log($"[ConsoleProSetup] Console Pro custom filter auto-setup: {ex.Message} (non-critical)");
+                Debug.Log(
+                    $"[ConsoleProSetup] Console Pro custom filter auto-setup: {ex.Message} (non-critical)"
+                );
             }
 
-            Debug.Log("[ConsoleProSetup] 💡 For permanent colored filters:\n" +
-                "   1. Right-click Console Pro toolbar > Preferences\n" +
-                "   2. Go to Custom Filters tab\n" +
-                "   3. Add filters named 'npc/dialog', 'npc/llm', 'npc/rag', etc.\n" +
-                "   4. Set colors and search terms '#dialog#', '#llm#', '#rag#'\n" +
-                "   5. Set a Shared Settings file in Preferences > Shared Settings\n" +
-                "   → This file can be committed to version control for team use.");
+            Debug.Log(
+                "[ConsoleProSetup] 💡 For permanent colored filters:\n"
+                    + "   1. Right-click Console Pro toolbar > Preferences\n"
+                    + "   2. Go to Custom Filters tab\n"
+                    + "   3. Add filters named 'npc/dialog', 'npc/llm', 'npc/rag', etc.\n"
+                    + "   4. Set colors and search terms '#dialog#', '#llm#', '#rag#'\n"
+                    + "   5. Set a Shared Settings file in Preferences > Shared Settings\n"
+                    + "   → This file can be committed to version control for team use."
+            );
         }
 
         static Type FindConsoleProRemoteServerType()
@@ -309,8 +346,11 @@ namespace NPCSystem.Editor.Tools
         /// Public forwarding — ConsoleProIntegration's methods are private.
         /// We need public wrappers for the setup tool to call them.
         /// </summary>
-        public static bool EnsureScriptingDefinePublic() => ConsoleProIntegration.EnsureScriptingDefine();
-        public static string VerifyInstallationPublic() => ConsoleProIntegration.VerifyInstallation();
+        public static bool EnsureScriptingDefinePublic() =>
+            ConsoleProIntegration.EnsureScriptingDefine();
+
+        public static string VerifyInstallationPublic() =>
+            ConsoleProIntegration.VerifyInstallation();
 
         // Custom editor to show the guide in a window
         [MenuItem("Tools/Console Pro/Show Setup Guide", false, 200)]
@@ -320,7 +360,10 @@ namespace NPCSystem.Editor.Tools
             EditorUtility.DisplayDialog(
                 "Console Pro Setup Guide",
                 GetGuideText()
-                    .Replace("═══════════════════════════════════════════════════════\n  Console Pro — Full Feature Guide\n═══════════════════════════════════════════════════════\n\n", "")
+                    .Replace(
+                        "═══════════════════════════════════════════════════════\n  Console Pro — Full Feature Guide\n═══════════════════════════════════════════════════════\n\n",
+                        ""
+                    )
                     .Replace("═══════════════════════════════════════════════════════\n", ""),
                 "OK"
             );

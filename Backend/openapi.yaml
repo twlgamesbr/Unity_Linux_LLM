@@ -1,0 +1,810 @@
+openapi: 3.0.3
+info:
+  title: Unity Linux LLM - Unified Backend Services API
+  description: |
+    Single source of truth (Super Swagger) documenting all local backend services integrated with the Unity gameplay client, Dedicated Server, WebGL client, and Datadog monitoring.
+    
+    This specification covers:
+    1. **Supabase Auth (Gotrue)**: Port `8091` (Internal `9999`)
+    2. **Supabase REST (PostgREST)**: Port `8092` (Internal `3000`)
+    3. **Qdrant Vector DB**: Port `6333`
+    4. **LocalAI / Proxy**: Port `8080` (Direct) & `8090` (Observability proxy)
+  version: 2.0.0
+servers:
+  - url: http://localhost:8091
+    description: Supabase Auth (Gotrue)
+  - url: http://localhost:8092
+    description: Supabase REST (PostgREST)
+  - url: http://localhost:6333
+    description: Qdrant Vector DB
+  - url: http://localhost:8080
+    description: LocalAI Upstream (Direct)
+  - url: http://localhost:8090
+    description: LocalAI Observability Proxy
+
+paths:
+  # ─── SUPABASE AUTH ─────────────────────────────────────────────────────────
+  /auth/v1/signup:
+    post:
+      summary: Sign Up / Register
+      description: Creates a new player user inside Supabase Gotrue.
+      tags:
+        - Supabase Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: player1@npc-game.local
+                password:
+                  type: string
+                  format: password
+                  example: super-secret-password
+      responses:
+        '200':
+          description: Registration successful, returns user object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthUser'
+
+  /auth/v1/token:
+    post:
+      summary: Sign In / Refresh Token
+      description: Authenticates a player or refreshes an active session, issuing Gotrue JWT access and refresh tokens.
+      tags:
+        - Supabase Auth
+      parameters:
+        - name: grant_type
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [password, refresh_token]
+            example: password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: player1@npc-game.local
+                password:
+                  type: string
+                  format: password
+                  example: super-secret-password
+                refresh_token:
+                  type: string
+                  example: valid-gotrue-refresh-token
+      responses:
+        '200':
+          description: Authentication successful.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthSession'
+
+  /auth/v1/logout:
+    post:
+      summary: Sign Out
+      description: Revokes the current player session.
+      tags:
+        - Supabase Auth
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: Successfully signed out.
+
+  /auth/v1/user:
+    get:
+      summary: Get Current User
+      description: Retrieves the currently authenticated user's profile and credentials.
+      tags:
+        - Supabase Auth
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: User retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthUser'
+
+  # ─── SUPABASE REST (PostgREST) ─────────────────────────────────────────────
+  /rest/v1/player_profiles:
+    get:
+      summary: Read Player Profiles
+      description: Retrieves player profile records. Supports filtering via standard PostgREST syntax.
+      tags:
+        - Supabase REST
+      security:
+        - BearerAuth: []
+        - ApikeyAuth: []
+      responses:
+        '200':
+          description: A list of player profiles.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlayerProfile'
+
+  /rest/v1/npc_definitions:
+    get:
+      summary: Read NPC Definitions
+      description: Retrieves canonical definitions of all NPCs in the database.
+      tags:
+        - Supabase REST
+      security:
+        - ApikeyAuth: []
+      responses:
+        '200':
+          description: A list of active and inactive NPCs.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NpcDefinition'
+
+  /rest/v1/player_npc_relationships:
+    get:
+      summary: Read Player NPC Relationships
+      description: Returns relationship indices (trust score, current mood, interaction counts) between players and NPCs.
+      tags:
+        - Supabase REST
+      security:
+        - BearerAuth: []
+        - ApikeyAuth: []
+      responses:
+        '200':
+          description: Relationship details.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PlayerNpcRelationship'
+
+  /rest/v1/dialogue_sessions:
+    get:
+      summary: List Dialogue Sessions
+      description: Returns dialogue interaction sessions mapped to players and NPCs.
+      tags:
+        - Supabase REST
+      security:
+        - BearerAuth: []
+        - ApikeyAuth: []
+      responses:
+        '200':
+          description: Dialogue session records.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DialogueSession'
+    post:
+      summary: Create Dialogue Session
+      description: Initializes a new conversation session between a player and an NPC.
+      tags:
+        - Supabase REST
+      security:
+        - BearerAuth: []
+        - ApikeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_id
+                - npc_slug
+              properties:
+                room_id:
+                  type: string
+                  format: uuid
+                user_id:
+                  type: string
+                  format: uuid
+                npc_slug:
+                  type: string
+                  example: butler
+      responses:
+        '201':
+          description: Session created.
+
+  /rest/v1/dialogue_turns:
+    get:
+      summary: Get Dialogue Turns
+      description: Retrieves the turns (messages) that make up a dialogue session.
+      tags:
+        - Supabase REST
+      security:
+        - BearerAuth: []
+        - ApikeyAuth: []
+      responses:
+        '200':
+          description: Match records.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DialogueTurn'
+    post:
+      summary: Append Dialogue Turn
+      description: Appends a system, assistant, or user dialogue turn to an active session.
+      tags:
+        - Supabase REST
+      security:
+        - BearerAuth: []
+        - ApikeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DialogueTurnInput'
+      responses:
+        '201':
+          description: Turn successfully logged.
+
+  /rest/v1/rpc/get_player_dialogue_context:
+    post:
+      summary: Retrieve Context (RPC)
+      description: Returns unified player context (trust score, clues, inventory items, locations visited) for constructing dynamic LLM system prompts.
+      tags:
+        - Supabase REST
+      security:
+        - BearerAuth: []
+        - ApikeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - p_user_id
+              properties:
+                p_user_id:
+                  type: string
+                  format: uuid
+                p_npc_slug:
+                  type: string
+                  example: butler
+      responses:
+        '200':
+          description: Aggregated JSON context block returned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PlayerDialogueContextResponse'
+
+  # ─── QDRANT VECTOR DB ──────────────────────────────────────────────────────
+  /collections:
+    get:
+      summary: List Collections
+      description: Retrieves all active vector collections inside Qdrant.
+      tags:
+        - Qdrant Vector DB
+      responses:
+        '200':
+          description: List of collections.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    type: object
+                    properties:
+                      collections:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              example: unity_linux_llm_codebase_v2
+                  status:
+                    type: string
+                    example: ok
+                  time:
+                    type: number
+                    example: 0.0012
+
+  /collections/{collection_name}:
+    get:
+      summary: Get Collection Details
+      description: Fetches specific schema and configuration parameters for a Qdrant collection, including vector dimensions.
+      tags:
+        - Qdrant Vector DB
+      parameters:
+        - name: collection_name
+          in: path
+          required: true
+          schema:
+            type: string
+            example: unity_linux_llm_codebase_v2
+      responses:
+        '200':
+          description: Detailed parameters.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QdrantCollectionResponse'
+
+  /collections/{collection_name}/points/query:
+    post:
+      summary: Semantic Search / Hybrid Query
+      description: Executes dense or hybrid vector search queries against the collection, matching embeddings generated by LocalAI.
+      tags:
+        - Qdrant Vector DB
+      parameters:
+        - name: collection_name
+          in: path
+          required: true
+          schema:
+            type: string
+            example: unity_linux_llm_codebase_v2
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - query
+                - limit
+              properties:
+                query:
+                  type: array
+                  items:
+                    type: number
+                  description: Dense vector query embeddings (768 floats for nomic-embed-text).
+                limit:
+                  type: integer
+                  minimum: 1
+                  default: 5
+                  example: 5
+                with_payload:
+                  type: boolean
+                  default: true
+                  example: true
+      responses:
+        '200':
+          description: Nearest points.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QdrantQueryResult'
+
+  # ─── LOCALAI / PROXY ───────────────────────────────────────────────────────
+  /v1/chat/completions:
+    post:
+      summary: Chat Completions (LLM Inference)
+      description: |
+        Generates text completions using models like `llama-3.2-3b-instruct` or `qwen2.5`. 
+        When called via the **Observability Proxy (:8090)**, this endpoint triggers deep Datadog LLM Observability traces (tokens, latency, prompt/response matching).
+        When called directly on **Upstream (:8080)**, it executes directly without side-effects.
+      tags:
+        - LocalAI Inference
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - model
+                - messages
+              properties:
+                model:
+                  type: string
+                  example: llama-3.2-3b-instruct:q8_0
+                messages:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - role
+                      - content
+                    properties:
+                      role:
+                        type: string
+                        enum: [system, user, assistant]
+                        example: system
+                      content:
+                        type: string
+                        example: You are a friendly butler in a Victorian manor.
+                temperature:
+                  type: number
+                  minimum: 0
+                  maximum: 2
+                  default: 0.7
+                  example: 0.7
+                max_tokens:
+                  type: integer
+                  default: 150
+                  example: 150
+      responses:
+        '200':
+          description: Chat response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocalAIChatResponse'
+
+  /v1/embeddings:
+    post:
+      summary: Generate Embeddings
+      description: Encodes input text into a high-dimensional dense vector for Qdrant storage and retrieval.
+      tags:
+        - LocalAI Inference
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - model
+                - input
+              properties:
+                model:
+                  type: string
+                  example: nomic-embed-text-v1.5
+                input:
+                  type: string
+                  example: Butler was seen at 9:00 PM near the study door.
+      responses:
+        '200':
+          description: Embedded text vector.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocalAIEmbeddingResponse'
+
+  /health:
+    get:
+      summary: Health Check
+      description: Pings the service to verify status and loaded models.
+      tags:
+        - LocalAI Inference
+      responses:
+        '200':
+          description: Service healthy.
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    ApikeyAuth:
+      type: apiKey
+      in: header
+      name: apikey
+
+  schemas:
+    # ─── Auth Schemas ───
+    AuthUser:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        created_at:
+          type: string
+          format: date-time
+
+    AuthSession:
+      type: object
+      properties:
+        access_token:
+          type: string
+        token_type:
+          type: string
+          example: bearer
+        expires_in:
+          type: integer
+          example: 3600
+        refresh_token:
+          type: string
+        user:
+          $ref: '#/components/schemas/AuthUser'
+
+    # ─── PostgREST Schemas ───
+    PlayerProfile:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        display_name:
+          type: string
+        avatar_url:
+          type: string
+        is_online:
+          type: boolean
+        last_login_at:
+          type: string
+          format: date-time
+
+    NpcDefinition:
+      type: object
+      properties:
+        npc_slug:
+          type: string
+        display_name:
+          type: string
+        description:
+          type: string
+        personality_tags:
+          type: array
+          items:
+            type: string
+        base_mood:
+          type: string
+          default: neutral
+
+    PlayerNpcRelationship:
+      type: object
+      properties:
+        user_id:
+          type: string
+          format: uuid
+        npc_slug:
+          type: string
+        trust_score:
+          type: integer
+          minimum: 0
+          maximum: 100
+        current_mood:
+          type: string
+        dialogue_count:
+          type: integer
+
+    DialogueSession:
+      type: object
+      properties:
+        session_id:
+          type: string
+          format: uuid
+        room_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        npc_slug:
+          type: string
+        started_at:
+          type: string
+          format: date-time
+        ended_at:
+          type: string
+          format: date-time
+        turn_count:
+          type: integer
+        summary:
+          type: string
+
+    DialogueTurn:
+      type: object
+      properties:
+        turn_id:
+          type: integer
+        session_id:
+          type: string
+          format: uuid
+        player_id:
+          type: string
+          format: uuid
+        role:
+          type: string
+          enum: [user, assistant, system]
+        content:
+          type: string
+        npc_mood_snapshot:
+          type: string
+        npc_trust_snapshot:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+
+    DialogueTurnInput:
+      type: object
+      required:
+        - session_id
+        - role
+        - content
+      properties:
+        session_id:
+          type: string
+          format: uuid
+        player_id:
+          type: string
+          format: uuid
+        role:
+          type: string
+          enum: [user, assistant, system]
+        content:
+          type: string
+        npc_mood_snapshot:
+          type: string
+        npc_trust_snapshot:
+          type: integer
+
+    PlayerDialogueContextResponse:
+      type: object
+      properties:
+        player_name:
+          type: string
+        player_id:
+          type: string
+        is_online:
+          type: boolean
+        trust_score:
+          type: integer
+        current_mood:
+          type: string
+        dialogue_count:
+          type: integer
+        clues:
+          type: array
+          items:
+            type: string
+        items:
+          type: array
+          items:
+            type: string
+        locations:
+          type: array
+          items:
+            type: string
+        last_interaction_at:
+          type: string
+          format: date-time
+
+    # ─── Qdrant Schemas ───
+    QdrantCollectionResponse:
+      type: object
+      properties:
+        result:
+          type: object
+          properties:
+            status:
+              type: string
+              example: green
+            config:
+              type: object
+              properties:
+                params:
+                  type: object
+                  properties:
+                    vectors:
+                      type: object
+                      properties:
+                        dense:
+                          type: object
+                          properties:
+                            size:
+                              type: integer
+                              example: 768
+                            distance:
+                              type: string
+                              example: Cosine
+        status:
+          type: string
+          example: ok
+
+    QdrantQueryResult:
+      type: object
+      properties:
+        result:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              score:
+                type: number
+                example: 0.8923
+              payload:
+                type: object
+                properties:
+                  text:
+                    type: string
+                    example: "The Butler has worked here for over 15 years and has high trust."
+        status:
+          type: string
+          example: ok
+
+    # ─── LocalAI Schemas ───
+    LocalAIChatResponse:
+      type: object
+      properties:
+        id:
+          type: string
+        object:
+          type: string
+          example: chat.completion
+        created:
+          type: integer
+        model:
+          type: string
+        choices:
+          type: array
+          items:
+            type: object
+            properties:
+              index:
+                type: integer
+              message:
+                type: object
+                properties:
+                  role:
+                    type: string
+                    example: assistant
+                  content:
+                    type: string
+              finish_reason:
+                type: string
+                example: stop
+        usage:
+          type: object
+          properties:
+            prompt_tokens:
+              type: integer
+            completion_tokens:
+              type: integer
+            total_tokens:
+              type: integer
+
+    LocalAIEmbeddingResponse:
+      type: object
+      properties:
+        object:
+          type: string
+          example: list
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              object:
+                type: string
+                example: embedding
+              index:
+                type: integer
+              embedding:
+                type: array
+                items:
+                  type: number
+        model:
+          type: string

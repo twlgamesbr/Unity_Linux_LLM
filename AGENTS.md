@@ -77,6 +77,7 @@ Dual source of truth (do not duplicate rule text here):
 
 ## 4. Backend services
 
+- **OpenAPI / "Super Swagger" Specification**: Located locally at `Backend/openapi.yaml`. Defines and documents all endpoints, request payloads, response structures, query parameters, schemas, and metrics for **Supabase Auth (`8091`)**, **Supabase REST (`8092`)**, **Qdrant Vector DB (`6333`)**, and **LocalAI / Proxy (`8080/8090`)**. Agents can read this file directly to understand integration schemas.
 - LocalAI (upstream): **port 8080** — all gameplay dialogue, embeddings, and health checks go directly to this port. Static config in `NPCLocalAIConfig.LocalAIDirectPort`.
 - localai-proxy (observability): **port 8090** — provides token/latency tracking for CLI tools, codebase-watchdog, and ad-hoc debugging. NOT in the gameplay path. Static config in `NPCLocalAIConfig.LocalAIProxyPort`.
 - Supabase: Gotrue `:8091`, PostgREST `:8092`.

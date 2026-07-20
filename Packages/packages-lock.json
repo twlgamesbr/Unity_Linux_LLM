@@ -1,15 +1,5 @@
 {
   "dependencies": {
-    "com.datadoghq.unity": {
-      "version": "1.7.1",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {
-        "com.google.external-dependency-manager": "1.2.186",
-        "com.unity.nuget.newtonsoft-json": "3.2.1"
-      },
-      "url": "https://package.openupm.com"
-    },
     "com.gladekit.mcp-bridge": {
       "version": "https://github.com/Glade-tool/glade-mcp.git?path=/unity-bridge",
       "depth": 0,
@@ -18,14 +8,7 @@
         "com.unity.inputsystem": "1.0.0",
         "com.unity.ai.navigation": "1.0.0"
       },
-      "hash": "4c3572086672672c3599cbb0cd454a87e49069f4"
-    },
-    "com.google.external-dependency-manager": {
-      "version": "1.2.188",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {},
-      "url": "https://package.openupm.com"
+      "hash": "ab75e325dabbd794ad187744c242bc5be2c86337"
     },
     "com.unity.2d.animation": {
       "version": "15.1.0",
@@ -88,22 +71,6 @@
       "dependencies": {
         "com.unity.2d.common": "14.0.1",
         "com.unity.modules.uielements": "1.0.0"
-      },
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.addressables": {
-      "version": "2.9.1",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.profiling.core": "1.0.2",
-        "com.unity.test-framework": "1.4.5",
-        "com.unity.modules.assetbundle": "1.0.0",
-        "com.unity.modules.jsonserialize": "1.0.0",
-        "com.unity.modules.imageconversion": "1.0.0",
-        "com.unity.modules.unitywebrequest": "1.0.0",
-        "com.unity.scriptablebuildpipeline": "2.6.1",
-        "com.unity.modules.unitywebrequestassetbundle": "1.0.0"
       },
       "url": "https://packages.unity.com"
     },
@@ -442,15 +409,6 @@
         "com.unity.modules.jsonserialize": "1.0.0"
       },
       "url": "https://packages.unity.com"
-    },
-    "com.unity.testtools.codecoverage": {
-      "version": "file:com.unity.testtools.codecoverage",
-      "depth": 0,
-      "source": "embedded",
-      "dependencies": {
-        "com.unity.test-framework": "1.4.5",
-        "com.unity.settings-manager": "2.0.0"
-      }
     },
     "com.unity.timeline": {
       "version": "1.8.12",

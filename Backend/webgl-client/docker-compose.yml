@@ -23,6 +23,8 @@ services:
       - ../../Builds/WebGL_client/WebGL:/usr/share/nginx/html:ro
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - ./datadog-rum-init.js:/usr/share/nginx/html/datadog-rum-init.js:ro
+      - ../openapi.yaml:/usr/share/nginx/html/openapi.yaml:ro
+      - ./swagger.html:/usr/share/nginx/html/swagger.html:ro
     restart: unless-stopped
     logging:
       driver: json-file

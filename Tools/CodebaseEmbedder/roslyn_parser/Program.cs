@@ -53,13 +53,18 @@ internal static class Program
 
         foreach (var file in files)
         {
-            var sourceText = await File.ReadAllTextAsync(file).ConfigureAwait(false);
+            var sourceText = await File.ReadAllTextAsync(file);
             var tree = CSharpSyntaxTree.ParseText(sourceText, options, path: file);
-            var root = await tree.GetRootAsync().ConfigureAwait(false);
+            var root = await tree.GetRootAsync();
             var relativePath = Path.GetRelativePath(projectRoot, file)
                 .Replace(Path.DirectorySeparatorChar, '/');
             filePaths.Add(relativePath);
-            var (fileResults, fileSymbols) = AnalyzeFile(projectRoot, relativePath, sourceText, root);
+            var (fileResults, fileSymbols) = AnalyzeFile(
+                projectRoot,
+                relativePath,
+                sourceText,
+                root
+            );
             results.AddRange(fileResults);
             allSymbols.AddRange(fileSymbols);
         }
@@ -99,7 +104,11 @@ internal static class Program
         // Resolve unresolved call targets
         foreach (var obj in results)
         {
-            if (obj is RelationRecord rel && rel.RelationKind == "calls" && !string.IsNullOrEmpty(rel.Target))
+            if (
+                obj is RelationRecord rel
+                && rel.RelationKind == "calls"
+                && !string.IsNullOrEmpty(rel.Target)
+            )
             {
                 var targetName = rel.Target.Split('(')[0].Trim();
                 if (symbolLookup.TryGetValue(targetName, out var candidates))
@@ -119,13 +128,15 @@ internal static class Program
             ["files_scanned"] = filePaths.Count,
             ["files"] = filePaths.ToList(),
         };
-        results.Add(new FileRecord
-        {
-            RecordType = "symbol_index",
-            StableKey = "symbol_index:global",
-            Text = $"Symbol index: {allSymbols.Count} symbols across {filePaths.Count} files",
-            Payload = symbolIndex,
-        });
+        results.Add(
+            new FileRecord
+            {
+                RecordType = "symbol_index",
+                StableKey = "symbol_index:global",
+                Text = $"Symbol index: {allSymbols.Count} symbols across {filePaths.Count} files",
+                Payload = symbolIndex,
+            }
+        );
 
         var json = JsonSerializer.Serialize(
             results,
@@ -135,16 +146,14 @@ internal static class Program
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             }
         );
-        await Console.Out.WriteLineAsync(json).ConfigureAwait(false);
+        await Console.Out.WriteLineAsync(json);
         return 0;
     }
 
-    private static (List<object> Records, List<(string StableKey, string FQN, string Kind)> Symbols) AnalyzeFile(
-        string projectRoot,
-        string relPath,
-        string text,
-        SyntaxNode root
-    )
+    private static (
+        List<object> Records,
+        List<(string StableKey, string FQN, string Kind)> Symbols
+    ) AnalyzeFile(string projectRoot, string relPath, string text, SyntaxNode root)
     {
         var records = new List<object>();
         var symbols = new List<(string StableKey, string FQN, string Kind)>();
@@ -207,28 +216,32 @@ internal static class Program
         }
         filePayload["member_names"] = allMemberNames.OrderBy(n => n).ToList();
 
-        records.Add(new FileRecord
-        {
-            RecordType = "file_overview",
-            StableKey = $"file:{relPath}",
-            Text = string.Join(
-                "\n",
-                new[]
-                {
-                    $"File overview {relPath}",
-                    $"Assembly -",
-                    $"Region Runtime",
-                    $"Namespaces: {string.Join(", ", declaredNamespaces)}",
-                    $"Using directives: {string.Join(", ", usings)}",
-                    $"Types: {string.Join(", ", filePayload["type_names"] as List<string> ?? new())}",
-                    $"Members: {string.Join(", ", allMemberNames)}",
-                }
-            ),
-            Payload = filePayload,
-        });
+        records.Add(
+            new FileRecord
+            {
+                RecordType = "file_overview",
+                StableKey = $"file:{relPath}",
+                Text = string.Join(
+                    "\n",
+                    new[]
+                    {
+                        $"File overview {relPath}",
+                        $"Assembly -",
+                        $"Region Runtime",
+                        $"Namespaces: {string.Join(", ", declaredNamespaces)}",
+                        $"Using directives: {string.Join(", ", usings)}",
+                        $"Types: {string.Join(", ", filePayload["type_names"] as List<string> ?? new())}",
+                        $"Members: {string.Join(", ", allMemberNames)}",
+                    }
+                ),
+                Payload = filePayload,
+            }
+        );
         symbols.Add(($"file:{relPath}", relPath, "file"));
 
-        foreach (var namespaceDeclaration in root.DescendantNodes().OfType<NamespaceDeclarationSyntax>())
+        foreach (
+            var namespaceDeclaration in root.DescendantNodes().OfType<NamespaceDeclarationSyntax>()
+        )
         {
             var ns = namespaceDeclaration.Name.ToString();
             var types = namespaceDeclaration
@@ -247,24 +260,26 @@ internal static class Program
                 ["line_end"] =
                     namespaceDeclaration.GetLocation().GetLineSpan().EndLinePosition.Line + 1,
             };
-            records.Add(new FileRecord
-            {
-                RecordType = "namespace",
-                StableKey = $"namespace:{ns}:{relPath}:{payload["line_start"]}",
-                Text = string.Join(
-                    "\n",
-                    new[]
-                    {
-                        $"Namespace {ns}",
-                        $"Path {relPath}",
-                        $"Assembly -",
-                        $"Region Runtime",
-                        $"Declared types: {string.Join(", ", types)}",
-                        $"Using directives: {string.Join(", ", usings)}",
-                    }
-                ),
-                Payload = payload,
-            });
+            records.Add(
+                new FileRecord
+                {
+                    RecordType = "namespace",
+                    StableKey = $"namespace:{ns}:{relPath}:{payload["line_start"]}",
+                    Text = string.Join(
+                        "\n",
+                        new[]
+                        {
+                            $"Namespace {ns}",
+                            $"Path {relPath}",
+                            $"Assembly -",
+                            $"Region Runtime",
+                            $"Declared types: {string.Join(", ", types)}",
+                            $"Using directives: {string.Join(", ", usings)}",
+                        }
+                    ),
+                    Payload = payload,
+                }
+            );
             symbols.Add(($"namespace:{ns}:{relPath}", ns, "namespace"));
         }
 
@@ -284,33 +299,37 @@ internal static class Program
                 ["line_start"] = usingLine,
                 ["line_end"] = usingLine,
             };
-            records.Add(new FileRecord
-            {
-                RecordType = "using_directive",
-                StableKey = $"using:{usingNs}:{relPath}:{usingLine}",
-                Text = string.Join(
-                    "\n",
-                    new[]
-                    {
-                        $"Using directive {usingNs}",
-                        $"Path {relPath}",
-                        $"Assembly -",
-                        $"Declared namespaces: {string.Join(", ", declaredNamespaces)}",
-                        $"Types in file: {string.Join(", ", filePayload["type_names"] as List<string> ?? new())}",
-                    }
-                ),
-                Payload = usingPayload,
-            });
+            records.Add(
+                new FileRecord
+                {
+                    RecordType = "using_directive",
+                    StableKey = $"using:{usingNs}:{relPath}:{usingLine}",
+                    Text = string.Join(
+                        "\n",
+                        new[]
+                        {
+                            $"Using directive {usingNs}",
+                            $"Path {relPath}",
+                            $"Assembly -",
+                            $"Declared namespaces: {string.Join(", ", declaredNamespaces)}",
+                            $"Types in file: {string.Join(", ", filePayload["type_names"] as List<string> ?? new())}",
+                        }
+                    ),
+                    Payload = usingPayload,
+                }
+            );
             foreach (var declaredNs in declaredNamespaces)
             {
-                records.Add(new RelationRecord
-                {
-                    RelationKind = "namespace-uses-namespace",
-                    Source = declaredNs,
-                    Target = usingNs,
-                    Path = relPath,
-                    Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty },
-                });
+                records.Add(
+                    new RelationRecord
+                    {
+                        RelationKind = "namespace-uses-namespace",
+                        Source = declaredNs,
+                        Target = usingNs,
+                        Path = relPath,
+                        Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty },
+                    }
+                );
             }
         }
 
@@ -397,48 +416,56 @@ internal static class Program
                 $"Interfaces: {(interfaces.Any() ? string.Join(", ", interfaces) : "-")}"
             );
 
-            records.Add(new FileRecord
-            {
-                RecordType = "type",
-                StableKey = $"type:{fqTypeName}:{relPath}",
-                Text = string.Join("\n", textParts),
-                Payload = payload,
-            });
+            records.Add(
+                new FileRecord
+                {
+                    RecordType = "type",
+                    StableKey = $"type:{fqTypeName}:{relPath}",
+                    Text = string.Join("\n", textParts),
+                    Payload = payload,
+                }
+            );
             symbols.Add(($"type:{fqTypeName}:{relPath}", fqTypeName, "type"));
 
             if (!string.IsNullOrEmpty(ns))
             {
-                records.Add(new RelationRecord
-                {
-                    RelationKind = "namespace-contains-type",
-                    Source = ns,
-                    Target = fqTypeName,
-                    Path = relPath,
-                    Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty },
-                });
+                records.Add(
+                    new RelationRecord
+                    {
+                        RelationKind = "namespace-contains-type",
+                        Source = ns,
+                        Target = fqTypeName,
+                        Path = relPath,
+                        Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty },
+                    }
+                );
             }
             foreach (var baseType in baseTypes)
             {
-                records.Add(new RelationRecord
-                {
-                    RelationKind = "inherits",
-                    Source = fqTypeName,
-                    Target = NormalizeTypeName(baseType),
-                    Path = relPath,
-                    Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty },
-                });
+                records.Add(
+                    new RelationRecord
+                    {
+                        RelationKind = "inherits",
+                        Source = fqTypeName,
+                        Target = NormalizeTypeName(baseType),
+                        Path = relPath,
+                        Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty },
+                    }
+                );
                 EmitTypeUses(records, fqTypeName, baseType, relPath, "base_type");
             }
             foreach (var iface in interfaces)
             {
-                records.Add(new RelationRecord
-                {
-                    RelationKind = "implements",
-                    Source = fqTypeName,
-                    Target = NormalizeTypeName(iface),
-                    Path = relPath,
-                    Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty },
-                });
+                records.Add(
+                    new RelationRecord
+                    {
+                        RelationKind = "implements",
+                        Source = fqTypeName,
+                        Target = NormalizeTypeName(iface),
+                        Path = relPath,
+                        Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty },
+                    }
+                );
                 EmitTypeUses(records, fqTypeName, iface, relPath, "interface");
             }
 
@@ -446,8 +473,8 @@ internal static class Program
             foreach (var member in typeDeclaration.Members.OfType<MethodDeclarationSyntax>())
             {
                 var memberName = member.Identifier.Text;
-                var paramTypes = member.ParameterList.Parameters
-                    .Select(p => p.Type?.ToString() ?? string.Empty)
+                var paramTypes = member
+                    .ParameterList.Parameters.Select(p => p.Type?.ToString() ?? string.Empty)
                     .Where(t => !string.IsNullOrWhiteSpace(t))
                     .ToList();
                 EmitMember(
@@ -462,13 +489,14 @@ internal static class Program
                     memberName,
                     "method",
                     member.Modifiers.ToString()
-                    + " "
-                    + member.ReturnType
-                    + " "
-                    + memberName
-                    + member.ParameterList,
+                        + " "
+                        + member.ReturnType
+                        + " "
+                        + memberName
+                        + member.ParameterList,
                     member.ReturnType.ToString(),
-                    paramTypes);
+                    paramTypes
+                );
             }
 
             // --- CONSTRUCTORS ---
@@ -476,19 +504,55 @@ internal static class Program
             {
                 var ctorName = ctor.Identifier.Text;
                 var signature = ctor.Modifiers + " " + ctorName + ctor.ParameterList;
-                EmitMember(records, symbols, relPath, filePayload, ns, typeName, fqTypeName, ctor, ctorName, "constructor", signature);
+                EmitMember(
+                    records,
+                    symbols,
+                    relPath,
+                    filePayload,
+                    ns,
+                    typeName,
+                    fqTypeName,
+                    ctor,
+                    ctorName,
+                    "constructor",
+                    signature
+                );
             }
 
             // --- PROPERTIES ---
             foreach (var prop in typeDeclaration.Members.OfType<PropertyDeclarationSyntax>())
             {
                 var propName = prop.Identifier.Text;
-                var hasGetter = prop.AccessorList?.Accessors.Any(a => a.IsKind(SyntaxKind.GetAccessorDeclaration)) ?? false;
-                var hasSetter = prop.AccessorList?.Accessors.Any(a => a.IsKind(SyntaxKind.SetAccessorDeclaration)) ?? false;
-                var hasInit = prop.AccessorList?.Accessors.Any(a => a.IsKind(SyntaxKind.InitAccessorDeclaration)) ?? false;
-                var isAutoProp = prop.AccessorList?.Accessors.All(a => a.Body == null && a.ExpressionBody == null) ?? false;
-                var accessorSummary = $"get:{(hasGetter ? "Y" : "N")} set:{(hasSetter ? "Y" : "N")} init:{(hasInit ? "Y" : "N")} auto:{(isAutoProp ? "Y" : "N")}";
-                var signature = prop.Modifiers + " " + prop.Type + " " + propName + " { " + accessorSummary + " }";
+                var hasGetter =
+                    prop.AccessorList?.Accessors.Any(a =>
+                        a.IsKind(SyntaxKind.GetAccessorDeclaration)
+                    )
+                    ?? false;
+                var hasSetter =
+                    prop.AccessorList?.Accessors.Any(a =>
+                        a.IsKind(SyntaxKind.SetAccessorDeclaration)
+                    )
+                    ?? false;
+                var hasInit =
+                    prop.AccessorList?.Accessors.Any(a =>
+                        a.IsKind(SyntaxKind.InitAccessorDeclaration)
+                    )
+                    ?? false;
+                var isAutoProp =
+                    prop.AccessorList?.Accessors.All(a =>
+                        a.Body == null && a.ExpressionBody == null
+                    ) ?? false;
+                var accessorSummary =
+                    $"get:{(hasGetter ? "Y" : "N")} set:{(hasSetter ? "Y" : "N")} init:{(hasInit ? "Y" : "N")} auto:{(isAutoProp ? "Y" : "N")}";
+                var signature =
+                    prop.Modifiers
+                    + " "
+                    + prop.Type
+                    + " "
+                    + propName
+                    + " { "
+                    + accessorSummary
+                    + " }";
 
                 var line = prop.GetLocation().GetLineSpan().StartLinePosition.Line + 1;
                 var endLine = prop.GetLocation().GetLineSpan().EndLinePosition.Line + 1;
@@ -500,7 +564,13 @@ internal static class Program
                     ["type_name"] = typeName,
                     ["member_name"] = propName,
                     ["symbol_kind"] = "property",
-                    ["signature"] = string.Join(" ", signature.Split(new[] { ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)),
+                    ["signature"] = string.Join(
+                        " ",
+                        signature.Split(
+                            new[] { ' ', '\t', '\r', '\n' },
+                            StringSplitOptions.RemoveEmptyEntries
+                        )
+                    ),
                     ["return_type"] = propType,
                     ["line_start"] = line,
                     ["line_end"] = endLine,
@@ -510,23 +580,32 @@ internal static class Program
                     ["is_auto_property"] = isAutoProp,
                 };
 
-                records.Add(new FileRecord
-                {
-                    RecordType = "member",
-                    StableKey = $"member:{fq}:{line}:{relPath}",
-                    Text = $"{prop.Type} {propName} {{ {accessorSummary} }}\n{relPath}:{line}-{endLine}\nType {typeName} in {ns}",
-                    Payload = memberPayload,
-                });
+                records.Add(
+                    new FileRecord
+                    {
+                        RecordType = "member",
+                        StableKey = $"member:{fq}:{line}:{relPath}",
+                        Text =
+                            $"{prop.Type} {propName} {{ {accessorSummary} }}\n{relPath}:{line}-{endLine}\nType {typeName} in {ns}",
+                        Payload = memberPayload,
+                    }
+                );
                 symbols.Add(($"member:{fq}:{line}:{relPath}", fq, "property"));
 
-                records.Add(new RelationRecord
-                {
-                    RelationKind = "type-contains-member",
-                    Source = fqTypeName,
-                    Target = fq,
-                    Path = relPath,
-                    Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty, ["member_kind"] = "property" },
-                });
+                records.Add(
+                    new RelationRecord
+                    {
+                        RelationKind = "type-contains-member",
+                        Source = fqTypeName,
+                        Target = fq,
+                        Path = relPath,
+                        Payload = new Dictionary<string, object>
+                        {
+                            ["asmdef"] = string.Empty,
+                            ["member_kind"] = "property",
+                        },
+                    }
+                );
                 EmitTypeUses(records, fqTypeName, propType, relPath, "property");
             }
 
@@ -544,37 +623,54 @@ internal static class Program
                     ["type_name"] = typeName,
                     ["member_name"] = evtName,
                     ["symbol_kind"] = "event",
-                    ["signature"] = string.Join(" ", signature.Split(new[] { ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)),
+                    ["signature"] = string.Join(
+                        " ",
+                        signature.Split(
+                            new[] { ' ', '\t', '\r', '\n' },
+                            StringSplitOptions.RemoveEmptyEntries
+                        )
+                    ),
                     ["line_start"] = line,
                     ["line_end"] = endLine,
                 };
 
-                records.Add(new FileRecord
-                {
-                    RecordType = "member",
-                    StableKey = $"member:{fq}:{line}:{relPath}",
-                    Text = $"{signature}\n{relPath}:{line}-{endLine}\nType {typeName} in {ns}",
-                    Payload = memberPayload,
-                });
+                records.Add(
+                    new FileRecord
+                    {
+                        RecordType = "member",
+                        StableKey = $"member:{fq}:{line}:{relPath}",
+                        Text = $"{signature}\n{relPath}:{line}-{endLine}\nType {typeName} in {ns}",
+                        Payload = memberPayload,
+                    }
+                );
                 symbols.Add(($"member:{fq}:{line}:{relPath}", fq, "event"));
 
-                records.Add(new RelationRecord
-                {
-                    RelationKind = "type-contains-member",
-                    Source = fqTypeName,
-                    Target = fq,
-                    Path = relPath,
-                    Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty, ["member_kind"] = "event" },
-                });
+                records.Add(
+                    new RelationRecord
+                    {
+                        RelationKind = "type-contains-member",
+                        Source = fqTypeName,
+                        Target = fq,
+                        Path = relPath,
+                        Payload = new Dictionary<string, object>
+                        {
+                            ["asmdef"] = string.Empty,
+                            ["member_kind"] = "event",
+                        },
+                    }
+                );
             }
 
             // --- ALL FIELDS (not just serialized) ---
             foreach (var field in typeDeclaration.Members.OfType<FieldDeclarationSyntax>())
             {
                 var isSerialized =
-                    field.AttributeLists.SelectMany(a => a.Attributes)
-                        .Any(a => a.Name.ToString().EndsWith("SerializeField", StringComparison.OrdinalIgnoreCase))
-                    || field.Modifiers.Any(SyntaxKind.PublicKeyword);
+                    field
+                        .AttributeLists.SelectMany(a => a.Attributes)
+                        .Any(a =>
+                            a.Name.ToString()
+                                .EndsWith("SerializeField", StringComparison.OrdinalIgnoreCase)
+                        ) || field.Modifiers.Any(SyntaxKind.PublicKeyword);
                 foreach (var variable in field.Declaration.Variables)
                 {
                     var fieldName = variable.Identifier.Text;
@@ -592,28 +688,41 @@ internal static class Program
                         ["line_start"] = line,
                         ["line_end"] = endLine,
                         ["is_serialized"] = isSerialized,
-                        ["attributes"] = field.AttributeLists.SelectMany(a => a.Attributes)
-                            .Select(a => a.Name.ToString()).Distinct().ToList(),
+                        ["attributes"] = field
+                            .AttributeLists.SelectMany(a => a.Attributes)
+                            .Select(a => a.Name.ToString())
+                            .Distinct()
+                            .ToList(),
                         ["signature"] = $"{field.Modifiers} {fieldType} {fieldName}".Trim(),
                     };
                     var recordType = isSerialized ? "serialized_field" : "field";
-                    records.Add(new FileRecord
-                    {
-                        RecordType = recordType,
-                        StableKey = $"{recordType}:{fq}:{relPath}",
-                        Text = $"{(isSerialized ? "Serialized" : "Non-serialized")} field {typeName}.{fieldName} : {fieldType} in {relPath}\nOwning type {typeName}, Namespace {ns}",
-                        Payload = payloadField,
-                    });
+                    records.Add(
+                        new FileRecord
+                        {
+                            RecordType = recordType,
+                            StableKey = $"{recordType}:{fq}:{relPath}",
+                            Text =
+                                $"{(isSerialized ? "Serialized" : "Non-serialized")} field {typeName}.{fieldName} : {fieldType} in {relPath}\nOwning type {typeName}, Namespace {ns}",
+                            Payload = payloadField,
+                        }
+                    );
                     symbols.Add(($"{recordType}:{fq}:{relPath}", fq, "field"));
 
-                    records.Add(new RelationRecord
-                    {
-                        RelationKind = "type-contains-member",
-                        Source = fqTypeName,
-                        Target = fq,
-                        Path = relPath,
-                        Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty, ["member_kind"] = "field", ["is_serialized"] = isSerialized },
-                    });
+                    records.Add(
+                        new RelationRecord
+                        {
+                            RelationKind = "type-contains-member",
+                            Source = fqTypeName,
+                            Target = fq,
+                            Path = relPath,
+                            Payload = new Dictionary<string, object>
+                            {
+                                ["asmdef"] = string.Empty,
+                                ["member_kind"] = "field",
+                                ["is_serialized"] = isSerialized,
+                            },
+                        }
+                    );
                     EmitTypeUses(records, fqTypeName, fieldType, relPath, "field");
                 }
             }
@@ -627,23 +736,38 @@ internal static class Program
                 var target = call.Expression.ToString();
                 if (string.IsNullOrWhiteSpace(target))
                     continue;
-                if (new[] { "if", "for", "foreach", "while", "switch", "catch", "using", "nameof", "typeof", "new" }
-                    .Contains(target))
+                if (
+                    new[]
+                    {
+                        "if",
+                        "for",
+                        "foreach",
+                        "while",
+                        "switch",
+                        "catch",
+                        "using",
+                        "nameof",
+                        "typeof",
+                        "new",
+                    }.Contains(target)
+                )
                     continue;
 
                 var line = call.GetLocation().GetLineSpan().StartLinePosition.Line + 1;
-                records.Add(new RelationRecord
-                {
-                    RelationKind = "calls",
-                    Source = fqTypeName,
-                    Target = target,
-                    Path = relPath,
-                    Payload = new Dictionary<string, object>
+                records.Add(
+                    new RelationRecord
                     {
-                        ["asmdef"] = string.Empty,
-                        ["line_start"] = line,
-                    },
-                });
+                        RelationKind = "calls",
+                        Source = fqTypeName,
+                        Target = target,
+                        Path = relPath,
+                        Payload = new Dictionary<string, object>
+                        {
+                            ["asmdef"] = string.Empty,
+                            ["line_start"] = line,
+                        },
+                    }
+                );
             }
         }
 
@@ -663,7 +787,8 @@ internal static class Program
         string kind,
         string rawSignature,
         string? returnType = null,
-        List<string>? parameterTypes = null)
+        List<string>? parameterTypes = null
+    )
     {
         var line = member.GetLocation().GetLineSpan().StartLinePosition.Line + 1;
         var endLine = member.GetLocation().GetLineSpan().EndLinePosition.Line + 1;
@@ -675,8 +800,8 @@ internal static class Program
         var attributes = new List<string>();
         if (member is MemberDeclarationSyntax memberDecl)
         {
-            attributes = memberDecl.AttributeLists
-                .SelectMany(a => a.Attributes)
+            attributes = memberDecl
+                .AttributeLists.SelectMany(a => a.Attributes)
                 .Select(a => a.Name.ToString())
                 .Distinct()
                 .ToList();
@@ -688,7 +813,13 @@ internal static class Program
             ["type_name"] = typeName,
             ["member_name"] = memberName,
             ["symbol_kind"] = kind,
-            ["signature"] = string.Join(" ", rawSignature.Split(new[] { ' ', '\t', '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)),
+            ["signature"] = string.Join(
+                " ",
+                rawSignature.Split(
+                    new[] { ' ', '\t', '\r', '\n' },
+                    StringSplitOptions.RemoveEmptyEntries
+                )
+            ),
             ["line_start"] = line,
             ["line_end"] = endLine,
             ["attributes"] = attributes,
@@ -698,23 +829,32 @@ internal static class Program
         if (parameterTypes is { Count: > 0 })
             memberPayload["parameter_types"] = parameterTypes;
 
-        records.Add(new FileRecord
-        {
-            RecordType = "member",
-            StableKey = $"member:{fq}:{line}:{relPath}",
-            Text = $"{memberPayload["signature"]}\n{relPath}:{line}-{endLine}\nType {typeName} in {ns}",
-            Payload = memberPayload,
-        });
+        records.Add(
+            new FileRecord
+            {
+                RecordType = "member",
+                StableKey = $"member:{fq}:{line}:{relPath}",
+                Text =
+                    $"{memberPayload["signature"]}\n{relPath}:{line}-{endLine}\nType {typeName} in {ns}",
+                Payload = memberPayload,
+            }
+        );
         symbols.Add(($"member:{fq}:{line}:{relPath}", fq, kind));
 
-        records.Add(new RelationRecord
-        {
-            RelationKind = "type-contains-member",
-            Source = fqTypeName,
-            Target = fq,
-            Path = relPath,
-            Payload = new Dictionary<string, object> { ["asmdef"] = string.Empty, ["member_kind"] = kind },
-        });
+        records.Add(
+            new RelationRecord
+            {
+                RelationKind = "type-contains-member",
+                Source = fqTypeName,
+                Target = fq,
+                Path = relPath,
+                Payload = new Dictionary<string, object>
+                {
+                    ["asmdef"] = string.Empty,
+                    ["member_kind"] = kind,
+                },
+            }
+        );
 
         if (!string.IsNullOrWhiteSpace(returnType))
             EmitTypeUses(records, fqTypeName, returnType, relPath, "return");
@@ -727,9 +867,29 @@ internal static class Program
 
     private static readonly HashSet<string> PrimitiveTypeNames = new(StringComparer.Ordinal)
     {
-        "void", "bool", "byte", "sbyte", "char", "decimal", "double", "float", "int", "uint",
-        "long", "ulong", "short", "ushort", "object", "string", "dynamic", "var",
-        "Task", "UniTask", "CancellationToken", "Action", "Func",
+        "void",
+        "bool",
+        "byte",
+        "sbyte",
+        "char",
+        "decimal",
+        "double",
+        "float",
+        "int",
+        "uint",
+        "long",
+        "ulong",
+        "short",
+        "ushort",
+        "object",
+        "string",
+        "dynamic",
+        "var",
+        "Task",
+        "UniTask",
+        "CancellationToken",
+        "Action",
+        "Func",
     };
 
     private static string NormalizeTypeName(string typeName)
@@ -747,7 +907,12 @@ internal static class Program
         if (string.IsNullOrWhiteSpace(typeText))
             yield break;
         // Split generic args and arrays: List<Foo>, Foo[], Dictionary<A,B>
-        foreach (var part in typeText.Split(new[] { '<', '>', ',', '[', ']', ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries))
+        foreach (
+            var part in typeText.Split(
+                new[] { '<', '>', ',', '[', ']', ' ', '\t' },
+                StringSplitOptions.RemoveEmptyEntries
+            )
+        )
         {
             var name = NormalizeTypeName(part);
             if (string.IsNullOrWhiteSpace(name))
@@ -765,23 +930,26 @@ internal static class Program
         string sourceFq,
         string typeText,
         string relPath,
-        string via)
+        string via
+    )
     {
         foreach (var target in ExtractTypeNames(typeText).Distinct(StringComparer.Ordinal))
         {
-            records.Add(new RelationRecord
-            {
-                RelationKind = "type-uses-type",
-                Source = sourceFq,
-                Target = target,
-                Path = relPath,
-                Payload = new Dictionary<string, object>
+            records.Add(
+                new RelationRecord
                 {
-                    ["asmdef"] = string.Empty,
-                    ["via"] = via,
-                    ["raw_type"] = typeText,
-                },
-            });
+                    RelationKind = "type-uses-type",
+                    Source = sourceFq,
+                    Target = target,
+                    Path = relPath,
+                    Payload = new Dictionary<string, object>
+                    {
+                        ["asmdef"] = string.Empty,
+                        ["via"] = via,
+                        ["raw_type"] = typeText,
+                    },
+                }
+            );
         }
     }
 }

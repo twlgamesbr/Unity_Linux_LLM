@@ -178,9 +178,37 @@ namespace NPCSystem.Auth
                 && expiresAt <= DateTime.UtcNow;
         }
 
+        private static string _cachedPersistentDataPath;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void InitializeOnMainThread()
+        {
+            try
+            {
+                _cachedPersistentDataPath = Application.persistentDataPath;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[UnitySessionStore] Failed to cache persistentDataPath on startup: {ex.Message}");
+            }
+        }
+
         static string GetFullPath()
         {
-            return Path.Combine(Application.persistentDataPath, RelativePath).Replace('\\', '/');
+            string basePath = _cachedPersistentDataPath;
+            if (string.IsNullOrEmpty(basePath))
+            {
+                try
+                {
+                    basePath = Application.persistentDataPath;
+                    _cachedPersistentDataPath = basePath;
+                }
+                catch
+                {
+                    basePath = Directory.GetCurrentDirectory();
+                }
+            }
+            return Path.Combine(basePath, RelativePath).Replace('\\', '/');
         }
     }
 }

@@ -257,6 +257,8 @@ graph TB
 
 ## 4. Full Endpoint Reference
 
+A unified, single-source-of-truth **OpenAPI 3.0 (Super Swagger) Specification** has been established locally at [`Backend/openapi.yaml`](../../Backend/openapi.yaml). It documents all endpoints, query parameters, request/response bodies, headers, schemas, and metrics for Supabase, Qdrant, and LocalAI. Standard OpenAPI/Swagger renderers (such as Redoc or Swagger UI) can be used to view the interactive documentation for local developer environments.
+
 | Endpoint | Purpose | Auth | Consumers |
 |---|---|---|---|
 | `http://localhost:8085/` | WebGL client entry | none | Browser |
