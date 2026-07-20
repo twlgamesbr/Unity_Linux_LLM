@@ -175,8 +175,10 @@ namespace Unity.Entities.Editor
         {
             if (node.Parent != null)
             {
-                if (!node.Parent.Enabled) return false;
-                if (!NodeParentsAllEnabled(node.Parent)) return false;
+                if (!node.Parent.Enabled)
+                    return false;
+                if (!NodeParentsAllEnabled(node.Parent))
+                    return false;
             }
 
             return true;

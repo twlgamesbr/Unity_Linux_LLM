@@ -189,7 +189,8 @@ namespace TMPro
                 // Search for potential alternative locations in the user project
                 string[] matchingPaths = Directory.GetDirectories(packagePath, "TextMesh Pro", SearchOption.AllDirectories);
                 string path = ValidateLocation(matchingPaths, packagePath);
-                if (path != null) return packagePath + path;
+                if (path != null)
+                    return packagePath + path;
             }
 
             return null;

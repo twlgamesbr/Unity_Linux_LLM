@@ -32,7 +32,8 @@ namespace Unity.PlatformToolkit.PlayMode
             get => m_Value;
             set
             {
-                if (Equals(m_Value, value)) return;
+                if (Equals(m_Value, value))
+                    return;
                 m_Value = value;
                 SerializeValue();
                 m_Persistor?.PersistWrites();

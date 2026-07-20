@@ -444,7 +444,8 @@ namespace TMPro
         /// </summary>
         public void Clear()
         {
-            if (this.vertices == null) return;
+            if (this.vertices == null)
+                return;
 
             Array.Clear(this.vertices, 0, this.vertices.Length);
             this.vertexCount = 0;
@@ -459,7 +460,8 @@ namespace TMPro
         /// </summary>
         public void Clear(bool uploadChanges)
         {
-            if (this.vertices == null) return;
+            if (this.vertices == null)
+                return;
 
             Array.Clear(this.vertices, 0, this.vertices.Length);
             this.vertexCount = 0;
@@ -548,7 +550,8 @@ namespace TMPro
             // Make sure the sorting order array is not larger than the vertices array.
             int indexCount = sortingOrder.Count;
 
-            if (indexCount * 4 > vertices.Length) return;
+            if (indexCount * 4 > vertices.Length)
+                return;
 
             int src_index;
 

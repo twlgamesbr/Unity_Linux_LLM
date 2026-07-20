@@ -130,7 +130,8 @@ namespace TMPro
 
         internal void SetLinkID(char[] text, int startIndex, int length)
         {
-            if (linkID == null || linkID.Length < length) linkID = new char[length];
+            if (linkID == null || linkID.Length < length)
+                linkID = new char[length];
 
             for (int i = 0; i < length; i++)
                 linkID[i] = text[startIndex + i];

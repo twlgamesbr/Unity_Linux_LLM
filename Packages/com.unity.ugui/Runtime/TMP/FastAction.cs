@@ -14,7 +14,8 @@ namespace TMPro
 
         public void Add(System.Action rhs)
         {
-            if (lookup.ContainsKey(rhs)) return;
+            if (lookup.ContainsKey(rhs))
+                return;
 
             lookup[rhs] = delegates.AddLast(rhs);
         }
@@ -52,7 +53,8 @@ namespace TMPro
 
         public void Add(System.Action<A> rhs)
         {
-            if (lookup.ContainsKey(rhs)) return;
+            if (lookup.ContainsKey(rhs))
+                return;
 
             lookup[rhs] = delegates.AddLast(rhs);
         }
@@ -91,7 +93,8 @@ namespace TMPro
 
         public void Add(System.Action<A, B> rhs)
         {
-            if (lookup.ContainsKey(rhs)) return;
+            if (lookup.ContainsKey(rhs))
+                return;
 
             lookup[rhs] = delegates.AddLast(rhs);
         }
@@ -131,7 +134,8 @@ namespace TMPro
 
         public void Add(System.Action<A, B, C> rhs)
         {
-            if (lookup.ContainsKey(rhs)) return;
+            if (lookup.ContainsKey(rhs))
+                return;
 
             lookup[rhs] = delegates.AddLast(rhs);
         }

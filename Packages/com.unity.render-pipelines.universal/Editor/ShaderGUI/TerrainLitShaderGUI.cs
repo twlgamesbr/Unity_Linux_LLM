@@ -37,7 +37,13 @@ namespace UnityEditor.Rendering.Universal
         }
 
         static StylesLayer s_Styles = null;
-        private static StylesLayer styles { get { if (s_Styles == null) s_Styles = new StylesLayer(); return s_Styles; } }
+        private static StylesLayer styles { get
+            {
+                if (s_Styles == null)
+                    s_Styles = new StylesLayer();
+                return s_Styles;
+            }
+        }
 
         protected override uint materialFilter => (uint)Expandable.SurfaceOptions;
 
@@ -243,13 +249,17 @@ namespace UnityEditor.Rendering.Universal
                 if (terrainLayer.maskMapTexture != null)
                 {
                     float min, max;
-                    min = maskMapRemapMin.x; max = maskMapRemapMax.x;
+                    min = maskMapRemapMin.x;
+                    max = maskMapRemapMax.x;
                     EditorGUILayout.MinMaxSlider(s_Styles.metallic, ref min, ref max, 0, 1);
-                    maskMapRemapMin.x = min; maskMapRemapMax.x = max;
+                    maskMapRemapMin.x = min;
+                    maskMapRemapMax.x = max;
 
-                    min = maskMapRemapMin.y; max = maskMapRemapMax.y;
+                    min = maskMapRemapMin.y;
+                    max = maskMapRemapMax.y;
                     EditorGUILayout.MinMaxSlider(s_Styles.ao, ref min, ref max, 0, 1);
-                    maskMapRemapMin.y = min; maskMapRemapMax.y = max;
+                    maskMapRemapMin.y = min;
+                    maskMapRemapMax.y = max;
 
                     if (heightBlend)
                     {
@@ -274,9 +284,11 @@ namespace UnityEditor.Rendering.Universal
                         --EditorGUI.indentLevel;
                     }
 
-                    min = maskMapRemapMin.w; max = maskMapRemapMax.w;
+                    min = maskMapRemapMin.w;
+                    max = maskMapRemapMax.w;
                     EditorGUILayout.MinMaxSlider(s_Styles.smoothness, ref min, ref max, 0, 1);
-                    maskMapRemapMin.w = min; maskMapRemapMax.w = max;
+                    maskMapRemapMin.w = min;
+                    maskMapRemapMax.w = max;
                 }
                 else
                 {

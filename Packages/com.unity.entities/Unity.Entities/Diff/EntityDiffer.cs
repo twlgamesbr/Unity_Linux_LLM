@@ -416,11 +416,16 @@ namespace Unity.Entities
                             }
                             finally
                             {
-                                if (duplicateEntityGuids.IsCreated) duplicateEntityGuids.Dispose();
-                                if (forwardEntityChanges.IsCreated) forwardEntityChanges.Dispose();
-                                if (reverseEntityChanges.IsCreated) reverseEntityChanges.Dispose();
-                                if (forwardBlobAssetChanges.IsCreated) forwardBlobAssetChanges.Dispose();
-                                if (reverseBlobAssetChanges.IsCreated) reverseBlobAssetChanges.Dispose();
+                                if (duplicateEntityGuids.IsCreated)
+                                    duplicateEntityGuids.Dispose();
+                                if (forwardEntityChanges.IsCreated)
+                                    forwardEntityChanges.Dispose();
+                                if (reverseEntityChanges.IsCreated)
+                                    reverseEntityChanges.Dispose();
+                                if (forwardBlobAssetChanges.IsCreated)
+                                    forwardBlobAssetChanges.Dispose();
+                                if (reverseBlobAssetChanges.IsCreated)
+                                    reverseBlobAssetChanges.Dispose();
                             }
                         }
                     }

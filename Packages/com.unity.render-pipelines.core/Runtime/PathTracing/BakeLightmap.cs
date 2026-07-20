@@ -47,7 +47,8 @@ namespace UnityEngine.PathTracing.Lightmapping
         public bool IsValid() => LodGroup != -1;
         public bool IsContributor()
         {
-            if (LodContributorLevel == -1) return false;
+            if (LodContributorLevel == -1)
+                return false;
             return (LodMask & (1 << LodContributorLevel)) != 0;
         }
         public byte MinLodLevelMask() { return (byte)(LodMask & -LodMask); }

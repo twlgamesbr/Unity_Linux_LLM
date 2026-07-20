@@ -158,7 +158,8 @@ namespace Unity.Entities.Editor
                     countNodeHavingValue += m_Values.Length;
 
                 childCount.Add(m_CurrentLength);
-                if (m_CurrentLength == 0) return;
+                if (m_CurrentLength == 0)
+                    return;
 
                 for (var index = 0; index < m_CurrentLength; index++)
                 {

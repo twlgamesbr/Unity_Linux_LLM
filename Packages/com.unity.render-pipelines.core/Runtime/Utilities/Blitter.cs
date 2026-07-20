@@ -396,12 +396,14 @@ namespace UnityEngine.Rendering
         /// disabled, textures are always 2D so forcing them to 2D has no impact.</param>
         internal static void CopyTexture(RasterCommandBuffer cmd, bool isMSAA, bool force2DForXR = false)
         {
-            if (force2DForXR) cmd.EnableShaderKeyword("DISABLE_TEXTURE2D_X_ARRAY");
+            if (force2DForXR)
+                cmd.EnableShaderKeyword("DISABLE_TEXTURE2D_X_ARRAY");
 
             DrawTriangle(cmd, s_Copy, isMSAA ? 1 : 0);
 
             // Set back the XR texture for regular XR calls
-            if (force2DForXR) cmd.DisableShaderKeyword("DISABLE_TEXTURE2D_X_ARRAY");
+            if (force2DForXR)
+                cmd.DisableShaderKeyword("DISABLE_TEXTURE2D_X_ARRAY");
         }
 
         /// <summary>

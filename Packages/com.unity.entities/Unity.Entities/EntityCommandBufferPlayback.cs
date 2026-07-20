@@ -32,7 +32,11 @@ namespace Unity.Entities
         public bool ShouldPlayback
         {
             get { return m_Data != null ? m_Data->m_ShouldPlayback : false; }
-            set { if (m_Data != null) m_Data->m_ShouldPlayback = value; }
+            set
+            {
+                if (m_Data != null)
+                    m_Data->m_ShouldPlayback = value;
+            }
         }
 
         /// <summary>

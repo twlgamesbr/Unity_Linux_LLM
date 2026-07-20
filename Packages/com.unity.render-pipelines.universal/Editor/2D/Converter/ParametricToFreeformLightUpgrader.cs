@@ -170,8 +170,10 @@ namespace UnityEditor.Rendering.Universal
         {
             if (item is ParametricToFreeformLightUpgraderItem lightItem)
             {
-                if (lightItem.type == 1) URP2DConverterUtility.UpgradePrefab(lightItem.assetPath, UpgradeGameObject);
-                else URP2DConverterUtility.UpgradeScene(lightItem.assetPath, UpgradeGameObject);
+                if (lightItem.type == 1)
+                    URP2DConverterUtility.UpgradePrefab(lightItem.assetPath, UpgradeGameObject);
+                else
+                    URP2DConverterUtility.UpgradeScene(lightItem.assetPath, UpgradeGameObject);
             }
 
             message = string.Empty;

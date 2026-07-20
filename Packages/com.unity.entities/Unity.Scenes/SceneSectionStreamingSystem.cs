@@ -142,7 +142,8 @@ namespace Unity.Scenes
         {
             get
             {
-                for (int i = 0; i < m_Streams.Length; ++i) {
+                for (int i = 0; i < m_Streams.Length; ++i)
+                {
                     if (m_Streams[i].Operation != null && !m_Streams[i].Operation.IsCompleted)
                         return false;
                 }
@@ -691,7 +692,8 @@ namespace Unity.Scenes
         {
             // Sections > 0 need the external references from sections 0 and will wait for it to be loaded.
             // So we have to ensure sections 0 are loaded first, otherwise there's a risk of starving loading streams.
-            if (!m_PendingStreamRequests.IsEmptyIgnoreFilter) {
+            if (!m_PendingStreamRequests.IsEmptyIgnoreFilter)
+            {
                 using (var entities = m_PendingStreamRequests.ToEntityArray(Allocator.TempJob))
                 {
                     var priorityList = new NativeList<Entity>(Allocator.Temp);

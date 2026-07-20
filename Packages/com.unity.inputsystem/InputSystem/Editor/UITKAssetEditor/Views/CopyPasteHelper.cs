@@ -176,7 +176,8 @@ namespace UnityEngine.InputSystem.Editor
         {
             s_lastAddedElement = null;
             var typeOfCopiedData = GetCopiedClipboardType();
-            if (typeOfCopiedData != typeof(InputActionMap)) return null;
+            if (typeOfCopiedData != typeof(InputActionMap))
+                return null;
             s_State = state;
             var actionMapArray = state.serializedObject.FindProperty(nameof(InputActionAsset.m_ActionMaps));
             PasteData(EditorHelpers.GetSystemCopyBufferContents(), new[] {state.selectedActionMapIndex}, actionMapArray);
@@ -210,7 +211,8 @@ namespace UnityEngine.InputSystem.Editor
             var actionMap = mapIndex >= 0 ? Selectors.GetActionMapAtIndex(state, mapIndex)?.wrappedProperty
                 : Selectors.GetSelectedActionMap(state)?.wrappedProperty;
             var actionArray = actionMap?.FindPropertyRelative(nameof(InputActionMap.m_Actions));
-            if (actionArray == null) return;
+            if (actionArray == null)
+                return;
             var index = state.selectedActionIndex;
             if (addLast)
                 index = actionArray.arraySize - 1;
@@ -221,7 +223,8 @@ namespace UnityEngine.InputSystem.Editor
         {
             var actionMap = Selectors.GetSelectedActionMap(state)?.wrappedProperty;
             var bindingsArray = actionMap?.FindPropertyRelative(nameof(InputActionMap.m_Bindings));
-            if (bindingsArray == null) return;
+            if (bindingsArray == null)
+                return;
             int newBindingIndex;
             if (state.selectionType == SelectionType.Action)
                 newBindingIndex = Selectors.GetLastBindingIndexForSelectedAction(state);

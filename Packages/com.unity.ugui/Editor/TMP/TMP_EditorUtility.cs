@@ -89,7 +89,8 @@ namespace TMPro.EditorUtilities
                 // place in currently selected directory
                 path += "/" + name + ".asset";
             }
-            else {
+            else
+            {
                 // place in current selection's containing directory
                 path = Path.GetDirectoryName(path) + "/" + name + ".asset";
             }
@@ -137,7 +138,8 @@ namespace TMPro.EditorUtilities
         // Function used to find the Font Asset which matches the given Material Preset and Font Atlas Texture.
         internal static TMP_FontAsset FindMatchingFontAsset(Material mat)
         {
-            if (mat.GetTexture(ShaderUtilities.ID_MainTex) == null) return null;
+            if (mat.GetTexture(ShaderUtilities.ID_MainTex) == null)
+                return null;
 
             // Find the dependent assets of this material.
             string[] dependentAssets = AssetDatabase.GetDependencies(AssetDatabase.GetAssetPath(mat), false);
@@ -174,7 +176,8 @@ namespace TMPro.EditorUtilities
                 // Search for potential alternative locations in the user project
                 string[] matchingPaths = Directory.GetDirectories(packagePath, "TextMesh Pro", SearchOption.AllDirectories);
                 packagePath = ValidateLocation(matchingPaths, packagePath);
-                if (packagePath != null) return packagePath;
+                if (packagePath != null)
+                    return packagePath;
             }
 
             return null;
@@ -201,7 +204,8 @@ namespace TMPro.EditorUtilities
                 // Search for potential alternative locations in the user project
                 string[] matchingPaths = Directory.GetDirectories(packagePath, "TextMesh Pro", SearchOption.AllDirectories);
                 string path = ValidateLocation(matchingPaths, packagePath);
-                if (path != null) return packagePath + path;
+                if (path != null)
+                    return packagePath + path;
             }
 
             return null;

@@ -702,7 +702,8 @@ namespace FlyingWormConsole3.LiteNetLib
                 lock (_requestsDict)
                     _requestsDict.Remove(request.RemoteEndPoint);
             }
-            else lock (_requestsDict)
+            else
+                lock (_requestsDict)
             {
                 if (TryGetPeer(request.RemoteEndPoint, out netPeer))
                 {

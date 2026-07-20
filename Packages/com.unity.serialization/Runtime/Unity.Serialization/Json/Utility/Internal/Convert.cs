@@ -60,14 +60,16 @@ namespace Unity.Serialization.Json
             {
                 value = -value;
 
-                if (value > 0) {
+                if (value > 0)
+                {
                     output = 0;
                     return ParseError.Overflow;
                 }
             }
             else
             {
-                if (value < 0) {
+                if (value < 0)
+                {
                     output = 0;
                     return ParseError.Overflow;
                 }
@@ -305,7 +307,8 @@ namespace Unity.Serialization.Json
 
         public static unsafe bool IsIntegral(char* c, int len)
         {
-            if (len == 0) return false;
+            if (len == 0)
+                return false;
 
             var i = 0;
 
@@ -316,7 +319,8 @@ namespace Unity.Serialization.Json
 
             for (; i < len; i++)
             {
-                if (!IsDigit(c[i]))  return false;
+                if (!IsDigit(c[i]))
+                    return false;
             }
 
             return true;
@@ -324,7 +328,8 @@ namespace Unity.Serialization.Json
 
         public static unsafe bool IsDecimal(char* c, int len)
         {
-            if (len == 0) return false;
+            if (len == 0)
+                return false;
 
             var i = 0;
 

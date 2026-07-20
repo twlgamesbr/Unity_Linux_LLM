@@ -60,7 +60,10 @@ namespace Unity.Entities
         [MonoPInvokeCallback(typeof(AllocatorManager.TryFunction))]
         internal static int Try(IntPtr state, ref AllocatorManager.Block block)
         {
-            unsafe { return ((ScratchpadAllocator*)state)->Try(ref block); }
+            unsafe
+            {
+                return ((ScratchpadAllocator*)state)->Try(ref block);
+            }
         }
 
         /// <summary>

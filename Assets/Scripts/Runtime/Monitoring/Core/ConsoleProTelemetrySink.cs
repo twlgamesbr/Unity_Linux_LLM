@@ -87,7 +87,8 @@ namespace NPCSystem.Monitoring
                 int i = 0;
                 foreach (var kvp in evt.Tags)
                 {
-                    if (i > 0) sb.Append(", ");
+                    if (i > 0)
+                        sb.Append(", ");
                     sb.Append($"{kvp.Key}={kvp.Value}");
                     i++;
                 }

@@ -159,25 +159,31 @@ namespace UnityEditor.TestRunner.TestLaunchers
         }
         
         // Below implementation is copy-paste from HttpUtility.JavaScriptStringEncode
-        private static string JavaScriptStringEncode(string value) {
-            if (String.IsNullOrEmpty(value)) {
+        private static string JavaScriptStringEncode(string value)
+        {
+            if (String.IsNullOrEmpty(value))
+            {
                 return String.Empty;
             }
 
             StringBuilder b = null;
             int startIndex = 0;
             int count = 0;
-            for (int i = 0; i < value.Length; i++) {
+            for (int i = 0; i < value.Length; i++)
+            {
                 char c = value[i];
 
                 // Append the unhandled characters (that do not require special treament)
                 // to the string builder when special characters are detected.
-                if (CharRequiresJavaScriptEncoding(c)) {
-                    if (b == null) {
+                if (CharRequiresJavaScriptEncoding(c))
+                {
+                    if (b == null)
+                    {
                         b = new StringBuilder(value.Length + 5);
                     }
 
-                    if (count > 0) {
+                    if (count > 0)
+                    {
                         b.Append(value, startIndex, count);
                     }
 
@@ -208,27 +214,31 @@ namespace UnityEditor.TestRunner.TestLaunchers
                         b.Append("\\f");
                         break;
                     default:
-                        if (CharRequiresJavaScriptEncoding(c)) {
+                        if (CharRequiresJavaScriptEncoding(c))
+                        {
                             AppendCharAsUnicodeJavaScript(b, c);
                         }
-                        else {
+                        else
+                        {
                             count++;
                         }
                         break;
                 }
             }
 
-            if (b == null) {
+            if (b == null)
+            {
                 return value;
             }
 
-            if (count > 0) {
+            if (count > 0)
+            {
                 b.Append(value, startIndex, count);
             }
 
             return b.ToString();
         }
-        
+
         private static bool CharRequiresJavaScriptEncoding(char c) {
             return c < 0x20 // control chars always have to be encoded
                    || c == '\"' // chars which must be encoded per JSON spec

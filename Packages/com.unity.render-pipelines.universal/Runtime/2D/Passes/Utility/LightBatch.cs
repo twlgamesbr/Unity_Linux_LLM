@@ -49,8 +49,14 @@ namespace UnityEngine.Rendering.Universal
 
         internal void Reset()
         {
-            unsafe { UnsafeUtility.MemClear(m_Markers.GetUnsafePtr(), UnsafeUtility.SizeOf<int>() * LightBuffer.kBatchMax); }
-            unsafe { UnsafeUtility.MemClear(m_NativeBuffer.GetUnsafePtr(), UnsafeUtility.SizeOf<PerLight2D>() * LightBuffer.kMax); }
+            unsafe
+            {
+                UnsafeUtility.MemClear(m_Markers.GetUnsafePtr(), UnsafeUtility.SizeOf<int>() * LightBuffer.kBatchMax);
+            }
+            unsafe
+            {
+                UnsafeUtility.MemClear(m_NativeBuffer.GetUnsafePtr(), UnsafeUtility.SizeOf<PerLight2D>() * LightBuffer.kMax);
+            }
         }
 
     }

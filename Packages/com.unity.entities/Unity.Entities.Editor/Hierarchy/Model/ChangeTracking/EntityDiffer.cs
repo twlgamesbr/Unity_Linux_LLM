@@ -61,8 +61,10 @@ namespace Unity.Entities.Editor
 
             public void Dispose()
             {
-                if (null != Ptr->Entities) Memory.Unmanaged.Free(Ptr->Entities, Allocator.Persistent);
-                if (CollectionHelper.ShouldDeallocate(m_Allocator)) Memory.Unmanaged.Free(Ptr, m_Allocator);
+                if (null != Ptr->Entities)
+                    Memory.Unmanaged.Free(Ptr->Entities, Allocator.Persistent);
+                if (CollectionHelper.ShouldDeallocate(m_Allocator))
+                    Memory.Unmanaged.Free(Ptr, m_Allocator);
             }
         }
 
@@ -325,7 +327,8 @@ namespace Unity.Entities.Editor
             public void Execute(int index)
             {
                 var chunkSequenceNumber = ChunkShadowBySequenceNumberKeys[index];
-                if (chunkSequenceNumber == 0 || ChunkSequenceNumbers.Contains(chunkSequenceNumber)) return;
+                if (chunkSequenceNumber == 0 || ChunkSequenceNumbers.Contains(chunkSequenceNumber))
+                    return;
                 var chunkShadow = ChunkShadowBySequenceNumber[chunkSequenceNumber];
                 RemovedChunks.AddNoResize(chunkShadow);
             }

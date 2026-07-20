@@ -126,10 +126,14 @@ namespace UnityEngine.PathTracing.Core
             while (parent != null && ShouldCollapse(parent))
             {
                 // Remove the children from the leaves list
-                if (_leaves.Contains(parent.TopLeft)) _leaves.Remove(parent.TopLeft);
-                if (_leaves.Contains(parent.TopRight)) _leaves.Remove(parent.TopRight);
-                if (_leaves.Contains(parent.BottomLeft)) _leaves.Remove(parent.BottomLeft);
-                if (_leaves.Contains(parent.BottomRight)) _leaves.Remove(parent.BottomRight);
+                if (_leaves.Contains(parent.TopLeft))
+                    _leaves.Remove(parent.TopLeft);
+                if (_leaves.Contains(parent.TopRight))
+                    _leaves.Remove(parent.TopRight);
+                if (_leaves.Contains(parent.BottomLeft))
+                    _leaves.Remove(parent.BottomLeft);
+                if (_leaves.Contains(parent.BottomRight))
+                    _leaves.Remove(parent.BottomRight);
 
                 // Collapse the parent node
                 parent.TopLeft = null;

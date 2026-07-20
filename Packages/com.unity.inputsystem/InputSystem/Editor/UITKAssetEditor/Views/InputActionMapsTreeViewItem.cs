@@ -41,7 +41,11 @@ namespace UnityEngine.InputSystem.Editor
 
             RegisterCallback<MouseDownEvent>(OnMouseDownEventForRename);
             renameTextfield.RegisterCallback<FocusInEvent>(e => IsFocused = true);
-            renameTextfield.RegisterCallback<FocusOutEvent>(e => { OnEditTextFinished(); IsFocused = false; });
+            renameTextfield.RegisterCallback<FocusOutEvent>(e =>
+            {
+                OnEditTextFinished();
+                IsFocused = false;
+            });
             _ = new ContextualMenuManipulator(menuBuilder =>
             {
                 OnContextualMenuPopulateEvent?.Invoke(menuBuilder);

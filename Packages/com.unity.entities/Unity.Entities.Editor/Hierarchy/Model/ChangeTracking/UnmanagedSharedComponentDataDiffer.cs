@@ -98,7 +98,8 @@ namespace Unity.Entities.Editor
                 Ptr->RemovedComponentIndices.Dispose();
                 Ptr->SharedComponentData.Dispose();
 
-                if (CollectionHelper.ShouldDeallocate(m_Allocator)) Memory.Unmanaged.Free(Ptr, m_Allocator);
+                if (CollectionHelper.ShouldDeallocate(m_Allocator))
+                    Memory.Unmanaged.Free(Ptr, m_Allocator);
             }
 
             public void GetAddedComponentEntities(NativeList<Entity> entities)
@@ -224,8 +225,10 @@ namespace Unity.Entities.Editor
 
             public void Dispose()
             {
-                if (null != Ptr->Entities) Memory.Unmanaged.Free(Ptr->Entities, Allocator.Persistent);
-                if (CollectionHelper.ShouldDeallocate(m_Allocator)) Memory.Unmanaged.Free(Ptr, m_Allocator);
+                if (null != Ptr->Entities)
+                    Memory.Unmanaged.Free(Ptr->Entities, Allocator.Persistent);
+                if (CollectionHelper.ShouldDeallocate(m_Allocator))
+                    Memory.Unmanaged.Free(Ptr, m_Allocator);
             }
         }
 
@@ -522,7 +525,8 @@ namespace Unity.Entities.Editor
             public void Execute(int index)
             {
                 var chunkSequenceNumber = ChunkShadowBySequenceNumberKeys[index];
-                if (chunkSequenceNumber == 0 || ChunkSequenceNumbers.Contains(chunkSequenceNumber)) return;
+                if (chunkSequenceNumber == 0 || ChunkSequenceNumbers.Contains(chunkSequenceNumber))
+                    return;
                 var chunkShadow = ChunkShadowBySequenceNumber[chunkSequenceNumber];
                 RemovedChunks.AddNoResize(chunkShadow);
             }
@@ -573,7 +577,8 @@ namespace Unity.Entities.Editor
                 var chunk = Chunks[index].m_Chunk;
                 var archetype = Chunks[index].Archetype.Archetype;
                 var indexInTypeArray = ChunkDataUtility.GetIndexInTypeArray(archetype, TypeIndex);
-                if (indexInTypeArray == -1) return;
+                if (indexInTypeArray == -1)
+                    return;
 
                 if (ShadowChunksBySequenceNumber.TryGetValue(chunk.SequenceNumber, out var shadow))
                 {
@@ -642,7 +647,8 @@ namespace Unity.Entities.Editor
                 var chunk = Chunks[index].m_Chunk;
                 var archetype = Chunks[index].Archetype.Archetype;
                 var indexInTypeArray = ChunkDataUtility.GetIndexInTypeArray(archetype, TypeIndex);
-                if (indexInTypeArray == -1) return;
+                if (indexInTypeArray == -1)
+                    return;
                 var sequenceNumber = chunk.SequenceNumber;
 
                 if (ChunkShadowBySequenceNumber.TryGetValue(sequenceNumber, out var shadow))

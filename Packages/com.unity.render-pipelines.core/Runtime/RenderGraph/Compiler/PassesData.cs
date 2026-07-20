@@ -432,10 +432,12 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
         internal readonly bool IsUsedAsFragment(in ResourceHandle h, CompilerContextData ctx)
         {
             //Only textures can be used as a fragment attachment.
-            if (h.type != RenderGraphResourceType.Texture) return false;
+            if (h.type != RenderGraphResourceType.Texture)
+                return false;
 
             // Only raster passes can have fragment attachments
-            if (type != RenderGraphPassType.Raster) return false;
+            if (type != RenderGraphPassType.Raster)
+                return false;
 
             foreach (ref readonly var fragment in Fragments(ctx))
             {
@@ -1369,7 +1371,8 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
             var size = fragments.size;
 
             // If depth is the only attachment of the native pass, we are done
-            if (size == 1) return;
+            if (size == 1)
+                return;
 
             // size > 1
             // In this case, we are adding depth attachment to a native pass with other existing attachments

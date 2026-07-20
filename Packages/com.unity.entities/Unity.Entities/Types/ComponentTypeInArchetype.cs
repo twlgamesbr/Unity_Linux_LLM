@@ -103,7 +103,8 @@ namespace Unity.Entities
 #endif
         public override bool Equals(object obj)
         {
-            if (obj is ComponentTypeInArchetype) return (ComponentTypeInArchetype)obj == this;
+            if (obj is ComponentTypeInArchetype)
+                return (ComponentTypeInArchetype)obj == this;
 
             return false;
         }

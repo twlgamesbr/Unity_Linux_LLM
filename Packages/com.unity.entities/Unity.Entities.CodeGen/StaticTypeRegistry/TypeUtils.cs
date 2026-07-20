@@ -91,12 +91,18 @@ namespace Unity.Entities.CodeGen
 
         public static AlignAndSize AlignAndSizeOfType(MetadataType mtype, int bits)
         {
-            if (mtype == MetadataType.Boolean || mtype == MetadataType.Byte || mtype == MetadataType.SByte) return AlignAndSize.One;
-            if (mtype == MetadataType.Int16 || mtype == MetadataType.UInt16 || mtype == MetadataType.Char) return AlignAndSize.Two;
-            if (mtype == MetadataType.Int32 || mtype == MetadataType.UInt32 || mtype == MetadataType.Single) return AlignAndSize.Four;
-            if (mtype == MetadataType.Int64 || mtype == MetadataType.UInt64 || mtype == MetadataType.Double) return AlignAndSize.Eight;
-            if (mtype == MetadataType.IntPtr || mtype == MetadataType.UIntPtr) return AlignAndSize.Pointer(bits);
-            if (mtype == MetadataType.String) return AlignAndSize.NativeString(bits);
+            if (mtype == MetadataType.Boolean || mtype == MetadataType.Byte || mtype == MetadataType.SByte)
+                return AlignAndSize.One;
+            if (mtype == MetadataType.Int16 || mtype == MetadataType.UInt16 || mtype == MetadataType.Char)
+                return AlignAndSize.Two;
+            if (mtype == MetadataType.Int32 || mtype == MetadataType.UInt32 || mtype == MetadataType.Single)
+                return AlignAndSize.Four;
+            if (mtype == MetadataType.Int64 || mtype == MetadataType.UInt64 || mtype == MetadataType.Double)
+                return AlignAndSize.Eight;
+            if (mtype == MetadataType.IntPtr || mtype == MetadataType.UIntPtr)
+                return AlignAndSize.Pointer(bits);
+            if (mtype == MetadataType.String)
+                return AlignAndSize.NativeString(bits);
 
             throw new ArgumentException($"Metadata type {mtype} is a special type which is not supported");
         }
@@ -127,8 +133,10 @@ namespace Unity.Entities.CodeGen
 
             // This is a gross hack and i'm not proud of it; we use bits as an array index,
             // and we call this method recursively.
-            if (bits == 32) bits = 0;
-            else if (bits == 64) bits = 1;
+            if (bits == 32)
+                bits = 0;
+            else if (bits == 64)
+                bits = 1;
 
             if (typeRef.IsPointer)
                 return AlignAndSize.Pointer(bits);
@@ -214,8 +222,10 @@ namespace Unity.Entities.CodeGen
 
         public AlignAndSize AlignAndSizeOfField(FieldReference fieldRef, int bits)
         {
-            if (bits == 32) bits = 0;
-            else if (bits == 64) bits = 1;
+            if (bits == 32)
+                bits = 0;
+            else if (bits == 64)
+                bits = 1;
 
             if (!StructFieldAlignment[bits].ContainsKey(fieldRef))
             {
@@ -234,12 +244,15 @@ namespace Unity.Entities.CodeGen
 
         public static bool HasNestedDynamicArrayType(TypeReference type)
         {
-            if (type.IsPrimitive || type.Resolve().IsEnum || type.MetadataType == MetadataType.String) return false;
-            if (IsDynamicArray(type)) return true;
+            if (type.IsPrimitive || type.Resolve().IsEnum || type.MetadataType == MetadataType.String)
+                return false;
+            if (IsDynamicArray(type))
+                return true;
 
             foreach (var field in type.Resolve().Fields)
             {
-                if (field.IsNotSerialized) continue;
+                if (field.IsNotSerialized)
+                    continue;
                 if (HasNestedDynamicArrayType(field.FieldType))
                     return true;
             }
@@ -419,7 +432,8 @@ namespace Unity.Entities.CodeGen
         public static bool IsPodType(TypeReference typeRef)
         {
             TypeDefinition type = typeRef.Resolve();
-            if (type.IsCppBasicType() || type.IsEnum) return true;
+            if (type.IsCppBasicType() || type.IsEnum)
+                return true;
 
             var typeResolver = TypeResolver.For(typeRef);
             foreach (var f in type.Fields)
@@ -504,8 +518,10 @@ namespace Unity.Entities.CodeGen
 
         public void PreprocessTypeFields(TypeReference valuetype, int bits, int depth)
         {
-            if (bits == 32) bits = 0;
-            else if (bits == 64) bits = 1;
+            if (bits == 32)
+                bits = 0;
+            else if (bits == 64)
+                bits = 1;
 
             int size = 0;
             int highestFieldAlignment = 0;

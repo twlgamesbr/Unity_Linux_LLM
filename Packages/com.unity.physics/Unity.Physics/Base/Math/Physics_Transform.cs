@@ -76,7 +76,12 @@ namespace Unity.Physics
             /// <summary>   Gets or sets the scale. </summary>
             ///
             /// <value> The scale. </value>
-            public float Scale { get => m_Scale; set { UnityEngine.Assertions.Assert.IsTrue(value != 0.0f); m_Scale = value; } }
+            public float Scale { get => m_Scale; set
+                {
+                    UnityEngine.Assertions.Assert.IsTrue(value != 0.0f);
+                    m_Scale = value;
+                }
+            }
 
             /// <summary>   Gets the inverse rotation. </summary>
             ///

@@ -290,7 +290,12 @@ namespace UnityEngine.UI
         /// <summary>
         /// Reference to the viewport RectTransform that is the parent of the content RectTransform.
         /// </summary>
-        public RectTransform viewport { get { return m_Viewport; } set { m_Viewport = value; SetDirtyCaching(); } }
+        public RectTransform viewport { get { return m_Viewport; } set
+            {
+                m_Viewport = value;
+                SetDirtyCaching();
+            }
+        }
 
         [SerializeField]
         private Scrollbar m_HorizontalScrollbar;
@@ -386,7 +391,12 @@ namespace UnityEngine.UI
         /// <summary>
         /// The mode of visibility for the horizontal scrollbar.
         /// </summary>
-        public ScrollbarVisibility horizontalScrollbarVisibility { get { return m_HorizontalScrollbarVisibility; } set { m_HorizontalScrollbarVisibility = value; SetDirtyCaching(); } }
+        public ScrollbarVisibility horizontalScrollbarVisibility { get { return m_HorizontalScrollbarVisibility; } set
+            {
+                m_HorizontalScrollbarVisibility = value;
+                SetDirtyCaching();
+            }
+        }
 
         [SerializeField]
         private ScrollbarVisibility m_VerticalScrollbarVisibility;
@@ -394,7 +404,12 @@ namespace UnityEngine.UI
         /// <summary>
         /// The mode of visibility for the vertical scrollbar.
         /// </summary>
-        public ScrollbarVisibility verticalScrollbarVisibility { get { return m_VerticalScrollbarVisibility; } set { m_VerticalScrollbarVisibility = value; SetDirtyCaching(); } }
+        public ScrollbarVisibility verticalScrollbarVisibility { get { return m_VerticalScrollbarVisibility; } set
+            {
+                m_VerticalScrollbarVisibility = value;
+                SetDirtyCaching();
+            }
+        }
 
         [SerializeField]
         private float m_HorizontalScrollbarSpacing;
@@ -402,7 +417,12 @@ namespace UnityEngine.UI
         /// <summary>
         /// The space between the scrollbar and the viewport.
         /// </summary>
-        public float horizontalScrollbarSpacing { get { return m_HorizontalScrollbarSpacing; } set { m_HorizontalScrollbarSpacing = value; SetDirty(); } }
+        public float horizontalScrollbarSpacing { get { return m_HorizontalScrollbarSpacing; } set
+            {
+                m_HorizontalScrollbarSpacing = value;
+                SetDirty();
+            }
+        }
 
         [SerializeField]
         private float m_VerticalScrollbarSpacing;
@@ -410,7 +430,12 @@ namespace UnityEngine.UI
         /// <summary>
         /// The space between the scrollbar and the viewport.
         /// </summary>
-        public float verticalScrollbarSpacing { get { return m_VerticalScrollbarSpacing; } set { m_VerticalScrollbarSpacing = value; SetDirty(); } }
+        public float verticalScrollbarSpacing { get { return m_VerticalScrollbarSpacing; } set
+            {
+                m_VerticalScrollbarSpacing = value;
+                SetDirty();
+            }
+        }
 
         [SerializeField]
         private ScrollRectEvent m_OnValueChanged = new ScrollRectEvent();
@@ -1052,8 +1077,16 @@ namespace UnityEngine.UI
             }
         }
 
-        private void SetHorizontalNormalizedPosition(float value) { if(horizontalNormalizedPosition != value) SetNormalizedPosition(value, 0); }
-        private void SetVerticalNormalizedPosition(float value) { if(verticalNormalizedPosition != value) SetNormalizedPosition(value, 1); }
+        private void SetHorizontalNormalizedPosition(float value)
+        {
+            if (horizontalNormalizedPosition != value)
+                SetNormalizedPosition(value, 0);
+        }
+        private void SetVerticalNormalizedPosition(float value)
+        {
+            if (verticalNormalizedPosition != value)
+                SetNormalizedPosition(value, 1);
+        }
 
         /// <summary>
         /// >Set the horizontal or vertical scroll position as a value between 0 and 1, with 0 being at the left or at the bottom.

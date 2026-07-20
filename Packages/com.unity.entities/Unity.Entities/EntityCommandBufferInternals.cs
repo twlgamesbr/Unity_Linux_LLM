@@ -1362,7 +1362,8 @@ namespace Unity.Entities
                 c->Used = 0;
                 c->Size = chunkSize;
 
-                if (prev != null) prev->Next = c;
+                if (prev != null)
+                    prev->Next = c;
 
                 if (chain->m_Head == null)
                 {

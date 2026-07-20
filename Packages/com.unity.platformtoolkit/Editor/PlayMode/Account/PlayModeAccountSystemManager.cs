@@ -142,7 +142,8 @@ namespace Unity.PlatformToolkit.PlayMode
 
         private void PrimaryAccountChangeProcessor()
         {
-            if (m_Disposed) return;
+            if (m_Disposed)
+                return;
 
             // Capturing the state of the Account Data at the time of the event.
             var primaryAccountData = m_UserManager.PrimaryAccountData;
@@ -165,7 +166,8 @@ namespace Unity.PlatformToolkit.PlayMode
 
         private void AccountStateChangeProcessor(PlayModeAccountData accountData, AccountState accountState)
         {
-            if (m_Disposed) return;
+            if (m_Disposed)
+                return;
             async Task ProcessAccountChange()
             {
                 await using var modifier = await m_AccountSystem.BeginAccountSystemModification();

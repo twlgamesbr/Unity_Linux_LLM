@@ -54,7 +54,8 @@ namespace UnityEngine.InputSystem.Editor
 
         protected override void ResetProperty(SerializedProperty property)
         {
-            if (property == null) return;
+            if (property == null)
+                return;
 
             property.SetStringValue(nameof(InputActionMap.m_Id), Guid.NewGuid().ToString());
             property.SetStringValue(nameof(InputActionMap.m_Name), "Input Action Map");

@@ -13,7 +13,11 @@ namespace Unity.Networking.Transport
         static void Warn(string msg) => UnityEngine.Debug.LogWarning(msg);
 
         [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]
-        static void WarnIf(bool condition, string msg) { if (condition) UnityEngine.Debug.LogWarning(msg); }
+        static void WarnIf(bool condition, string msg)
+        {
+            if (condition)
+                UnityEngine.Debug.LogWarning(msg);
+        }
 
         public enum Opcode
         {

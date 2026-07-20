@@ -30,7 +30,8 @@ namespace Unity.PlatformToolkit.Editor
             var localSavingPlatform = declarations.FirstOrDefault(d => d.Key == "Unity.LocalSaving");
             foreach (BuildTarget bt in Enum.GetValues(typeof(BuildTarget)))
             {
-                if (m_BuildTargetToDeclarationMappings.ContainsKey(bt)) continue;
+                if (m_BuildTargetToDeclarationMappings.ContainsKey(bt))
+                    continue;
                 if (localSavingPlatform != null && localSavingPlatform.SupportedPlatforms.Contains(bt))
                     TryAddBuildTarget(localSavingPlatform.Key, bt);
                 else

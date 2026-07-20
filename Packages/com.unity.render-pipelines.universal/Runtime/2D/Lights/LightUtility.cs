@@ -330,7 +330,8 @@ namespace UnityEngine.Rendering.Universal
                 var nx = (System.Int64)((double)shapePath[i].x * (double)kClipperScale);
                 var ny = (System.Int64)((double)shapePath[i].y * (double)kClipperScale);
                 var addPoint = new IntPoint(nx + Random.Range(-10, 10), ny + Random.Range(-10, 10));
-                addPoint.N = i; addPoint.D = -1;
+                addPoint.N = i;
+                addPoint.D = -1;
                 path.Add(addPoint);
             }
             var lastPointIndex = inputPointCount - 1;

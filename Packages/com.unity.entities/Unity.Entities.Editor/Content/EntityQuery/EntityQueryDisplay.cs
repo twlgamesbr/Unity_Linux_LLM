@@ -197,7 +197,8 @@ namespace Unity.Entities.Editor
             m_ComponentsListView.makeItem += () =>
             {
                 var view = new ComponentView(default);
-                if (!fromSystem) view.m_AccessMode.Hide();
+                if (!fromSystem)
+                    view.m_AccessMode.Hide();
                 return view;
             };
             m_ComponentsListView.bindItem += (element, i) =>

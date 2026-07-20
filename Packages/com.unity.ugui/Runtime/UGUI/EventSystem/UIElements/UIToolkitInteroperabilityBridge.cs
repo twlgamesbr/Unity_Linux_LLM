@@ -25,7 +25,8 @@ namespace UnityEngine.UIElements
             get => m_EventSystem;
             set
             {
-                if (m_EventSystem == value) return;
+                if (m_EventSystem == value)
+                    return;
                 Debug.Assert(!m_Started && !m_Enabled, "Expect EventSystem set before OnEnable and Start");
                 m_EventSystem = value;
             }
@@ -90,7 +91,8 @@ namespace UnityEngine.UIElements
 
         private void StartTrackingUIToolkitPanels()
         {
-            if (m_IsTrackingPanels || !shouldTrackPanels) return;
+            if (m_IsTrackingPanels || !shouldTrackPanels)
+                return;
 
             // Can be null if runtime panels have not been created yet; mark for retry in Update()
             if (IRuntimePanel.uIElementsRuntimeUtility == null)
@@ -117,7 +119,8 @@ namespace UnityEngine.UIElements
 
         private void StopTrackingUIToolkitPanels()
         {
-            if (!m_IsTrackingPanels) return;
+            if (!m_IsTrackingPanels)
+                return;
 
             // Can be null if runtime panels have not been created or UI Toolkit is stripped
             IRuntimePanel.uIElementsRuntimeUtility?.RemoveOnCreatePanelAction( StartTrackingPanel);
@@ -221,7 +224,8 @@ namespace UnityEngine.UIElements
 
         public void OnEnable()
         {
-            if (m_Enabled) return;
+            if (m_Enabled)
+                return;
             m_Enabled = true;
 
             if (PanelInputState.current != null)
@@ -243,7 +247,8 @@ namespace UnityEngine.UIElements
 
         public void OnDisable()
         {
-            if (!m_Enabled) return;
+            if (!m_Enabled)
+                return;
             m_Enabled = false;
 
             PanelInputState.onApply -= Apply;
@@ -297,10 +302,12 @@ namespace UnityEngine.UIElements
 
         private void ApplyOverrideUIToolkitEvents()
         {
-            if (m_OldOverrideUIToolkitEvents == m_OverrideUIToolkitEvents) return;
+            if (m_OldOverrideUIToolkitEvents == m_OverrideUIToolkitEvents)
+                return;
             m_OldOverrideUIToolkitEvents = m_OverrideUIToolkitEvents;
 
-            if (!m_Enabled) return;
+            if (!m_Enabled)
+                return;
 
             // Can be null if runtime panels have not been created yet; mark for retry in Update()
             if (m_OverrideUIToolkitEvents)
@@ -388,7 +395,8 @@ namespace UnityEngine.UIElements
         private List<IRuntimePanel> m_PanelsToRemove = new();
         private void UpdatePanelGameObjects()
         {
-            if (!m_IsTrackingPanels) return;
+            if (!m_IsTrackingPanels)
+                return;
 
             bool isWorldSpaceActive = false;
             foreach (var panel in trackedPanels)

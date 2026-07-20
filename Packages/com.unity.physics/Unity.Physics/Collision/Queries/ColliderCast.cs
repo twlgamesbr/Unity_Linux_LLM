@@ -53,7 +53,13 @@ namespace Unity.Physics
 
         internal Ray Ray;
         internal QueryContext QueryContext;
-        internal ColliderType ColliderType { get { unsafe { return Collider->Type; } } }
+        internal ColliderType ColliderType { get
+            {
+                unsafe
+                {
+                    return Collider->Type; }
+            }
+        }
 
         /// <summary>   Gets or sets the query collider scale. </summary>
         ///

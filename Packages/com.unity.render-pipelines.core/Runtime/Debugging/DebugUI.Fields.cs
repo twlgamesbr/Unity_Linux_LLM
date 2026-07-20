@@ -289,8 +289,10 @@ namespace UnityEngine.Rendering
             /// <returns>Validated value.</returns>
             public override int ValidateValue(int value)
             {
-                if (min != null) value = Mathf.Max(value, min());
-                if (max != null) value = Mathf.Min(value, max());
+                if (min != null)
+                    value = Mathf.Max(value, min());
+                if (max != null)
+                    value = Mathf.Min(value, max());
                 return value;
             }
 
@@ -386,8 +388,10 @@ namespace UnityEngine.Rendering
             /// <returns>Validated value.</returns>
             public override uint ValidateValue(uint value)
             {
-                if (min != null) value = (uint)Mathf.Max(value, min());
-                if (max != null) value = (uint)Mathf.Min(value, max());
+                if (min != null)
+                    value = (uint)Mathf.Max(value, min());
+                if (max != null)
+                    value = (uint)Mathf.Min(value, max());
                 return value;
             }
 
@@ -483,8 +487,10 @@ namespace UnityEngine.Rendering
             /// <returns>Validated value.</returns>
             public override float ValidateValue(float value)
             {
-                if (min != null) value = Mathf.Max(value, min());
-                if (max != null) value = Mathf.Min(value, max());
+                if (min != null)
+                    value = Mathf.Max(value, min());
+                if (max != null)
+                    value = Mathf.Min(value, max());
                 return value;
             }
 
@@ -1509,8 +1515,16 @@ namespace UnityEngine.Rendering
                         field,
                         (newValue) => UpdateVectorComponent(componentIndex, newValue),
                         () => this[componentIndex],
-                        onDecrement: (fast) => { selectedComponent = componentIndex; OnDecrement(fast); },
-                        onIncrement: (fast) => { selectedComponent = componentIndex; OnIncrement(fast); }
+                        onDecrement: (fast) =>
+                        {
+                            selectedComponent = componentIndex;
+                            OnDecrement(fast);
+                        },
+                        onIncrement: (fast) =>
+                        {
+                            selectedComponent = componentIndex;
+                            OnIncrement(fast);
+                        }
                     );
 
                     field.RegisterCallback<FocusInEvent>(evt =>
@@ -1523,7 +1537,6 @@ namespace UnityEngine.Rendering
                     field.label = componentNames[i];
                     field.tooltip = $"{displayName} {componentNames[i]}";
                     componentFields[i] = field;
-
                 }
 
                 return componentFields;

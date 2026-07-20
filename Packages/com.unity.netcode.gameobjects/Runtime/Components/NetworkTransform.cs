@@ -217,30 +217,102 @@ namespace Unity.Netcode.Components
             internal uint GetBitsetRepresentation()
             {
                 uint bitset = 0;
-                if (InLocalSpace) { bitset |= k_InLocalSpaceBit; }
-                if (HasPositionX) { bitset |= k_PositionXBit; }
-                if (HasPositionY) { bitset |= k_PositionYBit; }
-                if (HasPositionZ) { bitset |= k_PositionZBit; }
-                if (HasRotAngleX) { bitset |= k_RotAngleXBit; }
-                if (HasRotAngleY) { bitset |= k_RotAngleYBit; }
-                if (HasRotAngleZ) { bitset |= k_RotAngleZBit; }
-                if (HasScaleX) { bitset |= k_ScaleXBit; }
-                if (HasScaleY) { bitset |= k_ScaleYBit; }
-                if (HasScaleZ) { bitset |= k_ScaleZBit; }
-                if (IsTeleportingNextFrame) { bitset |= k_TeleportingBit; }
-                if (UseInterpolation) { bitset |= k_Interpolate; }
-                if (QuaternionSync) { bitset |= k_QuaternionSync; }
-                if (QuaternionCompression) { bitset |= k_QuaternionCompress; }
-                if (UseHalfFloatPrecision) { bitset |= k_UseHalfFloats; }
-                if (IsSynchronizing) { bitset |= k_Synchronization; }
-                if (UsePositionSlerp) { bitset |= k_PositionSlerp; }
-                if (IsParented) { bitset |= k_IsParented; }
-                if (SynchronizeBaseHalfFloat) { bitset |= k_SynchBaseHalfFloat; }
-                if (ReliableSequenced) { bitset |= k_ReliableSequenced; }
-                if (UseUnreliableDeltas) { bitset |= k_UseUnreliableDeltas; }
-                if (UnreliableFrameSync) { bitset |= k_UnreliableFrameSync; }
-                if (SwitchTransformSpaceWhenParented) { bitset |= k_SwitchTransformSpaceWhenParented; }
-                if (TrackByStateId) { bitset |= k_TrackStateId; }
+                if (InLocalSpace)
+                {
+                    bitset |= k_InLocalSpaceBit;
+                }
+                if (HasPositionX)
+                {
+                    bitset |= k_PositionXBit;
+                }
+                if (HasPositionY)
+                {
+                    bitset |= k_PositionYBit;
+                }
+                if (HasPositionZ)
+                {
+                    bitset |= k_PositionZBit;
+                }
+                if (HasRotAngleX)
+                {
+                    bitset |= k_RotAngleXBit;
+                }
+                if (HasRotAngleY)
+                {
+                    bitset |= k_RotAngleYBit;
+                }
+                if (HasRotAngleZ)
+                {
+                    bitset |= k_RotAngleZBit;
+                }
+                if (HasScaleX)
+                {
+                    bitset |= k_ScaleXBit;
+                }
+                if (HasScaleY)
+                {
+                    bitset |= k_ScaleYBit;
+                }
+                if (HasScaleZ)
+                {
+                    bitset |= k_ScaleZBit;
+                }
+                if (IsTeleportingNextFrame)
+                {
+                    bitset |= k_TeleportingBit;
+                }
+                if (UseInterpolation)
+                {
+                    bitset |= k_Interpolate;
+                }
+                if (QuaternionSync)
+                {
+                    bitset |= k_QuaternionSync;
+                }
+                if (QuaternionCompression)
+                {
+                    bitset |= k_QuaternionCompress;
+                }
+                if (UseHalfFloatPrecision)
+                {
+                    bitset |= k_UseHalfFloats;
+                }
+                if (IsSynchronizing)
+                {
+                    bitset |= k_Synchronization;
+                }
+                if (UsePositionSlerp)
+                {
+                    bitset |= k_PositionSlerp;
+                }
+                if (IsParented)
+                {
+                    bitset |= k_IsParented;
+                }
+                if (SynchronizeBaseHalfFloat)
+                {
+                    bitset |= k_SynchBaseHalfFloat;
+                }
+                if (ReliableSequenced)
+                {
+                    bitset |= k_ReliableSequenced;
+                }
+                if (UseUnreliableDeltas)
+                {
+                    bitset |= k_UseUnreliableDeltas;
+                }
+                if (UnreliableFrameSync)
+                {
+                    bitset |= k_UnreliableFrameSync;
+                }
+                if (SwitchTransformSpaceWhenParented)
+                {
+                    bitset |= k_SwitchTransformSpaceWhenParented;
+                }
+                if (TrackByStateId)
+                {
+                    bitset |= k_TrackStateId;
+                }
                 return bitset;
             }
 
@@ -2712,9 +2784,18 @@ namespace Unity.Netcode.Components
                     }
                     else
                     {
-                        if (SyncPositionX) { adjustedPosition.x = interpolatedPosition.x; }
-                        if (SyncPositionY) { adjustedPosition.y = interpolatedPosition.y; }
-                        if (SyncPositionZ) { adjustedPosition.z = interpolatedPosition.z; }
+                        if (SyncPositionX)
+                        {
+                            adjustedPosition.x = interpolatedPosition.x;
+                        }
+                        if (SyncPositionY)
+                        {
+                            adjustedPosition.y = interpolatedPosition.y;
+                        }
+                        if (SyncPositionZ)
+                        {
+                            adjustedPosition.z = interpolatedPosition.z;
+                        }
                     }
                 }
 
@@ -2727,9 +2808,18 @@ namespace Unity.Netcode.Components
                     else
                     {
                         var interpolatedScale = m_ScaleInterpolator.GetInterpolatedValue();
-                        if (SyncScaleX) { adjustedScale.x = interpolatedScale.x; }
-                        if (SyncScaleY) { adjustedScale.y = interpolatedScale.y; }
-                        if (SyncScaleZ) { adjustedScale.z = interpolatedScale.z; }
+                        if (SyncScaleX)
+                        {
+                            adjustedScale.x = interpolatedScale.x;
+                        }
+                        if (SyncScaleY)
+                        {
+                            adjustedScale.y = interpolatedScale.y;
+                        }
+                        if (SyncScaleZ)
+                        {
+                            adjustedScale.z = interpolatedScale.z;
+                        }
                     }
                 }
 
@@ -2743,9 +2833,18 @@ namespace Unity.Netcode.Components
                     else
                     {
                         var interpolatedEulerAngles = interpolatedRotation.eulerAngles;
-                        if (SyncRotAngleX) { adjustedRotAngles.x = interpolatedEulerAngles.x; }
-                        if (SyncRotAngleY) { adjustedRotAngles.y = interpolatedEulerAngles.y; }
-                        if (SyncRotAngleZ) { adjustedRotAngles.z = interpolatedEulerAngles.z; }
+                        if (SyncRotAngleX)
+                        {
+                            adjustedRotAngles.x = interpolatedEulerAngles.x;
+                        }
+                        if (SyncRotAngleY)
+                        {
+                            adjustedRotAngles.y = interpolatedEulerAngles.y;
+                        }
+                        if (SyncRotAngleZ)
+                        {
+                            adjustedRotAngles.z = interpolatedEulerAngles.z;
+                        }
                         adjustedRotation.eulerAngles = adjustedRotAngles;
                     }
                 }
@@ -2773,12 +2872,30 @@ namespace Unity.Netcode.Components
                 }
                 else
                 {
-                    if (flagStates.HasPositionX) { adjustedPosition.x = networkState.PositionX; }
-                    if (flagStates.HasPositionY) { adjustedPosition.y = networkState.PositionY; }
-                    if (flagStates.HasPositionZ) { adjustedPosition.z = networkState.PositionZ; }
-                    if (flagStates.HasScaleX) { adjustedScale.x = networkState.ScaleX; }
-                    if (flagStates.HasScaleY) { adjustedScale.y = networkState.ScaleY; }
-                    if (flagStates.HasScaleZ) { adjustedScale.z = networkState.ScaleZ; }
+                    if (flagStates.HasPositionX)
+                    {
+                        adjustedPosition.x = networkState.PositionX;
+                    }
+                    if (flagStates.HasPositionY)
+                    {
+                        adjustedPosition.y = networkState.PositionY;
+                    }
+                    if (flagStates.HasPositionZ)
+                    {
+                        adjustedPosition.z = networkState.PositionZ;
+                    }
+                    if (flagStates.HasScaleX)
+                    {
+                        adjustedScale.x = networkState.ScaleX;
+                    }
+                    if (flagStates.HasScaleY)
+                    {
+                        adjustedScale.y = networkState.ScaleY;
+                    }
+                    if (flagStates.HasScaleZ)
+                    {
+                        adjustedScale.z = networkState.ScaleZ;
+                    }
                 }
 
                 // Non-interpolated rotation
@@ -2790,9 +2907,18 @@ namespace Unity.Netcode.Components
                     }
                     else
                     {
-                        if (flagStates.HasRotAngleX) { adjustedRotAngles.x = networkState.RotAngleX; }
-                        if (flagStates.HasRotAngleY) { adjustedRotAngles.y = networkState.RotAngleY; }
-                        if (flagStates.HasRotAngleZ) { adjustedRotAngles.z = networkState.RotAngleZ; }
+                        if (flagStates.HasRotAngleX)
+                        {
+                            adjustedRotAngles.x = networkState.RotAngleX;
+                        }
+                        if (flagStates.HasRotAngleY)
+                        {
+                            adjustedRotAngles.y = networkState.RotAngleY;
+                        }
+                        if (flagStates.HasRotAngleZ)
+                        {
+                            adjustedRotAngles.z = networkState.RotAngleZ;
+                        }
                         adjustedRotation.eulerAngles = adjustedRotAngles;
                     }
                 }

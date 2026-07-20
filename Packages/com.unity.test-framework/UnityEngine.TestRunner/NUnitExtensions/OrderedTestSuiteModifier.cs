@@ -99,7 +99,8 @@ namespace UnityEngine.TestRunner.NUnitExtensions
             else if (type == typeof(TestAssembly))
             {
                 var testAssembly = (TestAssembly)test;
-                newTest = new TestAssembly(testAssembly.Assembly, testAssembly.Name);;
+                newTest = new TestAssembly(testAssembly.Assembly, testAssembly.Name);
+                ;
             }
             else if (type == typeof(TestFixture))
             {

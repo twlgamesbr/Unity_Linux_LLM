@@ -38,14 +38,24 @@ namespace UnityEngine.UI
         /// <summary>
         /// The fit mode to use to determine the width.
         /// </summary>
-        public FitMode horizontalFit { get { return m_HorizontalFit; } set { if (SetPropertyUtility.SetStruct(ref m_HorizontalFit, value)) SetDirty(); } }
+        public FitMode horizontalFit { get { return m_HorizontalFit; } set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_HorizontalFit, value))
+                    SetDirty();
+            }
+        }
 
         [SerializeField] protected FitMode m_VerticalFit = FitMode.Unconstrained;
 
         /// <summary>
         /// The fit mode to use to determine the height.
         /// </summary>
-        public FitMode verticalFit { get { return m_VerticalFit; } set { if (SetPropertyUtility.SetStruct(ref m_VerticalFit, value)) SetDirty(); } }
+        public FitMode verticalFit { get { return m_VerticalFit; } set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_VerticalFit, value))
+                    SetDirty();
+            }
+        }
 
         [System.NonSerialized] private RectTransform m_Rect;
         private RectTransform rectTransform

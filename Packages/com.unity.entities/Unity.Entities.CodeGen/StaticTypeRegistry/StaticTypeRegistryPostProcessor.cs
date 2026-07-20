@@ -87,7 +87,8 @@ namespace Unity.Entities.CodeGen
         protected override bool PostProcessImpl(TypeDefinition[] componentSystemTypes)
         {
             if (AssemblyDefinition.Name.Name != "UnityEngine.CoreModule" &&
-                !AssemblyDefinition.MainModule.AssemblyReferences.Any(r => r.Name.Contains("UnityEngine.CoreModule"))) return false;
+                !AssemblyDefinition.MainModule.AssemblyReferences.Any(r => r.Name.Contains("UnityEngine.CoreModule")))
+                return false;
             bool madeChange = false;
 
             IsReleaseConfig = false;//!EntitiesILPostProcessors.Defines.Contains("DEBUG");
@@ -269,7 +270,8 @@ namespace Unity.Entities.CodeGen
 
         bool AddTypeToListIfSupported(HashSet<TypeReference> typeSet, TypeReference type)
         {
-            if (type.Resolve().CustomAttributes.Any(a => a.AttributeType.Name.Contains("DisableAutoTypeRegistrationAttribute"))) return false;
+            if (type.Resolve().CustomAttributes.Any(a => a.AttributeType.Name.Contains("DisableAutoTypeRegistrationAttribute")))
+                return false;
 
             if (IsInstantiableComponentType(type) || IsInstantiableUnityEngineObject(type))
             { 
@@ -279,7 +281,7 @@ namespace Unity.Entities.CodeGen
             }
             return false;
         }
-         
+
         /// <summary>
         /// Generates a list of type information for all component types in the assembly
         /// </summary>
@@ -301,9 +303,11 @@ namespace Unity.Entities.CodeGen
                 if ((type.IsValueType() && !type.IsInterface && type.Interfaces.Count > 0) || !type.IsValueType())
                 {
                     // Generic components are handled below
-                    if (type.HasGenericParameters) continue;
+                    if (type.HasGenericParameters)
+                        continue;
 
-                    if (!disableRegistration && AddTypeToListIfSupported(components, type)) continue;
+                    if (!disableRegistration && AddTypeToListIfSupported(components, type))
+                        continue;
 
                     // If we're here the type isn't a component so see if it's a system
 
@@ -426,10 +430,13 @@ namespace Unity.Entities.CodeGen
         {
             public bool Equals(SystemAttributeWithTypeReference x, SystemAttributeWithTypeReference y)
             {
-                if (x.Kind != y.Kind) return false;
-                if (x.Flags != y.Flags) return false;
-                if (x.TargetSystemType == null && y.TargetSystemType == null) return true;
-                return x.TargetSystemType.FullName == y.TargetSystemType.FullName; 
+                if (x.Kind != y.Kind)
+                    return false;
+                if (x.Flags != y.Flags)
+                    return false;
+                if (x.TargetSystemType == null && y.TargetSystemType == null)
+                    return true;
+                return x.TargetSystemType.FullName == y.TargetSystemType.FullName;
             }
 
             //if you use HashCode.Combine, there's a runtime error because of mismatched bcl's

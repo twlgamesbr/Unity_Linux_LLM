@@ -231,7 +231,8 @@ namespace Unity.Serialization.Json
             var type = typeof(TContainer);
 
             // Never write metadata for special json types.
-            if (type == typeof(JsonObject) || type == typeof(JsonArray)) return default;
+            if (type == typeof(JsonObject) || type == typeof(JsonArray))
+                return default;
 
             var metadata = default(SerializedContainerMetadata);
 

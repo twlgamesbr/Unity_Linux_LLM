@@ -736,7 +736,8 @@ namespace Unity.Entities.Editor
 
                     while (enumerator.MoveNext())
                     {
-                        if (enumerator.Current.Value.Parent != HierarchyNodeHandle.Root) continue;
+                        if (enumerator.Current.Value.Parent != HierarchyNodeHandle.Root)
+                            continue;
                         State.ChildrenBuffer.Add(HierarchyNodeHandle.FromEntity(enumerator.Current.Entity));
                         childCount++;
                     }

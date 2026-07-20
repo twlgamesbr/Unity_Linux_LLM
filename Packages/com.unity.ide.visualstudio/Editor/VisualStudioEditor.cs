@@ -216,12 +216,13 @@ namespace Microsoft.Unity.VisualStudio.Editor
 		{
 			var editorPath = CodeEditor.CurrentEditorInstallation;
 
-			if (!Discovery.TryDiscoverInstallation(editorPath, out var installation)) {
-				Debug.LogWarning($"Visual Studio executable {editorPath} is not found. Please change your settings in Edit > Preferences > External Tools.");
+			if (!Discovery.TryDiscoverInstallation(editorPath, out var installation))
+            {
+                Debug.LogWarning($"Visual Studio executable {editorPath} is not found. Please change your settings in Edit > Preferences > External Tools.");
 				return false;
-			}
+            }
 
-			var generator = installation.ProjectGenerator;
+            var generator = installation.ProjectGenerator;
 			if (!IsSupportedPath(path, generator))
 				return false;
 
@@ -230,9 +231,9 @@ namespace Microsoft.Unity.VisualStudio.Editor
 
 			var solution = GetOrGenerateSolutionFile(generator);
 			return installation.Open(path, line, column, solution);
-		}
+        }
 
-		private static bool OpenFromInstallation(IVisualStudioInstallation installation, string path, int line, int column)
+        private static bool OpenFromInstallation(IVisualStudioInstallation installation, string path, int line, int column)
 		{
 			var solution = installation.ProjectGenerator.SolutionFile();
 			return installation.Open(path, line, column, solution);

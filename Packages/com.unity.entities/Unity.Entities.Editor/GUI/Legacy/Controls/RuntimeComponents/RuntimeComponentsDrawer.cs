@@ -114,7 +114,8 @@ namespace Unity.Editor.Legacy
         /// </summary>
         protected override void VisitProperty<TContainer, TValue>(Property<TContainer, TValue> property, ref TContainer container, ref TValue value)
         {
-            if (!BeginProperty(property, value)) return;
+            if (!BeginProperty(property, value))
+                return;
 
             PropertyContainer.Accept(this, ref value);
 
@@ -123,7 +124,8 @@ namespace Unity.Editor.Legacy
 
         protected override void VisitCollection<TContainer, TCollection, TElement>(Property<TContainer, TCollection> property, ref TContainer container, ref TCollection value)
         {
-            if (!BeginProperty(property, value)) return;
+            if (!BeginProperty(property, value))
+                return;
 
             LabelField("Size", value.Count, IsMixedSize<TCollection, TElement>(value));
 
@@ -189,7 +191,8 @@ namespace Unity.Editor.Legacy
 
         protected override void VisitSet<TContainer, TSet, TElement>(Property<TContainer, TSet> property, ref TContainer container, ref TSet value)
         {
-            if (!BeginProperty(property, value)) return;
+            if (!BeginProperty(property, value))
+                return;
 
             if (IsMixedSize<TSet, TElement>(value))
             {
@@ -208,7 +211,8 @@ namespace Unity.Editor.Legacy
 
         protected override void VisitDictionary<TContainer, TDictionary, TKey, TValue>(Property<TContainer, TDictionary> property, ref TContainer container, ref TDictionary value)
         {
-            if (!BeginProperty(property, value)) return;
+            if (!BeginProperty(property, value))
+                return;
 
             if (IsMixedSize<TDictionary, KeyValuePair<TKey, TValue>>(value))
             {
@@ -231,7 +235,8 @@ namespace Unity.Editor.Legacy
             {
                 var typeIndex = TypeManager.GetTypeIndex(GetComponentType(typeof(TValue)));
 
-                if (!m_SelectedComponentTypes.Contains(typeIndex)) return false;
+                if (!m_SelectedComponentTypes.Contains(typeIndex))
+                    return false;
 
                 var style = new GUIStyle("HelpBox")
                 {
@@ -313,8 +318,10 @@ namespace Unity.Editor.Legacy
 
         static string GetComponentCategory(TypeIndex t)
         {
-            if (t.IsManagedComponent) return "(Managed)";
-            if (t.IsSharedComponentType) return "(Shared)";
+            if (t.IsManagedComponent)
+                return "(Managed)";
+            if (t.IsSharedComponentType)
+                return "(Shared)";
             return t.IsBuffer ? "(Buffer)" : string.Empty;
         }
 

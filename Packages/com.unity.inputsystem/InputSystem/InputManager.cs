@@ -2066,7 +2066,8 @@ namespace UnityEngine.InputSystem
                 try
                 {
                     // exclude InputSystem assembly which should be loaded first
-                    if (assembly == inputSystemAssembly) continue;
+                    if (assembly == inputSystemAssembly)
+                        continue;
 
                     // Only register types from assemblies that reference InputSystem
                     foreach (var referencedAssembly in assembly.GetReferencedAssemblies())
@@ -2924,7 +2925,8 @@ namespace UnityEngine.InputSystem
                     continue;
 
                 var layout = TryFindMatchingControlLayout(ref m_AvailableDevices[i].description, id);
-                if (!IsDeviceLayoutMarkedAsSupportedInSettings(layout)) continue;
+                if (!IsDeviceLayoutMarkedAsSupportedInSettings(layout))
+                    continue;
 
                 if (layout.IsEmpty())
                 {

@@ -737,7 +737,8 @@ namespace Unity.Physics
                 // Incremental=false for if Tree was previously not built incrementally. We need to clear out any
                 //   previous content to make sure we don't retain any leftover, untracked bodies.
                 bool requiresTreeClear = (bvh.NodeCount == 0 || !Incremental);
-                if (requiresTreeClear) bvh.Clear();
+                if (requiresTreeClear)
+                    bvh.Clear();
 
                 Incremental = true;
 

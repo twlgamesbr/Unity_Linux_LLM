@@ -25,7 +25,8 @@ namespace NPCSystem.Monitoring
         /// </summary>
         public void Register(ITelemetrySink sink)
         {
-            if (sink == null) throw new ArgumentNullException(nameof(sink));
+            if (sink == null)
+                throw new ArgumentNullException(nameof(sink));
             lock (_lock)
             {
                 if (_frozen)
@@ -40,7 +41,8 @@ namespace NPCSystem.Monitoring
         /// </summary>
         public void Unregister(ITelemetrySink sink)
         {
-            if (sink == null) return;
+            if (sink == null)
+                return;
             lock (_lock)
             {
                 _sinks.Remove(sink);
@@ -53,7 +55,8 @@ namespace NPCSystem.Monitoring
         /// </summary>
         public void Freeze()
         {
-            lock (_lock) _frozen = true;
+            lock (_lock)
+                _frozen = true;
         }
 
         /// <summary>
@@ -66,7 +69,8 @@ namespace NPCSystem.Monitoring
             ITelemetrySink[] snapshot;
             lock (_lock)
             {
-                if (_sinks.Count == 0) return;
+                if (_sinks.Count == 0)
+                    return;
                 snapshot = _sinks.ToArray();
             }
 
@@ -108,7 +112,11 @@ namespace NPCSystem.Monitoring
         /// </summary>
         public int SinkCount
         {
-            get { lock (_lock) return _sinks.Count; }
+            get
+            {
+                lock (_lock)
+                    return _sinks.Count;
+            }
         }
     }
 }

@@ -1193,7 +1193,8 @@ namespace UnityEngine.Rendering.Universal
         private protected int AdjustAndGetScreenMSAASamples(RenderGraph renderGraph, bool intermediateTexturesAreSampledAsTextures)
         {
             // In the editor (ConfigureTargetTexture in PlayModeView.cs) and many platforms, the system render target is always allocated without MSAA
-            if (!SystemInfo.supportsMultisampledBackBuffer) return 1;
+            if (!SystemInfo.supportsMultisampledBackBuffer)
+                return 1;
 
             
             // For mobile platforms, when URP main rendering is done to an intermediate target and NRP enabled

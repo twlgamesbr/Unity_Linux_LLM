@@ -40,10 +40,22 @@ namespace Unity.Netcode
         {
 
             byte bitset = 0x00;
-            if (WorldPositionStays) { bitset |= k_WorldPositionStays; }
-            if (IsLatestParentSet) { bitset |= k_IsLatestParentSet; }
-            if (RemoveParent) { bitset |= k_RemoveParent; }
-            if (AuthorityApplied) { bitset |= k_AuthorityApplied; }
+            if (WorldPositionStays)
+            {
+                bitset |= k_WorldPositionStays;
+            }
+            if (IsLatestParentSet)
+            {
+                bitset |= k_IsLatestParentSet;
+            }
+            if (RemoveParent)
+            {
+                bitset |= k_RemoveParent;
+            }
+            if (AuthorityApplied)
+            {
+                bitset |= k_AuthorityApplied;
+            }
 
             BytePacker.WriteValueBitPacked(writer, NetworkObjectId);
             writer.WriteByteSafe(bitset);

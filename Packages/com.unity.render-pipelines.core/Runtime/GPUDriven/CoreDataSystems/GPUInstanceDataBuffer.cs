@@ -909,7 +909,8 @@ namespace UnityEngine.Rendering
             {
                 if (req.done)
                     localData.CopyFrom(req.GetData<TData>());
-                else ++errorCount;
+                else
+                    ++errorCount;
             });
 
             cmd.WaitAllAsyncReadbackRequests();

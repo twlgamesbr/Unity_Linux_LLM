@@ -72,7 +72,8 @@ namespace Unity.Physics
                 // Iterate over constraints and solve them
                 for (int i = 0; i < constraints.Length; i++)
                 {
-                    if (constraints[i].Touched) continue;
+                    if (constraints[i].Touched)
+                        continue;
 
                     SurfaceConstraintInfo constraint = constraints[i];
 

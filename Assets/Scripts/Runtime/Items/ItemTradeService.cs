@@ -62,7 +62,8 @@ namespace NPCSystem.Items
         /// </summary>
         public bool ServerCanGiveItem(ulong playerClientId, string itemId)
         {
-            if (!IsServer) return false;
+            if (!IsServer)
+                return false;
 
             if (_catalog == null)
             {
@@ -97,7 +98,8 @@ namespace NPCSystem.Items
         /// </summary>
         public bool ServerTryGiveItem(ulong playerClientId, string itemId)
         {
-            if (!IsServer) return false;
+            if (!IsServer)
+                return false;
 
             if (!ServerCanGiveItem(playerClientId, itemId))
                 return false;
@@ -130,10 +132,12 @@ namespace NPCSystem.Items
         /// </summary>
         public bool ServerTryRemoveItem(ulong playerClientId, string itemId)
         {
-            if (!IsServer) return false;
+            if (!IsServer)
+                return false;
 
             NPCPlayerInventory inventory = FindPlayerInventory(playerClientId);
-            if (inventory == null) return false;
+            if (inventory == null)
+                return false;
 
             bool removed = inventory.ServerTryRemoveItem(itemId);
             if (removed)

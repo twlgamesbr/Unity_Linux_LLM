@@ -404,7 +404,8 @@ namespace TMPro
         {
             character = null;
 
-            if (font == null) return null;
+            if (font == null)
+                return null;
 
             if (font.characterLookupTable.TryGetValue(unicode, out character))
             {
@@ -420,12 +421,14 @@ namespace TMPro
                 for (int i = 0; i < font.fallbackFontAssetTable.Count && character == null; i++)
                 {
                     TMP_FontAsset temp = font.fallbackFontAssetTable[i];
-                    if (temp == null) continue;
+                    if (temp == null)
+                        continue;
 
                     EntityId id = temp.GetEntityId();
 
                     // Skip over the fallback font asset in the event it is null or if already searched.
-                    if (k_searchedFontAssets.Contains(id)) continue;
+                    if (k_searchedFontAssets.Contains(id))
+                        continue;
 
                     // Add to list of font assets already searched.
                     k_searchedFontAssets.Add(id);

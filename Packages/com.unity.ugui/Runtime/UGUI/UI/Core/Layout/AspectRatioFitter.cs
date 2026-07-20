@@ -44,14 +44,24 @@ namespace UnityEngine.UI
         /// <summary>
         /// The mode to use to enforce the aspect ratio.
         /// </summary>
-        public AspectMode aspectMode { get { return m_AspectMode; } set { if (SetPropertyUtility.SetStruct(ref m_AspectMode, value)) SetDirty(); } }
+        public AspectMode aspectMode { get { return m_AspectMode; } set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_AspectMode, value))
+                    SetDirty();
+            }
+        }
 
         [SerializeField] private float m_AspectRatio = 1;
 
         /// <summary>
         /// The aspect ratio to enforce. This means width divided by height.
         /// </summary>
-        public float aspectRatio { get { return m_AspectRatio; } set { if (SetPropertyUtility.SetStruct(ref m_AspectRatio, value)) SetDirty(); } }
+        public float aspectRatio { get { return m_AspectRatio; } set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_AspectRatio, value))
+                    SetDirty();
+            }
+        }
 
         [System.NonSerialized]
         private RectTransform m_Rect;

@@ -247,7 +247,8 @@ namespace UnityEditor.Rendering
                 List<RenderGraph.DebugData.PassData> passDatas = new();
                 List<string> passNames = new();
                 var groupedPassIds = GetGroupedPassIds(visiblePassElement.passId);
-                foreach (int groupedId in groupedPassIds) {
+                foreach (int groupedId in groupedPassIds)
+                {
                     addedPasses.Add(groupedId);
                     passDatas.Add(m_CurrentDebugData.passList[groupedId]);
                     passNames.Add(m_CurrentDebugData.passList[groupedId].name);
@@ -336,8 +337,10 @@ namespace UnityEditor.Rendering
                             var attachmentFoldout = new Foldout();
 
                             string subResourceText = string.Empty;
-                            if (attachmentInfo.attachment.mipLevel > 0) subResourceText += $" Mip:{attachmentInfo.attachment.mipLevel}";
-                            if (attachmentInfo.attachment.depthSlice > 0) subResourceText += $" Slice:{attachmentInfo.attachment.depthSlice}";
+                            if (attachmentInfo.attachment.mipLevel > 0)
+                                subResourceText += $" Mip:{attachmentInfo.attachment.mipLevel}";
+                            if (attachmentInfo.attachment.depthSlice > 0)
+                                subResourceText += $" Slice:{attachmentInfo.attachment.depthSlice}";
 
                             // Abuse Foldout to allow two-line header (same as above)
                             attachmentFoldout.text = $"<b>{attachmentInfo.resourceName + subResourceText}</b><br>";

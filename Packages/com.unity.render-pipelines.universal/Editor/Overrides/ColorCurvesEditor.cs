@@ -133,14 +133,22 @@ namespace UnityEditor.Rendering.Universal
             const string overrideSuffix = " (Overriding)";
             switch (id)
             {
-                case 0: if (m_Master.overrideState.boolValue) label += overrideSuffix; break;
-                case 1: if (m_Red.overrideState.boolValue) label += overrideSuffix; break;
-                case 2: if (m_Green.overrideState.boolValue) label += overrideSuffix; break;
-                case 3: if (m_Blue.overrideState.boolValue) label += overrideSuffix; break;
-                case 4: if (m_HueVsHue.overrideState.boolValue) label += overrideSuffix; break;
-                case 5: if (m_HueVsSat.overrideState.boolValue) label += overrideSuffix; break;
-                case 6: if (m_SatVsSat.overrideState.boolValue) label += overrideSuffix; break;
-                case 7: if (m_LumVsSat.overrideState.boolValue) label += overrideSuffix; break;
+                case 0: if (m_Master.overrideState.boolValue)
+                        label += overrideSuffix; break;
+                case 1: if (m_Red.overrideState.boolValue)
+                        label += overrideSuffix; break;
+                case 2: if (m_Green.overrideState.boolValue)
+                        label += overrideSuffix; break;
+                case 3: if (m_Blue.overrideState.boolValue)
+                        label += overrideSuffix; break;
+                case 4: if (m_HueVsHue.overrideState.boolValue)
+                        label += overrideSuffix; break;
+                case 5: if (m_HueVsSat.overrideState.boolValue)
+                        label += overrideSuffix; break;
+                case 6: if (m_SatVsSat.overrideState.boolValue)
+                        label += overrideSuffix; break;
+                case 7: if (m_LumVsSat.overrideState.boolValue)
+                        label += overrideSuffix; break;
             }
             return label;
         }

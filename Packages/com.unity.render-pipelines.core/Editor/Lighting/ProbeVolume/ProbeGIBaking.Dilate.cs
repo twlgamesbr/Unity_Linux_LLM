@@ -200,7 +200,8 @@ namespace UnityEngine.Rendering
         {
             var prv = ProbeReferenceVolume.instance;
             var perSceneDataList = prv.perSceneDataList;
-            if (perSceneDataList.Count == 0) return;
+            if (perSceneDataList.Count == 0)
+                return;
             SetBakingContext(perSceneDataList);
 
             List<Cell> tempLoadedCells = new List<Cell>();
@@ -377,7 +378,8 @@ namespace UnityEngine.Rendering
         {
             if (m_BakingSet == null)
             {
-                if (ProbeReferenceVolume.instance.perSceneDataList.Count == 0) return;
+                if (ProbeReferenceVolume.instance.perSceneDataList.Count == 0)
+                    return;
                 SetBakingContext(ProbeReferenceVolume.instance.perSceneDataList);
             }
 

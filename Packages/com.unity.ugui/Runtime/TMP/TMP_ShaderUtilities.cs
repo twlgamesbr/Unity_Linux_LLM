@@ -394,7 +394,8 @@ namespace TMPro
                 GetShaderPropertyIDs();
 
             // Return if Material is null
-            if (material == null) return 0;
+            if (material == null)
+                return 0;
 
             int extraPadding = enableExtraPadding ? 4 : 0;
 
@@ -582,7 +583,8 @@ namespace TMPro
                 GetShaderPropertyIDs();
 
             // Return if Material is null
-            if (materials == null) return 0;
+            if (materials == null)
+                return 0;
 
             int extraPadding = enableExtraPadding ? 4 : 0;
 

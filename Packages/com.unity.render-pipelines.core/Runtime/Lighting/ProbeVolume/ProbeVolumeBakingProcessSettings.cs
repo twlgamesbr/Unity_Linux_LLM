@@ -57,7 +57,13 @@ namespace UnityEngine.Rendering
     [System.Serializable]
     internal struct ProbeVolumeBakingProcessSettings
     {
-        internal static ProbeVolumeBakingProcessSettings Default { get { var s = new ProbeVolumeBakingProcessSettings(); s.SetDefaults(); return s; } }
+        internal static ProbeVolumeBakingProcessSettings Default { get
+            {
+                var s = new ProbeVolumeBakingProcessSettings();
+                s.SetDefaults();
+                return s;
+            }
+        }
 
         internal enum SettingsVersion
         {

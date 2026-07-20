@@ -123,8 +123,10 @@ namespace UnityEngine.Rendering
             for (int i = 1; i < 8; i++)
             {
                 float proj = Vector3.Dot(axis, corners[i]);
-                if (proj < min) min = proj;
-                else if (proj > max)  max = proj;
+                if (proj < min)
+                    min = proj;
+                else if (proj > max)
+                    max = proj;
             }
 
             return new Vector2(min, max);

@@ -487,7 +487,9 @@ namespace UnityEngine.Rendering.Universal
                 if (c.TryGetComponent<UniversalAdditionalCameraData>(out var additionalCameraData))
                 {
                     additionalCameraData.historyManager.Dispose();
-                };
+                }
+
+                ;
             }
         }
 

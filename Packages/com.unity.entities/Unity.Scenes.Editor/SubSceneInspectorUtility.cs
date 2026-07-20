@@ -81,7 +81,8 @@ namespace Unity.Scenes.Editor
 
         static unsafe NativeArray<Entity> GetActiveWorldSections(World world, Hash128 sceneGUID)
         {
-            if (world == null || !world.IsCreated) return default;
+            if (world == null || !world.IsCreated)
+                return default;
 
             var sceneSystem = world.GetExistingSystem<SceneSystem>();
             var statePtr = world.Unmanaged.ResolveSystemState(sceneSystem);

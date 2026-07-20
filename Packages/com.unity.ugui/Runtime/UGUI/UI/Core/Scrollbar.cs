@@ -57,7 +57,14 @@ namespace UnityEngine.UI
         /// <summary>
         /// The RectTransform to use for the handle.
         /// </summary>
-        public RectTransform handleRect { get { return m_HandleRect; } set { if (SetPropertyUtility.SetClass(ref m_HandleRect, value)) { UpdateCachedReferences(); UpdateVisuals(); } } }
+        public RectTransform handleRect { get { return m_HandleRect; } set
+            {
+                if (SetPropertyUtility.SetClass(ref m_HandleRect, value))
+                {
+                    UpdateCachedReferences();
+                    UpdateVisuals(); }
+            }
+        }
 
         // Direction of movement.
         [SerializeField]
@@ -66,7 +73,12 @@ namespace UnityEngine.UI
         /// <summary>
         /// The direction of the scrollbar from minimum to maximum value.
         /// </summary>
-        public Direction direction { get { return m_Direction; } set { if (SetPropertyUtility.SetStruct(ref m_Direction, value)) UpdateVisuals(); } }
+        public Direction direction { get { return m_Direction; } set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_Direction, value))
+                    UpdateVisuals();
+            }
+        }
 
         protected Scrollbar()
         {}
@@ -109,7 +121,12 @@ namespace UnityEngine.UI
         /// <summary>
         /// The size of the scrollbar handle where 1 means it fills the entire scrollbar.
         /// </summary>
-        public float size { get { return m_Size; } set { if (SetPropertyUtility.SetStruct(ref m_Size, Mathf.Clamp01(value))) UpdateVisuals(); } }
+        public float size { get { return m_Size; } set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_Size, Mathf.Clamp01(value)))
+                    UpdateVisuals();
+            }
+        }
 
         [Range(0, 11)]
         [SerializeField]
@@ -118,7 +135,14 @@ namespace UnityEngine.UI
         /// <summary>
         /// The number of steps to use for the value. A value of 0 disables use of steps.
         /// </summary>
-        public int numberOfSteps { get { return m_NumberOfSteps; } set { if (SetPropertyUtility.SetStruct(ref m_NumberOfSteps, value)) { Set(m_Value); UpdateVisuals(); } } }
+        public int numberOfSteps { get { return m_NumberOfSteps; } set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_NumberOfSteps, value))
+                {
+                    Set(m_Value);
+                    UpdateVisuals(); }
+            }
+        }
 
         [Space(6)]
 

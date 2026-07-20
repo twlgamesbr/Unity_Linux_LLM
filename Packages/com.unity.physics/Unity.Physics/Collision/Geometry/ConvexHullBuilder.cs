@@ -136,11 +136,31 @@ namespace Unity.Physics
                 Uid = uid;
             }
 
-            public int GetVertex(int index) { fixed(int* p = &Vertex0) { return p[index]; } }
-            public void SetVertex(int index, int value) { fixed(int* p = &Vertex0) { p[index] = value; } }
+            public int GetVertex(int index)
+            {
+                fixed (int* p = &Vertex0)
+                {
+                    return p[index]; }
+            }
+            public void SetVertex(int index, int value)
+            {
+                fixed (int* p = &Vertex0)
+                {
+                    p[index] = value; }
+            }
 
-            public Edge GetLink(int index) { fixed(Edge* p = &Link0) { return p[index]; } }
-            public void SetLink(int index, Edge handle) { fixed(Edge* p = &Link0) { p[index] = handle; } }
+            public Edge GetLink(int index)
+            {
+                fixed (Edge* p = &Link0)
+                {
+                    return p[index]; }
+            }
+            public void SetLink(int index, Edge handle)
+            {
+                fixed (Edge* p = &Link0)
+                {
+                    p[index] = handle; }
+            }
 
             void IPoolElement.MarkFree(int nextFree)
             {
@@ -382,11 +402,12 @@ namespace Unity.Physics
                 case 0:
                 {
                     const float minDistanceFromPoint = 1e-5f;
-                    if (math.lengthsq(Vertices[0].Position - point) <= minDistanceFromPoint * minDistanceFromPoint) return false;
+                    if (math.lengthsq(Vertices[0].Position - point) <= minDistanceFromPoint * minDistanceFromPoint)
+                            return false;
                     AllocateVertex(point, userData);
                     Dimension = 1;
-                }
-                break;
+                    }
+                    break;
 
                 // 1 dimensional hull, make a triangle.
                 case 1:
@@ -461,8 +482,12 @@ namespace Unity.Physics
                                 Edge nt1 = AllocateTriangle(j, i, vertexIndex);
                                 Edge nt2 = AllocateTriangle(k, j, vertexIndex);
                                 Edge nt3 = AllocateTriangle(i, k, vertexIndex);
-                                BindEdges(nt0, nt1); BindEdges(nt0.Next, nt2); BindEdges(nt0.Prev, nt3);
-                                BindEdges(nt1.Prev, nt2.Next); BindEdges(nt2.Prev, nt3.Next); BindEdges(nt3.Prev, nt1.Next);
+                                BindEdges(nt0, nt1);
+                                    BindEdges(nt0.Next, nt2);
+                                    BindEdges(nt0.Prev, nt3);
+                                BindEdges(nt1.Prev, nt2.Next);
+                                    BindEdges(nt2.Prev, nt3.Next);
+                                    BindEdges(nt3.Prev, nt1.Next);
 
                                 // Re-insert other vertices.
                                 bool success = true;
@@ -477,10 +502,10 @@ namespace Unity.Physics
                                     success = success & AddPoint(vertex.Position, vertex.UserData);
                                 }
                                 return success;
+                                }
                             }
                         }
-                    }
-                    if (det == 0)
+                        if (det == 0)
                     {
                         // Hull is still 2D
                         bool* isOutside = stackalloc bool[Vertices.PeakCount];
@@ -511,19 +536,20 @@ namespace Unity.Physics
                                     newVertices[numNewVertices++] = Vertices[j];
                                     for (;;)
                                     {
-                                        if (isOutside[j]) break;
+                                        if (isOutside[j])
+                                                break;
                                         j = (j + 1) % Vertices.PeakCount;
                                         newVertices[numNewVertices++] = Vertices[j];
+                                        }
+                                        break;
                                     }
-                                    break;
                                 }
-                            }
 
-                            Vertices.CopyFrom(newVertices, numNewVertices);
+                                Vertices.CopyFrom(newVertices, numNewVertices);
+                            }
                         }
                     }
-                }
-                break;
+                    break;
 
                 // 3 dimensional hull, add vertex.
                 case 3:
@@ -552,11 +578,14 @@ namespace Unity.Physics
                         if (det == 0)
                         {
                             // Check for duplicated vertex.
-                            if (math.all(Vertices[triangle.Vertex0].IntPosition == intPoint)) return false;
-                            if (math.all(Vertices[triangle.Vertex1].IntPosition == intPoint)) return false;
-                            if (math.all(Vertices[triangle.Vertex2].IntPosition == intPoint)) return false;
-                        }
-                        if (det > 0)
+                            if (math.all(Vertices[triangle.Vertex0].IntPosition == intPoint))
+                                    return false;
+                            if (math.all(Vertices[triangle.Vertex1].IntPosition == intPoint))
+                                    return false;
+                            if (math.all(Vertices[triangle.Vertex2].IntPosition == intPoint))
+                                    return false;
+                            }
+                            if (det > 0)
                         {
                             nextTriangles[triangleIndex] = firstFrontTriangleIndex;
                             firstFrontTriangleIndex = triangleIndex;
@@ -578,10 +607,10 @@ namespace Unity.Physics
                             numBackTriangles++;
                         }
                         Triangles.Set(triangleIndex, triangle);
-                    }
+                        }
 
-                    // Return false if the vertex is inside the hull
-                    if (numFrontTriangles == 0 || numBackTriangles == 0)
+                        // Return false if the vertex is inside the hull
+                        if (numFrontTriangles == 0 || numBackTriangles == 0)
                     {
                         return false;
                     }
@@ -647,8 +676,8 @@ namespace Unity.Physics
                         }
                         BindEdges(lastFanEdge.Prev, firstFanEdge.Next);
                     }
-                }
-                break;
+                    }
+                    break;
             }
             return true;
         }
@@ -750,11 +779,13 @@ namespace Unity.Physics
                     for (int iTriangle = 0; iTriangle < numTriangles; iTriangle++)
                     {
                         int triangleIndex = triangleIndices[iTriangle];
-                        Triangle t = Triangles[triangleIndex]; t.FaceIndex = -1; Triangles.Set(triangleIndex, t);
-                    }
+                        Triangle t = Triangles[triangleIndex];
+                            t.FaceIndex = -1;
+                            Triangles.Set(triangleIndex, t);
+                        }
 
-                    // Merge triangles into faces
-                    for (int iTriangle = 0; iTriangle < numTriangles; iTriangle++)
+                        // Merge triangles into faces
+                        for (int iTriangle = 0; iTriangle < numTriangles; iTriangle++)
                     {
                         // Check if the triangle is already part of a face
                         int triangleIndex = triangleIndices[iTriangle];
@@ -765,7 +796,9 @@ namespace Unity.Physics
 
                         // Create a new face
                         int newFaceIndex = NumFaces++;
-                        Triangle t = Triangles[triangleIndex]; t.FaceIndex = newFaceIndex; Triangles.Set(triangleIndex, t);
+                        Triangle t = Triangles[triangleIndex];
+                            t.FaceIndex = newFaceIndex;
+                            Triangles.Set(triangleIndex, t);
 
                         // Search for the plane that best fits the triangle
                         int bestPlane = -1;
@@ -777,7 +810,8 @@ namespace Unity.Physics
                             float3 c = Vertices[t.Vertex2].Position;
                             for (int i = 0; i < planes.Length; i++)
                             {
-                                if (planesUsed[i]) continue;
+                                if (planesUsed[i])
+                                        continue;
                                 Plane currentPlane = planes[i];
                                 float3 errors = new float3(currentPlane.SignedDistanceToPoint(a), currentPlane.SignedDistanceToPoint(b), currentPlane.SignedDistanceToPoint(c));
                                 float error = math.cmax(math.abs(errors));
@@ -786,11 +820,11 @@ namespace Unity.Physics
                                     bestError = error;
                                     bestPlane = i;
                                 }
+                                }
                             }
-                        }
 
-                        // If a plane that fits the triangle was found, use it.  Otherwise compute one from the triangle vertices
-                        Plane plane;
+                            // If a plane that fits the triangle was found, use it.  Otherwise compute one from the triangle vertices
+                            Plane plane;
                         if (bestPlane < 0)
                         {
                             plane = ComputePlane(triangleIndex);
@@ -819,8 +853,10 @@ namespace Unity.Physics
 
                                 int linkedTriangleIndex = linkedEdge.TriangleIndex;
 
-                                if (Triangles[linkedTriangleIndex].FaceIndex != -1) continue;
-                                if (triangleAreas[linkedTriangleIndex] <= maxArea) continue;
+                                if (Triangles[linkedTriangleIndex].FaceIndex != -1)
+                                        continue;
+                                if (triangleAreas[linkedTriangleIndex] <= maxArea)
+                                        continue;
 
                                 int apex = ApexVertex(linkedEdge);
                                 float3 newVertex = Vertices[apex].Position;
@@ -851,9 +887,9 @@ namespace Unity.Physics
                                     openBoundaryEdgeIndex = i;
                                     maxArea = triangleAreas[linkedTriangleIndex];
                                 }
-                            }
+                                }
 
-                            if (openBoundaryEdgeIndex != -1)
+                                if (openBoundaryEdgeIndex != -1)
                             {
                                 Edge linkedEdge = GetLinkedEdge(boundaryEdges[openBoundaryEdgeIndex]);
 
@@ -881,17 +917,17 @@ namespace Unity.Physics
                             {
                                 break;
                             }
+                            }
+                            NumFaceVertices += numBoundaryEdges;
                         }
-                        NumFaceVertices += numBoundaryEdges;
-                    }
 
-                    // Triangle merging may turn 3D shapes into 2D, check for that case and reduce the dimension
-                    if (NumFaces < 4)
+                        // Triangle merging may turn 3D shapes into 2D, check for that case and reduce the dimension
+                        if (NumFaces < 4)
                     {
                         Rebuild2D();
                     }
-                }
-                break;
+                    }
+                    break;
             }
         }
 
@@ -908,9 +944,15 @@ namespace Unity.Physics
             int triangleIndex = Triangles.Allocate(triangle);
 
             Vertex v;
-            v = Vertices[vertex0]; v.Cardinality++; Vertices.Set(vertex0, v);
-            v = Vertices[vertex1]; v.Cardinality++; Vertices.Set(vertex1, v);
-            v = Vertices[vertex2]; v.Cardinality++; Vertices.Set(vertex2, v);
+            v = Vertices[vertex0];
+            v.Cardinality++;
+            Vertices.Set(vertex0, v);
+            v = Vertices[vertex1];
+            v.Cardinality++;
+            Vertices.Set(vertex1, v);
+            v = Vertices[vertex2];
+            v.Cardinality++;
+            Vertices.Set(vertex2, v);
 
             return new Edge(triangleIndex, 0);
         }
@@ -959,7 +1001,8 @@ namespace Unity.Physics
             while (true)
             {
                 bool remove = false;
-                if (Dimension != 3) break;
+                if (Dimension != 3)
+                    break;
 
                 for (int i = 0; i < Vertices.PeakCount; i++)
                 {
@@ -1090,7 +1133,9 @@ namespace Unity.Physics
 
         void SetUserData(int v, uint data)
         {
-            Vertex vertex = Vertices[v]; vertex.UserData = data; Vertices.Set(v, vertex);
+            Vertex vertex = Vertices[v];
+            vertex.UserData = data;
+            Vertices.Set(v, vertex);
         }
 
         // Returns a plane containing the edge through vertexIndex0 and vertexIndex1, with normal at equal angles
@@ -1623,7 +1668,8 @@ namespace Unity.Physics
             for (int i = 0; i < numPlanes; i++)
             {
                 Plane plane = planes[i];
-                OLSData ols = new OLSData(); ols.Init();
+                OLSData ols = new OLSData();
+                ols.Init();
 
                 float lastSinAngleSq;
                 {
@@ -1712,7 +1758,8 @@ namespace Unity.Physics
                             planes[edgePlaneIndex] = edgePlane;
 
                             // Build its OLS data
-                            OLSData ols = new OLSData(); ols.Init();
+                            OLSData ols = new OLSData();
+                            ols.Init();
                             ols.Include(Vertices[vertexIndex0].Position, 1.0f);
                             ols.Include(Vertices[vertexIndex1].Position, 1.0f);
                             olsData[edgePlaneIndex] = ols;
@@ -1955,10 +2002,12 @@ namespace Unity.Physics
                 numMerges = 0;
                 for (int i = 0; i < numOriginalPlanes - 1; i++)
                 {
-                    if (removed[i]) continue;
+                    if (removed[i])
+                        continue;
                     for (int j = i + 1; j < numOriginalPlanes; j++)
                     {
-                        if (removed[j]) continue;
+                        if (removed[j])
+                            continue;
                         if (math.dot(planes[i].Normal, planes[j].Normal) > cosMinAngleBetweenFaces)
                         {
                             OLSData combined = olsData[i];
@@ -2163,9 +2212,12 @@ namespace Unity.Physics
             foreach (int triangleIndex in Triangles.Indices)
             {
                 Triangle triangle = Triangles[triangleIndex];
-                if (triangle.Vertex0 == vertexIndex) return new Edge(triangleIndex, 0);
-                if (triangle.Vertex1 == vertexIndex) return new Edge(triangleIndex, 1);
-                if (triangle.Vertex2 == vertexIndex) return new Edge(triangleIndex, 2);
+                if (triangle.Vertex0 == vertexIndex)
+                    return new Edge(triangleIndex, 0);
+                if (triangle.Vertex1 == vertexIndex)
+                    return new Edge(triangleIndex, 1);
+                if (triangle.Vertex2 == vertexIndex)
+                    return new Edge(triangleIndex, 2);
             }
             return Edge.Invalid;
         }
@@ -2624,7 +2676,8 @@ namespace Unity.Physics
         {
             ulong low = a.Low + b.Low;
             ulong high = a.High + b.High;
-            if (low < a.Low) high++;
+            if (low < a.Low)
+                high++;
             return new Int128
             {
                 Low = low,
@@ -2641,7 +2694,8 @@ namespace Unity.Physics
         {
             ulong low = ~a.Low + 1;
             ulong high = ~a.High;
-            if (a.Low == 0) high++;
+            if (a.Low == 0)
+                high++;
             return new Int128
             {
                 Low = low,

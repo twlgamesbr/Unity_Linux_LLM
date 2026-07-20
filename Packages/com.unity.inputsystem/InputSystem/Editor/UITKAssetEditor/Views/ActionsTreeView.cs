@@ -226,7 +226,8 @@ namespace UnityEngine.InputSystem.Editor
                 m_ActionsTreeView.SetSelectionById(viewState.newElementID);
                 m_ActionsTreeView.ScrollToItemById(viewState.newElementID);
             }
-            RenameNewAction(viewState.newElementID);;
+            RenameNewAction(viewState.newElementID);
+            ;
             m_AddActionButton.SetEnabled(viewState.actionMapCount > 0);
 
             // Don't want to show action properties if there's no actions.
@@ -273,7 +274,8 @@ namespace UnityEngine.InputSystem.Editor
                 }
             }
 
-            if (!discardDrag) return;
+            if (!discardDrag)
+                return;
             var selectedItem = m_ActionsTreeView.GetItemDataForIndex<ActionOrBindingData>(m_ActionsTreeView.selectedIndices.First());
             Dispatch(selectedItem.isAction
                 ? Commands.SelectAction(selectedItem.name)

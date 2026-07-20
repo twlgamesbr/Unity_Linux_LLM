@@ -229,7 +229,8 @@ namespace Unity.Entities
                 foreach (var beforeType in elem.updateBefore)
                 {
                     int beforeIndex = LookupSystemElement(beforeType, lookupDictionary);
-                    if (beforeIndex < 0) throw new Exception("Bug in SortSystemUpdateList(), beforeIndex < 0");
+                    if (beforeIndex < 0)
+                        throw new Exception("Bug in SortSystemUpdateList(), beforeIndex < 0");
                     if (elements[beforeIndex].nAfter <= 0)
                         throw new Exception("Bug in SortSystemUpdateList(), nAfter <= 0");
 
@@ -242,7 +243,7 @@ namespace Unity.Entities
                 elements.ElementAt(sysIndex).nAfter = -1; // "Remove()"
             }
 
-            
+
             if (nextOutIndex < elements.Length)
             {
                /*

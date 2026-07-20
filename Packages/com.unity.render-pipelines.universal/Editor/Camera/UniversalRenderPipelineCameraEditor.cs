@@ -121,7 +121,8 @@ namespace UnityEditor.Rendering.Universal
                 var overlayAdditionalData = cam.GetUniversalAdditionalCameraData();
                 var type = overlayAdditionalData.renderType;
 
-                GUIContent errorContent = EditorGUIUtility.TrTextContent(type.GetName()); ;
+                GUIContent errorContent = EditorGUIUtility.TrTextContent(type.GetName());
+                ;
 
 
                 var renderer = overlayAdditionalData.scriptableRenderer;

@@ -52,9 +52,12 @@ namespace NPCSystem.Dialogue.UI
         public static void UpdatePortrait(NPCProfile activeProfile, RawImage portrait1, RawImage portrait2, RawImage portrait3)
         {
             // Hide all portraits
-            if (portrait1 != null) portrait1.gameObject.SetActive(false);
-            if (portrait2 != null) portrait2.gameObject.SetActive(false);
-            if (portrait3 != null) portrait3.gameObject.SetActive(false);
+            if (portrait1 != null)
+                portrait1.gameObject.SetActive(false);
+            if (portrait2 != null)
+                portrait2.gameObject.SetActive(false);
+            if (portrait3 != null)
+                portrait3.gameObject.SetActive(false);
 
             if (activeProfile == null || activeProfile.PortraitTexture == null)
                 return;

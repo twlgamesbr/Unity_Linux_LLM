@@ -21,7 +21,8 @@ namespace UnityEngine.Rendering
         {
             m_WrappedCommandBuffer = wrapped;
             m_ExecutingPass = executingPass;
-            if (isAsync) m_WrappedCommandBuffer.SetExecutionFlags(CommandBufferExecutionFlags.AsyncCompute);
+            if (isAsync)
+                m_WrappedCommandBuffer.SetExecutionFlags(CommandBufferExecutionFlags.AsyncCompute);
         }
 
         ///<summary>See (https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer-name.html)</summary>
@@ -40,7 +41,8 @@ namespace UnityEngine.Rendering
         [Conditional("DEVELOPMENT_BUILD"), Conditional("UNITY_EDITOR")]
         protected internal void ThrowIfGlobalStateNotAllowed()
         {
-            if (m_ExecutingPass != null && !m_ExecutingPass.allowGlobalState) throw new InvalidOperationException($"{m_ExecutingPass.name}: Modifying global state from this command buffer is not allowed. Please ensure your render graph pass allows modifying global state.");
+            if (m_ExecutingPass != null && !m_ExecutingPass.allowGlobalState)
+                throw new InvalidOperationException($"{m_ExecutingPass.name}: Modifying global state from this command buffer is not allowed. Please ensure your render graph pass allows modifying global state.");
         }
 
         /// <summary>
@@ -50,7 +52,8 @@ namespace UnityEngine.Rendering
         [Conditional("DEVELOPMENT_BUILD"), Conditional("UNITY_EDITOR")]
         protected internal void ThrowIfRasterNotAllowed()
         {
-            if (m_ExecutingPass != null && !m_ExecutingPass.HasRenderAttachments()) throw new InvalidOperationException($"{m_ExecutingPass.name}: Using raster commands from a pass with no active render target is not allowed as it will use an undefined render target state. Please set up pass render targets using SetRenderAttachments.");
+            if (m_ExecutingPass != null && !m_ExecutingPass.HasRenderAttachments())
+                throw new InvalidOperationException($"{m_ExecutingPass.name}: Using raster commands from a pass with no active render target is not allowed as it will use an undefined render target state. Please set up pass render targets using SetRenderAttachments.");
         }
 
         /// <summary>
@@ -67,9 +70,11 @@ namespace UnityEngine.Rendering
         {
             if(RenderGraph.enableValidityChecks)
             {
-                if (m_ExecutingPass == null) return;
+                if (m_ExecutingPass == null)
+                    return;
 
-                if (h.IsBuiltin()) return;
+                if (h.IsBuiltin())
+                    return;
 
                 if (!m_ExecutingPass.IsRead(h.handle) && !m_ExecutingPass.IsWritten(h.handle) && !m_ExecutingPass.IsTransient(h.handle))
                 {
@@ -95,7 +100,8 @@ namespace UnityEngine.Rendering
         {
             if (RenderGraph.enableValidityChecks)
             {
-                if (m_ExecutingPass == null) return;
+                if (m_ExecutingPass == null)
+                    return;
 
                 if (!m_ExecutingPass.IsRead(h.handle) && !m_ExecutingPass.IsTransient(h.handle))
                 {
@@ -122,7 +128,8 @@ namespace UnityEngine.Rendering
         {
             if(RenderGraph.enableValidityChecks)
             {
-                if (m_ExecutingPass == null) return;
+                if (m_ExecutingPass == null)
+                    return;
 
                 if (h.IsBuiltin())
                 {

@@ -240,8 +240,10 @@ namespace UnityEditor.Rendering
 
         static string ConvertValueToString(object value)
         {
-            if (value == null) return null;
-            if (value is IList list) return list.DumpValues();
+            if (value == null)
+                return null;
+            if (value is IList list)
+                return list.DumpValues();
             return ConvertPrimitiveWithInvariants(value);
         }
 

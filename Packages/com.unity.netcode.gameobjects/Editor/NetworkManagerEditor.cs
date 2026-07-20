@@ -407,7 +407,10 @@ namespace Unity.Netcode.Editor
 #if !MULTIPLAYER_TOOLS
             DrawInstallMultiplayerToolsTip();
 #endif
-            void SetExpanded(bool expanded) { networkManager.NetworkManagerExpanded = expanded; }
+            void SetExpanded(bool expanded)
+            {
+                networkManager.NetworkManagerExpanded = expanded;
+            }
             ;
             DrawFoldOutGroup<NetworkManager>(networkManager.GetType(), DisplayNetworkManagerProperties, networkManager.NetworkManagerExpanded, SetExpanded);
             DisplayCallToActionButtons();

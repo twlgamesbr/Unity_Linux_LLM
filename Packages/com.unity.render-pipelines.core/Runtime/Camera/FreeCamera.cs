@@ -173,7 +173,8 @@ namespace UnityEngine.Rendering
             if (inputChangeSpeed != 0.0f)
             {
                 m_MoveSpeed += inputChangeSpeed * m_MoveSpeedIncrement;
-                if (m_MoveSpeed < m_MoveSpeedIncrement) m_MoveSpeed = m_MoveSpeedIncrement;
+                if (m_MoveSpeed < m_MoveSpeedIncrement)
+                    m_MoveSpeed = m_MoveSpeedIncrement;
             }
 
             bool moved = inputRotateAxisX != 0.0f || inputRotateAxisY != 0.0f || inputVertical != 0.0f || inputHorizontal != 0.0f || inputYAxis != 0.0f;

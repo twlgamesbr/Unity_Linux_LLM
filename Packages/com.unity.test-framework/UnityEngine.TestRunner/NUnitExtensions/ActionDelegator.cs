@@ -15,7 +15,11 @@ namespace UnityEngine.TestTools.NUnitExtensions
         private Func<object> m_Action;
         public object Delegate(Action action)
         {
-            return Delegate(() => { action(); return null; });
+            return Delegate(() =>
+            {
+                action();
+                return null;
+            });
         }
 
         public object Delegate(Func<object> action)

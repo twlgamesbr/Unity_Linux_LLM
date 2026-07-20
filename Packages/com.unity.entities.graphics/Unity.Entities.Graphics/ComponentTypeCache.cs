@@ -31,7 +31,8 @@ namespace Unity.Rendering
 
         public void Dispose()
         {
-            if (UsedTypes.IsCreated) UsedTypes.Dispose();
+            if (UsedTypes.IsCreated)
+                UsedTypes.Dispose();
             TypeDynamics = null;
         }
 

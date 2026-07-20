@@ -11,7 +11,8 @@ namespace Unity.Entities
         {
             foreach (var system in world.Systems)
             {
-                if (system == null) continue;
+                if (system == null)
+                    continue;
                 var queryList = new List<EntityQuery>();
                 foreach (var query in system.EntityQueries)
                 {

@@ -155,7 +155,8 @@ namespace Unity.Physics
                     edge.EdgeIndex = (byte)((edge.EdgeIndex + 1) % face.NumVertices);
                 }
                 // If no suitable face is found then return the first face containing the supportingVertex
-                if (-1 == bestEdgeIndex) return firstFaceIndex;
+                if (-1 == bestEdgeIndex)
+                    return firstFaceIndex;
             }
 
             // Choose the face containing the best edge that is most parallel to the support direction

@@ -51,9 +51,12 @@ namespace Unity.Rendering
 #if UNITY_EDITOR
                 // imageContentsHash only available in the editor, but this type is only used
                 // during conversion, so it's only used in the editor.
-                if (color != null) ColorHash = color.imageContentsHash;
-                if (direction != null) DirectionHash = direction.imageContentsHash;
-                if (shadowMask != null) ShadowMaskHash = shadowMask.imageContentsHash;
+                if (color != null)
+                    ColorHash = color.imageContentsHash;
+                if (direction != null)
+                    DirectionHash = direction.imageContentsHash;
+                if (shadowMask != null)
+                    ShadowMaskHash = shadowMask.imageContentsHash;
 #endif
             }
 

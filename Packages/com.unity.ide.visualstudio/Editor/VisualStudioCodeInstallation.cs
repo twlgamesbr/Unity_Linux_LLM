@@ -216,11 +216,12 @@ namespace Microsoft.Unity.VisualStudio.Editor
 		{
 			byte[] buf = new byte[512];
 			int ret = readlink(path, buf, buf.Length);
-			if (ret == -1) return path;
+			if (ret == -1)
+                return path;
 			char[] cbuf = new char[512];
 			int chars = System.Text.Encoding.Default.GetChars(buf, 0, ret, cbuf, 0);
 			return new String(cbuf, 0, chars);
-		}
+        }
 #else
 		internal static string GetRealPath(string path)
 		{
@@ -228,7 +229,7 @@ namespace Microsoft.Unity.VisualStudio.Editor
 		}
 #endif
 
-		public override void CreateExtraFiles(string projectDirectory)
+        public override void CreateExtraFiles(string projectDirectory)
 		{
 			try
 			{

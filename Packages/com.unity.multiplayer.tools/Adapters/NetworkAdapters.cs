@@ -95,7 +95,9 @@ namespace Unity.Multiplayer.Tools.Adapters
                 }
                 OnAdapterAdded -= subscribeToAdapter;
                 OnAdapterRemoved -= unsubscribeFromAdapter;
-            };
+            }
+
+            ;
             return UnsubscribeFromAllAdapters;
         }
     }

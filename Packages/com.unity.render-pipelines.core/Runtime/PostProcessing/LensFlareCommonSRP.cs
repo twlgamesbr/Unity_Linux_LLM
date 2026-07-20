@@ -1073,7 +1073,8 @@ namespace UnityEngine.Rendering
                 cmd.SetViewport(viewport);
             } */
 
-            if (clearRenderTarget) {
+            if (clearRenderTarget)
+            {
                 cmd.ClearRenderTarget(false, true, Color.black);
             }
 

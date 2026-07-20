@@ -33,7 +33,8 @@ namespace Datadog.Unity.Flags
             {
                 // Replay current (NotReady) state immediately, matching IFlagsClient contract.
                 // No further transitions will ever fire on a noop client.
-                if (value == null) return;
+                if (value == null)
+                    return;
                 value(this, new FlagsStateChange(FlagsClientState.NotReady, FlagsClientState.NotReady));
             }
             remove { }

@@ -672,7 +672,8 @@ namespace Unity.Entities.Editor
                 foreach (var typeIndex in selectedComponentTypes)
                 {
                     var typeIndexInArchetype = ChunkDataUtility.GetIndexInTypeArray(archetype, typeIndex);
-                    if (typeIndexInArchetype == -1) continue;
+                    if (typeIndexInArchetype == -1)
+                        continue;
                     var typeChangeVersion = archetype->Chunks.GetChangeVersion(typeIndexInArchetype, m_LastChunk.m_Chunk.ListIndex);
 
                     if (ChangeVersionUtility.DidChange(typeChangeVersion, m_LastGlobalSystemVersion))

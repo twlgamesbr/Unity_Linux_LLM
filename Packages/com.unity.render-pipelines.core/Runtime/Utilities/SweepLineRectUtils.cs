@@ -14,7 +14,8 @@ namespace UnityEngine.Rendering
             public int Compare(Vector4 a, Vector4 b)
             {
                 int cx = a.x.CompareTo(b.x);
-                if (cx != 0) return cx;
+                if (cx != 0)
+                    return cx;
                 // tie on x: larger y first (+1 before -1)
                 return b.y.CompareTo(a.y);
             }
@@ -66,12 +67,14 @@ namespace UnityEngine.Rendering
                 float y1 = activeBuffer[i].y;
                 if (y0 <= cy1)
                 {
-                    if (y1 > cy1) cy1 = y1;
+                    if (y1 > cy1)
+                        cy1 = y1;
                 }
                 else
                 {
                     total += (cy1 - cy0);
-                    cy0 = y0; cy1 = y1;
+                    cy0 = y0;
+                    cy1 = y1;
                 }
             }
             total += (cy1 - cy0);

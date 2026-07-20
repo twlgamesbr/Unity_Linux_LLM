@@ -34,9 +34,19 @@ namespace TMPro
 
         public float bottom { get { return m_Bottom; } set { m_Bottom = value; } }
 
-        public float horizontal { get { return m_Left; } set { m_Left = value; m_Right = value; } }
+        public float horizontal { get { return m_Left; } set
+            {
+                m_Left = value;
+                m_Right = value;
+            }
+        }
 
-        public float vertical { get { return m_Top; } set { m_Top = value; m_Bottom = value; } }
+        public float vertical { get { return m_Top; } set
+            {
+                m_Top = value;
+                m_Bottom = value;
+            }
+        }
 
         /// <summary>
         ///

@@ -39,7 +39,8 @@ namespace UnityEngine.Rendering.Universal
             // Add all the names to the dictionary
             foreach (var selection in selectionSources)
             {
-                string name = selection.GetSourceName()?.text?.Trim(); ;
+                string name = selection.GetSourceName()?.text?.Trim();
+                ;
 
                 List<SelectionSource> sourceList;
                 if(selectionSourcesByName.ContainsKey(name))
@@ -57,7 +58,7 @@ namespace UnityEngine.Rendering.Universal
 
 
             // Look for any repeats
-            foreach(var sourceList in selectionSourcesByName.Values)
+            foreach (var sourceList in selectionSourcesByName.Values)
             {
                 // If there is more than one source with the same name renumber it
                 if(sourceList.Count > 1)

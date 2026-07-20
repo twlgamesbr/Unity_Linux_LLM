@@ -108,7 +108,8 @@ namespace NPCSystem.Editor.Tools
         static SettingsGuardConfig LoadOrCreateConfig()
         {
             var config = AssetDatabase.LoadAssetAtPath<SettingsGuardConfig>(ConfigPath);
-            if (config != null) return config;
+            if (config != null)
+                return config;
             return CreateDefaultConfig();
         }
 
@@ -161,7 +162,8 @@ namespace NPCSystem.Editor.Tools
             foreach (var pd in config.scriptingDefines)
             {
                 NamedBuildTarget? target = NamedBuildTargetFromString(pd.platformName);
-                if (!target.HasValue) continue;
+                if (!target.HasValue)
+                    continue;
 
                 var currentDefines = PlayerSettings.GetScriptingDefineSymbols(target.Value);
                 var expectedDefines = pd.defines;
@@ -282,7 +284,8 @@ namespace NPCSystem.Editor.Tools
             foreach (var ovr in config.platformOverrides)
             {
                 NamedBuildTarget? target = NamedBuildTargetFromString(ovr.platformName);
-                if (!target.HasValue) continue;
+                if (!target.HasValue)
+                    continue;
 
                 try
                 {
@@ -314,7 +317,8 @@ namespace NPCSystem.Editor.Tools
             foreach (var pd in config.scriptingDefines)
             {
                 NamedBuildTarget? target = NamedBuildTargetFromString(pd.platformName);
-                if (!target.HasValue) continue;
+                if (!target.HasValue)
+                    continue;
 
                 var currentDefines = PlayerSettings.GetScriptingDefineSymbols(target.Value);
                 var currentSet = new HashSet<string>(currentDefines.Split(';')

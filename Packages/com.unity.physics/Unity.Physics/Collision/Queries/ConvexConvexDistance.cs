@@ -72,13 +72,18 @@ namespace Unity.Physics
                         float num = math.dot(-A.Xyz, delta);
 
                         // Reduce if closest point do not project on the line segment.
-                        if (num >= den) { NumVertices = 1; A = B; goto case 1; }
+                        if (num >= den)
+                            {
+                                NumVertices = 1;
+                                A = B;
+                                goto case 1;
+                            }
 
-                        // Compute support direction
-                        Direction = math.cross(math.cross(delta, A.Xyz), delta);
+                            // Compute support direction
+                            Direction = math.cross(math.cross(delta, A.Xyz), delta);
                         ScaledDistance = math.dot(Direction, A.Xyz);
-                    }
-                    break;
+                        }
+                        break;
 
                     // Triangle.
                     case 3:
@@ -149,22 +154,33 @@ namespace Unity.Physics
                         bool3 onFace = (insideEdge0 & insideEdge1 & !insideFace);
                         if (math.any(onFace))
                         {
-                            if (onFace.y) { A = B; B = C; }
-                            else if (onFace.z) { B = C; }
-                        }
-                        else
+                            if (onFace.y)
+                                {
+                                    A = B;
+                                    B = C;
+                                }
+                                else if (onFace.z)
+                                {
+                                    B = C;
+                                }
+                            }
+                            else
                         {
                             // Check if the closest point is on an edge
                             // TODO maybe we can safely drop two vertices in this case
                             bool3 insideVertex = (edges.Dot(d) >= 0).xyz;
                             bool3 onEdge = (!insideEdge0 & !insideEdge1.zxy & insideVertex);
-                            if (math.any(onEdge.yz)) { A = B; B = C; }
-                        }
+                            if (math.any(onEdge.yz))
+                                {
+                                    A = B;
+                                    B = C;
+                                }
+                            }
 
-                        C = D;
+                            C = D;
                         NumVertices = 3;
                         goto case 3;
-                    }
+                        }
                 }
             }
 
@@ -511,9 +527,12 @@ namespace Unity.Physics
                     {
                         ConvexHullBuilder.Triangle triangle = hull.Triangles[closestTriangleIndex];
                         simplex.NumVertices = 3;
-                        simplex.A.Xyz = hull.Vertices[triangle.Vertex0].Position; simplex.A.Id = hull.Vertices[triangle.Vertex0].UserData;
-                        simplex.B.Xyz = hull.Vertices[triangle.Vertex1].Position; simplex.B.Id = hull.Vertices[triangle.Vertex1].UserData;
-                        simplex.C.Xyz = hull.Vertices[triangle.Vertex2].Position; simplex.C.Id = hull.Vertices[triangle.Vertex2].UserData;
+                        simplex.A.Xyz = hull.Vertices[triangle.Vertex0].Position;
+                        simplex.A.Id = hull.Vertices[triangle.Vertex0].UserData;
+                        simplex.B.Xyz = hull.Vertices[triangle.Vertex1].Position;
+                        simplex.B.Id = hull.Vertices[triangle.Vertex1].UserData;
+                        simplex.C.Xyz = hull.Vertices[triangle.Vertex2].Position;
+                        simplex.C.Id = hull.Vertices[triangle.Vertex2].UserData;
                         simplex.Direction = -closestPlane.Normal;
                         simplex.ScaledDistance = closestPlane.Distance;
 

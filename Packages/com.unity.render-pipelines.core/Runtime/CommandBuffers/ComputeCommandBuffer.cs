@@ -94,85 +94,153 @@ namespace UnityEngine.Rendering
         /// <summary>Wraps [SetGlobalFloat](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloat.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloat.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloat.html)</param>
-        public void SetGlobalFloat(int nameID, float value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalFloat(nameID, value); }
+        public void SetGlobalFloat(int nameID, float value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalFloat(nameID, value);
+        }
 
         /// <summary>Wraps [SetGlobalInt](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalInt.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalInt.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalInt.html)</param>
-        public void SetGlobalInt(int nameID, int value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalInt(nameID, value); }
+        public void SetGlobalInt(int nameID, int value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalInt(nameID, value);
+        }
 
         /// <summary>Wraps [SetGlobalInteger](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalInteger.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalInteger.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalInteger.html)</param>
-        public void SetGlobalInteger(int nameID, int value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalInteger(nameID, value); }
+        public void SetGlobalInteger(int nameID, int value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalInteger(nameID, value);
+        }
 
         /// <summary>Wraps [SetGlobalVector](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVector.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVector.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVector.html)</param>
-        public void SetGlobalVector(int nameID, Vector4 value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalVector(nameID, value); }
+        public void SetGlobalVector(int nameID, Vector4 value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalVector(nameID, value);
+        }
 
         /// <summary>Wraps [SetGlobalColor](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalColor.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalColor.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalColor.html)</param>
-        public void SetGlobalColor(int nameID, Color value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalColor(nameID, value); }
+        public void SetGlobalColor(int nameID, Color value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalColor(nameID, value);
+        }
 
         /// <summary>Wraps [SetGlobalMatrix](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrix.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrix.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrix.html)</param>
-        public void SetGlobalMatrix(int nameID, Matrix4x4 value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalMatrix(nameID, value); }
+        public void SetGlobalMatrix(int nameID, Matrix4x4 value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalMatrix(nameID, value);
+        }
 
         /// <summary>Wraps [EnableShaderKeyword](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.EnableShaderKeyword.html) on a CommandBuffer.</summary>
         /// <param name="keyword">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.EnableShaderKeyword.html)</param>
-        public void EnableShaderKeyword(string keyword)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.EnableShaderKeyword(keyword); }
+        public void EnableShaderKeyword(string keyword)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.EnableShaderKeyword(keyword);
+        }
 
         /// <summary>Wraps [EnableKeyword](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.EnableKeyword.html) on a CommandBuffer.</summary>
         /// <param name="keyword">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.EnableKeyword.html)</param>
-        public void EnableKeyword(in GlobalKeyword keyword)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.EnableKeyword(keyword); }
+        public void EnableKeyword(in GlobalKeyword keyword)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.EnableKeyword(keyword);
+        }
 
         /// <summary>Wraps [EnableKeyword](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.EnableKeyword.html) on a CommandBuffer.</summary>
         /// <param name="material">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.EnableKeyword.html)</param>
         /// <param name="keyword">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.EnableKeyword.html)</param>
-        public void EnableKeyword(Material material, in LocalKeyword keyword)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.EnableKeyword(material, keyword); }
+        public void EnableKeyword(Material material, in LocalKeyword keyword)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.EnableKeyword(material, keyword);
+        }
 
         /// <summary>Wraps [EnableKeyword](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.EnableKeyword.html) on a CommandBuffer.</summary>
         /// <param name="computeShader">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.EnableKeyword.html)</param>
         /// <param name="keyword">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.EnableKeyword.html)</param>
-        public void EnableKeyword(ComputeShader computeShader, in LocalKeyword keyword)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.EnableKeyword(computeShader, keyword); }
+        public void EnableKeyword(ComputeShader computeShader, in LocalKeyword keyword)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.EnableKeyword(computeShader, keyword);
+        }
 
         /// <summary>Wraps [DisableShaderKeyword](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DisableShaderKeyword.html) on a CommandBuffer.</summary>
         /// <param name="keyword">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DisableShaderKeyword.html)</param>
-        public void DisableShaderKeyword(string keyword)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.DisableShaderKeyword(keyword); }
+        public void DisableShaderKeyword(string keyword)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.DisableShaderKeyword(keyword);
+        }
 
         /// <summary>Wraps [DisableKeyword](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DisableKeyword.html) on a CommandBuffer.</summary>
         /// <param name="keyword">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DisableKeyword.html)</param>
-        public void DisableKeyword(in GlobalKeyword keyword)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.DisableKeyword(keyword); }
+        public void DisableKeyword(in GlobalKeyword keyword)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.DisableKeyword(keyword);
+        }
 
         /// <summary>Wraps [DisableKeyword](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DisableKeyword.html) on a CommandBuffer.</summary>
         /// <param name="material">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DisableKeyword.html)</param>
         /// <param name="keyword">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DisableKeyword.html)</param>
-        public void DisableKeyword(Material material, in LocalKeyword keyword)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.DisableKeyword(material, keyword); }
+        public void DisableKeyword(Material material, in LocalKeyword keyword)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.DisableKeyword(material, keyword);
+        }
 
         /// <summary>Wraps [DisableKeyword](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DisableKeyword.html) on a CommandBuffer.</summary>
         /// <param name="computeShader">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DisableKeyword.html)</param>
         /// <param name="keyword">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DisableKeyword.html)</param>
-        public void DisableKeyword(ComputeShader computeShader, in LocalKeyword keyword)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.DisableKeyword(computeShader, keyword); }
+        public void DisableKeyword(ComputeShader computeShader, in LocalKeyword keyword)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.DisableKeyword(computeShader, keyword);
+        }
 
         /// <summary>Wraps [SetKeyword](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetKeyword.html) on a CommandBuffer.</summary>
         /// <param name="keyword">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetKeyword.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetKeyword.html)</param>
-        public void SetKeyword(in GlobalKeyword keyword, bool value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetKeyword(keyword, value); }
+        public void SetKeyword(in GlobalKeyword keyword, bool value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetKeyword(keyword, value);
+        }
 
         /// <summary>Wraps [SetKeyword](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetKeyword.html) on a CommandBuffer.</summary>
         /// <param name="material">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetKeyword.html)</param>
         /// <param name="keyword">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetKeyword.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetKeyword.html)</param>
-        public void SetKeyword(Material material, in LocalKeyword keyword, bool value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetKeyword(material, keyword, value); }
+        public void SetKeyword(Material material, in LocalKeyword keyword, bool value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetKeyword(material, keyword, value);
+        }
 
         /// <summary>Wraps [SetKeyword](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetKeyword.html) on a CommandBuffer.</summary>
         /// <param name="computeShader">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetKeyword.html)</param>
         /// <param name="keyword">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetKeyword.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetKeyword.html)</param>
-        public void SetKeyword(ComputeShader computeShader, in LocalKeyword keyword, bool value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetKeyword(computeShader, keyword, value); }
+        public void SetKeyword(ComputeShader computeShader, in LocalKeyword keyword, bool value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetKeyword(computeShader, keyword, value);
+        }
 
         /// <summary>Wraps [SetViewProjectionMatrices](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetViewProjectionMatrices.html) on a CommandBuffer.</summary>
         /// <param name="view">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetViewProjectionMatrices.html)</param>
@@ -187,17 +255,29 @@ namespace UnityEngine.Rendering
         /// <summary>Wraps [SetGlobalFloatArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloatArray.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloatArray.html)</param>
         /// <param name="values">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloatArray.html)</param>
-        public void SetGlobalFloatArray(int nameID, float[] values)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalFloatArray(nameID, values); }
+        public void SetGlobalFloatArray(int nameID, float[] values)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalFloatArray(nameID, values);
+        }
 
         /// <summary>Wraps [SetGlobalVectorArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVectorArray.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVectorArray.html)</param>
         /// <param name="values">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVectorArray.html)</param>
-        public void SetGlobalVectorArray(int nameID, Vector4[] values)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalVectorArray(nameID, values); }
+        public void SetGlobalVectorArray(int nameID, Vector4[] values)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalVectorArray(nameID, values);
+        }
 
         /// <summary>Wraps [SetGlobalMatrixArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrixArray.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrixArray.html)</param>
         /// <param name="values">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrixArray.html)</param>
-        public void SetGlobalMatrixArray(int nameID, Matrix4x4[] values)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalMatrixArray(nameID, values); }
+        public void SetGlobalMatrixArray(int nameID, Matrix4x4[] values)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalMatrixArray(nameID, values);
+        }
 
         /// <summary>Wraps [SetLateLatchProjectionMatrices](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetLateLatchProjectionMatrices.html) on a CommandBuffer.</summary>
         /// <param name="projectionMat">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetLateLatchProjectionMatrices.html)</param>
@@ -409,14 +489,22 @@ namespace UnityEngine.Rendering
         /// <param name="kernelIndex">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
         /// <param name="rt">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
-        public void SetComputeTextureParam(ComputeShader computeShader, int kernelIndex, string name, TextureHandle rt)  { ValidateTextureHandle(rt);  m_WrappedCommandBuffer.SetComputeTextureParam(computeShader, kernelIndex, name, rt); }
+        public void SetComputeTextureParam(ComputeShader computeShader, int kernelIndex, string name, TextureHandle rt)
+        {
+            ValidateTextureHandle(rt);
+            m_WrappedCommandBuffer.SetComputeTextureParam(computeShader, kernelIndex, name, rt);
+        }
 
         /// <summary>Wraps [SetComputeTextureParam](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html) on a CommandBuffer.</summary>
         /// <param name="computeShader">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
         /// <param name="kernelIndex">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
         /// <param name="rt">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
-        public void SetComputeTextureParam(ComputeShader computeShader, int kernelIndex, int nameID, TextureHandle rt)  { ValidateTextureHandle(rt);  m_WrappedCommandBuffer.SetComputeTextureParam(computeShader, kernelIndex, nameID, rt); }
+        public void SetComputeTextureParam(ComputeShader computeShader, int kernelIndex, int nameID, TextureHandle rt)
+        {
+            ValidateTextureHandle(rt);
+            m_WrappedCommandBuffer.SetComputeTextureParam(computeShader, kernelIndex, nameID, rt);
+        }
 
         /// <summary>Wraps [SetComputeTextureParam](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html) on a CommandBuffer.</summary>
         /// <param name="computeShader">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
@@ -424,7 +512,11 @@ namespace UnityEngine.Rendering
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
         /// <param name="rt">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
         /// <param name="mipLevel">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
-        public void SetComputeTextureParam(ComputeShader computeShader, int kernelIndex, string name, TextureHandle rt, int mipLevel)  { ValidateTextureHandle(rt);  m_WrappedCommandBuffer.SetComputeTextureParam(computeShader, kernelIndex, name, rt, mipLevel); }
+        public void SetComputeTextureParam(ComputeShader computeShader, int kernelIndex, string name, TextureHandle rt, int mipLevel)
+        {
+            ValidateTextureHandle(rt);
+            m_WrappedCommandBuffer.SetComputeTextureParam(computeShader, kernelIndex, name, rt, mipLevel);
+        }
 
         /// <summary>Wraps [SetComputeTextureParam](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html) on a CommandBuffer.</summary>
         /// <param name="computeShader">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
@@ -432,7 +524,11 @@ namespace UnityEngine.Rendering
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
         /// <param name="rt">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
         /// <param name="mipLevel">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
-        public void SetComputeTextureParam(ComputeShader computeShader, int kernelIndex, int nameID, TextureHandle rt, int mipLevel)  { ValidateTextureHandle(rt);  m_WrappedCommandBuffer.SetComputeTextureParam(computeShader, kernelIndex, nameID, rt, mipLevel); }
+        public void SetComputeTextureParam(ComputeShader computeShader, int kernelIndex, int nameID, TextureHandle rt, int mipLevel)
+        {
+            ValidateTextureHandle(rt);
+            m_WrappedCommandBuffer.SetComputeTextureParam(computeShader, kernelIndex, nameID, rt, mipLevel);
+        }
 
         /// <summary>Wraps [SetComputeTextureParam](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html) on a CommandBuffer.</summary>
         /// <param name="computeShader">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
@@ -441,7 +537,11 @@ namespace UnityEngine.Rendering
         /// <param name="rt">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
         /// <param name="mipLevel">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
         /// <param name="element">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
-        public void SetComputeTextureParam(ComputeShader computeShader, int kernelIndex, string name, TextureHandle rt, int mipLevel, RenderTextureSubElement element)  { ValidateTextureHandle(rt);  m_WrappedCommandBuffer.SetComputeTextureParam(computeShader, kernelIndex, name, rt, mipLevel, element); }
+        public void SetComputeTextureParam(ComputeShader computeShader, int kernelIndex, string name, TextureHandle rt, int mipLevel, RenderTextureSubElement element)
+        {
+            ValidateTextureHandle(rt);
+            m_WrappedCommandBuffer.SetComputeTextureParam(computeShader, kernelIndex, name, rt, mipLevel, element);
+        }
 
         /// <summary>Wraps [SetComputeTextureParam](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html) on a CommandBuffer.</summary>
         /// <param name="computeShader">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
@@ -450,7 +550,11 @@ namespace UnityEngine.Rendering
         /// <param name="rt">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
         /// <param name="mipLevel">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
         /// <param name="element">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeTextureParam.html)</param>
-        public void SetComputeTextureParam(ComputeShader computeShader, int kernelIndex, int nameID, TextureHandle rt, int mipLevel, RenderTextureSubElement element)  { ValidateTextureHandle(rt);  m_WrappedCommandBuffer.SetComputeTextureParam(computeShader, kernelIndex, nameID, rt, mipLevel, element); }
+        public void SetComputeTextureParam(ComputeShader computeShader, int kernelIndex, int nameID, TextureHandle rt, int mipLevel, RenderTextureSubElement element)
+        {
+            ValidateTextureHandle(rt);
+            m_WrappedCommandBuffer.SetComputeTextureParam(computeShader, kernelIndex, nameID, rt, mipLevel, element);
+        }
 
         /// <summary>Wraps [SetComputeBufferParam](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeBufferParam.html) on a CommandBuffer.</summary>
         /// <param name="computeShader">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetComputeBufferParam.html)</param>
@@ -666,13 +770,21 @@ namespace UnityEngine.Rendering
         /// <param name="rayTracingShader">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRayTracingTextureParam.html)</param>
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRayTracingTextureParam.html)</param>
         /// <param name="rt">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRayTracingTextureParam.html)</param>
-        public void SetRayTracingTextureParam(RayTracingShader rayTracingShader, string name, TextureHandle rt)  { ValidateTextureHandle(rt);  m_WrappedCommandBuffer.SetRayTracingTextureParam(rayTracingShader, name, rt); }
+        public void SetRayTracingTextureParam(RayTracingShader rayTracingShader, string name, TextureHandle rt)
+        {
+            ValidateTextureHandle(rt);
+            m_WrappedCommandBuffer.SetRayTracingTextureParam(rayTracingShader, name, rt);
+        }
 
         /// <summary>Wraps [SetRayTracingTextureParam](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRayTracingTextureParam.html) on a CommandBuffer.</summary>
         /// <param name="rayTracingShader">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRayTracingTextureParam.html)</param>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRayTracingTextureParam.html)</param>
         /// <param name="rt">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRayTracingTextureParam.html)</param>
-        public void SetRayTracingTextureParam(RayTracingShader rayTracingShader, int nameID, TextureHandle rt)  { ValidateTextureHandle(rt);  m_WrappedCommandBuffer.SetRayTracingTextureParam(rayTracingShader, nameID, rt); }
+        public void SetRayTracingTextureParam(RayTracingShader rayTracingShader, int nameID, TextureHandle rt)
+        {
+            ValidateTextureHandle(rt);
+            m_WrappedCommandBuffer.SetRayTracingTextureParam(rayTracingShader, nameID, rt);
+        }
 
         /// <summary>Wraps [SetRayTracingFloatParam](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRayTracingFloatParam.html) on a CommandBuffer.</summary>
         /// <param name="rayTracingShader">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetRayTracingFloatParam.html)</param>
@@ -814,147 +926,259 @@ namespace UnityEngine.Rendering
         /// <summary>Wraps [SetGlobalFloat](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloat.html) on a CommandBuffer.</summary>
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloat.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloat.html)</param>
-        public void SetGlobalFloat(string name, float value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalFloat(name, value); }
+        public void SetGlobalFloat(string name, float value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalFloat(name, value);
+        }
 
         /// <summary>Wraps [SetGlobalInt](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalInt.html) on a CommandBuffer.</summary>
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalInt.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalInt.html)</param>
-        public void SetGlobalInt(string name, int value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalInt(name, value); }
+        public void SetGlobalInt(string name, int value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalInt(name, value);
+        }
 
         /// <summary>Wraps [SetGlobalInteger](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalInteger.html) on a CommandBuffer.</summary>
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalInteger.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalInteger.html)</param>
-        public void SetGlobalInteger(string name, int value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalInteger(name, value); }
+        public void SetGlobalInteger(string name, int value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalInteger(name, value);
+        }
 
         /// <summary>Wraps [SetGlobalVector](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVector.html) on a CommandBuffer.</summary>
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVector.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVector.html)</param>
-        public void SetGlobalVector(string name, Vector4 value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalVector(name, value); }
+        public void SetGlobalVector(string name, Vector4 value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalVector(name, value);
+        }
 
         /// <summary>Wraps [SetGlobalColor](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalColor.html) on a CommandBuffer.</summary>
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalColor.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalColor.html)</param>
-        public void SetGlobalColor(string name, Color value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalColor(name, value); }
+        public void SetGlobalColor(string name, Color value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalColor(name, value);
+        }
 
         /// <summary>Wraps [SetGlobalMatrix](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrix.html) on a CommandBuffer.</summary>
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrix.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrix.html)</param>
-        public void SetGlobalMatrix(string name, Matrix4x4 value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalMatrix(name, value); }
+        public void SetGlobalMatrix(string name, Matrix4x4 value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalMatrix(name, value);
+        }
 
         /// <summary>Wraps [SetGlobalFloatArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloatArray.html) on a CommandBuffer.</summary>
         /// <param name="propertyName">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloatArray.html)</param>
         /// <param name="values">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloatArray.html)</param>
-        public void SetGlobalFloatArray(string propertyName, List<float> values)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalFloatArray(propertyName, values); }
+        public void SetGlobalFloatArray(string propertyName, List<float> values)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalFloatArray(propertyName, values);
+        }
 
         /// <summary>Wraps [SetGlobalFloatArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloatArray.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloatArray.html)</param>
         /// <param name="values">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloatArray.html)</param>
-        public void SetGlobalFloatArray(int nameID, List<float> values)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalFloatArray(nameID, values); }
+        public void SetGlobalFloatArray(int nameID, List<float> values)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalFloatArray(nameID, values);
+        }
 
         /// <summary>Wraps [SetGlobalFloatArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloatArray.html) on a CommandBuffer.</summary>
         /// <param name="propertyName">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloatArray.html)</param>
         /// <param name="values">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloatArray.html)</param>
-        public void SetGlobalFloatArray(string propertyName, float[] values)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalFloatArray(propertyName, values); }
+        public void SetGlobalFloatArray(string propertyName, float[] values)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalFloatArray(propertyName, values);
+        }
 
         /// <summary>Wraps [SetGlobalVectorArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVectorArray.html) on a CommandBuffer.</summary>
         /// <param name="propertyName">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVectorArray.html)</param>
         /// <param name="values">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVectorArray.html)</param>
-        public void SetGlobalVectorArray(string propertyName, List<Vector4> values)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalVectorArray(propertyName, values); }
+        public void SetGlobalVectorArray(string propertyName, List<Vector4> values)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalVectorArray(propertyName, values);
+        }
 
         /// <summary>Wraps [SetGlobalVectorArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVectorArray.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVectorArray.html)</param>
         /// <param name="values">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVectorArray.html)</param>
-        public void SetGlobalVectorArray(int nameID, List<Vector4> values)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalVectorArray(nameID, values); }
+        public void SetGlobalVectorArray(int nameID, List<Vector4> values)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalVectorArray(nameID, values);
+        }
 
         /// <summary>Wraps [SetGlobalVectorArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVectorArray.html) on a CommandBuffer.</summary>
         /// <param name="propertyName">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVectorArray.html)</param>
         /// <param name="values">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVectorArray.html)</param>
-        public void SetGlobalVectorArray(string propertyName, Vector4[] values)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalVectorArray(propertyName, values); }
+        public void SetGlobalVectorArray(string propertyName, Vector4[] values)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalVectorArray(propertyName, values);
+        }
 
         /// <summary>Wraps [SetGlobalMatrixArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrixArray.html) on a CommandBuffer.</summary>
         /// <param name="propertyName">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrixArray.html)</param>
         /// <param name="values">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrixArray.html)</param>
-        public void SetGlobalMatrixArray(string propertyName, List<Matrix4x4> values)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalMatrixArray(propertyName, values); }
+        public void SetGlobalMatrixArray(string propertyName, List<Matrix4x4> values)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalMatrixArray(propertyName, values);
+        }
 
         /// <summary>Wraps [SetGlobalMatrixArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrixArray.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrixArray.html)</param>
         /// <param name="values">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrixArray.html)</param>
-        public void SetGlobalMatrixArray(int nameID, List<Matrix4x4> values)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalMatrixArray(nameID, values); }
+        public void SetGlobalMatrixArray(int nameID, List<Matrix4x4> values)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalMatrixArray(nameID, values);
+        }
 
         /// <summary>Wraps [SetGlobalMatrixArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrixArray.html) on a CommandBuffer.</summary>
         /// <param name="propertyName">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrixArray.html)</param>
         /// <param name="values">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrixArray.html)</param>
-        public void SetGlobalMatrixArray(string propertyName, Matrix4x4[] values)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalMatrixArray(propertyName, values); }
+        public void SetGlobalMatrixArray(string propertyName, Matrix4x4[] values)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalMatrixArray(propertyName, values);
+        }
 
         /// <summary>Wraps [SetGlobalTexture](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html) on a CommandBuffer.</summary>
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html)</param>
-        public void SetGlobalTexture(string name, TextureHandle value)  { ThrowIfGlobalStateNotAllowed(); ValidateTextureHandle(value);  m_WrappedCommandBuffer.SetGlobalTexture(name, value); }
+        public void SetGlobalTexture(string name, TextureHandle value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            ValidateTextureHandle(value);
+            m_WrappedCommandBuffer.SetGlobalTexture(name, value);
+        }
 
         /// <summary>Wraps [SetGlobalTexture](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html)</param>
-        public void SetGlobalTexture(int nameID, TextureHandle value)  { ThrowIfGlobalStateNotAllowed(); ValidateTextureHandle(value);  m_WrappedCommandBuffer.SetGlobalTexture(nameID, value); }
+        public void SetGlobalTexture(int nameID, TextureHandle value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            ValidateTextureHandle(value);
+            m_WrappedCommandBuffer.SetGlobalTexture(nameID, value);
+        }
 
         /// <summary>Wraps [SetGlobalTexture](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html) on a CommandBuffer.</summary>
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html)</param>
         /// <param name="element">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html)</param>
-        public void SetGlobalTexture(string name, TextureHandle value, RenderTextureSubElement element)  { ThrowIfGlobalStateNotAllowed(); ValidateTextureHandle(value);  m_WrappedCommandBuffer.SetGlobalTexture(name, value, element); }
+        public void SetGlobalTexture(string name, TextureHandle value, RenderTextureSubElement element)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            ValidateTextureHandle(value);
+            m_WrappedCommandBuffer.SetGlobalTexture(name, value, element);
+        }
 
         /// <summary>Wraps [SetGlobalTexture](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html)</param>
         /// <param name="element">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html)</param>
-        public void SetGlobalTexture(int nameID, TextureHandle value, RenderTextureSubElement element)  { ThrowIfGlobalStateNotAllowed(); ValidateTextureHandle(value);  m_WrappedCommandBuffer.SetGlobalTexture(nameID, value, element); }
+        public void SetGlobalTexture(int nameID, TextureHandle value, RenderTextureSubElement element)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            ValidateTextureHandle(value);
+            m_WrappedCommandBuffer.SetGlobalTexture(nameID, value, element);
+        }
 
         /// <summary>Wraps [SetGlobalBuffer](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalBuffer.html) on a CommandBuffer.</summary>
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalBuffer.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalBuffer.html)</param>
-        public void SetGlobalBuffer(string name, ComputeBuffer value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalBuffer(name, value); }
+        public void SetGlobalBuffer(string name, ComputeBuffer value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalBuffer(name, value);
+        }
 
         /// <summary>Wraps [SetGlobalBuffer](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalBuffer.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalBuffer.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalBuffer.html)</param>
-        public void SetGlobalBuffer(int nameID, ComputeBuffer value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalBuffer(nameID, value); }
+        public void SetGlobalBuffer(int nameID, ComputeBuffer value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalBuffer(nameID, value);
+        }
 
         /// <summary>Wraps [SetGlobalBuffer](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalBuffer.html) on a CommandBuffer.</summary>
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalBuffer.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalBuffer.html)</param>
-        public void SetGlobalBuffer(string name, GraphicsBuffer value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalBuffer(name, value); }
+        public void SetGlobalBuffer(string name, GraphicsBuffer value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalBuffer(name, value);
+        }
 
         /// <summary>Wraps [SetGlobalBuffer](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalBuffer.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalBuffer.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalBuffer.html)</param>
-        public void SetGlobalBuffer(int nameID, GraphicsBuffer value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalBuffer(nameID, value); }
+        public void SetGlobalBuffer(int nameID, GraphicsBuffer value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalBuffer(nameID, value);
+        }
 
         /// <summary>Wraps [SetGlobalConstantBuffer](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html) on a CommandBuffer.</summary>
         /// <param name="buffer">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
         /// <param name="offset">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
         /// <param name="size">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
-        public void SetGlobalConstantBuffer(ComputeBuffer buffer, int nameID, int offset, int size)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalConstantBuffer(buffer, nameID, offset, size); }
+        public void SetGlobalConstantBuffer(ComputeBuffer buffer, int nameID, int offset, int size)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalConstantBuffer(buffer, nameID, offset, size);
+        }
 
         /// <summary>Wraps [SetGlobalConstantBuffer](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html) on a CommandBuffer.</summary>
         /// <param name="buffer">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
         /// <param name="offset">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
         /// <param name="size">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
-        public void SetGlobalConstantBuffer(ComputeBuffer buffer, string name, int offset, int size)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalConstantBuffer(buffer, name, offset, size); }
+        public void SetGlobalConstantBuffer(ComputeBuffer buffer, string name, int offset, int size)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalConstantBuffer(buffer, name, offset, size);
+        }
 
         /// <summary>Wraps [SetGlobalConstantBuffer](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html) on a CommandBuffer.</summary>
         /// <param name="buffer">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
         /// <param name="offset">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
         /// <param name="size">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
-        public void SetGlobalConstantBuffer(GraphicsBuffer buffer, int nameID, int offset, int size)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalConstantBuffer(buffer, nameID, offset, size); }
+        public void SetGlobalConstantBuffer(GraphicsBuffer buffer, int nameID, int offset, int size)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalConstantBuffer(buffer, nameID, offset, size);
+        }
 
         /// <summary>Wraps [SetGlobalConstantBuffer](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html) on a CommandBuffer.</summary>
         /// <param name="buffer">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
         /// <param name="offset">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
         /// <param name="size">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
-        public void SetGlobalConstantBuffer(GraphicsBuffer buffer, string name, int offset, int size)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalConstantBuffer(buffer, name, offset, size); }
+        public void SetGlobalConstantBuffer(GraphicsBuffer buffer, string name, int offset, int size)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalConstantBuffer(buffer, name, offset, size);
+        }
 
         /// <summary>Wraps [SetShadowSamplingMode](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetShadowSamplingMode.html) on a CommandBuffer.</summary>
         /// <param name="shadowmap">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetShadowSamplingMode.html)</param>

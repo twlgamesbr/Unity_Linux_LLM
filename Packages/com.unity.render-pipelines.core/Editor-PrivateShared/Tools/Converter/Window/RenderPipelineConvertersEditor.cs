@@ -334,8 +334,10 @@ namespace UnityEditor.Rendering.Converter
 
         void InitializeAllActiveConverters(ClickEvent evt)
         {
-            if (EditorApplication.isPlaying) return;
-            if (!SaveCurrentSceneAndContinue()) return;
+            if (EditorApplication.isPlaying)
+                return;
+            if (!SaveCurrentSceneAndContinue())
+                return;
 
             // Gather all the converters that are selected
             var convertersToInitialize = new List<RenderPipelineConverterVisualElement>();
@@ -436,10 +438,13 @@ namespace UnityEditor.Rendering.Converter
 
         void Convert(ClickEvent evt)
         {
-            if (EditorApplication.isPlaying) return;
-            if (!ShowIrreversibleChangesDialog()) return;
+            if (EditorApplication.isPlaying)
+                return;
+            if (!ShowIrreversibleChangesDialog())
+                return;
             // Ask to save save the current open scene and after the conversion is done reload the same scene.
-            if (!SaveCurrentSceneAndContinue()) return;
+            if (!SaveCurrentSceneAndContinue())
+                return;
 
             string currentScenePath = SceneManager.GetActiveScene().path;
 

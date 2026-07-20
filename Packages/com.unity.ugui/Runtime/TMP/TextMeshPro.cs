@@ -89,7 +89,16 @@ namespace TMPro
         {
             get { return m_autoSizeTextContainer; }
 
-            set { if (m_autoSizeTextContainer == value) return; m_autoSizeTextContainer = value; if (m_autoSizeTextContainer) { TMP_UpdateManager.RegisterTextElementForLayoutRebuild(this); SetLayoutDirty(); } }
+            set
+            {
+                if (m_autoSizeTextContainer == value)
+                    return;
+                m_autoSizeTextContainer = value;
+                if (m_autoSizeTextContainer)
+                {
+                    TMP_UpdateManager.RegisterTextElementForLayoutRebuild(this);
+                    SetLayoutDirty(); }
+            }
         }
 
 
@@ -183,7 +192,11 @@ namespace TMPro
         public MaskingTypes maskType
         {
             get { return m_maskType; }
-            set { m_maskType = value; SetMask(m_maskType); }
+            set
+            {
+                m_maskType = value;
+                SetMask(m_maskType);
+            }
         }
 
 
@@ -280,7 +293,8 @@ namespace TMPro
         /// <param name="update"></param>
         public override void Rebuild(CanvasUpdate update)
         {
-            if (this == null) return;
+            if (this == null)
+                return;
 
             if (update == CanvasUpdate.Prelayout)
             {
@@ -293,7 +307,8 @@ namespace TMPro
             {
                 this.OnPreRenderObject();
 
-                if (!m_isMaterialDirty) return;
+                if (!m_isMaterialDirty)
+                    return;
 
                 UpdateMaterial();
                 m_isMaterialDirty = false;
@@ -331,7 +346,8 @@ namespace TMPro
             checkPaddingRequired = false;
 
             // Return if text object is not awake yet.
-            if (m_textInfo == null) return;
+            if (m_textInfo == null)
+                return;
 
             // Update sub text objects
             for (int i = 1; i < m_textInfo.materialCount; i++)
@@ -379,7 +395,8 @@ namespace TMPro
         /// </summary>
         public override void ClearMesh(bool updateMesh)
         {
-            if (m_textInfo.meshInfo[0].mesh == null) m_textInfo.meshInfo[0].mesh = m_mesh;
+            if (m_textInfo.meshInfo[0].mesh == null)
+                m_textInfo.meshInfo[0].mesh = m_mesh;
 
             m_textInfo.ClearMeshInfo(updateMesh);
         }
@@ -1751,7 +1768,11 @@ namespace TMPro
                             // Try to match remaining components, skipping ignorable code points when they aren't the expected component.
                             while (ligatureGlyphID != 0 && componentIndex < componentCount)
                             {
-                                if (idx >= textProcessingArray.Length) { ligatureGlyphID = 0; break; }
+                                if (idx >= textProcessingArray.Length)
+                                {
+                                    ligatureGlyphID = 0;
+                                    break;
+                                }
 
                                 uint codepoint = textProcessingArray[idx].unicode;
                                 uint glyphIndex = m_currentFontAsset.GetGlyphIndex(codepoint);
@@ -4308,7 +4329,8 @@ namespace TMPro
                     case HorizontalAlignmentOptions.Justified:
                     case HorizontalAlignmentOptions.Flush:
                         // Skip Zero Width Characters and spaces outside of the margins.
-                        if (i > lineInfo.lastVisibleCharacterIndex || unicode == 0x0A || unicode == 0xAD || unicode == 0x200B || unicode == 0x2060 || unicode == 0x03) break;
+                        if (i > lineInfo.lastVisibleCharacterIndex || unicode == 0x0A || unicode == 0xAD || unicode == 0x200B || unicode == 0x2060 || unicode == 0x03)
+                            break;
 
                         char lastCharOfCurrentLine = characterInfos[lineInfo.lastCharacterIndex].character;
 
@@ -4337,11 +4359,16 @@ namespace TMPro
                                 int visibleCount = lineInfo.visibleCharacterCount - 1 + lineInfo.controlCharacterCount;
                                 int spaces = lineInfo.visibleSpaceCount - lineInfo.controlCharacterCount;
 
-                                if (isFirstSeperator) { spaces -= 1; visibleCount += 1; }
+                                if (isFirstSeperator)
+                                {
+                                    spaces -= 1;
+                                    visibleCount += 1;
+                                }
 
                                 float ratio = spaces > 0 ? m_wordWrappingRatios : 1;
 
-                                if (spaces < 1) spaces = 1;
+                                if (spaces < 1)
+                                    spaces = 1;
 
                                 if (unicode != 0xA0 && (unicode == 9 || char.IsSeparator(unicode)))
                                 {
@@ -4499,7 +4526,8 @@ namespace TMPro
                             // Pack UV's so that we can pass Xscale needed for Shader to maintain 1:1 ratio.
                             #region Pack Scale into UV2
                             xScale = characterInfos[i].scale * Mathf.Abs(lossyScale) * (1 - m_charWidthAdjDelta) * m_characterHorizontalScale;
-                            if (!characterInfos[i].isUsingAlternateTypeface && (characterInfos[i].style & FontStyles.Bold) == FontStyles.Bold) xScale *= -1;
+                            if (!characterInfos[i].isUsingAlternateTypeface && (characterInfos[i].style & FontStyles.Bold) == FontStyles.Bold)
+                                xScale *= -1;
 
                             // Set SDF Scale
                             characterInfos[i].vertex_BL.uv.w = xScale;
@@ -5040,7 +5068,8 @@ namespace TMPro
                     // Clear unused vertices
                     m_textInfo.meshInfo[i].ClearUnusedVertices();
 
-                    if (m_subTextObjects[i] == null) continue;
+                    if (m_subTextObjects[i] == null)
+                        continue;
 
                     // Sort the geometry of the sub-text objects if needed.
                     if (m_geometrySortingOrder != VertexSortingOrder.Normal)
@@ -5083,7 +5112,8 @@ namespace TMPro
         /// <returns></returns>
         protected override Vector3[] GetTextContainerLocalCorners()
         {
-            if (m_rectTransform == null) m_rectTransform = this.rectTransform;
+            if (m_rectTransform == null)
+                m_rectTransform = this.rectTransform;
 
             m_rectTransform.GetLocalCorners(m_RectTransformCorners);
 

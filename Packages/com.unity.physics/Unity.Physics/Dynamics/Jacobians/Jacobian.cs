@@ -730,7 +730,8 @@ namespace Unity.Physics
         // - Unity Physics joints use a spring frequency parameterization
         public static float CalculateSpringFrequencyFromSpringConstant(float springConstant, float mass = 1.0f)
         {
-            if (springConstant < Math.Constants.Eps) return 0.0f;
+            if (springConstant < Math.Constants.Eps)
+                return 0.0f;
 
             // f = (1 / 2pi) * sqrt(k / m)
             return math.sqrt(springConstant / mass) * Math.Constants.OneOverTau;
@@ -745,7 +746,8 @@ namespace Unity.Physics
         // purely viscous motors, the provided damping coefficient is returned here as an approximation.
         public static float CalculateDampingRatio(float springConstant, float dampingCoefficient, float mass = 1.0f)
         {
-            if (dampingCoefficient < Math.Constants.Eps) return 0.0f;
+            if (dampingCoefficient < Math.Constants.Eps)
+                return 0.0f;
 
             var tmp = springConstant * mass;
             if (tmp < Math.Constants.Eps)
@@ -760,7 +762,8 @@ namespace Unity.Physics
 
         public static float CalculateSpringConstantFromSpringFrequency(float springFrequency, float mass = 1.0f)
         {
-            if (springFrequency < Math.Constants.Eps) return 0.0f;
+            if (springFrequency < Math.Constants.Eps)
+                return 0.0f;
 
             // f = (1 / 2pi) * sqrt(k / m)
             // k = m * (f * 2pi)^2
@@ -770,7 +773,8 @@ namespace Unity.Physics
 
         public static float CalculateDampingCoefficient(float springConstant, float dampingRatio, float mass = 1.0f)
         {
-            if (dampingRatio < Math.Constants.Eps) return 0.0f;
+            if (dampingRatio < Math.Constants.Eps)
+                return 0.0f;
 
             var tmp = springConstant * mass;
             if (tmp < Math.Constants.Eps)

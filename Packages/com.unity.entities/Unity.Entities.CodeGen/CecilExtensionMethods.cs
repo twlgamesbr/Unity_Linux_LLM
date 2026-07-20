@@ -65,7 +65,8 @@ namespace Unity.Entities.CodeGen
         public static bool TypeImplements(this TypeReference typeReference, TypeReference interfaceType)
         {
             var resolvedType = typeReference.Resolve();
-            if (resolvedType == null) return false;
+            if (resolvedType == null)
+                return false;
 
             return resolvedType.Interfaces.Any(i =>
             {
@@ -196,10 +197,12 @@ namespace Unity.Entities.CodeGen
                 if (arg.Interfaces.Any(typeInterface => typeInterface.InterfaceType.FullName == "Unity.Entities.ISystem"))
                     return true;
 
-                if (baseTypeRef == null) return false;
+                if (baseTypeRef == null)
+                    return false;
 
                 ///XXX THIS IS BAD https://jira.unity3d.com/browse/DOTS-10211
-                if (baseTypeRef.Namespace == "Unity.Entities" && baseTypeRef.Name == "ComponentSystemBase") return true;
+                if (baseTypeRef.Namespace == "Unity.Entities" && baseTypeRef.Name == "ComponentSystemBase")
+                    return true;
 
                 switch (baseTypeRef.Name)
                 {

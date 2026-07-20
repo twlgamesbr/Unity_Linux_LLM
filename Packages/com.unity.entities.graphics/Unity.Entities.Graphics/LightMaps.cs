@@ -85,9 +85,12 @@ namespace Unity.Rendering
         public override int GetHashCode()
         {
             int hash = 0;
-            if (!ReferenceEquals(colorsRef, null)) hash ^= colorsRef.GetHashCode();
-            if (!ReferenceEquals(directionsRef, null)) hash ^= directionsRef.GetHashCode();
-            if (!ReferenceEquals(shadowMasksRef, null)) hash ^= shadowMasksRef.GetHashCode();
+            if (!ReferenceEquals(colorsRef, null))
+                hash ^= colorsRef.GetHashCode();
+            if (!ReferenceEquals(directionsRef, null))
+                hash ^= directionsRef.GetHashCode();
+            if (!ReferenceEquals(shadowMasksRef, null))
+                hash ^= shadowMasksRef.GetHashCode();
             return hash;
         }
 

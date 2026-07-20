@@ -235,7 +235,10 @@ namespace Unity.Collections
         [MonoPInvokeCallback(typeof(AllocatorManager.TryFunction))]
         internal static int Try(IntPtr state, ref AllocatorManager.Block block)
         {
-            unsafe { return ((AutoFreeAllocator*)state)->Try(ref block); }
+            unsafe
+            {
+                return ((AutoFreeAllocator*)state)->Try(ref block);
+            }
         }
 
         /// <summary>

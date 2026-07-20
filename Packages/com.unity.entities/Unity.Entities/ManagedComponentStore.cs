@@ -225,7 +225,8 @@ namespace Unity.Entities
             var typeIndex = TypeManager.GetTypeIndex<T>();
             var index = FindSharedComponentIndex(TypeManager.GetTypeIndex<T>(), newData);
 
-            if (index == 0) return 0;
+            if (index == 0)
+                return 0;
 
             if (index != -1)
             {
@@ -566,7 +567,8 @@ namespace Unity.Entities
             for (int srcIndex = 1; srcIndex < numSharedComponents; ++srcIndex)
             {
                 var srcData = srcManagedComponents.m_SharedComponentData[srcIndex];
-                if (srcData == null) continue;
+                if (srcData == null)
+                    continue;
 
                 var typeIndex = srcInfos[srcIndex].ComponentType;
                 var hashCode = srcInfos[srcIndex].HashCode;
@@ -579,7 +581,6 @@ namespace Unity.Entities
             }
 
             srcManagedComponents.ResetSharedComponentData();
-
         }
 
 

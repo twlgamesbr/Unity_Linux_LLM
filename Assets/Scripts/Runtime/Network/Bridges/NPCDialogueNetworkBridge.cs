@@ -773,7 +773,8 @@ namespace NPCSystem.Network.Bridges
             onStart = (_) => { };
             onComplete = (reqId, response) =>
             {
-                if (reqId != request.requestId) return;
+                if (reqId != request.requestId)
+                    return;
                 responseContent = response;
                 _dialogueManager.OnResponseStart.RemoveListener(onStart);
                 _dialogueManager.OnResponseComplete.RemoveListener(onComplete);

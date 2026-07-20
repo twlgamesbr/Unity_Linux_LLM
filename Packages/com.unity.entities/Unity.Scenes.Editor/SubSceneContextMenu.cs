@@ -186,7 +186,10 @@ namespace Unity.Scenes.Editor
                 var topLevelSelection = GetValidSelectedGameObjectsForSubSceneCreation(args.target);
                 if (topLevelSelection == null)
                     return null;
-                try { ThrowIfAnyGameObjectsCannotBeMovedToSubScene(topLevelSelection); }
+                try
+                {
+                    ThrowIfAnyGameObjectsCannotBeMovedToSubScene(topLevelSelection);
+                }
                 catch (ArgumentException e)
                 {
                     EditorUtility.DisplayDialog("Cannot Move Selection To Sub Scene", e.Message, "OK");

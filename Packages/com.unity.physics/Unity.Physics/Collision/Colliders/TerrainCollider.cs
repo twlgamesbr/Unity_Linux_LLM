@@ -167,7 +167,11 @@ namespace Unity.Physics
         /// <param name="filter">   Specifies the filter. </param>
         public void SetCollisionFilter(CollisionFilter filter)
         {
-            if (!m_Header.Filter.Equals(filter)) { m_Header.Version++; m_Header.Filter = filter; }
+            if (!m_Header.Filter.Equals(filter))
+            {
+                m_Header.Version++;
+                m_Header.Filter = filter;
+            }
         }
 
         /// <summary>   This function is not implemented for this collider type. </summary>

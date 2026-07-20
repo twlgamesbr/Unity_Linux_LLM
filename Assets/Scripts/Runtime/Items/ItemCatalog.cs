@@ -41,7 +41,8 @@ namespace NPCSystem.Items
             _index.Clear();
             foreach (var def in _definitions)
             {
-                if (def == null) continue;
+                if (def == null)
+                    continue;
                 string id = def.ItemId.ToLowerInvariant().Trim();
                 if (!string.IsNullOrWhiteSpace(id) && !_index.ContainsKey(id))
                 {

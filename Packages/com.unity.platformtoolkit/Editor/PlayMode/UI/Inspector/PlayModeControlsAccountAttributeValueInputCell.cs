@@ -36,7 +36,8 @@ namespace Unity.PlatformToolkit.PlayMode
             get => m_ValueType;
             set
             {
-                if (m_ValueType == value) return;
+                if (m_ValueType == value)
+                    return;
                 m_ValueType = value;
                 UpdateUI();
             }

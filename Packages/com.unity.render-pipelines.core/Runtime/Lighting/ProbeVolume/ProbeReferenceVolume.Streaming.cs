@@ -617,7 +617,8 @@ namespace UnityEngine.Rendering
         /// <param name="options">Options coming from the volume stack.</param>
         public void UpdateCellStreaming(CommandBuffer cmd, Camera camera, ProbeVolumesOptions options)
         {
-            if (!isInitialized || m_CurrentBakingSet == null) return;
+            if (!isInitialized || m_CurrentBakingSet == null)
+                return;
 
             using (new ProfilingScope(ProfilingSampler.Get(CoreProfileId.APVCellStreamingUpdate)))
             {
@@ -961,7 +962,8 @@ namespace UnityEngine.Rendering
                 return 1;
             else if (a.indexInfo.updateInfo.GetNumberOfChunks() < b.indexInfo.updateInfo.GetNumberOfChunks())
                 return -1;
-            else return 0;
+            else
+                return 0;
         }
 
         static DynamicArray<Cell>.SortComparer s_DefragComparer = DefragComparer;
@@ -1255,10 +1257,14 @@ namespace UnityEngine.Rendering
                 cellData.touchupVolumeInteraction = (new NativeArray<byte>(touchupSize, Allocator.Persistent, NativeArrayOptions.UninitializedMemory)).Reinterpret<float>(1);
                 cellData.offsetVectors = (new NativeArray<byte>(offsetsSize, Allocator.Persistent, NativeArrayOptions.UninitializedMemory)).Reinterpret<Vector3>(1);
 
-                request.supportStreamingRequest.AddReadCommand(supportOffset, positionSize, (byte*)cellData.probePositions.GetUnsafePtr()); supportOffset += positionSize;
-                request.supportStreamingRequest.AddReadCommand(supportOffset, validitySize, (byte*)cellData.validity.GetUnsafePtr()); supportOffset += validitySize;
-                request.supportStreamingRequest.AddReadCommand(supportOffset, touchupSize, (byte*)cellData.touchupVolumeInteraction.GetUnsafePtr()); supportOffset += touchupSize;
-                request.supportStreamingRequest.AddReadCommand(supportOffset, layerSize, (byte*)cellData.layer.GetUnsafePtr()); supportOffset += layerSize;
+                request.supportStreamingRequest.AddReadCommand(supportOffset, positionSize, (byte*)cellData.probePositions.GetUnsafePtr());
+                supportOffset += positionSize;
+                request.supportStreamingRequest.AddReadCommand(supportOffset, validitySize, (byte*)cellData.validity.GetUnsafePtr());
+                supportOffset += validitySize;
+                request.supportStreamingRequest.AddReadCommand(supportOffset, touchupSize, (byte*)cellData.touchupVolumeInteraction.GetUnsafePtr());
+                supportOffset += touchupSize;
+                request.supportStreamingRequest.AddReadCommand(supportOffset, layerSize, (byte*)cellData.layer.GetUnsafePtr());
+                supportOffset += layerSize;
                 request.supportStreamingRequest.AddReadCommand(supportOffset, offsetsSize, (byte*)cellData.offsetVectors.GetUnsafePtr());
                 request.supportStreamingRequest.RunCommands(supportDataAsset.OpenFile());
             }

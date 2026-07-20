@@ -390,7 +390,14 @@ namespace Unity.Physics
         /// <summary>   Gets or sets the material. </summary>
         ///
         /// <value> The material. </value>
-        public Material Material { get => m_Header.Material; set { if (!m_Header.Material.Equals(value)) { m_Header.Version += 1; m_Header.Material = value; } } }
+        public Material Material { get => m_Header.Material; set
+            {
+                if (!m_Header.Material.Equals(value))
+                {
+                    m_Header.Version += 1;
+                    m_Header.Material = value; }
+            }
+        }
 
         /// <summary>   Gets the collision filter. </summary>
         ///
@@ -402,7 +409,11 @@ namespace Unity.Physics
         /// <param name="filter">   Specifies the filter. </param>
         public void SetCollisionFilter(CollisionFilter filter)
         {
-            if (!m_Header.Filter.Equals(filter)) { m_Header.Version++; m_Header.Filter = filter; }
+            if (!m_Header.Filter.Equals(filter))
+            {
+                m_Header.Version++;
+                m_Header.Filter = filter;
+            }
         }
 
         /// <summary>

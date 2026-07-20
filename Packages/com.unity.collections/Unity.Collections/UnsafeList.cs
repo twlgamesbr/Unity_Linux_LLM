@@ -1680,7 +1680,8 @@ namespace Unity.Collections.LowLevel.Unsafe
         {
             for (int i = 0; i < Length; ++i)
             {
-                if (Ptr[i] == ptr) return i;
+                if (Ptr[i] == ptr)
+                    return i;
             }
 
             return -1;
@@ -1923,7 +1924,8 @@ namespace Unity.Collections.LowLevel.Unsafe
             {
                 for (int i = 0; i < Length; ++i)
                 {
-                    if (Ptr[i] == ptr) return i;
+                    if (Ptr[i] == ptr)
+                        return i;
                 }
                 return -1;
             }
@@ -1985,7 +1987,8 @@ namespace Unity.Collections.LowLevel.Unsafe
             {
                 for (int i = 0; i < Length; ++i)
                 {
-                    if (Ptr[i] == ptr) return i;
+                    if (Ptr[i] == ptr)
+                        return i;
                 }
                 return -1;
             }

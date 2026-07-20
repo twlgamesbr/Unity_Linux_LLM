@@ -214,7 +214,8 @@ namespace Unity.Entities.Editor
             var entityScene = Entity.Null;
             foreach (var entityToSubScene in m_EntityToSubScene)
             {
-                if (entityToSubScene.Value != subScene) continue;
+                if (entityToSubScene.Value != subScene)
+                    continue;
 
                 entityScene = entityToSubScene.Key;
                 break;

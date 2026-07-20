@@ -212,7 +212,8 @@ namespace UnityEngine.Rendering.Universal
             Vector3 center = 0.5f * (minCorner + maxCorner);
             Vector3 size = maxCorner - minCorner;
 
-            return new Bounds(center, size); ;
+            return new Bounds(center, size);
+            ;
         }
 
         internal static void CallOnBeforeRender(Camera camera, ILight2DCullResult cullResult)

@@ -1113,7 +1113,8 @@ namespace UnityEngine.InputSystem
         {
             get
             {
-                if (m_KeyboardMouseSchemeIndex == -1) m_KeyboardMouseSchemeIndex = asset.FindControlSchemeIndex("Keyboard&Mouse");
+                if (m_KeyboardMouseSchemeIndex == -1)
+                    m_KeyboardMouseSchemeIndex = asset.FindControlSchemeIndex("Keyboard&Mouse");
                 return asset.controlSchemes[m_KeyboardMouseSchemeIndex];
             }
         }
@@ -1122,7 +1123,8 @@ namespace UnityEngine.InputSystem
         {
             get
             {
-                if (m_GamepadSchemeIndex == -1) m_GamepadSchemeIndex = asset.FindControlSchemeIndex("Gamepad");
+                if (m_GamepadSchemeIndex == -1)
+                    m_GamepadSchemeIndex = asset.FindControlSchemeIndex("Gamepad");
                 return asset.controlSchemes[m_GamepadSchemeIndex];
             }
         }
@@ -1131,7 +1133,8 @@ namespace UnityEngine.InputSystem
         {
             get
             {
-                if (m_TouchSchemeIndex == -1) m_TouchSchemeIndex = asset.FindControlSchemeIndex("Touch");
+                if (m_TouchSchemeIndex == -1)
+                    m_TouchSchemeIndex = asset.FindControlSchemeIndex("Touch");
                 return asset.controlSchemes[m_TouchSchemeIndex];
             }
         }
@@ -1140,7 +1143,8 @@ namespace UnityEngine.InputSystem
         {
             get
             {
-                if (m_JoystickSchemeIndex == -1) m_JoystickSchemeIndex = asset.FindControlSchemeIndex("Joystick");
+                if (m_JoystickSchemeIndex == -1)
+                    m_JoystickSchemeIndex = asset.FindControlSchemeIndex("Joystick");
                 return asset.controlSchemes[m_JoystickSchemeIndex];
             }
         }
@@ -1149,7 +1153,8 @@ namespace UnityEngine.InputSystem
         {
             get
             {
-                if (m_XRSchemeIndex == -1) m_XRSchemeIndex = asset.FindControlSchemeIndex("XR");
+                if (m_XRSchemeIndex == -1)
+                    m_XRSchemeIndex = asset.FindControlSchemeIndex("XR");
                 return asset.controlSchemes[m_XRSchemeIndex];
             }
         }

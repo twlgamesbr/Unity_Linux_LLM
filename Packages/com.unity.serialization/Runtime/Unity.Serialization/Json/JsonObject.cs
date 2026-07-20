@@ -17,7 +17,8 @@ namespace Unity.Serialization.Json
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]  
         static void RegisterPropertyBag()
         {
-            if (k_Registered) return;
+            if (k_Registered)
+                return;
 
             k_Registered = true;
             PropertyBag.Register(new KeyValueCollectionPropertyBag<JsonObject, string, object>());
@@ -37,7 +38,8 @@ namespace Unity.Serialization.Json
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]  
         static void RegisterPropertyBag()
         {
-            if (k_Registered) return;
+            if (k_Registered)
+                return;
 
             k_Registered = true;
             PropertyBag.Register(new IndexedCollectionPropertyBag<JsonArray, object>());

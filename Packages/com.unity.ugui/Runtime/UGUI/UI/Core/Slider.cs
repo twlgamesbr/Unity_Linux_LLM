@@ -83,7 +83,14 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public RectTransform fillRect { get { return m_FillRect; } set { if (SetPropertyUtility.SetClass(ref m_FillRect, value)) {UpdateCachedReferences(); UpdateVisuals(); } } }
+        public RectTransform fillRect { get { return m_FillRect; } set
+            {
+                if (SetPropertyUtility.SetClass(ref m_FillRect, value))
+                {
+                    UpdateCachedReferences();
+                    UpdateVisuals(); }
+            }
+        }
 
         [SerializeField]
         private RectTransform m_HandleRect;
@@ -115,7 +122,14 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public RectTransform handleRect { get { return m_HandleRect; } set { if (SetPropertyUtility.SetClass(ref m_HandleRect, value)) { UpdateCachedReferences(); UpdateVisuals(); } } }
+        public RectTransform handleRect { get { return m_HandleRect; } set
+            {
+                if (SetPropertyUtility.SetClass(ref m_HandleRect, value))
+                {
+                    UpdateCachedReferences();
+                    UpdateVisuals(); }
+            }
+        }
 
         [Space]
 
@@ -148,7 +162,12 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public Direction direction { get { return m_Direction; } set { if (SetPropertyUtility.SetStruct(ref m_Direction, value)) UpdateVisuals(); } }
+        public Direction direction { get { return m_Direction; } set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_Direction, value))
+                    UpdateVisuals();
+            }
+        }
 
         [SerializeField]
         private float m_MinValue = 0;
@@ -176,7 +195,14 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public float minValue { get { return m_MinValue; } set { if (SetPropertyUtility.SetStruct(ref m_MinValue, value)) { Set(m_Value); UpdateVisuals(); } } }
+        public float minValue { get { return m_MinValue; } set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_MinValue, value))
+                {
+                    Set(m_Value);
+                    UpdateVisuals(); }
+            }
+        }
 
         [SerializeField]
         private float m_MaxValue = 1;
@@ -204,7 +230,14 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public float maxValue { get { return m_MaxValue; } set { if (SetPropertyUtility.SetStruct(ref m_MaxValue, value)) { Set(m_Value); UpdateVisuals(); } } }
+        public float maxValue { get { return m_MaxValue; } set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_MaxValue, value))
+                {
+                    Set(m_Value);
+                    UpdateVisuals(); }
+            }
+        }
 
         [SerializeField]
         private bool m_WholeNumbers = false;
@@ -232,7 +265,14 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public bool wholeNumbers { get { return m_WholeNumbers; } set { if (SetPropertyUtility.SetStruct(ref m_WholeNumbers, value)) { Set(m_Value); UpdateVisuals(); } } }
+        public bool wholeNumbers { get { return m_WholeNumbers; } set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_WholeNumbers, value))
+                {
+                    Set(m_Value);
+                    UpdateVisuals(); }
+            }
+        }
 
         [SerializeField]
         protected float m_Value;

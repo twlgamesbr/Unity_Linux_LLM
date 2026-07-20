@@ -231,7 +231,8 @@ namespace UnityEngine.Rendering
                     1.0f / s_VrsResources.tileSize.x,
                     1.0f / s_VrsResources.tileSize.y,
                     0,
-                    0);;
+                    0);
+                ;
 
                 builder.UseTexture(outerPassData.source);
                 builder.UseBuffer(outerPassData.lut);

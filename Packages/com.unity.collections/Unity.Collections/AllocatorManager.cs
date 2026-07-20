@@ -1353,7 +1353,12 @@ namespace Unity.Collections
             public int Length { get { return 32768; } set {} }
             public ref T ElementAt(int index)
             {
-                unsafe { fixed(Array4096<T>* p = &f0) { return ref UnsafeUtility.AsRef<T>((T*)p + index); } }
+                unsafe
+                {
+                    fixed (Array4096<T>* p = &f0)
+                    {
+                        return ref UnsafeUtility.AsRef<T>((T*)p + index); }
+                }
             }
         }
 

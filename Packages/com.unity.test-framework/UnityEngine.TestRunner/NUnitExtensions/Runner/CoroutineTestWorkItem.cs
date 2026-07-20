@@ -49,7 +49,9 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
                 var coroutineRunner = new CoroutineRunner(monoBehaviourCoroutineRunner, Context);
                 yield return coroutineRunner.HandleEnumerableTest(executeEnumerable);
 
-                while (executeEnumerable.MoveNext()) {}
+                while (executeEnumerable.MoveNext())
+                {
+                }
 
                 Result = Context.CurrentResult;
             }

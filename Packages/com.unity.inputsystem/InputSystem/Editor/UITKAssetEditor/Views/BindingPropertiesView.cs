@@ -146,7 +146,8 @@ namespace UnityEngine.InputSystem.Editor
 
         private void DrawControlSchemeToggles(ViewState viewState, SerializedInputBinding binding)
         {
-            if (!viewState.controlSchemes.Any()) return;
+            if (!viewState.controlSchemes.Any())
+                return;
 
             var useInControlSchemeLabel = new Label("Use in control scheme")
             {

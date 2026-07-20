@@ -254,7 +254,8 @@ namespace Unity.Entities.Editor
 
         void OnElementRenamed(HierarchyNameElement element, bool canceled)
         {
-            if (canceled) return;
+            if (canceled)
+                return;
 
             if (Handle.Kind == NodeKind.GameObject)
             {

@@ -25,7 +25,8 @@ namespace UnityEngine.Rendering.Universal
 
         public void Dispose()
         {
-            if (managedArray == null) return;
+            if (managedArray == null)
+                return;
 #if ENABLE_UNITY_COLLECTIONS_CHECKS
             AtomicSafetyHandle.Release(NativeArrayUnsafeUtility.GetAtomicSafetyHandle(nativeArray));
 #endif

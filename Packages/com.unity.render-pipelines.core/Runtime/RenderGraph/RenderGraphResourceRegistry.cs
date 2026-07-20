@@ -1092,7 +1092,8 @@ namespace UnityEngine.Rendering.RenderGraphModule
 
         private void ClearTexture(InternalRenderGraphContext rgContext, TextureResource resource)
         {
-            if (resource == null) return;
+            if (resource == null)
+                return;
             var debugClear = m_RenderGraphDebug.clearRenderTargetsAtCreation && !resource.desc.clearBuffer;
             var clearFlag = GraphicsFormatUtility.IsDepthStencilFormat(resource.desc.format) ? ClearFlag.DepthStencil : ClearFlag.Color;
             var clearColor = debugClear ? Color.magenta : resource.desc.clearColor;

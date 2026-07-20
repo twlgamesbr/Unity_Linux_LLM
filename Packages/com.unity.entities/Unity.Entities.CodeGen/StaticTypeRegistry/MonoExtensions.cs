@@ -45,11 +45,16 @@ namespace Unity.Entities.BuildUtils
         public static TypeDefinition FixedSpecialType(this TypeReference typeRef)
         {
             TypeDefinition type = typeRef.Resolve();
-            if (type.MetadataType == MetadataType.IntPtr) return type.Module.TypeSystem.IntPtr.Resolve();
-            if (type.MetadataType == MetadataType.Void) return type.Module.TypeSystem.Void.Resolve();
-            if (type.MetadataType == MetadataType.String) return type.Module.TypeSystem.String.Resolve();
-            if (IsCppBasicType(type)) return type;
-            else return null;
+            if (type.MetadataType == MetadataType.IntPtr)
+                return type.Module.TypeSystem.IntPtr.Resolve();
+            if (type.MetadataType == MetadataType.Void)
+                return type.Module.TypeSystem.Void.Resolve();
+            if (type.MetadataType == MetadataType.String)
+                return type.Module.TypeSystem.String.Resolve();
+            if (IsCppBasicType(type))
+                return type;
+            else
+                return null;
         }
 
 

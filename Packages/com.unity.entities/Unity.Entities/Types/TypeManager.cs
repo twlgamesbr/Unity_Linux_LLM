@@ -3291,7 +3291,8 @@ namespace Unity.Entities
 
         internal static TypeInfo BuildComponentType(Type type, BuildComponentCache caches)
         {
-            if (caches == null) caches = new BuildComponentCache();
+            if (caches == null)
+                caches = new BuildComponentCache();
             return BuildComponentType(type, null, caches);
         }
 

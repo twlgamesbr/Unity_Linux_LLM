@@ -76,7 +76,8 @@ namespace UnityEditor.TestRunner.TestLaunchers
 
             foreach (var target in targets)
             {
-                if (target.status != DeploymentTargetStatus.Ready) continue;
+                if (target.status != DeploymentTargetStatus.Ready)
+                    continue;
 
                 var logger = deploymentTargetManager.GetTargetLogger(target.id);
                 logger.Clear();

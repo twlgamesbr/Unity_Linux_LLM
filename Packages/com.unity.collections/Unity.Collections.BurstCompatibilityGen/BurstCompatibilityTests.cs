@@ -122,10 +122,12 @@ namespace Unity.Collections.Tests
                 var rtn = other.methodBase.DeclaringType.FullName;
 
                 int tc = ltn.CompareTo(rtn);
-                if (tc != 0) return tc;
+                if (tc != 0)
+                    return tc;
 
                 tc = lhs.Name.CompareTo(rhs.Name);
-                if (tc != 0) return tc;
+                if (tc != 0)
+                    return tc;
 
                 var lp = lhs.GetParameters();
                 var rp = rhs.GetParameters();

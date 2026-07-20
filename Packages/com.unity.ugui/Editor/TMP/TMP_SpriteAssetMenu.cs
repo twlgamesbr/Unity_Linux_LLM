@@ -424,7 +424,8 @@ namespace TMPro.EditorUtilities
                     int id = 0;
                     for (int j = 0; j < ids.Length; j++ )
                     {
-                        if (ids[0] != 0) break;
+                        if (ids[0] != 0)
+                            break;
 
                         if (j > 0 && (ids[j] - ids[j - 1]) > 1)
                         {

@@ -26,9 +26,11 @@ namespace Unity.Serialization.Binary
             visitor.SetUserDefinedAdapters(parameters.UserDefinedAdapters);
             visitor.SetSerializedReferences(parameters.DisableSerializedReferences ? default : state.GetSerializedReferences());
             
-            using (visitor.Lock()) PropertyContainer.Accept(visitor, ref container);
+            using (visitor.Lock())
+                PropertyContainer.Accept(visitor, ref container);
             
-            if (null == parameters.State && !parameters.DisableSerializedReferences) state.GetSerializedReferences().Clear();
+            if (null == parameters.State && !parameters.DisableSerializedReferences)
+                state.GetSerializedReferences().Clear();
         }
     }
 }

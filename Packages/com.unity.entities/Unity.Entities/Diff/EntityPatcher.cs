@@ -1162,7 +1162,8 @@ namespace Unity.Entities
             public int CompareTo(EntityComponentPair other)
             {
                 var result = Entity.CompareTo(other.Entity);
-                if (result != 0) return result;
+                if (result != 0)
+                    return result;
                 result = Component.TypeIndex.CompareTo(other.Component.TypeIndex);
                 return result;
             }

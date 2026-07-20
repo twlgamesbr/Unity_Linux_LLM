@@ -40,8 +40,10 @@ namespace Unity.Web.Stripping.Editor
         /// <returns>Compression type</returns>
         public static CompressionType GetCompressionType(string filename)
         {
-            if (IsBrotliCompressed(filename)) return CompressionType.Brotli;
-            if (IsGzipCompressed(filename)) return CompressionType.Gzip;
+            if (IsBrotliCompressed(filename))
+                return CompressionType.Brotli;
+            if (IsGzipCompressed(filename))
+                return CompressionType.Gzip;
             return CompressionType.Disabled;
         }
 

@@ -96,7 +96,8 @@ namespace Unity.Entities.UI
 
         void Callback(FocusOutEvent evt)
         {
-            m_RangeInputRoot.Hide();;
+            m_RangeInputRoot.Hide();
+            ;
             m_RangeButton.Show();
         }
 

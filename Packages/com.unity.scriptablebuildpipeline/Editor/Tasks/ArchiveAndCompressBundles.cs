@@ -297,7 +297,11 @@ namespace UnityEditor.Build.Pipeline.Tasks
                     }
                 }
 
-                List<ArchiveWorkItem> allItems = bundleNameToWorkItem.Select((x, index) => { x.Value.Index = index; return x.Value; }).ToList();
+                List<ArchiveWorkItem> allItems = bundleNameToWorkItem.Select((x, index) =>
+                {
+                    x.Value.Index = index;
+                    return x.Value;
+                }).ToList();
                 return allItems;
             }
         }
@@ -410,8 +414,14 @@ namespace UnityEditor.Build.Pipeline.Tasks
             {
                 tasks.Add(Task.Run(() =>
                 {
-                    try { ArchiveSingleItem(item, tempOutputFolder, log, stripUnityVersion); }
-                    finally { semaphore.Release(); }
+                    try
+                    {
+                        ArchiveSingleItem(item, tempOutputFolder, log, stripUnityVersion);
+                    }
+                    finally
+                    {
+                        semaphore.Release();
+                    }
                 }, srcToken.Token));
             }
 

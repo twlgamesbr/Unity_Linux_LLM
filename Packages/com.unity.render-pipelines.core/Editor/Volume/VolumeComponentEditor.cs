@@ -435,7 +435,8 @@ namespace UnityEditor.Rendering
         /// <returns>A label to display in the component header.</returns>
         public virtual GUIContent GetDisplayTitle()
         {
-            if (m_DisplayTitle != null) return m_DisplayTitle;
+            if (m_DisplayTitle != null)
+                return m_DisplayTitle;
 
             var volumeComponentType = volumeComponent.GetType();
             var displayInfo = volumeComponentType.GetCustomAttribute<DisplayInfoAttribute>();

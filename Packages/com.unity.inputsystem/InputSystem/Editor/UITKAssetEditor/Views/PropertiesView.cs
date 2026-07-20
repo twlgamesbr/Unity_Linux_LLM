@@ -87,7 +87,8 @@ namespace UnityEngine.InputSystem.Editor
 
         private bool IsValidProcessorForControl(Type expectedValueType, string name)
         {
-            if (expectedValueType == null) return true;
+            if (expectedValueType == null)
+                return true;
             var type = InputProcessor.s_Processors.LookupTypeRegistration(name);
             var valueType = InputProcessor.GetValueTypeFromType(type);
             if (valueType != null && !expectedValueType.IsAssignableFrom(valueType))
@@ -115,7 +116,8 @@ namespace UnityEngine.InputSystem.Editor
 
         private bool IsValidInteractionForControl(Type expectedValueType, string name)
         {
-            if (expectedValueType == null) return true;
+            if (expectedValueType == null)
+                return true;
             var type = InputInteraction.s_Interactions.LookupTypeRegistration(name);
             var valueType = InputInteraction.GetValueType(type);
             if (valueType != null && !expectedValueType.IsAssignableFrom(valueType))

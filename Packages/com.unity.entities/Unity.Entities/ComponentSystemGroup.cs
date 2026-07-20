@@ -721,18 +721,22 @@ namespace Unity.Entities
                         // Update unmanaged (burstable) code.
                         var handle = m_UnmanagedSystemsToUpdate[index.Index];
                         var state = (OnUpdateBefore.IsCreated || OnUpdateAfter.IsCreated) ? world.ResolveSystemState(handle) : null;
-                        if (OnUpdateBefore.IsCreated && state != null) OnUpdateBefore.Invoke(state->m_SystemTypeIndex, ref *state);
+                        if (OnUpdateBefore.IsCreated && state != null)
+                            OnUpdateBefore.Invoke(state->m_SystemTypeIndex, ref *state);
                         worldImpl.UpdateSystem(handle);
-                        if (OnUpdateAfter.IsCreated && state != null) OnUpdateAfter.Invoke(state->m_SystemTypeIndex, ref *state);
+                        if (OnUpdateAfter.IsCreated && state != null)
+                            OnUpdateAfter.Invoke(state->m_SystemTypeIndex, ref *state);
                     }
                     else
                     {
                         // Update managed code.
                         var sys = m_managedSystemsToUpdate[index.Index];
                         var state = sys.m_StatePtr;
-                        if (OnUpdateBefore.IsCreated && state != null) OnUpdateBefore.Invoke(state->m_SystemTypeIndex, ref *state);
+                        if (OnUpdateBefore.IsCreated && state != null)
+                            OnUpdateBefore.Invoke(state->m_SystemTypeIndex, ref *state);
                         sys.Update();
-                        if (OnUpdateAfter.IsCreated && state != null) OnUpdateAfter.Invoke(state->m_SystemTypeIndex, ref *state);
+                        if (OnUpdateAfter.IsCreated && state != null)
+                            OnUpdateAfter.Invoke(state->m_SystemTypeIndex, ref *state);
                     }
                 }
                 catch (Exception e)

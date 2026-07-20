@@ -328,7 +328,8 @@ namespace UnityEngine.Rendering
                                 {
                                     touchedBrick = true;
                                     minSubdiv = b.subdivisionLevel;
-                                    if (minSubdiv == 0) break;
+                                    if (minSubdiv == 0)
+                                        break;
                                 }
                             }
                         }
@@ -376,32 +377,72 @@ namespace UnityEngine.Rendering
 
         static void WriteToShaderCoeffsL0L1(in SphericalHarmonicsL2 sh, NativeArray<ushort> shaderCoeffsL0L1Rx, NativeArray<byte> shaderCoeffsL1GL1Ry, NativeArray<byte> shaderCoeffsL1BL1Rz, int offset)
         {
-            shaderCoeffsL0L1Rx[offset + 0] = SHFloatToHalf(sh[0, 0]); shaderCoeffsL0L1Rx[offset + 1] = SHFloatToHalf(sh[1, 0]); shaderCoeffsL0L1Rx[offset + 2] = SHFloatToHalf(sh[2, 0]); shaderCoeffsL0L1Rx[offset + 3] = SHFloatToHalf(sh[0, 1]);
-            shaderCoeffsL1GL1Ry[offset + 0] = SHFloatToByte(sh[1, 1]); shaderCoeffsL1GL1Ry[offset + 1] = SHFloatToByte(sh[1, 2]); shaderCoeffsL1GL1Ry[offset + 2] = SHFloatToByte(sh[1, 3]); shaderCoeffsL1GL1Ry[offset + 3] = SHFloatToByte(sh[0, 2]);
-            shaderCoeffsL1BL1Rz[offset + 0] = SHFloatToByte(sh[2, 1]); shaderCoeffsL1BL1Rz[offset + 1] = SHFloatToByte(sh[2, 2]); shaderCoeffsL1BL1Rz[offset + 2] = SHFloatToByte(sh[2, 3]); shaderCoeffsL1BL1Rz[offset + 3] = SHFloatToByte(sh[0, 3]);
+            shaderCoeffsL0L1Rx[offset + 0] = SHFloatToHalf(sh[0, 0]);
+            shaderCoeffsL0L1Rx[offset + 1] = SHFloatToHalf(sh[1, 0]);
+            shaderCoeffsL0L1Rx[offset + 2] = SHFloatToHalf(sh[2, 0]);
+            shaderCoeffsL0L1Rx[offset + 3] = SHFloatToHalf(sh[0, 1]);
+            shaderCoeffsL1GL1Ry[offset + 0] = SHFloatToByte(sh[1, 1]);
+            shaderCoeffsL1GL1Ry[offset + 1] = SHFloatToByte(sh[1, 2]);
+            shaderCoeffsL1GL1Ry[offset + 2] = SHFloatToByte(sh[1, 3]);
+            shaderCoeffsL1GL1Ry[offset + 3] = SHFloatToByte(sh[0, 2]);
+            shaderCoeffsL1BL1Rz[offset + 0] = SHFloatToByte(sh[2, 1]);
+            shaderCoeffsL1BL1Rz[offset + 1] = SHFloatToByte(sh[2, 2]);
+            shaderCoeffsL1BL1Rz[offset + 2] = SHFloatToByte(sh[2, 3]);
+            shaderCoeffsL1BL1Rz[offset + 3] = SHFloatToByte(sh[0, 3]);
         }
 
         static void WriteToShaderCoeffsL2(in SphericalHarmonicsL2 sh, NativeArray<byte> shaderCoeffsL2_0, NativeArray<byte> shaderCoeffsL2_1, NativeArray<byte> shaderCoeffsL2_2, NativeArray<byte> shaderCoeffsL2_3, int offset)
         {
-            shaderCoeffsL2_0[offset + 0] = SHFloatToByte(sh[0, 4]); shaderCoeffsL2_0[offset + 1] = SHFloatToByte(sh[0, 5]); shaderCoeffsL2_0[offset + 2] = SHFloatToByte(sh[0, 6]); shaderCoeffsL2_0[offset + 3] = SHFloatToByte(sh[0, 7]);
-            shaderCoeffsL2_1[offset + 0] = SHFloatToByte(sh[1, 4]); shaderCoeffsL2_1[offset + 1] = SHFloatToByte(sh[1, 5]); shaderCoeffsL2_1[offset + 2] = SHFloatToByte(sh[1, 6]); shaderCoeffsL2_1[offset + 3] = SHFloatToByte(sh[1, 7]);
-            shaderCoeffsL2_2[offset + 0] = SHFloatToByte(sh[2, 4]); shaderCoeffsL2_2[offset + 1] = SHFloatToByte(sh[2, 5]); shaderCoeffsL2_2[offset + 2] = SHFloatToByte(sh[2, 6]); shaderCoeffsL2_2[offset + 3] = SHFloatToByte(sh[2, 7]);
-            shaderCoeffsL2_3[offset + 0] = SHFloatToByte(sh[0, 8]); shaderCoeffsL2_3[offset + 1] = SHFloatToByte(sh[1, 8]); shaderCoeffsL2_3[offset + 2] = SHFloatToByte(sh[2, 8]);
+            shaderCoeffsL2_0[offset + 0] = SHFloatToByte(sh[0, 4]);
+            shaderCoeffsL2_0[offset + 1] = SHFloatToByte(sh[0, 5]);
+            shaderCoeffsL2_0[offset + 2] = SHFloatToByte(sh[0, 6]);
+            shaderCoeffsL2_0[offset + 3] = SHFloatToByte(sh[0, 7]);
+            shaderCoeffsL2_1[offset + 0] = SHFloatToByte(sh[1, 4]);
+            shaderCoeffsL2_1[offset + 1] = SHFloatToByte(sh[1, 5]);
+            shaderCoeffsL2_1[offset + 2] = SHFloatToByte(sh[1, 6]);
+            shaderCoeffsL2_1[offset + 3] = SHFloatToByte(sh[1, 7]);
+            shaderCoeffsL2_2[offset + 0] = SHFloatToByte(sh[2, 4]);
+            shaderCoeffsL2_2[offset + 1] = SHFloatToByte(sh[2, 5]);
+            shaderCoeffsL2_2[offset + 2] = SHFloatToByte(sh[2, 6]);
+            shaderCoeffsL2_2[offset + 3] = SHFloatToByte(sh[2, 7]);
+            shaderCoeffsL2_3[offset + 0] = SHFloatToByte(sh[0, 8]);
+            shaderCoeffsL2_3[offset + 1] = SHFloatToByte(sh[1, 8]);
+            shaderCoeffsL2_3[offset + 2] = SHFloatToByte(sh[2, 8]);
         }
 
         static void ReadFromShaderCoeffsL0L1(ref SphericalHarmonicsL2 sh, NativeArray<ushort> shaderCoeffsL0L1Rx, NativeArray<byte> shaderCoeffsL1GL1Ry, NativeArray<byte> shaderCoeffsL1BL1Rz, int offset)
         {
-            sh[0, 0] = SHHalfToFloat(shaderCoeffsL0L1Rx[offset + 0]); sh[1, 0] = SHHalfToFloat(shaderCoeffsL0L1Rx[offset + 1]); sh[2, 0] = SHHalfToFloat(shaderCoeffsL0L1Rx[offset + 2]); sh[0, 1] = SHHalfToFloat(shaderCoeffsL0L1Rx[offset + 3]);
-            sh[1, 1] = SHByteToFloat(shaderCoeffsL1GL1Ry[offset + 0]); sh[1, 2] = SHByteToFloat(shaderCoeffsL1GL1Ry[offset + 1]); sh[1, 3] = SHByteToFloat(shaderCoeffsL1GL1Ry[offset + 2]); sh[0, 2] = SHByteToFloat(shaderCoeffsL1GL1Ry[offset + 3]);
-            sh[2, 1] = SHByteToFloat(shaderCoeffsL1BL1Rz[offset + 0]); sh[2, 2] = SHByteToFloat(shaderCoeffsL1BL1Rz[offset + 1]); sh[2, 3] = SHByteToFloat(shaderCoeffsL1BL1Rz[offset + 2]); sh[0, 3] = SHByteToFloat(shaderCoeffsL1BL1Rz[offset + 3]);
+            sh[0, 0] = SHHalfToFloat(shaderCoeffsL0L1Rx[offset + 0]);
+            sh[1, 0] = SHHalfToFloat(shaderCoeffsL0L1Rx[offset + 1]);
+            sh[2, 0] = SHHalfToFloat(shaderCoeffsL0L1Rx[offset + 2]);
+            sh[0, 1] = SHHalfToFloat(shaderCoeffsL0L1Rx[offset + 3]);
+            sh[1, 1] = SHByteToFloat(shaderCoeffsL1GL1Ry[offset + 0]);
+            sh[1, 2] = SHByteToFloat(shaderCoeffsL1GL1Ry[offset + 1]);
+            sh[1, 3] = SHByteToFloat(shaderCoeffsL1GL1Ry[offset + 2]);
+            sh[0, 2] = SHByteToFloat(shaderCoeffsL1GL1Ry[offset + 3]);
+            sh[2, 1] = SHByteToFloat(shaderCoeffsL1BL1Rz[offset + 0]);
+            sh[2, 2] = SHByteToFloat(shaderCoeffsL1BL1Rz[offset + 1]);
+            sh[2, 3] = SHByteToFloat(shaderCoeffsL1BL1Rz[offset + 2]);
+            sh[0, 3] = SHByteToFloat(shaderCoeffsL1BL1Rz[offset + 3]);
         }
 
         static void ReadFromShaderCoeffsL2(ref SphericalHarmonicsL2 sh, NativeArray<byte> shaderCoeffsL2_0, NativeArray<byte> shaderCoeffsL2_1, NativeArray<byte> shaderCoeffsL2_2, NativeArray<byte> shaderCoeffsL2_3, int offset)
         {
-            sh[0, 4] = SHByteToFloat(shaderCoeffsL2_0[offset + 0]); sh[0, 5] = SHByteToFloat(shaderCoeffsL2_0[offset + 1]); sh[0, 6] = SHByteToFloat(shaderCoeffsL2_0[offset + 2]); sh[0, 7] = SHByteToFloat(shaderCoeffsL2_0[offset + 3]);
-            sh[1, 4] = SHByteToFloat(shaderCoeffsL2_1[offset + 0]); sh[1, 5] = SHByteToFloat(shaderCoeffsL2_1[offset + 1]); sh[1, 6] = SHByteToFloat(shaderCoeffsL2_1[offset + 2]); sh[1, 7] = SHByteToFloat(shaderCoeffsL2_1[offset + 3]);
-            sh[2, 4] = SHByteToFloat(shaderCoeffsL2_2[offset + 0]); sh[2, 5] = SHByteToFloat(shaderCoeffsL2_2[offset + 1]); sh[2, 6] = SHByteToFloat(shaderCoeffsL2_2[offset + 2]); sh[2, 7] = SHByteToFloat(shaderCoeffsL2_2[offset + 3]);
-            sh[0, 8] = SHByteToFloat(shaderCoeffsL2_3[offset + 0]); sh[1, 8] = SHByteToFloat(shaderCoeffsL2_3[offset + 1]); sh[2, 8] = SHByteToFloat(shaderCoeffsL2_3[offset + 2]);
+            sh[0, 4] = SHByteToFloat(shaderCoeffsL2_0[offset + 0]);
+            sh[0, 5] = SHByteToFloat(shaderCoeffsL2_0[offset + 1]);
+            sh[0, 6] = SHByteToFloat(shaderCoeffsL2_0[offset + 2]);
+            sh[0, 7] = SHByteToFloat(shaderCoeffsL2_0[offset + 3]);
+            sh[1, 4] = SHByteToFloat(shaderCoeffsL2_1[offset + 0]);
+            sh[1, 5] = SHByteToFloat(shaderCoeffsL2_1[offset + 1]);
+            sh[1, 6] = SHByteToFloat(shaderCoeffsL2_1[offset + 2]);
+            sh[1, 7] = SHByteToFloat(shaderCoeffsL2_1[offset + 3]);
+            sh[2, 4] = SHByteToFloat(shaderCoeffsL2_2[offset + 0]);
+            sh[2, 5] = SHByteToFloat(shaderCoeffsL2_2[offset + 1]);
+            sh[2, 6] = SHByteToFloat(shaderCoeffsL2_2[offset + 2]);
+            sh[2, 7] = SHByteToFloat(shaderCoeffsL2_2[offset + 3]);
+            sh[0, 8] = SHByteToFloat(shaderCoeffsL2_3[offset + 0]);
+            sh[1, 8] = SHByteToFloat(shaderCoeffsL2_3[offset + 1]);
+            sh[2, 8] = SHByteToFloat(shaderCoeffsL2_3[offset + 2]);
         }
 
         static void ReadFullFromShaderCoeffsL0L1L2(ref SphericalHarmonicsL2 sh,

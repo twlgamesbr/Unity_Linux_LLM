@@ -198,8 +198,12 @@ namespace Unity.Physics
                 faces[1] = new ConvexHull.Face { FirstIndex = 3, NumVertices = 3, MinHalfAngleCompressed = 0xff };
 
                 byte* index = &collider->m_ConvexHullData.FaceVertexIndices[0];
-                *index++ = 0; *index++ = 1; *index++ = 2;
-                *index++ = 2; *index++ = 1; *index++ = 0;
+                *index++ = 0;
+                *index++ = 1;
+                *index++ = 2;
+                *index++ = 2;
+                *index++ = 1;
+                *index++ = 0;
             }
 
             SetPlanes();
@@ -226,8 +230,14 @@ namespace Unity.Physics
                 faces[1] = new ConvexHull.Face { FirstIndex = 4, NumVertices = 4, MinHalfAngleCompressed = 0xff };
 
                 byte* index = &collider->m_ConvexHullData.FaceVertexIndices[0];
-                *index++ = 0; *index++ = 1; *index++ = 2; *index++ = 3;
-                *index++ = 3; *index++ = 2; *index++ = 1; *index++ = 0;
+                *index++ = 0;
+                *index++ = 1;
+                *index++ = 2;
+                *index++ = 3;
+                *index++ = 3;
+                *index++ = 2;
+                *index++ = 1;
+                *index++ = 0;
             }
 
             SetPlanes();
@@ -304,7 +314,14 @@ namespace Unity.Physics
         /// <summary>   Gets or sets the material. </summary>
         ///
         /// <value> The material. </value>
-        public Material Material { get => m_Header.Material; set { if (!m_Header.Material.Equals(value)) { m_Header.Version++; m_Header.Material = value; } } }
+        public Material Material { get => m_Header.Material; set
+            {
+                if (!m_Header.Material.Equals(value))
+                {
+                    m_Header.Version++;
+                    m_Header.Material = value; }
+            }
+        }
 
         /// <summary>   Gets the collision filter. </summary>
         ///
@@ -316,7 +333,11 @@ namespace Unity.Physics
         /// <param name="filter">   Specifies the filter. </param>
         public void SetCollisionFilter(CollisionFilter filter)
         {
-            if (!m_Header.Filter.Equals(filter)) { m_Header.Version++; m_Header.Filter = filter; }
+            if (!m_Header.Filter.Equals(filter))
+            {
+                m_Header.Version++;
+                m_Header.Filter = filter;
+            }
         }
 
         /// <summary>

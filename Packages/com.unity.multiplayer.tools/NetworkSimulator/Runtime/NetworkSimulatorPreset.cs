@@ -83,8 +83,10 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Runtime
         /// <see langword="true" /> if the specified object is equal to the current object; otherwise, <see langword="false" />.</returns>
         public bool Equals(NetworkSimulatorPreset other)
         {
-            if (ReferenceEquals(null, other)) return false;
-            if (ReferenceEquals(this, other)) return true;
+            if (ReferenceEquals(null, other))
+                return false;
+            if (ReferenceEquals(this, other))
+                return true;
             return Name == other.Name
                 && Description == other.Description
                 && PacketDelayMs == other.PacketDelayMs
@@ -96,9 +98,12 @@ namespace Unity.Multiplayer.Tools.NetworkSimulator.Runtime
         /// <inheritdoc />
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
+            if (ReferenceEquals(null, obj))
+                return false;
+            if (ReferenceEquals(this, obj))
+                return true;
+            if (obj.GetType() != GetType())
+                return false;
             return Equals((NetworkSimulatorPreset)obj);
         }
 

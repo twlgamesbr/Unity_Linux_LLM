@@ -34,7 +34,8 @@ namespace Unity.Entities.CodeGen
             bool changes = false;
 
             var assemblyAttributes = AssemblyDefinition.CustomAttributes;
-            if (unmanagedComponentSystemTypes.Length == 0 && assemblyAttributes.Count == 0) return false;
+            if (unmanagedComponentSystemTypes.Length == 0 && assemblyAttributes.Count == 0)
+                return false;
             
             // Create the registration class first so that if we need to put forwarders for generic ISystems into it, it's ready.
             // This must use a stable hash code function (do not using string.GetHashCode).

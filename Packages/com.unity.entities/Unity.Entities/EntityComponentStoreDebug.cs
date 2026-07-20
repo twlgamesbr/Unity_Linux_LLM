@@ -34,7 +34,10 @@ namespace Unity.Entities
                 Assert.IsNull(managedComponentData[i], $"unused managed component data {i} is not null");
 
             EntityComponentStore* selfPtr;
-            fixed(EntityComponentStore* self = &this) { selfPtr = self; }  // This is safe - we're allocated on the native heap
+            fixed(EntityComponentStore* self = &this)
+            {
+                selfPtr = self;
+            }  // This is safe - we're allocated on the native heap
 
             // Iterate by archetype
             var entityCountByArchetype = 0;
@@ -470,7 +473,8 @@ namespace Unity.Entities
             {
                 var type = componentTypeSet.GetComponentType(i);
                 allTypes += $"'{type}'";
-                if (i < componentTypeSet.Length - 1) allTypes += ", ";
+                if (i < componentTypeSet.Length - 1)
+                    allTypes += ", ";
             }
             return allTypes;
         }
@@ -482,7 +486,8 @@ namespace Unity.Entities
             for (var i = 0; i < numTypes; i++)
             {
                 allTypes += $"'{TypeManager.GetType(archetype->Types[i].TypeIndex)}'";
-                if (i < numTypes - 1) allTypes += ", ";
+                if (i < numTypes - 1)
+                    allTypes += ", ";
             }
             return allTypes;
         }
@@ -494,7 +499,8 @@ namespace Unity.Entities
             {
                 var type = componentTypes[i].TypeIndex;
                 allTypes += $"'{TypeManager.GetType(type)}'";
-                if (i < componentTypeCount - 1) allTypes += ", ";
+                if (i < componentTypeCount - 1)
+                    allTypes += ", ";
             }
             return allTypes;
         }

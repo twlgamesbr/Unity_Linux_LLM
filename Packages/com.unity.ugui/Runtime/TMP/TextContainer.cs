@@ -27,7 +27,15 @@ namespace TMPro
         public Vector2 pivot
         {
             get { return m_pivot; }
-            set { /*Debug.Log("Pivot has changed.");*/ if (m_pivot != value) { m_pivot = value; m_anchorPosition = GetAnchorPosition(m_pivot); m_hasChanged = true; OnContainerChanged(); } }
+            set
+            { /*Debug.Log("Pivot has changed.");*/
+                if (m_pivot != value)
+                {
+                    m_pivot = value;
+                    m_anchorPosition = GetAnchorPosition(m_pivot);
+                    m_hasChanged = true;
+                    OnContainerChanged(); }
+            }
         }
         [SerializeField]
         private Vector2 m_pivot;
@@ -36,7 +44,15 @@ namespace TMPro
         public TextContainerAnchors anchorPosition
         {
             get { return m_anchorPosition; }
-            set { /*Debug.Log("Anchor has changed.");*/ if (m_anchorPosition != value) { m_anchorPosition = value; m_pivot = GetPivot(m_anchorPosition); m_hasChanged = true; OnContainerChanged(); } }
+            set
+            { /*Debug.Log("Anchor has changed.");*/
+                if (m_anchorPosition != value)
+                {
+                    m_anchorPosition = value;
+                    m_pivot = GetPivot(m_anchorPosition);
+                    m_hasChanged = true;
+                    OnContainerChanged(); }
+            }
         }
         [SerializeField]
         private TextContainerAnchors m_anchorPosition = TextContainerAnchors.Middle;
@@ -46,7 +62,14 @@ namespace TMPro
         public Rect rect
         {
             get { return m_rect; }
-            set { /*Debug.Log("Rectangle has changed.");*/ if (m_rect != value) { m_rect = value; /*m_size = new Vector2(m_rect.width, m_rect.height);*/ m_hasChanged = true; OnContainerChanged(); } }
+            set
+            { /*Debug.Log("Rectangle has changed.");*/
+                if (m_rect != value)
+                {
+                    m_rect = value; /*m_size = new Vector2(m_rect.width, m_rect.height);*/
+                    m_hasChanged = true;
+                    OnContainerChanged(); }
+            }
         }
         [SerializeField]
         private Rect m_rect;
@@ -55,7 +78,16 @@ namespace TMPro
         public Vector2 size
         {
             get { return new Vector2(m_rect.width, m_rect.height); }
-            set { /*Debug.Log("Size has changed.");*/ if (new Vector2(m_rect.width, m_rect.height) != value) { SetRect(value); m_hasChanged = true; m_isDefaultWidth = false; m_isDefaultHeight = false; OnContainerChanged(); } }
+            set
+            { /*Debug.Log("Size has changed.");*/
+                if (new Vector2(m_rect.width, m_rect.height) != value)
+                {
+                    SetRect(value);
+                    m_hasChanged = true;
+                    m_isDefaultWidth = false;
+                    m_isDefaultHeight = false;
+                    OnContainerChanged(); }
+            }
         }
       
 
@@ -63,7 +95,13 @@ namespace TMPro
         public float width
         {
             get { return m_rect.width; }
-            set { /*Debug.Log("Width has changed.");*/ SetRect(new Vector2(value, m_rect.height)); m_hasChanged = true; m_isDefaultWidth = false; OnContainerChanged(); }
+            set
+            { /*Debug.Log("Width has changed.");*/
+                SetRect(new Vector2(value, m_rect.height));
+                m_hasChanged = true;
+                m_isDefaultWidth = false;
+                OnContainerChanged();
+            }
         }
 
 
@@ -71,7 +109,13 @@ namespace TMPro
         public float height
         {
             get { return m_rect.height; }
-            set { SetRect(new Vector2(m_rect.width, value)); m_hasChanged = true; m_isDefaultHeight = false; OnContainerChanged(); }
+            set
+            {
+                SetRect(new Vector2(m_rect.width, value));
+                m_hasChanged = true;
+                m_isDefaultHeight = false;
+                OnContainerChanged();
+            }
         }
 
 
@@ -124,7 +168,14 @@ namespace TMPro
         public Vector4 margins
         {
             get { return m_margins; }
-            set { if (m_margins != value) { /*Debug.Log("Margins have changed.");*/ m_margins = value; m_hasChanged = true; OnContainerChanged(); } }
+            set
+            {
+                if (m_margins != value)
+                { /*Debug.Log("Margins have changed.");*/
+                    m_margins = value;
+                    m_hasChanged = true;
+                    OnContainerChanged(); }
+            }
         }
         [SerializeField]
         private Vector4 m_margins;
@@ -137,7 +188,8 @@ namespace TMPro
         {
             get
             {
-                if (m_rectTransform == null) m_rectTransform = GetComponent<RectTransform>();
+                if (m_rectTransform == null)
+                    m_rectTransform = GetComponent<RectTransform>();
 
                 return m_rectTransform;
             }
@@ -157,7 +209,8 @@ namespace TMPro
         {
             get
             {
-                if (m_textMeshPro == null) m_textMeshPro = GetComponent<TextMeshPro>();
+                if (m_textMeshPro == null)
+                    m_textMeshPro = GetComponent<TextMeshPro>();
                 return m_textMeshPro;
             }
         }
@@ -246,7 +299,8 @@ namespace TMPro
         protected override void OnRectTransformDimensionsChange()
         {
             // Required to add a RectTransform to objects created in previous releases.
-            if (this.rectTransform == null) m_rectTransform = gameObject.AddComponent<RectTransform>();
+            if (this.rectTransform == null)
+                m_rectTransform = gameObject.AddComponent<RectTransform>();
 
             if (m_rectTransform.sizeDelta != k_defaultSize)
                 this.size = m_rectTransform.sizeDelta;

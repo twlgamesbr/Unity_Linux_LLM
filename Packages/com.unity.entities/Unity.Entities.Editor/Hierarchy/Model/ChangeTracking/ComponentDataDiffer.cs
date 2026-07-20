@@ -55,18 +55,21 @@ namespace Unity.Entities.Editor
 
             public void Dispose()
             {
-                if (null == Ptr) return;
+                if (null == Ptr)
+                    return;
 
                 Ptr->Buffer.Dispose();
                 Ptr->AddedComponents.Dispose();
                 Ptr->RemovedComponents.Dispose();
 
-                if (CollectionHelper.ShouldDeallocate(m_Allocator)) Memory.Unmanaged.Free(Ptr, m_Allocator);
+                if (CollectionHelper.ShouldDeallocate(m_Allocator))
+                    Memory.Unmanaged.Free(Ptr, m_Allocator);
             }
 
             public void GetAddedComponentEntities(NativeList<Entity> entities)
             {
-                if (!Ptr->Buffer.IsCreated) return;
+                if (!Ptr->Buffer.IsCreated)
+                    return;
                 var addedComponents = Ptr->AddedComponents;
                 entities.ResizeUninitialized(addedComponents.Length);
                 UnsafeUtility.MemCpy(entities.GetUnsafePtr(), addedComponents.Ptr, addedComponents.Length * UnsafeUtility.SizeOf<Entity>());
@@ -74,7 +77,8 @@ namespace Unity.Entities.Editor
 
             public void GetRemovedComponentEntities(NativeList<Entity> entities)
             {
-                if (!Ptr->Buffer.IsCreated) return;
+                if (!Ptr->Buffer.IsCreated)
+                    return;
                 var removedComponents = Ptr->RemovedComponents;
                 entities.ResizeUninitialized(removedComponents.Length);
                 UnsafeUtility.MemCpy(entities.GetUnsafePtr(), removedComponents.Ptr, removedComponents.Length * UnsafeUtility.SizeOf<Entity>());
@@ -84,7 +88,8 @@ namespace Unity.Entities.Editor
             {
                 EnsureIsExpectedComponent<T>();
 
-                if (!Ptr->Buffer.IsCreated) return;
+                if (!Ptr->Buffer.IsCreated)
+                    return;
                 var addedComponents = Ptr->AddedComponents;
                 components.ResizeUninitialized(addedComponents.Length);
                 UnsafeUtility.MemCpy(components.GetUnsafePtr(), Ptr->Buffer.Ptr, addedComponents.Length * UnsafeUtility.SizeOf<T>());
@@ -94,7 +99,8 @@ namespace Unity.Entities.Editor
             {
                 EnsureIsExpectedComponent<T>();
 
-                if (!Ptr->Buffer.IsCreated) return;
+                if (!Ptr->Buffer.IsCreated)
+                    return;
 
                 var removedComponents = Ptr->RemovedComponents;
                 components.ResizeUninitialized(removedComponents.Length);
@@ -213,9 +219,12 @@ namespace Unity.Entities.Editor
 
             public void Dispose()
             {
-                if (null != Ptr->Entities) Memory.Unmanaged.Free(Ptr->Entities, Allocator.Persistent);
-                if (null != Ptr->Components) Memory.Unmanaged.Free(Ptr->Components, Allocator.Persistent);
-                if (CollectionHelper.ShouldDeallocate(m_Allocator)) Memory.Unmanaged.Free(Ptr, m_Allocator);
+                if (null != Ptr->Entities)
+                    Memory.Unmanaged.Free(Ptr->Entities, Allocator.Persistent);
+                if (null != Ptr->Components)
+                    Memory.Unmanaged.Free(Ptr->Components, Allocator.Persistent);
+                if (CollectionHelper.ShouldDeallocate(m_Allocator))
+                    Memory.Unmanaged.Free(Ptr, m_Allocator);
             }
         }
 
@@ -514,7 +523,8 @@ namespace Unity.Entities.Editor
                 var archetype = Chunks[index].Archetype.Archetype;
                 var indexInTypeArray = ChunkDataUtility.GetIndexInTypeArray(archetype, TypeIndex);
 
-                if (indexInTypeArray == -1) return;
+                if (indexInTypeArray == -1)
+                    return;
 
                 if (ShadowChunksBySequenceNumber.TryGetValue(chunk.SequenceNumber, out var shadow))
                 {
@@ -636,7 +646,8 @@ namespace Unity.Entities.Editor
             public void Execute(int index)
             {
                 var chunkSequenceNumber = ChunkShadowBySequenceNumberKeys[index];
-                if (chunkSequenceNumber == 0 || ChunkSequenceNumbers.Contains(chunkSequenceNumber)) return;
+                if (chunkSequenceNumber == 0 || ChunkSequenceNumbers.Contains(chunkSequenceNumber))
+                    return;
                 var chunkShadow = ChunkShadowBySequenceNumber[chunkSequenceNumber];
                 RemovedChunks.AddNoResize(chunkShadow);
             }
@@ -674,7 +685,8 @@ namespace Unity.Entities.Editor
                 var chunk = Chunks[index].m_Chunk;
                 var archetype = Chunks[index].Archetype.Archetype;
                 var indexInTypeArray = ChunkDataUtility.GetIndexInTypeArray(archetype, TypeIndex);
-                if (indexInTypeArray == -1) return;
+                if (indexInTypeArray == -1)
+                    return;
                 var capacity = archetype->ChunkCapacity;
                 var sequenceNumber = chunk.SequenceNumber;
 

@@ -249,7 +249,8 @@ namespace TMPro
             {
                 TMP_FontAsset fontAsset = fontAssets[i];
 
-                if (fontAsset == null) continue;
+                if (fontAsset == null)
+                    continue;
 
                 // Add reference to this search query
                 //sourceFontAsset.FallbackSearchQueryLookup.Add(fontAsset.entityId);
@@ -285,7 +286,8 @@ namespace TMPro
             {
                 TMP_Asset textAsset = textAssets[i];
 
-                if (textAsset == null) continue;
+                if (textAsset == null)
+                    continue;
 
                 if (textAsset.GetType() == typeof(TMP_FontAsset))
                 {

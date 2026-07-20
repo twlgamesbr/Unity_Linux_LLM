@@ -24,7 +24,8 @@ namespace UnityEngine.UI
 
                     Object.Destroy(obj);
                 }
-                else Object.DestroyImmediate(obj);
+                else
+                    Object.DestroyImmediate(obj);
             }
         }
 
@@ -36,8 +37,10 @@ namespace UnityEngine.UI
         {
             if (obj != null)
             {
-                if (Application.isEditor) Object.DestroyImmediate(obj);
-                else Object.Destroy(obj);
+                if (Application.isEditor)
+                    Object.DestroyImmediate(obj);
+                else
+                    Object.Destroy(obj);
             }
         }
     }

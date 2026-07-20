@@ -121,7 +121,8 @@ namespace Unity.Multiplayer.Tools.NetStatsMonitor.Editor
                 m_TypeDropdown = new PopupField<string>();
                 m_TypeDropdown.label = "Type";
                 m_TypeDropdown.choices = k_TypeNamesShown;
-                m_TypeDropdown.index = Array.IndexOf(k_AvailableTypes, type); ;
+                m_TypeDropdown.index = Array.IndexOf(k_AvailableTypes, type);
+                ;
                 content.Add(m_TypeDropdown);
 
                 m_TypeDropdown.RegisterValueChangedCallback((evt =>

@@ -69,12 +69,15 @@ namespace Microsoft.Unity.VisualStudio.Editor
 
 		public static string MakeAbsolutePath(this string path)
 		{
-			if (string.IsNullOrEmpty(path)) { return string.Empty; }
-			return Path.IsPathRooted(path) ? path : GetAbsolutePath(path);
-		}
-		
-		// returns null if outside of the project scope
-		internal static string MakeRelativeToProjectPath(string fileName)
+			if (string.IsNullOrEmpty(path))
+            {
+                return string.Empty;
+            }
+            return Path.IsPathRooted(path) ? path : GetAbsolutePath(path);
+        }
+
+        // returns null if outside of the project scope
+        internal static string MakeRelativeToProjectPath(string fileName)
 		{
 			var basePath = GetAbsolutePath(Path.Combine(Application.dataPath, ".."));
 			fileName = NormalizePathSeparators(fileName);

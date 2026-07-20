@@ -246,7 +246,8 @@ namespace UnityEngine.TestRunner.NUnitExtensions.Runner
                 }
             }
 
-            if (_countOrder != 0) SortChildren();
+            if (_countOrder != 0)
+                SortChildren();
         }
 
         private class UnityWorkItemOrderComparer : IComparer<UnityWorkItem>

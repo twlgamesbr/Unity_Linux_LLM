@@ -54,7 +54,8 @@ namespace TMPro
 
         IEnumerator DoSpriteAnimationInternal(int currentCharacter, TMP_SpriteAsset spriteAsset, int start, int end, int framerate)
         {
-            if (m_TextComponent == null) yield break;
+            if (m_TextComponent == null)
+                yield break;
 
             // We yield otherwise this gets called before the sprite has rendered.
             yield return null;

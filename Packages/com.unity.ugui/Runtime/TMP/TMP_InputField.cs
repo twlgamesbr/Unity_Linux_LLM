@@ -685,7 +685,12 @@ namespace TMPro
             }
         }
 
-        public int caretWidth { get { return m_CaretWidth; } set { if (SetPropertyUtility.SetStruct(ref m_CaretWidth, value)) MarkGeometryAsDirty(); } }
+        public int caretWidth { get { return m_CaretWidth; } set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_CaretWidth, value))
+                    MarkGeometryAsDirty();
+            }
+        }
 
         public RectTransform textViewport { get { return m_TextViewport; } set { SetPropertyUtility.SetClass(ref m_TextViewport, value); } }
 
@@ -723,13 +728,35 @@ namespace TMPro
             }
         }
 
-        public float scrollSensitivity { get { return m_ScrollSensitivity; } set { if (SetPropertyUtility.SetStruct(ref m_ScrollSensitivity, value)) MarkGeometryAsDirty(); } }
+        public float scrollSensitivity { get { return m_ScrollSensitivity; } set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_ScrollSensitivity, value))
+                    MarkGeometryAsDirty();
+            }
+        }
 
-        public Color caretColor { get { return customCaretColor ? m_CaretColor : textComponent.color; } set { if (SetPropertyUtility.SetColor(ref m_CaretColor, value)) MarkGeometryAsDirty(); } }
+        public Color caretColor { get { return customCaretColor ? m_CaretColor : textComponent.color; } set
+            {
+                if (SetPropertyUtility.SetColor(ref m_CaretColor, value))
+                    MarkGeometryAsDirty();
+            }
+        }
 
-        public bool customCaretColor { get { return m_CustomCaretColor; } set { if (m_CustomCaretColor != value) { m_CustomCaretColor = value; MarkGeometryAsDirty(); } } }
+        public bool customCaretColor { get { return m_CustomCaretColor; } set
+            {
+                if (m_CustomCaretColor != value)
+                {
+                    m_CustomCaretColor = value;
+                    MarkGeometryAsDirty(); }
+            }
+        }
 
-        public Color selectionColor { get { return m_SelectionColor; } set { if (SetPropertyUtility.SetColor(ref m_SelectionColor, value)) MarkGeometryAsDirty(); } }
+        public Color selectionColor { get { return m_SelectionColor; } set
+            {
+                if (SetPropertyUtility.SetColor(ref m_SelectionColor, value))
+                    MarkGeometryAsDirty();
+            }
+        }
 
         public SubmitEvent onEndEdit { get { return m_OnEndEdit; } set { SetPropertyUtility.SetClass(ref m_OnEndEdit, value); } }
 
@@ -863,7 +890,12 @@ namespace TMPro
 
 
         // Content Type related
-        public ContentType contentType { get { return m_ContentType; } set { if (SetPropertyUtility.SetStruct(ref m_ContentType, value)) EnforceContentType(); } }
+        public ContentType contentType { get { return m_ContentType; } set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_ContentType, value))
+                    EnforceContentType();
+            }
+        }
 
         public LineType lineType
         {
@@ -899,7 +931,12 @@ namespace TMPro
         /// <summary>
         /// The type of input expected. See InputField.InputType.
         /// </summary>
-        public InputType inputType { get { return m_InputType; } set { if (SetPropertyUtility.SetStruct(ref m_InputType, value)) SetToCustom(); } }
+        public InputType inputType { get { return m_InputType; } set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_InputType, value))
+                    SetToCustom();
+            }
+        }
 
         /// <summary>
         /// The TouchScreenKeyboard being used to edit the Input Field.
@@ -927,7 +964,12 @@ namespace TMPro
         /// <summary>
         /// The type of validation to perform on a character
         /// </summary>
-        public CharacterValidation characterValidation { get { return m_CharacterValidation; } set { if (SetPropertyUtility.SetStruct(ref m_CharacterValidation, value)) SetToCustom(); } }
+        public CharacterValidation characterValidation { get { return m_CharacterValidation; } set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_CharacterValidation, value))
+                    SetToCustom();
+            }
+        }
 
         /// <summary>
         /// Sets the Input Validation to use a Custom Input Validation script.
@@ -935,7 +977,11 @@ namespace TMPro
         public TMP_InputValidator inputValidator
         {
             get { return m_InputValidator; }
-            set {  if (SetPropertyUtility.SetClass(ref m_InputValidator, value)) SetToCustom(CharacterValidation.CustomValidator); }
+            set
+            {
+                if (SetPropertyUtility.SetClass(ref m_InputValidator, value))
+                    SetToCustom(CharacterValidation.CustomValidator);
+            }
         }
         [SerializeField]
         protected TMP_InputValidator m_InputValidator = null;
@@ -945,12 +991,22 @@ namespace TMPro
         [SerializeField]
         private bool m_ShouldActivateOnSelect = true;
 
-        public bool richText { get { return m_RichText; } set { m_RichText = value; SetTextComponentRichTextMode(); } }
+        public bool richText { get { return m_RichText; } set
+            {
+                m_RichText = value;
+                SetTextComponentRichTextMode();
+            }
+        }
 
         // Derived property
         public bool multiLine { get { return m_LineType == LineType.MultiLineNewline || lineType == LineType.MultiLineSubmit; } }
         // Not shown in Inspector.
-        public char asteriskChar { get { return m_AsteriskChar; } set { if (SetPropertyUtility.SetStruct(ref m_AsteriskChar, value)) UpdateLabel(); } }
+        public char asteriskChar { get { return m_AsteriskChar; } set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_AsteriskChar, value))
+                    UpdateLabel();
+            }
+        }
         public bool wasCanceled { get { return m_WasCanceled; } }
 
 
@@ -984,11 +1040,31 @@ namespace TMPro
         /// Getters are public Setters are protected
         /// </summary>
 
-        protected int caretPositionInternal { get { return m_CaretPosition + compositionLength; } set { m_CaretPosition = value; ClampCaretPos(ref m_CaretPosition); } }
-        protected int stringPositionInternal { get { return m_StringPosition + compositionLength; } set { m_StringPosition = value; ClampStringPos(ref m_StringPosition); } }
+        protected int caretPositionInternal { get { return m_CaretPosition + compositionLength; } set
+            {
+                m_CaretPosition = value;
+                ClampCaretPos(ref m_CaretPosition);
+            }
+        }
+        protected int stringPositionInternal { get { return m_StringPosition + compositionLength; } set
+            {
+                m_StringPosition = value;
+                ClampStringPos(ref m_StringPosition);
+            }
+        }
 
-        protected int caretSelectPositionInternal { get { return m_CaretSelectPosition + compositionLength; } set { m_CaretSelectPosition = value; ClampCaretPos(ref m_CaretSelectPosition); } }
-        protected int stringSelectPositionInternal { get { return m_StringSelectPosition + compositionLength; } set { m_StringSelectPosition = value; ClampStringPos(ref m_StringSelectPosition); } }
+        protected int caretSelectPositionInternal { get { return m_CaretSelectPosition + compositionLength; } set
+            {
+                m_CaretSelectPosition = value;
+                ClampCaretPos(ref m_CaretSelectPosition);
+            }
+        }
+        protected int stringSelectPositionInternal { get { return m_StringSelectPosition + compositionLength; } set
+            {
+                m_StringSelectPosition = value;
+                ClampStringPos(ref m_StringSelectPosition);
+            }
+        }
 
         private bool hasSelection { get { return stringPositionInternal != stringSelectPositionInternal; } }
         private bool m_isSelected;
@@ -1007,7 +1083,12 @@ namespace TMPro
         public int caretPosition
         {
             get => caretSelectPositionInternal;
-            set { selectionAnchorPosition = value; selectionFocusPosition = value; UpdateStringIndexFromCaretPosition(); }
+            set
+            {
+                selectionAnchorPosition = value;
+                selectionFocusPosition = value;
+                UpdateStringIndexFromCaretPosition();
+            }
         }
 
         /// <summary>
@@ -1058,7 +1139,12 @@ namespace TMPro
         public int stringPosition
         {
             get => stringSelectPositionInternal;
-            set { selectionStringAnchorPosition = value; selectionStringFocusPosition = value; UpdateCaretPositionFromStringIndex(); }
+            set
+            {
+                selectionStringAnchorPosition = value;
+                selectionStringFocusPosition = value;
+                UpdateCaretPositionFromStringIndex();
+            }
         }
 
 
@@ -2675,7 +2761,8 @@ namespace TMPro
                 }
             }
 
-            if (closest == -1) return endCharIdx;
+            if (closest == -1)
+                return endCharIdx;
 
             //Debug.Log("Returning nearest character with Range = " + range);
 
@@ -2730,7 +2817,8 @@ namespace TMPro
                 }
             }
 
-            if (closest == -1) return endCharIdx;
+            if (closest == -1)
+                return endCharIdx;
 
             //Debug.Log("Returning nearest character with Range = " + range);
 
@@ -2741,7 +2829,7 @@ namespace TMPro
         }
 
 
-         private int PageUpCharacterPosition(int originalPos, bool goToFirstChar)
+        private int PageUpCharacterPosition(int originalPos, bool goToFirstChar)
         {
             if (originalPos >= m_TextComponent.textInfo.characterCount)
                 originalPos -= 1;
@@ -2794,7 +2882,8 @@ namespace TMPro
                 }
             }
 
-            if (closest == -1) return endCharIdx;
+            if (closest == -1)
+                return endCharIdx;
 
             //Debug.Log("Returning nearest character with Range = " + range);
 
@@ -2805,7 +2894,7 @@ namespace TMPro
         }
 
 
-         private int PageDownCharacterPosition(int originalPos, bool goToLastChar)
+        private int PageDownCharacterPosition(int originalPos, bool goToLastChar)
         {
             if (originalPos >= m_TextComponent.textInfo.characterCount)
                 return m_TextComponent.textInfo.characterCount - 1;
@@ -2859,7 +2948,8 @@ namespace TMPro
                 }
             }
 
-            if (closest == -1) return endCharIdx;
+            if (closest == -1)
+                return endCharIdx;
 
             if (range < 0.5f)
                 return closest;
@@ -3314,7 +3404,8 @@ namespace TMPro
             {
                 input = Validate(validateText, insertionPosition, input);
 
-                if (input == 0) return;
+                if (input == 0)
+                    return;
 
                 if (!char.IsHighSurrogate(input))
                     m_CaretSelectPosition = m_CaretPosition += 1;
@@ -3428,7 +3519,8 @@ namespace TMPro
 
         protected void SendOnEndTextSelection()
         {
-            if (!m_isSelected) return;
+            if (!m_isSelected)
+                return;
 
             if (onEndTextSelection != null)
                 onEndTextSelection.Invoke(m_Text, stringPositionInternal, stringSelectPositionInternal);
@@ -3563,7 +3655,8 @@ namespace TMPro
             //    return;
             //}
 
-            if (value < 0 || value > 1) return;
+            if (value < 0 || value > 1)
+                return;
 
             AdjustTextPositionRelativeToViewport(value);
 
@@ -3614,7 +3707,8 @@ namespace TMPro
             TMP_TextInfo textInfo = m_TextComponent.textInfo;
 
             // Check to make sure we have valid data and lines to query.
-            if (textInfo == null || textInfo.lineInfo == null || textInfo.lineCount == 0 || textInfo.lineCount > textInfo.lineInfo.Length) return;
+            if (textInfo == null || textInfo.lineInfo == null || textInfo.lineCount == 0 || textInfo.lineCount > textInfo.lineInfo.Length)
+                return;
 
             float verticalAlignmentOffset = 0;
             float textHeight = m_TextComponent.preferredHeight;
@@ -4192,27 +4286,34 @@ namespace TMPro
                 bool selectionAtStart = stringPositionInternal == 0 || stringSelectPositionInternal == 0;
                 if (!cursorBeforeDash)
                 {
-                    if (ch >= '0' && ch <= '9') return ch;
-                    if (ch == '-' && (pos == 0 || selectionAtStart) && !text.Contains('-')) return ch;
+                    if (ch >= '0' && ch <= '9')
+                        return ch;
+                    if (ch == '-' && (pos == 0 || selectionAtStart) && !text.Contains('-'))
+                        return ch;
 
                     var separator = Thread.CurrentThread.CurrentCulture.NumberFormat.NumberDecimalSeparator;
-                    if (ch == Convert.ToChar(separator) && characterValidation == CharacterValidation.Decimal && !text.Contains(separator)) return ch;
+                    if (ch == Convert.ToChar(separator) && characterValidation == CharacterValidation.Decimal && !text.Contains(separator))
+                        return ch;
 
                     //Some keyboards including Samsung require double tapping a . to get a - this allows these keyboards to input negative integers
-                    if (characterValidation == CharacterValidation.Integer && ch == '.' && (pos == 0 || selectionAtStart) && !text.Contains('-')) return '-';
+                    if (characterValidation == CharacterValidation.Integer && ch == '.' && (pos == 0 || selectionAtStart) && !text.Contains('-'))
+                        return '-';
                 }
-
             }
             else if (characterValidation == CharacterValidation.Digit)
             {
-                if (ch >= '0' && ch <= '9') return ch;
+                if (ch >= '0' && ch <= '9')
+                    return ch;
             }
             else if (characterValidation == CharacterValidation.Alphanumeric)
             {
                 // All alphanumeric characters
-                if (ch >= 'A' && ch <= 'Z') return ch;
-                if (ch >= 'a' && ch <= 'z') return ch;
-                if (ch >= '0' && ch <= '9') return ch;
+                if (ch >= 'A' && ch <= 'Z')
+                    return ch;
+                if (ch >= 'a' && ch <= 'z')
+                    return ch;
+                if (ch >= '0' && ch <= '9')
+                    return ch;
             }
             else if (characterValidation == CharacterValidation.Name)
             {
@@ -4273,11 +4374,16 @@ namespace TMPro
                 // Character . (dot, period, full stop) provided that it is not the first or last character,
                 // and provided also that it does not appear two or more times consecutively.
 
-                if (ch >= 'A' && ch <= 'Z') return ch;
-                if (ch >= 'a' && ch <= 'z') return ch;
-                if (ch >= '0' && ch <= '9') return ch;
-                if (ch == '@' && text.IndexOf('@') == -1) return ch;
-                if (kEmailSpecialCharacters.IndexOf(ch) != -1) return ch;
+                if (ch >= 'A' && ch <= 'Z')
+                    return ch;
+                if (ch >= 'a' && ch <= 'z')
+                    return ch;
+                if (ch >= '0' && ch <= '9')
+                    return ch;
+                if (ch == '@' && text.IndexOf('@') == -1)
+                    return ch;
+                if (kEmailSpecialCharacters.IndexOf(ch) != -1)
+                    return ch;
                 if (ch == '.')
                 {
                     char lastChar = (text.Length > 0) ? text[Mathf.Clamp(pos, 0, text.Length - 1)] : ' ';

@@ -189,7 +189,8 @@ namespace UnityEngine.Rendering.Universal
                 int bloomMipIndex = Mathf.Clamp(lensFlareScreenSpace.bloomMip.value, 0, bloomMipMax);
 
                 var prevCameraColor = resourceData.cameraColor;
-                resourceData.cameraColor = mipPyramid.GetResultMip(bloomMipIndex);;
+                resourceData.cameraColor = mipPyramid.GetResultMip(bloomMipIndex);
+                ;
 
                 m_LensFlareScreenSpacePass.Setup(colorSourceDesc.width, colorSourceDesc.height, bloomMipIndex);
                 m_LensFlareScreenSpacePass.RecordRenderGraph(renderGraph, frameData);
@@ -236,7 +237,7 @@ namespace UnityEngine.Rendering.Universal
             m_UberPass.RecordRenderGraph(renderGraph, frameData);
         }
 
-#region FinalPass
+        #region FinalPass
         public void RenderFinalPostProcessing(RenderGraph renderGraph, ContextContainer frameData, bool enableColorEncodingIfNeeded)
         {
             UniversalCameraData cameraData = frameData.Get<UniversalCameraData>();

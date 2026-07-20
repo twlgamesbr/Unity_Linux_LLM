@@ -80,7 +80,8 @@ namespace NPCSystem.Monitoring
                 foreach (var asm in assemblies)
                 {
                     var type = asm.GetType("FlyingWormConsole3.ConsolePro3Window");
-                    if (type == null) continue;
+                    if (type == null)
+                        continue;
 
                     var method = type.GetMethod("GetWindow",
                         System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);

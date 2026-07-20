@@ -305,9 +305,11 @@ namespace TMPro
         /// <param name="isFixedSize"></param>
         public static void Resize<T>(ref T[] array, int size, bool isBlockAllocated)
         {
-            if (isBlockAllocated) size = size > 1024 ? size + 256 : Mathf.NextPowerOfTwo(size);
+            if (isBlockAllocated)
+                size = size > 1024 ? size + 256 : Mathf.NextPowerOfTwo(size);
 
-            if (size == array.Length) return;
+            if (size == array.Length)
+                return;
 
             //Debug.Log("Resizing TextInfo from [" + array.Length + "] to [" + size + "]");
 

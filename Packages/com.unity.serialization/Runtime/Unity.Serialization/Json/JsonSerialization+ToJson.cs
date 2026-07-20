@@ -67,9 +67,11 @@ namespace Unity.Serialization.Json
             visitor.SetUserDefinedMigration(parameters.UserDefinedMigrations); 
             visitor.SetSerializedReferences(serializedReferences);
 
-            using (visitor.Lock()) PropertyContainer.Accept(visitor, ref container);
+            using (visitor.Lock())
+                PropertyContainer.Accept(visitor, ref container);
 
-            if (null == parameters.State && null != serializedReferences) serializedReferences.Clear();
+            if (null == parameters.State && null != serializedReferences)
+                serializedReferences.Clear();
         }
     }
 }

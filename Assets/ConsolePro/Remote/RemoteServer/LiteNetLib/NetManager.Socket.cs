@@ -430,7 +430,10 @@ namespace FlyingWormConsole3.LiteNetLib
             {
                 Ttl = NetConstants.SocketTTL;
 
-                try { socket.EnableBroadcast = true; }
+                try
+                {
+                    socket.EnableBroadcast = true;
+                }
                 catch (SocketException e)
                 {
                     NetDebug.WriteError($"[B]Broadcast error: {e.SocketErrorCode}");
@@ -438,7 +441,10 @@ namespace FlyingWormConsole3.LiteNetLib
 
                 if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 {
-                    try { socket.DontFragment = true; }
+                    try
+                    {
+                        socket.DontFragment = true;
+                    }
                     catch (SocketException e)
                     {
                         NetDebug.WriteError($"[B]DontFragment error: {e.SocketErrorCode}");

@@ -29,7 +29,8 @@ namespace UnityEditor.Rendering.Converter
 
                 // Try the object's thumbnail/icon
                 var icon = AssetPreview.GetMiniThumbnail(obj);
-                if (icon != null) return icon;
+                if (icon != null)
+                    return icon;
 
                 // Fallback to type icon
                 var type = obj.GetType();

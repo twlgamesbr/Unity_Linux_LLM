@@ -134,7 +134,8 @@ namespace Unity.Entities
             {
                 Entities.Clear();
                 ComponentTypes.Clear();
-                if (AddComponents.IsCreated) AddComponents.Clear();
+                if (AddComponents.IsCreated)
+                    AddComponents.Clear();
                 if (AddArchetypes.IsCreated)
                 {
                     for (int i = 0; i < AddArchetypes.Length; i++)
@@ -146,15 +147,24 @@ namespace Unity.Entities
                     }
                 }
 
-                if (RemoveComponents.IsCreated) RemoveComponents.Clear();
-                if (SetComponents.IsCreated) SetComponents.Clear();
-                if (LinkedEntityGroupAdditions.IsCreated) LinkedEntityGroupAdditions.Clear();
-                if (LinkedEntityGroupRemovals.IsCreated) LinkedEntityGroupRemovals.Clear();
-                if (EntityReferenceChanges.IsCreated) EntityReferenceChanges.Clear();
-                if (BlobAssetReferenceChanges.IsCreated) BlobAssetReferenceChanges.Clear();
-                if (ComponentData.IsCreated) ComponentData.Clear();
-                if (SharedComponentChanges.IsCreated) SharedComponentChanges.Clear();
-                if (ManagedComponentChanges.IsCreated) ManagedComponentChanges.Clear();
+                if (RemoveComponents.IsCreated)
+                    RemoveComponents.Clear();
+                if (SetComponents.IsCreated)
+                    SetComponents.Clear();
+                if (LinkedEntityGroupAdditions.IsCreated)
+                    LinkedEntityGroupAdditions.Clear();
+                if (LinkedEntityGroupRemovals.IsCreated)
+                    LinkedEntityGroupRemovals.Clear();
+                if (EntityReferenceChanges.IsCreated)
+                    EntityReferenceChanges.Clear();
+                if (BlobAssetReferenceChanges.IsCreated)
+                    BlobAssetReferenceChanges.Clear();
+                if (ComponentData.IsCreated)
+                    ComponentData.Clear();
+                if (SharedComponentChanges.IsCreated)
+                    SharedComponentChanges.Clear();
+                if (ManagedComponentChanges.IsCreated)
+                    ManagedComponentChanges.Clear();
             }
 
             public void Dispose()
@@ -162,7 +172,8 @@ namespace Unity.Entities
                 Entities.Dispose();
                 ComponentTypes.Dispose();
 
-                if (AddComponents.IsCreated) AddComponents.Dispose();
+                if (AddComponents.IsCreated)
+                    AddComponents.Dispose();
                 if (AddArchetypes.IsCreated)
                 {
                     foreach (var arch in AddArchetypes)
@@ -172,15 +183,24 @@ namespace Unity.Entities
                     }
                     AddArchetypes.Dispose();
                 }
-                if (RemoveComponents.IsCreated) RemoveComponents.Dispose();
-                if (SetComponents.IsCreated) SetComponents.Dispose();
-                if (LinkedEntityGroupAdditions.IsCreated) LinkedEntityGroupAdditions.Dispose();
-                if (LinkedEntityGroupRemovals.IsCreated) LinkedEntityGroupRemovals.Dispose();
-                if (EntityReferenceChanges.IsCreated) EntityReferenceChanges.Dispose();
-                if (BlobAssetReferenceChanges.IsCreated) BlobAssetReferenceChanges.Dispose();
-                if (ComponentData.IsCreated) ComponentData.Dispose();
-                if (SharedComponentChanges.IsCreated) SharedComponentChanges.Dispose();
-                if (ManagedComponentChanges.IsCreated) ManagedComponentChanges.Dispose();
+                if (RemoveComponents.IsCreated)
+                    RemoveComponents.Dispose();
+                if (SetComponents.IsCreated)
+                    SetComponents.Dispose();
+                if (LinkedEntityGroupAdditions.IsCreated)
+                    LinkedEntityGroupAdditions.Dispose();
+                if (LinkedEntityGroupRemovals.IsCreated)
+                    LinkedEntityGroupRemovals.Dispose();
+                if (EntityReferenceChanges.IsCreated)
+                    EntityReferenceChanges.Dispose();
+                if (BlobAssetReferenceChanges.IsCreated)
+                    BlobAssetReferenceChanges.Dispose();
+                if (ComponentData.IsCreated)
+                    ComponentData.Dispose();
+                if (SharedComponentChanges.IsCreated)
+                    SharedComponentChanges.Dispose();
+                if (ManagedComponentChanges.IsCreated)
+                    ManagedComponentChanges.Dispose();
             }
         }
 
@@ -206,13 +226,16 @@ namespace Unity.Entities
 
             public void Clear()
             {
-                if (List.IsCreated) List.Clear();
+                if (List.IsCreated)
+                    List.Clear();
             }
 
             public void Dispose()
             {
-                if (List.IsCreated) List.Dispose();
-                if (AddedCount.IsCreated) AddedCount.Dispose();
+                if (List.IsCreated)
+                    List.Dispose();
+                if (AddedCount.IsCreated)
+                    AddedCount.Dispose();
             }
 
             public int BinarySearchRange(EntityGuid key, int startIndex, int endIndex, int entryHint)
@@ -315,14 +338,18 @@ namespace Unity.Entities
 
             public void Clear()
             {
-                if (List.IsCreated) List.Clear();
-                if (Lookup.IsCreated) Lookup.Clear();
+                if (List.IsCreated)
+                    List.Clear();
+                if (Lookup.IsCreated)
+                    Lookup.Clear();
             }
 
             public void Dispose()
             {
-                if (List.IsCreated) List.Dispose();
-                if (Lookup.IsCreated) Lookup.Dispose();
+                if (List.IsCreated)
+                    List.Dispose();
+                if (Lookup.IsCreated)
+                    Lookup.Dispose();
             }
 
             public int GetOrAdd(T value)
@@ -2276,7 +2303,8 @@ namespace Unity.Entities
 
             void IVisitPropertyAdapter<Entity>.Visit<TContainer>(in VisitContext<TContainer, Entity> context, ref TContainer container, ref Entity value)
             {
-                if (!m_EntityReferencePatches.IsCreated) return;
+                if (!m_EntityReferencePatches.IsCreated)
+                    return;
 
                 var entityGuid = default(EntityGuid);
 
@@ -2295,7 +2323,8 @@ namespace Unity.Entities
 
             void IVisitPropertyAdapter<BlobAssetReferenceData>.Visit<TContainer>(in VisitContext<TContainer, BlobAssetReferenceData> context, ref TContainer container, ref BlobAssetReferenceData value)
             {
-                if (!m_BlobAssetReferencePatches.IsCreated) return;
+                if (!m_BlobAssetReferencePatches.IsCreated)
+                    return;
 
                 var hash = default(ulong);
 

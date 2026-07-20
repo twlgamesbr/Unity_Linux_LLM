@@ -16,7 +16,8 @@ namespace UnityEditor.TestTools.TestRunner
 
         protected bool ExecutePreBuildSetupMethods(ITest tests, ITestFilter testRunnerFilter)
         {
-            using (new ProfilerMarker(nameof(ExecutePreBuildSetupMethods)).Auto()) {
+            using (new ProfilerMarker(nameof(ExecutePreBuildSetupMethods)).Auto())
+            {
                 var logString = "Executing setup for: {0}";
                 return ExecuteMethods<IPrebuildSetup>(tests, testRunnerFilter, new PrebuildSetupAttributeFinder(), logString, targetClass => targetClass.Setup(), TestTargetPlatform);
             }
@@ -24,7 +25,8 @@ namespace UnityEditor.TestTools.TestRunner
 
         protected bool ExecutePrebuildSetupWithTestDataMethods(ITest tests, ITestFilter testRunnerFilter)
         {
-            using (new ProfilerMarker(nameof(ExecutePreBuildSetupMethods)).Auto()) {
+            using (new ProfilerMarker(nameof(ExecutePreBuildSetupMethods)).Auto())
+            {
                 var logString = "Executing setup for: {0}";
                 List<ITest> filteredTests = new List<ITest>();
                 TestFiltering.GetMatchingTests(tests, testRunnerFilter, ref filteredTests, TestTargetPlatform);
@@ -44,7 +46,8 @@ namespace UnityEditor.TestTools.TestRunner
 
         static void ExecutePostBuildCleanupMethods(ITest tests, ITestFilter testRunnerFilter, RuntimePlatform testTargetPlatform)
         {
-            using (new ProfilerMarker(nameof(ExecutePostBuildCleanupMethods)).Auto()) {
+            using (new ProfilerMarker(nameof(ExecutePostBuildCleanupMethods)).Auto())
+            {
                 var attributeFinder = new PostbuildCleanupAttributeFinder();
                 var logString = "Executing cleanup for: {0}";
                 ExecuteMethods<IPostBuildCleanup>(tests, testRunnerFilter, attributeFinder, logString, targetClass => targetClass.Cleanup(), testTargetPlatform);
@@ -53,7 +56,8 @@ namespace UnityEditor.TestTools.TestRunner
 
         static void ExecutePostBuildCleanupWithTestDataMethods(ITest tests, ITestFilter testRunnerFilter, RuntimePlatform testTargetPlatform)
         {
-            using (new ProfilerMarker(nameof(ExecutePostBuildCleanupMethods)).Auto()) {
+            using (new ProfilerMarker(nameof(ExecutePostBuildCleanupMethods)).Auto())
+            {
                 var attributeFinder = new PostbuildCleanupWithTestDataAttributeFinder();
                 var logString = "Executing cleanup for: {0}";
                 List<ITest> filteredTests = new List<ITest>();

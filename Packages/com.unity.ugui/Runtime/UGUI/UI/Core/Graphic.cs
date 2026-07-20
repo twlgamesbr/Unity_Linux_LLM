@@ -152,7 +152,12 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public virtual Color color { get { return m_Color; } set { if (SetPropertyUtility.SetColor(ref m_Color, value)) SetVerticesDirty(); } }
+        public virtual Color color { get { return m_Color; } set
+            {
+                if (SetPropertyUtility.SetColor(ref m_Color, value))
+                    SetVerticesDirty();
+            }
+        }
 
         [SerializeField] private bool m_RaycastTarget = true;
 

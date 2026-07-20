@@ -79,7 +79,8 @@ namespace Unity.Physics.Authoring
         /// <returns></returns>
         protected float CalculateSpringConstantFromSpringFrequency(float springFrequency, float mass = 1.0f)
         {
-            if (springFrequency < Math.Constants.Eps) return 0.0f;
+            if (springFrequency < Math.Constants.Eps)
+                return 0.0f;
 
             var tauXFrequency = Math.Constants.Tau * springFrequency;
             return tauXFrequency * tauXFrequency * mass;
@@ -755,7 +756,8 @@ namespace Unity.Physics.Authoring
             isPositionMotor = false;
             isVelocityMotor = false;
 
-            if (force <= threshold) return; // if no force applied at all, it isn't a motor
+            if (force <= threshold)
+                return; // if no force applied at all, it isn't a motor
 
             // If target position==0 AND target velocity==0 AND spring==0 AND damper== 0. This is not a motor.
             if (targetPosition <= threshold && targetVelocity <= threshold &&

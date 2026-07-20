@@ -22,7 +22,8 @@ class FullScreenPassRendererFeature_OldGUID : UnityEngine.Rendering.Universal.Fu
 #if UNITY_EDITOR
     void DownCast()
     {
-        if (this == null || this.Equals(null)) return;
+        if (this == null || this.Equals(null))
+            return;
 
         const string newGUID = "b00045f12942b46c698459096c89274e";
         const string oldGUID = "6d613f08f173d4dd895bb07b3230baa9";

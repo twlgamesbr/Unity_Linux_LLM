@@ -408,7 +408,8 @@ namespace Unity.Physics.Systems
             {
                 IntegrityCheckMap = buildPhysicsData.IntegrityCheckMap,
                 PhysicsColliderType = buildPhysicsData.PhysicsData.ComponentHandles.PhysicsColliderType
-            }.Schedule(buildPhysicsData.PhysicsData.StaticEntityGroup, state.Dependency);;
+            }.Schedule(buildPhysicsData.PhysicsData.StaticEntityGroup, state.Dependency);
+            ;
         }
     }
 

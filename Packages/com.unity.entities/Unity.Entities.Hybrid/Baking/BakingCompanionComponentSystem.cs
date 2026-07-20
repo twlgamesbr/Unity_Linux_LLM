@@ -26,7 +26,8 @@ namespace Unity.Entities
         {
             void AddType(System.Type type)
             {
-                if (m_ComponentTypeToDependencyOrder.ContainsKey(type)) return;
+                if (m_ComponentTypeToDependencyOrder.ContainsKey(type))
+                    return;
 
                 List<System.Type> requiredTypes = new();
 

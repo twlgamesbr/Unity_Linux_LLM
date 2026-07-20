@@ -1614,7 +1614,8 @@ namespace UnityEngine.InputSystem.Users
             for (var i = startIndex; i < s_GlobalState.allLostDeviceCount; ++i)
             {
                 var lostDevice = s_GlobalState.allLostDevices[i];
-                if (device == lostDevice || lostDevice.deviceId == newDeviceId) return i;
+                if (device == lostDevice || lostDevice.deviceId == newDeviceId)
+                    return i;
             }
 
             return -1;

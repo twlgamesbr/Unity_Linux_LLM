@@ -142,12 +142,14 @@ namespace NPCSystem.Dialogue.RAG
             using var request = UnityWebRequest.Get(url);
             await request.SendWebRequest();
 
-            if (request.result != UnityWebRequest.Result.Success) return null;
+            if (request.result != UnityWebRequest.Result.Success)
+                return null;
 
             try
             {
                 var response = JsonConvert.DeserializeObject<QdrantCollectionInfoResponse>(request.downloadHandler.text);
-                if (response?.result?.config?.params_config?.vectors?.dense == null) return "Invalid response structure.";
+                if (response?.result?.config?.params_config?.vectors?.dense == null)
+                    return "Invalid response structure.";
 
                 int denseSize = response.result.config.params_config.vectors.dense.size;
                 bool hasSparse = response.result.config.params_config.sparse_vectors != null &&
@@ -170,7 +172,10 @@ namespace NPCSystem.Dialogue.RAG
 
                 return $"Dense({denseSize}){(hasSparse ? $" + Sparse({_sparseVectorName})" : " [NO SPARSE]")}";
             }
-            catch (Exception ex) { return $"Parse error: {ex.Message}"; }
+            catch (Exception ex)
+            {
+                return $"Parse error: {ex.Message}";
+            }
         }
 
         [Serializable]
@@ -267,7 +272,8 @@ namespace NPCSystem.Dialogue.RAG
             {
                 // 1. Dense Embedding
                 List<float> queryVector = await _embedder.Embeddings(query);
-                if (queryVector.Count == 0) return new List<string>();
+                if (queryVector.Count == 0)
+                    return new List<string>();
 
                 // 2. Dense Query
                 var payload = new QueryPayload
@@ -280,7 +286,8 @@ namespace NPCSystem.Dialogue.RAG
                 string json = JsonConvert.SerializeObject(payload);
                 string responseText = await SendSearchRequestAsync(BuildQueryEndpoint(), json);
                 
-                if (string.IsNullOrWhiteSpace(responseText)) return new List<string>();
+                if (string.IsNullOrWhiteSpace(responseText))
+                    return new List<string>();
 
                 var searchResult = JsonConvert.DeserializeObject<QdrantQueryResult>(responseText);
                 List<string> results = ExtractPayloadTexts(searchResult);
@@ -306,7 +313,8 @@ namespace NPCSystem.Dialogue.RAG
         static List<string> ExtractPayloadTexts(QdrantQueryResult result)
         {
             var texts = new List<string>();
-            if (result?.result == null) return texts;
+            if (result?.result == null)
+                return texts;
 
             foreach (var point in result.result)
             {
@@ -326,7 +334,8 @@ namespace NPCSystem.Dialogue.RAG
             request.SetRequestHeader("Content-Type", "application/json");
 
             var operation = request.SendWebRequest();
-            while (!operation.isDone) await Task.Yield();
+            while (!operation.isDone)
+                await Task.Yield();
 
             if (request.result != UnityWebRequest.Result.Success)
             {

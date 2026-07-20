@@ -389,7 +389,8 @@ namespace UnityEngine.Rendering
 
             public void OnDispose(ref T currentStage)
             {
-                if (disposed) return;
+                if (disposed)
+                    return;
                 disposed = true;
 
                 if (LogFile != null)
@@ -425,7 +426,12 @@ namespace UnityEngine.Rendering
             static Stages currentStage = Stages.None;
             public BakingSetupProfiling(Stages stage) : base(stage, ref currentStage) { }
             public override Stages GetLastStep() => Stages.None;
-            public static void GetProgressRange(out float progress0, out float progress1) { float s = 1 / (float)Stages.None; progress0 = (float)currentStage * s; progress1 = progress0 + s; }
+            public static void GetProgressRange(out float progress0, out float progress1)
+            {
+                float s = 1 / (float)Stages.None;
+                progress0 = (float)currentStage * s;
+                progress1 = progress0 + s;
+            }
             public void Dispose() { OnDispose(ref currentStage); }
         }
 
@@ -444,7 +450,12 @@ namespace UnityEngine.Rendering
             static Stages currentStage = Stages.None;
             public BakingCompleteProfiling(Stages stage) : base(stage, ref currentStage) { }
             public override Stages GetLastStep() => Stages.None;
-            public static void GetProgressRange(out float progress0, out float progress1) { float s = 1 / (float)Stages.None; progress0 = (float)currentStage * s; progress1 = progress0 + s; }
+            public static void GetProgressRange(out float progress0, out float progress1)
+            {
+                float s = 1 / (float)Stages.None;
+                progress0 = (float)currentStage * s;
+                progress1 = progress0 + s;
+            }
             public void Dispose() { OnDispose(ref currentStage); }
         }
 
@@ -1734,7 +1745,8 @@ namespace UnityEngine.Rendering
                     bool bakedRenderingLayerMasks = (renderingLayerMasks.IsCreated & renderingLayerMasks.Length > 0);
                     uint probeRenderingLayerMask = 0;
 
-                    if (bakedRenderingLayerMasks) probeRenderingLayerMask = renderingLayerMasks[i];
+                    if (bakedRenderingLayerMasks)
+                        probeRenderingLayerMask = renderingLayerMasks[i];
 
                     float weightSum = 0.0f;
                     SphericalHarmonicsL2 shTrilinear = default;
@@ -1752,7 +1764,8 @@ namespace UnityEngine.Rendering
                         if (m_BakingBatch.positionToIndex.TryGetValue(probeHash, out var index))
                         {
                             bool valid = validity[positionRemap[index]] <= k_MinValidityForLeaking;
-                            if (!valid) continue;
+                            if (!valid)
+                                continue;
 
                             if (bakedRenderingLayerMasks)
                             {

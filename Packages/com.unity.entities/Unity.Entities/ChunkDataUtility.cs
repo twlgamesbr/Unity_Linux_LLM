@@ -838,7 +838,8 @@ namespace Unity.Entities
                     if (EntityComponentStore.IsUnmanagedSharedComponentIndex(sharedComponentIndex))
                     {
                         entityComponentStore->RemoveSharedComponentReference_Unmanaged(sharedComponentIndex);
-                    } else {
+                    } else
+                    {
                         entityComponentStore->ManagedChangesTracker.RemoveReference(sharedComponentIndex);
                     }
                 }
@@ -1013,13 +1014,15 @@ namespace Unity.Entities
                             if (EntityComponentStore.IsUnmanagedSharedComponentIndex(srcSharedComponentDataIndex))
                             {
                                 entityComponentStore->RemoveSharedComponentReference_Unmanaged(srcSharedComponentDataIndex);
-                            } else {
+                            } else
+                            {
                                 entityComponentStore->ManagedChangesTracker.RemoveReference(srcSharedComponentDataIndex);
                             }
                             if (EntityComponentStore.IsUnmanagedSharedComponentIndex(dstSharedComponentDataIndex))
                             {
                                 entityComponentStore->AddSharedComponentReference_Unmanaged(dstSharedComponentDataIndex);
-                            } else {
+                            } else
+                            {
                                 entityComponentStore->ManagedChangesTracker.AddReference(dstSharedComponentDataIndex);
                             }
                         }
@@ -1033,7 +1036,8 @@ namespace Unity.Entities
                         if (EntityComponentStore.IsUnmanagedSharedComponentIndex(sharedComponentDataIndex))
                         {
                             entityComponentStore->RemoveSharedComponentReference_Unmanaged(sharedComponentDataIndex);
-                        } else {
+                        } else
+                        {
                             entityComponentStore->ManagedChangesTracker.RemoveReference(sharedComponentDataIndex);
                         }
                         o++;
@@ -1044,7 +1048,8 @@ namespace Unity.Entities
                         if (EntityComponentStore.IsUnmanagedSharedComponentIndex(sharedComponentDataIndex))
                         {
                             entityComponentStore->AddSharedComponentReference_Unmanaged(sharedComponentDataIndex);
-                        } else {
+                        } else
+                        {
                             entityComponentStore->ManagedChangesTracker.AddReference(sharedComponentDataIndex);
                         }
                         n++;
@@ -1057,7 +1062,8 @@ namespace Unity.Entities
                     if (EntityComponentStore.IsUnmanagedSharedComponentIndex(sharedComponentDataIndex))
                     {
                         entityComponentStore->AddSharedComponentReference_Unmanaged(sharedComponentDataIndex);
-                    } else {
+                    } else
+                    {
                         entityComponentStore->ManagedChangesTracker.AddReference(sharedComponentDataIndex);
                     }
                 }
@@ -1068,7 +1074,8 @@ namespace Unity.Entities
                     if (EntityComponentStore.IsUnmanagedSharedComponentIndex(sharedComponentDataIndex))
                     {
                         entityComponentStore->RemoveSharedComponentReference_Unmanaged(sharedComponentDataIndex);
-                    } else {
+                    } else
+                    {
                         entityComponentStore->ManagedChangesTracker.RemoveReference(sharedComponentDataIndex);
                     }
                 }
@@ -1603,7 +1610,8 @@ namespace Unity.Entities
                 if (EntityComponentStore.IsUnmanagedSharedComponentIndex(sharedComponentIndex))
                 {
                     entityComponentStore->AddSharedComponentReference_Unmanaged(sharedComponentIndex);
-                } else {
+                } else
+                {
                     entityComponentStore->ManagedChangesTracker.AddReference(sharedComponentIndex);
                 }
             }
@@ -1634,7 +1642,8 @@ namespace Unity.Entities
                     if (EntityComponentStore.IsUnmanagedSharedComponentIndex(sharedComponentIndex))
                     {
                         entityComponentStore->AddSharedComponentReference_Unmanaged(sharedComponentIndex);
-                    } else {
+                    } else
+                    {
                         entityComponentStore->ManagedChangesTracker.AddReference(sharedComponentIndex);
                     }
                 }

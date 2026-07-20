@@ -60,7 +60,8 @@ namespace Unity.Physics
             BodyFromConstraintB = bFromConstraint;
 
             Is1D = false;
-            if (!math.all(ConstrainedAxes)) Is1D = ConstrainedAxes.x ^ ConstrainedAxes.y ^ ConstrainedAxes.z;
+            if (!math.all(ConstrainedAxes))
+                Is1D = ConstrainedAxes.x ^ ConstrainedAxes.y ^ ConstrainedAxes.z;
 
             Update(in motionA, in motionB);
         }

@@ -255,7 +255,8 @@ namespace TMPro
             {
                 // Get current character info.
                 TMP_CharacterInfo cInfo = text.textInfo.characterInfo[i];
-                if (visibleOnly && !cInfo.isVisible) continue;
+                if (visibleOnly && !cInfo.isVisible)
+                    continue;
 
                 // Ignore Carriage Returns <CR>
                 if (cInfo.character == '\r')
@@ -338,7 +339,8 @@ namespace TMPro
             {
                 // Get current character info.
                 TMP_CharacterInfo cInfo = text.textInfo.characterInfo[i];
-                if (visibleOnly && !cInfo.isVisible) continue;
+                if (visibleOnly && !cInfo.isVisible)
+                    continue;
 
                 // Get Bottom Left and Top Right position of the current character
                 Vector3 bl = rectTransform.TransformPoint(cInfo.bottomLeft);
@@ -348,7 +350,6 @@ namespace TMPro
 
                 if (PointIntersectRectangle(position, bl, tl, tr, br))
                     return i;
-
             }
             return -1;
         }
@@ -413,7 +414,8 @@ namespace TMPro
             {
                 // Get current character info.
                 TMP_CharacterInfo cInfo = text.textInfo.characterInfo[i];
-                if (visibleOnly && !cInfo.isVisible) continue;
+                if (visibleOnly && !cInfo.isVisible)
+                    continue;
 
                 // Get Bottom Left and Top Right position of the current character
                 Vector3 bl = rectTransform.TransformPoint(cInfo.bottomLeft);
@@ -1380,7 +1382,8 @@ namespace TMPro
                     int currentLine = currentCharInfo.lineNumber;
 
                     // Check if Link characters are on the current page
-                    if (text.overflowMode == TextOverflowModes.Page && currentCharInfo.pageNumber + 1 != text.pageToDisplay) continue;
+                    if (text.overflowMode == TextOverflowModes.Page && currentCharInfo.pageNumber + 1 != text.pageToDisplay)
+                        continue;
 
                     if (isBeginRegion == false)
                     {
@@ -1676,7 +1679,8 @@ namespace TMPro
                     int currentLine = currentCharInfo.lineNumber;
 
                     // Check if Link characters are on the current page
-                    if (text.overflowMode == TextOverflowModes.Page && currentCharInfo.pageNumber + 1 != text.pageToDisplay) continue;
+                    if (text.overflowMode == TextOverflowModes.Page && currentCharInfo.pageNumber + 1 != text.pageToDisplay)
+                        continue;
 
                     if (isBeginRegion == false)
                     {

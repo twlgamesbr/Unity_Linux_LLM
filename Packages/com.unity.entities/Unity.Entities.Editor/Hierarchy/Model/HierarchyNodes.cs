@@ -443,7 +443,8 @@ namespace Unity.Entities.Editor
                 }
 
                 Nodes.Length = writeIndex;
-                if (rootGameObjectsInSubScene.IsCreated) rootGameObjectsInSubScene.Dispose();
+                if (rootGameObjectsInSubScene.IsCreated)
+                    rootGameObjectsInSubScene.Dispose();
             }
 
             void CreateSubSceneGameObjectCache(int currentReadIndex, SubSceneInfo subSceneInfo, ref UnsafeParallelHashMap<EntityId,bool> rootGameObjectsInSubScene)

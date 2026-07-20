@@ -20,7 +20,8 @@ namespace Unity.Networking.Transport
         {
             SimulatorUtility.Parameters param = settings.GetSimulatorStageParameters();
             var simulatorParamsSizeOf = UnsafeUtility.SizeOf<SimulatorUtility.Parameters>();
-            if (simulatorParamsSizeOf != staticInstanceBufferLength) throw new InvalidOperationException($"simulatorParamsSizeOf {simulatorParamsSizeOf}");
+            if (simulatorParamsSizeOf != staticInstanceBufferLength)
+                throw new InvalidOperationException($"simulatorParamsSizeOf {simulatorParamsSizeOf}");
             UnsafeUtility.MemCpy(staticInstanceBuffer, &param, simulatorParamsSizeOf);
 
             return new NetworkPipelineStage(

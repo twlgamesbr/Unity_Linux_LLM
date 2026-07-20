@@ -30,7 +30,8 @@ namespace Unity.Rendering
             int cmp_NameID = NameID.CompareTo(other.NameID);
             int cmp_TypeIndex = TypeIndex.CompareTo(other.TypeIndex);
 
-            if (cmp_NameID != 0) return cmp_NameID;
+            if (cmp_NameID != 0)
+                return cmp_NameID;
             return cmp_TypeIndex;
         }
     }
@@ -83,8 +84,10 @@ namespace Unity.Rendering
             int numA = PropertyComponents.Length;
             int numB = other.PropertyComponents.Length;
 
-            if (numA < numB) return -1;
-            if (numA > numB) return 1;
+            if (numA < numB)
+                return -1;
+            if (numA > numB)
+                return 1;
 
             return UnsafeUtility.MemCmp(
                 PropertyComponents.Ptr,
@@ -101,7 +104,8 @@ namespace Unity.Rendering
 
         public void Dispose()
         {
-            if (PropertyComponents.IsCreated) PropertyComponents.Dispose();
+            if (PropertyComponents.IsCreated)
+                PropertyComponents.Dispose();
         }
 
         public struct MetadataValueComparer : IComparer<MetadataValue>

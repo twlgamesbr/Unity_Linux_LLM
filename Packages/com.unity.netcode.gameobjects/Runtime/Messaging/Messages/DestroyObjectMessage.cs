@@ -37,9 +37,18 @@ namespace Unity.Netcode
             var isDeferredDespawn = DeferredDespawnTick > 0;
 
             byte bitset = 0x00;
-            if (IsTargetedDestroy) { bitset |= k_IsTargetedDestroy; }
-            if (isDeferredDespawn) { bitset |= k_IsDeferredDespawn; }
-            if (DestroyGameObject) { bitset |= k_DestroyGameObject; }
+            if (IsTargetedDestroy)
+            {
+                bitset |= k_IsTargetedDestroy;
+            }
+            if (isDeferredDespawn)
+            {
+                bitset |= k_IsDeferredDespawn;
+            }
+            if (DestroyGameObject)
+            {
+                bitset |= k_DestroyGameObject;
+            }
 
             BytePacker.WriteValueBitPacked(writer, NetworkObjectId);
 

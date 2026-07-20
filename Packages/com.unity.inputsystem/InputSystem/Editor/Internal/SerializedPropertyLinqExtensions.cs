@@ -121,7 +121,8 @@ namespace UnityEngine.InputSystem.Editor
         private static IEnumerable<SerializedProperty> SkipIterator(SerializedProperty source, int count)
         {
             var enumerator = source.GetEnumerator();
-            while (count > 0 && enumerator.MoveNext()) count--;
+            while (count > 0 && enumerator.MoveNext())
+                count--;
             if (count <= 0)
             {
                 while (enumerator.MoveNext())
@@ -136,7 +137,8 @@ namespace UnityEngine.InputSystem.Editor
                 foreach (SerializedProperty element in source)
                 {
                     yield return element;
-                    if (--count == 0) break;
+                    if (--count == 0)
+                        break;
                 }
             }
         }

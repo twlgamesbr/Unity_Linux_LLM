@@ -258,7 +258,11 @@ namespace TMPro
         public static TMP_SpriteAsset SearchForSpriteByUnicode(TMP_SpriteAsset spriteAsset, uint unicode, bool includeFallbacks, out int spriteIndex)
         {
             // Check to make sure sprite asset is not null
-            if (spriteAsset == null) { spriteIndex = -1; return null; }
+            if (spriteAsset == null)
+            {
+                spriteIndex = -1;
+                return null;
+            }
 
             // Get sprite index for the given unicode
             spriteIndex = spriteAsset.GetSpriteIndexFromUnicode(unicode);
@@ -301,7 +305,8 @@ namespace TMPro
             for (int i = 0; i < spriteAssets.Count; i++)
             {
                 TMP_SpriteAsset temp = spriteAssets[i];
-                if (temp == null) continue;
+                if (temp == null)
+                    continue;
 
                 EntityId id = temp.GetEntityId();
 
@@ -355,7 +360,11 @@ namespace TMPro
         public static TMP_SpriteAsset SearchForSpriteByHashCode(TMP_SpriteAsset spriteAsset, int hashCode, bool includeFallbacks, out int spriteIndex)
         {
             // Make sure sprite asset is not null
-            if (spriteAsset == null) { spriteIndex = -1; return null; }
+            if (spriteAsset == null)
+            {
+                spriteIndex = -1;
+                return null;
+            }
 
             spriteIndex = spriteAsset.GetSpriteIndexFromHashcode(hashCode);
             if (spriteIndex != -1)
@@ -441,7 +450,8 @@ namespace TMPro
             for (int i = 0; i < spriteAssets.Count; i++)
             {
                 TMP_SpriteAsset temp = spriteAssets[i];
-                if (temp == null) continue;
+                if (temp == null)
+                    continue;
 
                 EntityId id = temp.entityId;
 
@@ -488,7 +498,8 @@ namespace TMPro
         /// </summary>
         public void SortGlyphTable()
         {
-            if (m_GlyphTable == null || m_GlyphTable.Count == 0) return;
+            if (m_GlyphTable == null || m_GlyphTable.Count == 0)
+                return;
 
             m_GlyphTable = m_GlyphTable.OrderBy(item => item.index).ToList();
         }

@@ -383,13 +383,15 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
             int destinationMaxWidth = math.max(math.max(destinationDesc.width, destinationDesc.height), destinationDesc.volumeDepth);
             int destinationTotalMipChainLevels = (int)math.log2(destinationMaxWidth) + 1;
 
-            if (numSlices == -1) numSlices = sourceDesc.slices - sourceSlice;
+            if (numSlices == -1)
+                numSlices = sourceDesc.slices - sourceSlice;
             if (numSlices > sourceDesc.slices - sourceSlice
                 || numSlices > destinationDesc.volumeDepth - destinationSlice)
             {
                 throw new ArgumentException($"BlitPass: {passName} attempts to blit too many slices. The pass will be skipped.");
             }
-            if (numMips == -1) numMips = sourceTotalMipChainLevels - sourceMip;
+            if (numMips == -1)
+                numMips = sourceTotalMipChainLevels - sourceMip;
             if (numMips > sourceTotalMipChainLevels - sourceMip
                 || numMips > destinationTotalMipChainLevels - destinationMip)
             {
@@ -1029,7 +1031,8 @@ namespace UnityEngine.Rendering.RenderGraphModule.Util
 
             CommandBuffer unsafeCmd = CommandBufferHelpers.GetNativeCommandBuffer(context.cmd);
 
-            if (data.propertyBlock == null) data.propertyBlock = s_PropertyBlock;
+            if (data.propertyBlock == null)
+                data.propertyBlock = s_PropertyBlock;
 
             if (data.source.IsValid())
             {

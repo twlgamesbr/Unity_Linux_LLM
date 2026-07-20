@@ -173,7 +173,8 @@ namespace UnityEditor.Rendering
                     foreach (var guid in bakingSet.sceneGUIDs)
                     {
                         Scene scene = SceneManager.GetSceneByPath(AssetDatabase.GUIDToAssetPath(guid));
-                        if (scene.isLoaded) continue;
+                        if (scene.isLoaded)
+                            continue;
 
                         if (bakingSet.HasBeenBaked())
                         {

@@ -23,9 +23,12 @@ namespace Unity.Rendering
 
             public int CompareTo(AssetIdentifier other)
             {
-                if (!IsValid && !other.IsValid) return 0;
-                if (!IsValid) return 1;
-                if (!other.IsValid) return -1;
+                if (!IsValid && !other.IsValid)
+                    return 0;
+                if (!IsValid)
+                    return 1;
+                if (!other.IsValid)
+                    return -1;
 
                 var guidCompare = Guid.CompareTo(other.Guid);
                 if (guidCompare != 0)

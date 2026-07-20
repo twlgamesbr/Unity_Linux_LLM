@@ -1112,7 +1112,8 @@ namespace Unity.Entities
             {
                 var system = sysHandlesInCreationOrder[i].handle;
                 var state = Unmanaged.ResolveSystemState(system);
-                if (state == null) continue;
+                if (state == null)
+                    continue;
                 if (state->m_ManagedSystem.IsAllocated)
                 {
                     try
@@ -1137,7 +1138,6 @@ namespace Unity.Entities
                         SystemBaseRegistry.CallOnStopRunning(state);
                     }
                 }
-
             }
 
             for (int i = sysHandlesInCreationOrder.Length - 1; i >= 0; --i)
@@ -1151,7 +1151,8 @@ namespace Unity.Entities
                 {
                     var state = Unmanaged.ResolveSystemState(system);
 
-                    if (state == null) continue;
+                    if (state == null)
+                        continue;
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
                     m_Unmanaged.AllowGetSystem = false;
 #endif
@@ -1183,7 +1184,8 @@ namespace Unity.Entities
                 try
                 {
                     var state = Unmanaged.ResolveSystemState(system);
-                    if (state == null) continue;
+                    if (state == null)
+                        continue;
                     if (state->m_ManagedSystem.IsAllocated)
                         state->ManagedSystem.OnAfterDestroyInternal();
                     else
@@ -1294,7 +1296,8 @@ namespace Unity.Entities
                 try
                 {
                     var type = actuallyAddedTypesList[i-startIndex];
-                    if (type == SystemTypeIndex.Null) continue;
+                    if (type == SystemTypeIndex.Null)
+                        continue;
 
                     if (!type.IsManaged)
                     {
@@ -1464,12 +1467,12 @@ namespace Unity.Entities
 
                     foreach (var system in world.Systems)
                     {
-                        if (system == null) continue;
+                        if (system == null)
+                            continue;
 
                         var statePtr = system.CheckedState();
                         if (statePtr->m_LastSystemVersion == changeVersion)
                             return statePtr;
-
                     }
                 }
             }

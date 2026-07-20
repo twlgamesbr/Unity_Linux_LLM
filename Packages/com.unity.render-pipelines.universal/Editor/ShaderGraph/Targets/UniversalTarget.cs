@@ -394,7 +394,8 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             {
                 foreach (var type in subTargetFilter.subTargetTypes)
                 {
-                    if (!type.IsAssignableFrom(activeSubTargetType)) continue;
+                    if (!type.IsAssignableFrom(activeSubTargetType))
+                        continue;
                     worksWithThisSubTarget = true;
                     break;
                 }
@@ -457,7 +458,8 @@ namespace UnityEditor.Rendering.Universal.ShaderGraph
             if (useCoreBlocks)
             {
                 context.AddBlock(BlockFields.VertexDescription.Position);
-                if (m_ActiveSubTarget.value is not UniversalTerrainLitSubTarget){
+                if (m_ActiveSubTarget.value is not UniversalTerrainLitSubTarget)
+                {
                     context.AddBlock(BlockFields.VertexDescription.Normal);
                     context.AddBlock(BlockFields.VertexDescription.Tangent);
                 }

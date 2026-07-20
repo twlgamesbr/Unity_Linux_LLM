@@ -112,7 +112,11 @@ namespace UnityEngine.UIElements.TestFramework
                 }
 
                 menu.AppendAction(itemName,
-                    (a) => { action?.Invoke(); actionUserData?.Invoke(data); },
+                    (a) =>
+                    {
+                        action?.Invoke();
+                        actionUserData?.Invoke(data);
+                    },
                     (a) => s,
                     data);
             }

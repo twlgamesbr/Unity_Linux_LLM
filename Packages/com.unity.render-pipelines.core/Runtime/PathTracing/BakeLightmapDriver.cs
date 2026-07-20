@@ -146,7 +146,8 @@ namespace UnityEngine.PathTracing.Lightmapping
 
             // Sample count expansion needs to be a power of 2 - calculate the expansion width
             expandedSampleWidth = math.ceilpow2(maxSamplesPerChunk);
-            if (expandedSampleWidth > maxSamplesPerChunk) expandedSampleWidth /= 2;
+            if (expandedSampleWidth > maxSamplesPerChunk)
+                expandedSampleWidth /= 2;
             Debug.Assert(expandedSampleWidth >= 1);
             Debug.Assert(expandedSampleWidth * chunkSize <= maxChunkSize);
 

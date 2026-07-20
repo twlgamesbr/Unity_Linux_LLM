@@ -501,7 +501,8 @@ namespace UnityEngine.Rendering
 
             // Find the size of the brick we can put for every axis given the padding size
             int maxSubdiv = ProbeReferenceVolume.instance.GetMaxSubdivision() - 1;
-            if (pv.overridesSubdivLevels) maxSubdiv = Mathf.Min(pv.highestSubdivLevelOverride, maxSubdiv);
+            if (pv.overridesSubdivLevels)
+                maxSubdiv = Mathf.Min(pv.highestSubdivLevelOverride, maxSubdiv);
 
             float rightPaddingSubdivLevel = ProbeReferenceVolume.instance.BrickSize(MaxSubdivLevelInProbeVolume(new Vector3(maxPadding.x, originalBounds.size.y, originalBounds.size.z), maxSubdiv));
             float leftPaddingSubdivLevel = ProbeReferenceVolume.instance.BrickSize(MaxSubdivLevelInProbeVolume(new Vector3(minPadding.x, originalBounds.size.y, originalBounds.size.z), maxSubdiv));

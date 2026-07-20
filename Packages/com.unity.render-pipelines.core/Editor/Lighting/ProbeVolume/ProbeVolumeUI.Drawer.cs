@@ -16,7 +16,8 @@ namespace UnityEditor.Rendering
 
         static void Drawer_BakeToolBar(SerializedProbeVolume serialized, Editor owner)
         {
-            if (!ProbeReferenceVolume.instance.isInitialized) return;
+            if (!ProbeReferenceVolume.instance.isInitialized)
+                return;
 
             ProbeVolume pv = (serialized.serializedObject.targetObject as ProbeVolume);
 

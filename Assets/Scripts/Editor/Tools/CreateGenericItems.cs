@@ -189,7 +189,8 @@ namespace NPCSystem.Editor.Tools
         {
             var serialized = new SerializedObject(obj);
             var prop = serialized.FindProperty(fieldName);
-            if (prop == null) return;
+            if (prop == null)
+                return;
 
             prop.ClearArray();
             for (int i = 0; i < items.Length; i++)

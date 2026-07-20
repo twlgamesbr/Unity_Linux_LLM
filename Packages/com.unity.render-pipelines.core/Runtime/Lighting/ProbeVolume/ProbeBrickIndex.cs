@@ -273,7 +273,8 @@ namespace UnityEngine.Rendering
                 entriesInfo[entry].firstChunkIndex = kEmptyIndex;
 
                 int numberOfChunksForEntry = entriesInfo[entry].numberOfChunks;
-                if (numberOfChunksForEntry == 0) continue;
+                if (numberOfChunksForEntry == 0)
+                    continue;
 
                 for (int i = 0; i < m_ChunksCount - numberOfChunksForEntry; ++i)
                 {
@@ -321,7 +322,8 @@ namespace UnityEngine.Rendering
                 int firstChunkForEntry = entriesInfo[entry].firstChunkIndex;
                 int numberOfChunkForEntry = entriesInfo[entry].numberOfChunks;
 
-                if (numberOfChunkForEntry == 0) continue;
+                if (numberOfChunkForEntry == 0)
+                    continue;
 
                 if (firstChunkForEntry < 0)
                 {
@@ -481,7 +483,8 @@ namespace UnityEngine.Rendering
             for (int e = 0; e < cellInfo.updateInfo.entriesInfo.Length; e++)
             {
                 ref var entryInfo = ref cellInfo.updateInfo.entriesInfo[e];
-                if (entryInfo.firstChunkIndex < 0) continue;
+                if (entryInfo.firstChunkIndex < 0)
+                    continue;
 
                 for (int i = entryInfo.firstChunkIndex; i < (entryInfo.firstChunkIndex + entryInfo.numberOfChunks); ++i)
                 {

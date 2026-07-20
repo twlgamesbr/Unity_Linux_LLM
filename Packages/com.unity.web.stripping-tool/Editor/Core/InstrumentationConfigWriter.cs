@@ -125,7 +125,8 @@ namespace Unity.Web.Stripping.Editor
             {
                 // Translate the index of the function to the internal numerical function name
                 config.Add($"{functionId};{submoduleName}");
-            } else {
+            } else
+            {
                 ErrorLog.WriteLine($"Could not find function id for {function}");
             }
         }

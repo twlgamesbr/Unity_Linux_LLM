@@ -476,7 +476,8 @@ namespace UnityEditor.Rendering
             foreach (var binding in data.Bindings)
             {
                 // skip if binding is not for material, or refers to a nonexistent renderer
-                if (!IsMaterialBinding(binding) || !renderersByPath.TryGetValue(binding.path, out var rendererData))continue;
+                if (!IsMaterialBinding(binding) || !renderersByPath.TryGetValue(binding.path, out var rendererData))
+                    continue;
 
                 // determine the shader property name and type from the binding
                 (string shaderProperty, ShaderPropertyType type) = EditorCurveBindingUtils.InferShaderProperty(binding);

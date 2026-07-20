@@ -116,7 +116,8 @@ namespace UnityEngine.Rendering
         /// <returns>Whether the SphericalHarmonicsL1 is equal to the object passed.</returns>
         public override bool Equals(object other)
         {
-            if (!(other is SphericalHarmonicsL1)) return false;
+            if (!(other is SphericalHarmonicsL1))
+                return false;
             return this == (SphericalHarmonicsL1)other;
         }
 

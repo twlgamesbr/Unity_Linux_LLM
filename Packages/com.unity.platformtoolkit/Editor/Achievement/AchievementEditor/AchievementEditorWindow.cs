@@ -71,7 +71,8 @@ namespace Unity.PlatformToolkit.Editor
         private void Import()
         {
             var filePath = EditorUtility.OpenFilePanel("Select file to import", Application.dataPath, "*csv");
-            if (!File.Exists(filePath)) return;
+            if (!File.Exists(filePath))
+                return;
             var data = File.ReadAllText(filePath);
             m_AchievementEditor.ImportCsv(data);
         }

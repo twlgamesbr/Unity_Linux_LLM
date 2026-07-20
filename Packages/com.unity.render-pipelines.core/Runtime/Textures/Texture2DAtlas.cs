@@ -318,7 +318,10 @@ namespace UnityEngine.Rendering
         public void Release()
         {
             ResetAllocator();
-            if (m_IsAtlasTextureOwner) { RTHandles.Release(m_AtlasTexture); }
+            if (m_IsAtlasTextureOwner)
+            {
+                RTHandles.Release(m_AtlasTexture);
+            }
         }
 
         /// <summary>

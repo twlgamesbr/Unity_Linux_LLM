@@ -575,7 +575,12 @@ namespace UnityEngine.UI
         /// <summary>
         /// The width of the caret in pixels.
         /// </summary>
-        public int caretWidth { get { return m_CaretWidth; } set { if (SetPropertyUtility.SetStruct(ref m_CaretWidth, value)) MarkGeometryAsDirty(); } }
+        public int caretWidth { get { return m_CaretWidth; } set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_CaretWidth, value))
+                    MarkGeometryAsDirty();
+            }
+        }
 
         /// <summary>
         /// The Text component that is going to be used to render the text to screen.
@@ -617,12 +622,24 @@ namespace UnityEngine.UI
         /// <summary>
         /// The custom caret color used if customCaretColor is set.
         /// </summary>
-        public Color caretColor { get { return customCaretColor ? m_CaretColor : textComponent.color; } set { if (SetPropertyUtility.SetColor(ref m_CaretColor, value)) MarkGeometryAsDirty(); } }
+        public Color caretColor { get { return customCaretColor ? m_CaretColor : textComponent.color; } set
+            {
+                if (SetPropertyUtility.SetColor(ref m_CaretColor, value))
+                    MarkGeometryAsDirty();
+            }
+        }
 
         /// <summary>
         /// Should a custom caret color be used or should the textComponent.color be used.
         /// </summary>
-        public bool customCaretColor { get { return m_CustomCaretColor; } set { if (m_CustomCaretColor != value) { m_CustomCaretColor = value; MarkGeometryAsDirty(); } } }
+        public bool customCaretColor { get { return m_CustomCaretColor; } set
+            {
+                if (m_CustomCaretColor != value)
+                {
+                    m_CustomCaretColor = value;
+                    MarkGeometryAsDirty(); }
+            }
+        }
 
         /// <summary>
         /// The color of the highlight to show which characters are selected.
@@ -647,7 +664,12 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public Color selectionColor { get { return m_SelectionColor; } set { if (SetPropertyUtility.SetColor(ref m_SelectionColor, value)) MarkGeometryAsDirty(); } }
+        public Color selectionColor { get { return m_SelectionColor; } set
+            {
+                if (SetPropertyUtility.SetColor(ref m_SelectionColor, value))
+                    MarkGeometryAsDirty();
+            }
+        }
 
         /// <summary>
         /// The Unity Event to call when editing has ended
@@ -862,7 +884,12 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public ContentType contentType { get { return m_ContentType; } set { if (SetPropertyUtility.SetStruct(ref m_ContentType, value)) EnforceContentType(); } }
+        public ContentType contentType { get { return m_ContentType; } set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_ContentType, value))
+                    EnforceContentType();
+            }
+        }
 
         /// <summary>
         /// The LineType used by the InputField.
@@ -917,7 +944,12 @@ namespace UnityEngine.UI
         /// <summary>
         /// The type of input expected. See InputField.InputType.
         /// </summary>
-        public InputType inputType { get { return m_InputType; } set { if (SetPropertyUtility.SetStruct(ref m_InputType, value)) SetToCustom(); } }
+        public InputType inputType { get { return m_InputType; } set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_InputType, value))
+                    SetToCustom();
+            }
+        }
 
         /// <summary>
         /// The TouchScreenKeyboard being used to edit the Input Field.
@@ -940,7 +972,12 @@ namespace UnityEngine.UI
         /// <summary>
         /// The type of validation to perform on a character
         /// </summary>
-        public CharacterValidation characterValidation { get { return m_CharacterValidation; } set { if (SetPropertyUtility.SetStruct(ref m_CharacterValidation, value)) SetToCustom(); } }
+        public CharacterValidation characterValidation { get { return m_CharacterValidation; } set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_CharacterValidation, value))
+                    SetToCustom();
+            }
+        }
 
         /// <summary>
         /// Set the InputField to be read only.
@@ -1007,7 +1044,12 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public char asteriskChar { get { return m_AsteriskChar; } set { if (SetPropertyUtility.SetStruct(ref m_AsteriskChar, value)) UpdateLabel(); } }
+        public char asteriskChar { get { return m_AsteriskChar; } set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_AsteriskChar, value))
+                    UpdateLabel();
+            }
+        }
 
         /// <summary>
         /// If the InputField was canceled and will revert back to the original text upon DeactivateInputField.
@@ -1020,8 +1062,10 @@ namespace UnityEngine.UI
         /// <param name="pos">The input position to be clampped</param>
         protected void ClampPos(ref int pos)
         {
-            if (pos < 0) pos = 0;
-            else if (pos > text.Length) pos = text.Length;
+            if (pos < 0)
+                pos = 0;
+            else if (pos > text.Length)
+                pos = text.Length;
         }
 
         /// <summary>
@@ -1029,8 +1073,18 @@ namespace UnityEngine.UI
         /// Getters are public Setters are protected
         /// </summary>
 
-        protected int caretPositionInternal { get { return m_CaretPosition + compositionString.Length; } set { m_CaretPosition = value; ClampPos(ref m_CaretPosition); } }
-        protected int caretSelectPositionInternal { get { return m_CaretSelectPosition + compositionString.Length; } set { m_CaretSelectPosition = value; ClampPos(ref m_CaretSelectPosition); } }
+        protected int caretPositionInternal { get { return m_CaretPosition + compositionString.Length; } set
+            {
+                m_CaretPosition = value;
+                ClampPos(ref m_CaretPosition);
+            }
+        }
+        protected int caretSelectPositionInternal { get { return m_CaretSelectPosition + compositionString.Length; } set
+            {
+                m_CaretSelectPosition = value;
+                ClampPos(ref m_CaretSelectPosition);
+            }
+        }
         private bool hasSelection { get { return caretPositionInternal != caretSelectPositionInternal; } }
 
 #if UNITY_EDITOR
@@ -1047,7 +1101,11 @@ namespace UnityEngine.UI
         public int caretPosition
         {
             get { return m_CaretSelectPosition + compositionString.Length; }
-            set { selectionAnchorPosition = value; selectionFocusPosition = value; }
+            set
+            {
+                selectionAnchorPosition = value;
+                selectionFocusPosition = value;
+            }
         }
 
         /// <summary>
@@ -3011,19 +3069,26 @@ namespace UnityEngine.UI
                 bool selectionAtStart = caretPositionInternal == 0 || caretSelectPositionInternal == 0;
                 if (!cursorBeforeDash || dashInSelection)
                 {
-                    if (ch >= '0' && ch <= '9') return ch;
-                    if (ch == '-' && (pos == 0 || selectionAtStart) && !text.Contains('-')) return ch;
-                    if ((ch == '.' || ch == ',') && characterValidation == CharacterValidation.Decimal && text.IndexOfAny(new[] { '.', ',' }) == -1) return ch;
+                    if (ch >= '0' && ch <= '9')
+                        return ch;
+                    if (ch == '-' && (pos == 0 || selectionAtStart) && !text.Contains('-'))
+                        return ch;
+                    if ((ch == '.' || ch == ',') && characterValidation == CharacterValidation.Decimal && text.IndexOfAny(new[] { '.', ',' }) == -1)
+                        return ch;
                     //Some keyboards including Samsung require double tapping a . to get a - this allows these keyboards to input negative integers
-                    if (characterValidation == CharacterValidation.Integer && ch == '.' && (pos == 0 || selectionAtStart) && !text.Contains('-')) return '-';
+                    if (characterValidation == CharacterValidation.Integer && ch == '.' && (pos == 0 || selectionAtStart) && !text.Contains('-'))
+                        return '-';
                 }
             }
             else if (characterValidation == CharacterValidation.Alphanumeric)
             {
                 // All alphanumeric characters
-                if (ch >= 'A' && ch <= 'Z') return ch;
-                if (ch >= 'a' && ch <= 'z') return ch;
-                if (ch >= '0' && ch <= '9') return ch;
+                if (ch >= 'A' && ch <= 'Z')
+                    return ch;
+                if (ch >= 'a' && ch <= 'z')
+                    return ch;
+                if (ch >= '0' && ch <= '9')
+                    return ch;
             }
             else if (characterValidation == CharacterValidation.Name)
             {
@@ -3087,11 +3152,16 @@ namespace UnityEngine.UI
                 // Character . (dot, period, full stop) provided that it is not the first or last character,
                 // and provided also that it does not appear two or more times consecutively.
 
-                if (ch >= 'A' && ch <= 'Z') return ch;
-                if (ch >= 'a' && ch <= 'z') return ch;
-                if (ch >= '0' && ch <= '9') return ch;
-                if (ch == '@' && text.IndexOf('@') == -1) return ch;
-                if (kEmailSpecialCharacters.IndexOf(ch) != -1) return ch;
+                if (ch >= 'A' && ch <= 'Z')
+                    return ch;
+                if (ch >= 'a' && ch <= 'z')
+                    return ch;
+                if (ch >= '0' && ch <= '9')
+                    return ch;
+                if (ch == '@' && text.IndexOf('@') == -1)
+                    return ch;
+                if (kEmailSpecialCharacters.IndexOf(ch) != -1)
+                    return ch;
                 if (ch == '.')
                 {
                     char lastChar = (text.Length > 0) ? text[Mathf.Clamp(pos, 0, text.Length - 1)] : ' ';

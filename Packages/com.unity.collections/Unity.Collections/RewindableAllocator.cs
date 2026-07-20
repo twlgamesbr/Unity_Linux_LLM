@@ -39,7 +39,12 @@ namespace Unity.Collections
         public ref T this[int index]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { unsafe { return ref ((T*)m_pointer)[index]; } }
+            get
+            {
+                unsafe
+                {
+                    return ref ((T*)m_pointer)[index]; }
+            }
         }
     }
 
@@ -417,7 +422,10 @@ namespace Unity.Collections
         [MonoPInvokeCallback(typeof(AllocatorManager.TryFunction))]
         internal static int Try(IntPtr state, ref AllocatorManager.Block block)
         {
-            unsafe { return ((RewindableAllocator*)state)->Try(ref block); }
+            unsafe
+            {
+                return ((RewindableAllocator*)state)->Try(ref block);
+            }
         }
 
         /// <summary>

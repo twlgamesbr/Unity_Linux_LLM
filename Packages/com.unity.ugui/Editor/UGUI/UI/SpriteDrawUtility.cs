@@ -30,10 +30,18 @@ namespace UnityEditor.UI
             tex.name = "[Generated] Checker Texture";
             tex.hideFlags = HideFlags.DontSave;
 
-            for (int y = 0; y < 8; ++y) for (int x = 0; x < 8; ++x) tex.SetPixel(x, y, c1);
-            for (int y = 8; y < 16; ++y) for (int x = 0; x < 8; ++x) tex.SetPixel(x, y, c0);
-            for (int y = 0; y < 8; ++y) for (int x = 8; x < 16; ++x) tex.SetPixel(x, y, c0);
-            for (int y = 8; y < 16; ++y) for (int x = 8; x < 16; ++x) tex.SetPixel(x, y, c1);
+            for (int y = 0; y < 8; ++y)
+                for (int x = 0; x < 8; ++x)
+                    tex.SetPixel(x, y, c1);
+            for (int y = 8; y < 16; ++y)
+                for (int x = 0; x < 8; ++x)
+                    tex.SetPixel(x, y, c0);
+            for (int y = 0; y < 8; ++y)
+                for (int x = 8; x < 16; ++x)
+                    tex.SetPixel(x, y, c0);
+            for (int y = 8; y < 16; ++y)
+                for (int x = 8; x < 16; ++x)
+                    tex.SetPixel(x, y, c1);
 
             tex.Apply();
             tex.filterMode = FilterMode.Point;

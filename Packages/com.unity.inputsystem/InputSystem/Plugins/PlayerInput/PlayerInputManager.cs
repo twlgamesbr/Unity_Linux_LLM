@@ -727,7 +727,8 @@ namespace UnityEngine.InputSystem
                 isValid = false;
             }
 
-            if (isValid) return;
+            if (isValid)
+                return;
 
             var assetInfo = actions.name;
 #if UNITY_EDITOR

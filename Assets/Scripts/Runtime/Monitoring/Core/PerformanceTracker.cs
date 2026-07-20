@@ -80,7 +80,8 @@ namespace NPCSystem.Monitoring
         {
             if (exception != null)
             {
-                lock (_tags) _tags["exceptionType"] = exception.GetType().Name;
+                lock (_tags)
+                    _tags["exceptionType"] = exception.GetType().Name;
             }
             Complete("error", message ?? $"{_source} failed.");
         }
@@ -95,10 +96,12 @@ namespace NPCSystem.Monitoring
 
         void Complete(string status, string message)
         {
-            if (_completed) return;
+            if (_completed)
+                return;
             lock (_tags)
             {
-                if (_completed) return;
+                if (_completed)
+                    return;
                 _completed = true;
                 _stopwatch.Stop();
 

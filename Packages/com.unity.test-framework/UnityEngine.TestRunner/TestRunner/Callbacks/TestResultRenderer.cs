@@ -68,7 +68,8 @@ namespace UnityEngine.TestTools.TestRunner.Callbacks
 
         public void Draw()
         {
-            if (!m_ShowResults) return;
+            if (!m_ShowResults)
+                return;
             if (m_FailedTestCollection.Count == 0)
             {
                 GUILayout.Label("All test(s) succeeded", Styles.SucceedLabelStyle, GUILayout.Width(600));

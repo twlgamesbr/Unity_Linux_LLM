@@ -317,7 +317,8 @@ namespace UnityEngine.Rendering
 
             if (m_BakingSet == null)
             {
-                if (perSceneDataList.Count == 0) return new ProbeSubdivisionContext();
+                if (perSceneDataList.Count == 0)
+                    return new ProbeSubdivisionContext();
                 SetBakingContext(perSceneDataList);
             }
 

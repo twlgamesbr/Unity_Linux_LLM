@@ -124,7 +124,8 @@ namespace Unity.Entities
 
             public override void SetValue(ref EntityContainer container, TComponent value)
             {
-                if (IsReadOnly) throw new NotSupportedException("Property is ReadOnly");
+                if (IsReadOnly)
+                    throw new NotSupportedException("Property is ReadOnly");
 
                 if (IsZeroSize)
                     return;
@@ -345,7 +346,8 @@ namespace Unity.Entities
 
             foreach (var p in EnumerateProperties(container))
             {
-                if (p.Name != name) continue;
+                if (p.Name != name)
+                    continue;
                 property = p;
                 return true;
             }

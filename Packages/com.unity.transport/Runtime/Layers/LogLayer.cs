@@ -48,7 +48,8 @@ namespace Unity.Networking.Transport
             public void Execute()
             {
                 var count = Queue.Count;
-                if (count == 0) return;
+                if (count == 0)
+                    return;
                 
                 var buffer = new UnsafeText(4096, Allocator.Temp);
 

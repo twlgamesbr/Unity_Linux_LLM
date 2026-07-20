@@ -4541,7 +4541,8 @@ namespace Unity.Entities
             for (var i = 0; i < componentTypeCount; i++)
             {
                 var type = TypeManager.GetType(new TypeIndex { Value = i });
-                if (interfaceType.IsAssignableFrom(type)) listOut.Add(type);
+                if (interfaceType.IsAssignableFrom(type))
+                    listOut.Add(type);
             }
 
             return listOut;
@@ -5987,7 +5988,8 @@ namespace Unity.Entities
             ecs->AssertEntitiesExist(&entity, 1);
             var archetype = ecs->GetArchetype(entity);
 
-            if ((uint)index >= archetype->TypesCount) return TypeIndex.Null;
+            if ((uint)index >= archetype->TypesCount)
+                return TypeIndex.Null;
 
             return archetype->Types[index + 1].TypeIndex;
         }

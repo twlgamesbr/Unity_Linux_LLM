@@ -83,7 +83,8 @@ namespace Unity.PlatformToolkit.PlayMode
             set
             {
                 m_Configuration = value;
-                if (value == null) return;
+                if (value == null)
+                    return;
 
                 var currentValue = this.value;
 

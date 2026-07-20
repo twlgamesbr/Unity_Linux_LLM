@@ -140,14 +140,19 @@ namespace UnityEngine.Rendering
         float[] weights = null;
         float ComputeWeight(Volume volume, Vector3 triggerPos)
         {
-            if (volume == null) return 0;
+            if (volume == null)
+                return 0;
 
             var profile = volume.HasInstantiatedProfile() ? volume.profile : volume.sharedProfile;
 
-            if (!volume.gameObject.activeInHierarchy) return 0;
-            if (!volume.enabled || profile == null || volume.weight <= 0f) return 0;
-            if (!profile.TryGet(selectedComponentType, out VolumeComponent component)) return 0;
-            if (!component.active) return 0;
+            if (!volume.gameObject.activeInHierarchy)
+                return 0;
+            if (!volume.enabled || profile == null || volume.weight <= 0f)
+                return 0;
+            if (!profile.TryGet(selectedComponentType, out VolumeComponent component))
+                return 0;
+            if (!component.active)
+                return 0;
 
             float weight = Mathf.Clamp01(volume.weight);
             if (!volume.isGlobal)
@@ -206,7 +211,8 @@ namespace UnityEngine.Rendering
 
                 for (int j = 0; j < fields.Length; j++)
                 {
-                    var param = GetParameter(component, fields[j]); ;
+                    var param = GetParameter(component, fields[j]);
+                    ;
                     states[i, j] = param.overrideState ? param : null;
                 }
             }

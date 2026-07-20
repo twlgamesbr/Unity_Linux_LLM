@@ -134,7 +134,12 @@ namespace UnityEngine.UI
         /// <summary>
         /// The Rect Transform of the template for the dropdown list.
         /// </summary>
-        public RectTransform template { get { return m_Template; } set { m_Template = value; RefreshShownValue(); } }
+        public RectTransform template { get { return m_Template; } set
+            {
+                m_Template = value;
+                RefreshShownValue();
+            }
+        }
 
         // Text to be used as a caption for the current value. It's not required, but it's kept here for convenience.
         [SerializeField]
@@ -143,7 +148,12 @@ namespace UnityEngine.UI
         /// <summary>
         /// The Text component to hold the text of the currently selected option.
         /// </summary>
-        public Text captionText { get { return m_CaptionText; } set { m_CaptionText = value; RefreshShownValue(); } }
+        public Text captionText { get { return m_CaptionText; } set
+            {
+                m_CaptionText = value;
+                RefreshShownValue();
+            }
+        }
 
         [SerializeField]
         private Image m_CaptionImage;
@@ -151,7 +161,12 @@ namespace UnityEngine.UI
         /// <summary>
         /// The Image component to hold the image of the currently selected option.
         /// </summary>
-        public Image captionImage { get { return m_CaptionImage; } set { m_CaptionImage = value; RefreshShownValue(); } }
+        public Image captionImage { get { return m_CaptionImage; } set
+            {
+                m_CaptionImage = value;
+                RefreshShownValue();
+            }
+        }
 
         [Space]
 
@@ -161,7 +176,12 @@ namespace UnityEngine.UI
         /// <summary>
         /// The Text component to hold the text of the item.
         /// </summary>
-        public Text itemText { get { return m_ItemText; } set { m_ItemText = value; RefreshShownValue(); } }
+        public Text itemText { get { return m_ItemText; } set
+            {
+                m_ItemText = value;
+                RefreshShownValue();
+            }
+        }
 
         [SerializeField]
         private Image m_ItemImage;
@@ -169,7 +189,12 @@ namespace UnityEngine.UI
         /// <summary>
         /// The Image component to hold the image of the item
         /// </summary>
-        public Image itemImage { get { return m_ItemImage; } set { m_ItemImage = value; RefreshShownValue(); } }
+        public Image itemImage { get { return m_ItemImage; } set
+            {
+                m_ItemImage = value;
+                RefreshShownValue();
+            }
+        }
 
         [Space]
 
@@ -278,7 +303,11 @@ namespace UnityEngine.UI
         public List<OptionData> options
         {
             get { return m_Options.options; }
-            set { m_Options.options = value; RefreshShownValue(); }
+            set
+            {
+                m_Options.options = value;
+                RefreshShownValue();
+            }
         }
 
         [Space]

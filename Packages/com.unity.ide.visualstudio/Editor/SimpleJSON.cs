@@ -691,7 +691,8 @@ namespace SimpleJSON
                     case '/':
                         if (allowLineComments && !QuoteMode && i + 1 < aJSON.Length && aJSON[i + 1] == '/')
                         {
-                            while (++i < aJSON.Length && aJSON[i] != '\n' && aJSON[i] != '\r') ;
+                            while (++i < aJSON.Length && aJSON[i] != '\n' && aJSON[i] != '\r')
+                                ;
                             break;
                         }
                         Token.Append(aJSON[i]);
@@ -1348,19 +1349,31 @@ namespace SimpleJSON
 
         public override int AsInt
         {
-            get { Set(new JSONNumber(0)); return 0; }
+            get
+            {
+                Set(new JSONNumber(0));
+                return 0;
+            }
             set { Set(new JSONNumber(value)); }
         }
 
         public override float AsFloat
         {
-            get { Set(new JSONNumber(0.0f)); return 0.0f; }
+            get
+            {
+                Set(new JSONNumber(0.0f));
+                return 0.0f;
+            }
             set { Set(new JSONNumber(value)); }
         }
 
         public override double AsDouble
         {
-            get { Set(new JSONNumber(0.0)); return 0.0; }
+            get
+            {
+                Set(new JSONNumber(0.0));
+                return 0.0;
+            }
             set { Set(new JSONNumber(value)); }
         }
 
@@ -1404,7 +1417,11 @@ namespace SimpleJSON
 
         public override bool AsBool
         {
-            get { Set(new JSONBool(false)); return false; }
+            get
+            {
+                Set(new JSONBool(false));
+                return false;
+            }
             set { Set(new JSONBool(value)); }
         }
 

@@ -153,7 +153,8 @@ namespace UnityEngine.InputSystem.Editor
             if (m_PerPropertyViewData == null)
                 m_PerPropertyViewData = new Dictionary<string, InputActionDrawerViewData>();
 
-            if (m_PerPropertyViewData.TryGetValue(property.propertyPath, out var data)) return data;
+            if (m_PerPropertyViewData.TryGetValue(property.propertyPath, out var data))
+                return data;
 
             data = new InputActionDrawerViewData();
             m_PerPropertyViewData.Add(property.propertyPath, data);

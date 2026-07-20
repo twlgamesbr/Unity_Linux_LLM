@@ -568,7 +568,8 @@ namespace Unity.Physics
 
                                         // If VelToReachCp was updated in CalculateRestution, update contact distance to 0.
                                         jacAngular.ContactDistance = applyRestitution ? 0.0f : newDistanceToCp;
-                                        if (!applyRestitution) jacAngular.ApplyImpulse = false;
+                                        if (!applyRestitution)
+                                            jacAngular.ApplyImpulse = false;
                                     }
                                     else
                                     {
@@ -577,7 +578,8 @@ namespace Unity.Physics
                                             ref jacAngular, relativeVelocity, jacAngular.ContactDistance, dv);
                                     }
 
-                                    if (applyRestitution) solveCount++;
+                                    if (applyRestitution)
+                                        solveCount++;
                                 }
                             }
 

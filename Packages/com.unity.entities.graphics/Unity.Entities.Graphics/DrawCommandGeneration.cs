@@ -95,13 +95,20 @@ namespace Unity.Rendering
             int cmpBatchID = BatchID.CompareTo(other.BatchID);
             int cmpLODIndex = MeshLodIndex.CompareTo(other.MeshLodIndex);
 
-            if (cmpFilterIndex != 0) return cmpFilterIndex;
-            if (cmpFlags != 0) return cmpFlags;
-            if (cmpMaterialID != 0) return cmpMaterialID;
-            if (cmpMeshID != 0) return cmpMeshID;
-            if (cmpSubMeshIndex != 0) return cmpSubMeshIndex;
-            if (cmpSplitMask != 0) return cmpSplitMask;
-            if (cmpLODIndex != 0) return cmpLODIndex;
+            if (cmpFilterIndex != 0)
+                return cmpFilterIndex;
+            if (cmpFlags != 0)
+                return cmpFlags;
+            if (cmpMaterialID != 0)
+                return cmpMaterialID;
+            if (cmpMeshID != 0)
+                return cmpMeshID;
+            if (cmpSubMeshIndex != 0)
+                return cmpSubMeshIndex;
+            if (cmpSplitMask != 0)
+                return cmpSplitMask;
+            if (cmpLODIndex != 0)
+                return cmpLODIndex;
 
             return cmpBatchID;
         }
@@ -1066,7 +1073,8 @@ namespace Unity.Rendering
             int filterIndex = chunk.GetSharedComponentIndex(RenderFilterSettings);
             BatchFilterSettings filterSettings = FilterSettings[filterIndex];
 
-            if (((1 << filterSettings.layer) & CullingLayerMask) == 0) return;
+            if (((1 << filterSettings.layer) & CullingLayerMask) == 0)
+                return;
 
             // If the chunk has a RenderMeshArray, get access to the corresponding registered
             // Material and Mesh IDs

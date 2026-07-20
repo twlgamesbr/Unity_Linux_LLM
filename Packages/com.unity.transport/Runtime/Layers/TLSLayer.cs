@@ -446,7 +446,8 @@ namespace Unity.Networking.Transport
 
             private void AdvanceHandshake(Binding.unitytls_client* clientPtr)
             {
-                while (Binding.unitytls_client_handshake(clientPtr) == Binding.UNITYTLS_HANDSHAKE_STEP);
+                while (Binding.unitytls_client_handshake(clientPtr) == Binding.UNITYTLS_HANDSHAKE_STEP)
+                    ;
             }
 
             private void Disconnect(ConnectionId connection)

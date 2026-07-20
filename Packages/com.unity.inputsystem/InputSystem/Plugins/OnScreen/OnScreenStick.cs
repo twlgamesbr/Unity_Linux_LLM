@@ -136,7 +136,8 @@ namespace UnityEngine.InputSystem.OnScreen
 
             m_StartPos = ((RectTransform)transform).anchoredPosition;
 
-            if (m_Behaviour != Behaviour.ExactPositionWithDynamicOrigin) return;
+            if (m_Behaviour != Behaviour.ExactPositionWithDynamicOrigin)
+                return;
 
             m_PointerDownPos = m_StartPos;
 
@@ -229,7 +230,10 @@ namespace UnityEngine.InputSystem.OnScreen
 
         private void OnPointerDown(InputAction.CallbackContext ctx)
         {
-            if (m_IsIsolationActive) { return; }
+            if (m_IsIsolationActive)
+            {
+                return;
+            }
             Debug.Assert(EventSystem.current != null);
 
             var screenPosition = Vector2.zero;
@@ -252,7 +256,8 @@ namespace UnityEngine.InputSystem.OnScreen
             var stickSelected = false;
             foreach (var result in m_RaycastResults)
             {
-                if (result.gameObject != gameObject) continue;
+                if (result.gameObject != gameObject)
+                    continue;
 
                 stickSelected = true;
                 break;
@@ -306,12 +311,14 @@ namespace UnityEngine.InputSystem.OnScreen
 
         private void OnPointerUp(InputAction.CallbackContext ctx)
         {
-            if (!m_IsIsolationActive) return;
+            if (!m_IsIsolationActive)
+                return;
 
             // if it's a finger ensure that is the one that get released
             if (m_TouchControl != null)
             {
-                if (m_TouchControl.isInProgress) return;
+                if (m_TouchControl.isInProgress)
+                    return;
                 m_PointerMoveAction.ApplyBindingOverride(null, path: "<Touchscreen>/touch*/position");
                 m_TouchControl = null;
             }
@@ -353,7 +360,8 @@ namespace UnityEngine.InputSystem.OnScreen
 
             DrawGizmoCircle(center, m_MovementRange);
 
-            if (m_Behaviour != Behaviour.ExactPositionWithDynamicOrigin) return;
+            if (m_Behaviour != Behaviour.ExactPositionWithDynamicOrigin)
+                return;
 
             Gizmos.color = new Color32(158, 84, 219, 255);
             DrawGizmoCircle(startPos, m_DynamicOriginRange);

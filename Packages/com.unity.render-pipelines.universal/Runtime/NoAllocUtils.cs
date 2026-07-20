@@ -68,9 +68,12 @@ namespace UnityEngine.Rendering.Universal
                 data[b] = tmp;
             }
 
-            if (compare(data[end], data[start]) < 0) Swap(start, end);
-            if (compare(data[pivot], data[start]) < 0) Swap(start, pivot);
-            if (compare(data[end], data[pivot]) < 0) Swap(pivot, end);
+            if (compare(data[end], data[start]) < 0)
+                Swap(start, end);
+            if (compare(data[pivot], data[start]) < 0)
+                Swap(start, pivot);
+            if (compare(data[end], data[pivot]) < 0)
+                Swap(pivot, end);
             return data[pivot];
         }
 
@@ -83,8 +86,10 @@ namespace UnityEngine.Rendering.Universal
 
             while (true)
             {
-                while (compare(data[start], pivotValue) < 0) ++start;
-                while (compare(data[end], pivotValue) > 0) --end;
+                while (compare(data[start], pivotValue) < 0)
+                    ++start;
+                while (compare(data[end], pivotValue) > 0)
+                    --end;
 
                 if (start >= end)
                 {

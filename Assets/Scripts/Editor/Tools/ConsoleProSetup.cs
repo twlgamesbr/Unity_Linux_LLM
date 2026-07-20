@@ -157,7 +157,8 @@ namespace NPCSystem.Editor.Tools
         static void CheckRemoteServerInScene()
         {
             var remoteType = FindConsoleProRemoteServerType();
-            if (remoteType == null) return;
+            if (remoteType == null)
+                return;
 
             var existing = UnityEngine.Object.FindObjectOfType(remoteType);
             if (existing == null)
@@ -224,7 +225,8 @@ namespace NPCSystem.Editor.Tools
                 try
                 {
                     var t = asm.GetType("FlyingWormConsole3.ConsoleProRemoteServer");
-                    if (t != null) return t;
+                    if (t != null)
+                        return t;
                 }
                 catch { }
             }
@@ -239,9 +241,11 @@ namespace NPCSystem.Editor.Tools
                 try
                 {
                     var t = asm.GetType("FlyingWormConsole3.ConsolePro3Window");
-                    if (t != null) return t;
+                    if (t != null)
+                        return t;
                     t = asm.GetType("ConsolePro3Window");
-                    if (t != null) return t;
+                    if (t != null)
+                        return t;
                 }
                 catch { }
             }

@@ -306,7 +306,8 @@ namespace Unity.Jobs.CodeGen
             // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
             // From: https://gist.github.com/xoofx/710aaf86e0e8c81649d1261b1ef9590e
-            if (assembly == null) throw new ArgumentNullException(nameof(assembly));
+            if (assembly == null)
+                throw new ArgumentNullException(nameof(assembly));
             const int mdMaxCount = 1 << 24;
             foreach (var module in assembly.Modules)
             {
@@ -321,7 +322,8 @@ namespace Unity.Jobs.CodeGen
                         {
                             CollectGenericTypeInstances(type, types, visited);
                         }
-                    } else if (token == null) break;
+                    } else if (token == null)
+                        break;
                 }
 
                 for (int i = 1; i < mdMaxCount; i++)
@@ -339,7 +341,8 @@ namespace Unity.Jobs.CodeGen
                             }
                         }
                     }
-                    else if (token == null) break;
+                    else if (token == null)
+                        break;
                 }
 
                 for (int i = 1; i < mdMaxCount; i++)
@@ -355,15 +358,18 @@ namespace Unity.Jobs.CodeGen
                             CollectGenericTypeInstances(fieldType, types, visited);
                         }
                     }
-                    else if (token == null) break;
+                    else if (token == null)
+                        break;
                 }
             }
         }
 
         private static void CollectGenericTypeInstances(TypeReference type, List<TypeReference> types, HashSet<string> visited)
         {
-            if (type.IsPrimitive) return;
-            if (!visited.Add(type.FullName)) return;
+            if (type.IsPrimitive)
+                return;
+            if (!visited.Add(type.FullName))
+                return;
 
             // Add only concrete types
             if (type.IsGenericInstance && !type.ContainsGenericParameter)

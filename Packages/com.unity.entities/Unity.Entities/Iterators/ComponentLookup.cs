@@ -239,7 +239,8 @@ namespace Unity.Entities
             if (Hint.Unlikely(archetype != m_Cache.Archetype))
                 m_Cache.Update(archetype, m_TypeIndex);
             var typeIndexInArchetype = m_Cache.IndexInArchetype;
-            if (typeIndexInArchetype == -1) return false;
+            if (typeIndexInArchetype == -1)
+                return false;
             var chunkVersion = archetype->Chunks.GetChangeVersion(typeIndexInArchetype, chunk.ListIndex);
 
             return ChangeVersionUtility.DidChange(chunkVersion, version);

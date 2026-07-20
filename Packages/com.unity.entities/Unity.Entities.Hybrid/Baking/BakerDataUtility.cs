@@ -146,7 +146,8 @@ namespace Unity.Entities
                 compatibleComponentCount += types.Count;
                 foreach (var compatibleType in types)
                 {
-                    if (compatibleType.ContainsGenericParameters) continue;
+                    if (compatibleType.ContainsGenericParameters)
+                        continue;
 
                     var typeIndex = TypeManager.GetOrCreateTypeIndex(compatibleType);
                     {

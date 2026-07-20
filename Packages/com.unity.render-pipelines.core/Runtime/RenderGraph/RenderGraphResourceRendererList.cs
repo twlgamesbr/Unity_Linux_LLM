@@ -23,7 +23,12 @@ namespace UnityEngine.Rendering.RenderGraphModule
         internal RendererListHandleType type;
         bool m_IsValid;
         internal int handle { get; private set; }
-        internal RendererListHandle(int handle, RendererListHandleType type = RendererListHandleType.Renderers) { this.handle = handle; m_IsValid = true; this.type = type; }
+        internal RendererListHandle(int handle, RendererListHandleType type = RendererListHandleType.Renderers)
+        {
+            this.handle = handle;
+            m_IsValid = true;
+            this.type = type;
+        }
 
         /// <summary>
         /// Conversion to int.

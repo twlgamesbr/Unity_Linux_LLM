@@ -310,7 +310,8 @@ namespace Unity.Entities
                 // Retain a mapping of references within this object. This is needed to support things like circular references.
                 if (isReferenceType)
                 {
-                    if (null == m_References) m_References = new Dictionary<object, object>();
+                    if (null == m_References)
+                        m_References = new Dictionary<object, object>();
                     m_References.Add(srcValue, dstValue);
                 }
             }

@@ -122,11 +122,14 @@ namespace UnityEngine.Rendering
             get => m_ActiveSet.Get();
             set
             {
-                if (ReferenceEquals(m_ActiveSet.Get(), value)) return;
-                if (m_TempBakingSet) Object.DestroyImmediate(m_ActiveSet.Get());
+                if (ReferenceEquals(m_ActiveSet.Get(), value))
+                    return;
+                if (m_TempBakingSet)
+                    Object.DestroyImmediate(m_ActiveSet.Get());
                 m_ActiveSet.Set(value);
                 m_TempBakingSet = false;
-                if (m_ActiveSet.Get() == null) return;
+                if (m_ActiveSet.Get() == null)
+                    return;
                 m_SingleSceneMode = m_ActiveSet.Get().singleSceneMode;
                 InitializeSceneList();
             }
@@ -347,7 +350,11 @@ namespace UnityEngine.Rendering
             m_SingleSceneMode = EditorGUILayout.Popup(Styles.bakingMode, m_SingleSceneMode ? 0 : 1, Styles.bakingModeOptions) == 0;
             if (EditorGUI.EndChangeCheck() && !m_SingleSceneMode)
             {
-                if (activeSet != null) { EditorUtility.SetDirty(activeSet); activeSet.singleSceneMode = false; }
+                if (activeSet != null)
+                {
+                    EditorUtility.SetDirty(activeSet);
+                    activeSet.singleSceneMode = false;
+                }
                 SaveTempBakingSetIfNeeded();
             }
 
@@ -361,7 +368,11 @@ namespace UnityEngine.Rendering
             var newSet = ObjectFieldWithNew(Styles.currentBakingSet, activeSet, CreateBakingSet);
             if (EditorGUI.EndChangeCheck())
             {
-                if (newSet != null) { EditorUtility.SetDirty(newSet); newSet.singleSceneMode = false; }
+                if (newSet != null)
+                {
+                    EditorUtility.SetDirty(newSet);
+                    newSet.singleSceneMode = false;
+                }
                 activeSet = newSet;
 
                 ProbeReferenceVolume.instance.Clear();
@@ -515,7 +526,8 @@ namespace UnityEngine.Rendering
         void SaveTempBakingSetIfNeeded()
         {
             var scene = SceneManager.GetActiveScene();
-            if (!m_TempBakingSet || scene == null) return;
+            if (!m_TempBakingSet || scene == null)
+                return;
             string path = string.IsNullOrEmpty(scene.path) ?
                 ProbeVolumeBakingSet.GetDirectory("Assets/", "Untitled") :
                 ProbeVolumeBakingSet.GetDirectory(scene.path, scene.name);
@@ -1027,9 +1039,11 @@ namespace UnityEngine.Rendering
                 var scene = SceneManager.GetSceneAt(i);
                 var guid = ProbeReferenceVolume.GetSceneGUID(scene);
                 var sceneBakingSet = ProbeVolumeBakingSet.GetBakingSetForScene(guid);
-                if (!scene.isLoaded || sceneBakingSet != activeSet) continue;
+                if (!scene.isLoaded || sceneBakingSet != activeSet)
+                    continue;
                 var sceneBakeData = sceneBakingSet.GetSceneBakeData(guid);
-                if (sceneBakeData.hasProbeVolume && !sceneBakeData.bakeScene) continue;
+                if (sceneBakeData.hasProbeVolume && !sceneBakeData.bakeScene)
+                    continue;
 
                 AdaptiveProbeVolumes.partialBakeSceneList.Add(guid);
             }

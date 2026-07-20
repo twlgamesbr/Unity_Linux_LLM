@@ -74,7 +74,8 @@ namespace Unity.Entities.Editor
         public int CompareTo(HierarchyNodeHandle other)
         {
             var value = ((byte) Kind).CompareTo((byte) other.Kind);
-            if (value != 0) return value;
+            if (value != 0)
+                return value;
             value = Index.CompareTo(other.Index);
             return value != 0 ? value : Version.CompareTo(other.Version);
         }

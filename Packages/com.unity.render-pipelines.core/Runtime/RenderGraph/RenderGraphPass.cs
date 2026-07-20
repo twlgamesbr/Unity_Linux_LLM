@@ -188,10 +188,12 @@ namespace UnityEngine.Rendering.RenderGraphModule
         {
             // We ignore the version when checking, if any version is used it is considered a match
 
-            if (depthAccess.textureHandle.IsValid() && depthAccess.textureHandle.handle.index == res.handle.index) return true;
+            if (depthAccess.textureHandle.IsValid() && depthAccess.textureHandle.handle.index == res.handle.index)
+                return true;
             for (int i = 0; i < colorBufferAccess.Length; i++)
             {
-                if (colorBufferAccess[i].textureHandle.IsValid() && colorBufferAccess[i].textureHandle.handle.index == res.handle.index) return true;
+                if (colorBufferAccess[i].textureHandle.IsValid() && colorBufferAccess[i].textureHandle.handle.index == res.handle.index)
+                    return true;
             }
 
             return false;

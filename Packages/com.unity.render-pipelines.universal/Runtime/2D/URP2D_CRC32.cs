@@ -11,7 +11,8 @@ namespace UnityEngine.Rendering.Universal
         static URP2D_Crc32()
         {
             Tables = new uint[8][];
-            for (int i = 0; i < 8; i++) Tables[i] = new uint[256];
+            for (int i = 0; i < 8; i++)
+                Tables[i] = new uint[256];
 
             uint polynomial = 0xEDB88320;
             // Fill Table 0
@@ -76,7 +77,8 @@ namespace UnityEngine.Rendering.Universal
 
         public static uint Compute(string input)
         {
-            if (string.IsNullOrEmpty(input)) return 0;
+            if (string.IsNullOrEmpty(input))
+                return 0;
             // Use the most efficient way to get bytes without huge allocations
             return Compute(Encoding.UTF8.GetBytes(input));
         }

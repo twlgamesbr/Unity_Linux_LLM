@@ -211,10 +211,13 @@ namespace Unity.Entities
                     {
 #if ENABLE_PROFILER
                         var system = World.Unmanaged.TryGetSystemStateForId(buffer.SystemID); // System is likely to be in our world.
-                        if (system == null) system = World.FindSystemStateForId(buffer.SystemID);
-                        if (system != null) system->m_ProfilerMarker.Begin();
+                        if (system == null)
+                            system = World.FindSystemStateForId(buffer.SystemID);
+                        if (system != null)
+                            system->m_ProfilerMarker.Begin();
                         buffer.Playback(EntityManager);
-                        if (system != null) system->m_ProfilerMarker.End();
+                        if (system != null)
+                            system->m_ProfilerMarker.End();
 #else
                         buffer.Playback(EntityManager);
 #endif

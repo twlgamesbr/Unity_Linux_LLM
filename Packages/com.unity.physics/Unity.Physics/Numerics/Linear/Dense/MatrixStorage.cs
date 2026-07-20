@@ -21,7 +21,11 @@ namespace Unity.Numerics.Linear.Dense.Primitives
         public float this[int i, int j]
         {
             get { return cols[j][i]; }
-            set { var c = cols[j]; c[i] = value; }
+            set
+            {
+                var c = cols[j];
+                c[i] = value;
+            }
         }
 
         public readonly Vector* Rows { get => rows; }

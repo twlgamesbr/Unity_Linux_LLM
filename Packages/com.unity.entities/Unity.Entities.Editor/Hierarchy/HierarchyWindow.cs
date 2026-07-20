@@ -125,10 +125,12 @@ namespace Unity.Entities.Editor
 
         protected override void OnCleanup()
         {
-            if (m_HierarchySettings != null) m_HierarchySettings.UseAdvanceSearchSettingChanged -= OnUseAdvanceSearchSettingChanged;
+            if (m_HierarchySettings != null)
+                m_HierarchySettings.UseAdvanceSearchSettingChanged -= OnUseAdvanceSearchSettingChanged;
             EditorApplication.update -= OnBackgroundUpdate;
             Selection.selectionChanged -= OnGlobalSelectionChanged;
-            if (dataModeController != null) dataModeController.dataModeChanged -= OnDataModeChanged;
+            if (dataModeController != null)
+                dataModeController.dataModeChanged -= OnDataModeChanged;
             EditorApplication.playModeStateChanged -= OnPlayModeStateChanged;
             m_Hierarchy?.Dispose();
         }

@@ -329,7 +329,8 @@ namespace TMPro.EditorUtilities
         public override void OnInspectorGUI()
         {
             // Make sure Multi selection only includes TMP Text objects.
-            if (IsMixSelectionTypes()) return;
+            if (IsMixSelectionTypes())
+                return;
 
             serializedObject.Update();
 
@@ -350,7 +351,8 @@ namespace TMPro.EditorUtilities
 
         public void OnSceneGUI()
         {
-            if (IsMixSelectionTypes()) return;
+            if (IsMixSelectionTypes())
+                return;
 
             // Margin Frame & Handles
             m_RectTransform.GetWorldCorners(m_RectCorners);
@@ -1311,7 +1313,8 @@ namespace TMPro.EditorUtilities
         protected GUIContent[] GetMaterialPresets()
         {
             TMP_FontAsset fontAsset = m_FontAssetProp.objectReferenceValue as TMP_FontAsset;
-            if (fontAsset == null) return null;
+            if (fontAsset == null)
+                return null;
 
             m_MaterialPresets = TMP_EditorUtility.FindMaterialReferences(fontAsset);
             m_MaterialPresetNames = new GUIContent[m_MaterialPresets.Length];

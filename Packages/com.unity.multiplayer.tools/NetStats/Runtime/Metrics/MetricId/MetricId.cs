@@ -77,8 +77,10 @@ namespace Unity.Multiplayer.Tools.NetStats
         /// <returns>true if the specified object is equal to the current object; otherwise, false.</returns>
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (obj.GetType() != this.GetType()) return false;
+            if (ReferenceEquals(null, obj))
+                return false;
+            if (obj.GetType() != this.GetType())
+                return false;
             return Equals((MetricId)obj);
         }
 

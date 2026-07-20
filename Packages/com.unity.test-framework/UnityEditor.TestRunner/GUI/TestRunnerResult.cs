@@ -81,33 +81,43 @@ namespace UnityEditor.TestTools.TestRunner.GUI
 
         public void CalculateParentResult(string parentId, IDictionary<string, List<TestRunnerResult>> results)
         {
-            if (results == null) return;
+            if (results == null)
+                return;
             results.TryGetValue(parentId , out var childrenResult);
-            if (childrenResult == null) return;
-            if (childrenResult.TrueForAll(x => x.resultStatus == ResultStatus.Passed)) resultStatus = ResultStatus.Passed;
-            if (childrenResult.TrueForAll(x => x.resultStatus == ResultStatus.Skipped)) resultStatus = ResultStatus.Skipped;
+            if (childrenResult == null)
+                return;
+            if (childrenResult.TrueForAll(x => x.resultStatus == ResultStatus.Passed))
+                resultStatus = ResultStatus.Passed;
+            if (childrenResult.TrueForAll(x => x.resultStatus == ResultStatus.Skipped))
+                resultStatus = ResultStatus.Skipped;
             else if (childrenResult.Any(x => x.resultStatus == ResultStatus.Skipped))
             {
                 resultStatus = ResultStatus.Passed;
             }
-            if (childrenResult.Any(x => x.resultStatus == ResultStatus.Inconclusive)) resultStatus = ResultStatus.Inconclusive;
-            if (childrenResult.Any(x => x.resultStatus == ResultStatus.Failed)) resultStatus = ResultStatus.Failed;
-            if (childrenResult.Any(x => x.resultStatus == ResultStatus.NotRun)) resultStatus = ResultStatus.NotRun;
+            if (childrenResult.Any(x => x.resultStatus == ResultStatus.Inconclusive))
+                resultStatus = ResultStatus.Inconclusive;
+            if (childrenResult.Any(x => x.resultStatus == ResultStatus.Failed))
+                resultStatus = ResultStatus.Failed;
+            if (childrenResult.Any(x => x.resultStatus == ResultStatus.NotRun))
+                resultStatus = ResultStatus.NotRun;
             UpdateParentResult(results);
         }
 
         public void CalculateAndSetParentDuration(string parentId, IDictionary<string, List<TestRunnerResult>> results)
         {
-            if (results == null) return;
+            if (results == null)
+                return;
             results.TryGetValue(parentId , out var childrenResult);
-            if (childrenResult == null) return;
+            if (childrenResult == null)
+                return;
             var totalDuration = childrenResult.Sum(x => x.duration);
             duration = (float)totalDuration;
         }
 
         private void UpdateParentResult(IDictionary<string, List<TestRunnerResult>> results)
         {
-            if (string.IsNullOrEmpty(parentUniqueId)) return;
+            if (string.IsNullOrEmpty(parentUniqueId))
+                return;
             results.TryGetValue(parentUniqueId, out var parentResultList);
             if (parentResultList != null && parentResultList.Count > 0)
             {

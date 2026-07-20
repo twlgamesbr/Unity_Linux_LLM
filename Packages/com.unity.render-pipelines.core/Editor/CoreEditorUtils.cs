@@ -67,7 +67,8 @@ namespace UnityEditor.Rendering
             for (int i = members.Count - 1; i >= 0; i--)
             {
                 sb.Append(members[i]);
-                if (i > 0) sb.Append('.');
+                if (i > 0)
+                    sb.Append('.');
             }
 
             return sb.ToString();

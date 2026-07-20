@@ -71,7 +71,10 @@ namespace UnityEngine.Rendering.Universal
             // m_Resolution = math.min((int)reflectionProbeResolution, SystemInfo.maxTextureSize);
             m_Resolution = 1;
             var format = GraphicsFormat.B10G11R11_UFloatPack32;
-            if (!SystemInfo.IsFormatSupported(format, GraphicsFormatUsage.Render)) { format = GraphicsFormat.R16G16B16A16_SFloat; }
+            if (!SystemInfo.IsFormatSupported(format, GraphicsFormatUsage.Render))
+            {
+                format = GraphicsFormat.R16G16B16A16_SFloat;
+            }
             m_AtlasTexture0 = new RenderTexture(new RenderTextureDescriptor
             {
                 width = m_Resolution.x,
@@ -130,7 +133,8 @@ namespace UnityEngine.Rendering.Universal
                     m_NeedsRemove.Add(id);
                     for (var i = 0; i < k_MaxMipCount; i++)
                     {
-                        if (cachedProbe.dataIndices[i] != -1) m_AtlasAllocator.Free(new BuddyAllocation(cachedProbe.levels[i], cachedProbe.dataIndices[i]));
+                        if (cachedProbe.dataIndices[i] != -1)
+                            m_AtlasAllocator.Free(new BuddyAllocation(cachedProbe.levels[i], cachedProbe.dataIndices[i]));
                     }
                 }
             }
@@ -191,7 +195,8 @@ namespace UnityEngine.Rendering.Universal
                         // in 1x1 mip. The octahedron size is double the face size, so that ends up at 2x2. Due to
                         // borders the final mip must be 4x4 as that leaves 2x2 texels for the octahedron.
                         var mipLevel = math.min(level + mip, m_AtlasAllocator.levelCount - 1);
-                        if (!m_AtlasAllocator.TryAllocate(mipLevel, out var allocation)) break;
+                        if (!m_AtlasAllocator.TryAllocate(mipLevel, out var allocation))
+                            break;
                         // We split up the allocation struct because C# cannot do struct fixed arrays :(
                         cachedProbe.levels[mip] = allocation.level;
                         cachedProbe.dataIndices[mip] = allocation.index;
@@ -203,11 +208,14 @@ namespace UnityEngine.Rendering.Universal
                     if (mip < cachedProbe.mipCount)
                     {
 #pragma warning disable 618 // Todo(@daniel.andersen): Remove deprecated API usage
-                        if (!m_WarningCache.ContainsKey(id)) showFullWarning = true;
+                        if (!m_WarningCache.ContainsKey(id))
+                            showFullWarning = true;
                         m_WarningCache[id] = frameIndex;
 #pragma warning restore 618
-                        for (var i = 0; i < mip; i++) m_AtlasAllocator.Free(new BuddyAllocation(cachedProbe.levels[i], cachedProbe.dataIndices[i]));
-                        for (var i = 0; i < k_MaxMipCount; i++) cachedProbe.dataIndices[i] = -1;
+                        for (var i = 0; i < mip; i++)
+                            m_AtlasAllocator.Free(new BuddyAllocation(cachedProbe.levels[i], cachedProbe.dataIndices[i]));
+                        for (var i = 0; i < k_MaxMipCount; i++)
+                            cachedProbe.dataIndices[i] = -1;
                         continue;
                     }
 
@@ -290,7 +298,8 @@ namespace UnityEngine.Rendering.Universal
                 m_BoxMax[dataIndex] = new Vector4(probe.bounds.max.x, probe.bounds.max.y, probe.bounds.max.z, probe.blendDistance);
                 m_BoxMin[dataIndex] = new Vector4(probe.bounds.min.x, probe.bounds.min.y, probe.bounds.min.z, probe.importance);
                 m_ProbePosition[dataIndex] = new Vector4(probe.localToWorldMatrix.m03, probe.localToWorldMatrix.m13, probe.localToWorldMatrix.m23, (probe.isBoxProjection ? 1 : -1) * (cachedProbe.mipCount));
-                for (var i = 0; i < cachedProbe.mipCount; i++) m_MipScaleOffset[dataIndex * k_MaxMipCount + i] = GetScaleOffset(cachedProbe.levels[i], cachedProbe.dataIndices[i], false, false);
+                for (var i = 0; i < cachedProbe.mipCount; i++)
+                    m_MipScaleOffset[dataIndex * k_MaxMipCount + i] = GetScaleOffset(cachedProbe.levels[i], cachedProbe.dataIndices[i], false, false);
                 var rot = Quaternion.Inverse(probe.reflectionProbe.transform.rotation);
                 m_Rotations[dataIndex] = new Vector4(rot.x, rot.y, rot.z, rot.w);
             }
@@ -341,7 +350,8 @@ namespace UnityEngine.Rendering.Universal
             var coordinate = SpaceFillingCurves.DecodeMorton2D((uint)dataIndex);
             var scale = (size - (includePadding ? 0 : 2)) / ((float2)m_Resolution);
             var bias = ((float2) coordinate * size + (includePadding ? 0 : 1)) / (m_Resolution);
-            if (yflip) bias.y = 1.0f - bias.y - scale.y;
+            if (yflip)
+                bias.y = 1.0f - bias.y - scale.y;
             return math.float4(scale, bias);
         }
 

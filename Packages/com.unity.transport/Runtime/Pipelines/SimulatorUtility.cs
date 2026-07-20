@@ -316,13 +316,16 @@ namespace Unity.Networking.Transport.Utilities
             for (int i = 0; i < param.MaxPacketCount; i++)
             {
                 DelayedPacket* packet = (DelayedPacket*)(processBufferPtr + dataSize * i);
-                if ((int)packet->delayUntil == 0) continue;
+                if ((int)packet->delayUntil == 0)
+                    continue;
                 packetsInQueue++;
 
-                if (packet->delayUntil > currentTimestamp) continue;
+                if (packet->delayUntil > currentTimestamp)
+                    continue;
                 readyPackets++;
 
-                if (oldestTime <= packet->delayUntil) continue;
+                if (oldestTime <= packet->delayUntil)
+                    continue;
                 oldestPacketIndex = i;
                 oldestTime = packet->delayUntil;
             }

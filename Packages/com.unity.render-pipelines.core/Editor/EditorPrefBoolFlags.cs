@@ -46,8 +46,10 @@ namespace UnityEditor.Rendering
         /// <param name="v">Boolean value to set to the given flags</param>
         public void SetFlag(T f, bool v)
         {
-            if (v) rawValue |= (uint)(int)(object)f;
-            else rawValue &= ~(uint)(int)(object)f;
+            if (v)
+                rawValue |= (uint)(int)(object)f;
+            else
+                rawValue &= ~(uint)(int)(object)f;
         }
 
         /// <summary>Explicit conversion operator to the underlying type</summary>

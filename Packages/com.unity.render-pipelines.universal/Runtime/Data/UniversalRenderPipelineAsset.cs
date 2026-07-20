@@ -2004,7 +2004,8 @@ namespace UnityEngine.Rendering.Universal
         internal bool ValidateRendererDataList(bool partial = false)
         {
             var emptyEntries = 0;
-            for (int i = 0; i < m_RendererDataList.Length; i++) emptyEntries += ValidateRendererData(i) ? 0 : 1;
+            for (int i = 0; i < m_RendererDataList.Length; i++)
+                emptyEntries += ValidateRendererData(i) ? 0 : 1;
             if (partial)
                 return emptyEntries == 0;
             return emptyEntries != m_RendererDataList.Length;
@@ -2013,7 +2014,8 @@ namespace UnityEngine.Rendering.Universal
         internal bool ValidateRendererData(int index)
         {
             // Check to see if you are asking for the default renderer
-            if (index == -1) index = m_DefaultRendererIndex;
+            if (index == -1)
+                index = m_DefaultRendererIndex;
             return index < m_RendererDataList.Length ? m_RendererDataList[index] != null : false;
         }
 

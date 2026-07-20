@@ -51,7 +51,8 @@ namespace UnityEngine.InputSystem.Editor
 
                 var inputActionsAssets = objects.Where(o => o != null && o.name == kAssetNameProjectWideInputActions && o is InputActionAsset);
 
-                if (!inputActionsAssets.Any()) return;
+                if (!inputActionsAssets.Any())
+                    return;
 
                 Debug.Log("Migrating Project-wide Input Actions from InputManager.asset to InputSystem_Actions.inputactions asset");
 

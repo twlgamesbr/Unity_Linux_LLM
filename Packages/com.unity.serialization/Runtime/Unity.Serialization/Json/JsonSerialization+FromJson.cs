@@ -498,7 +498,8 @@ namespace Unity.Serialization.Json
             var wrapper = new PropertyWrapper<T>(container);
             try
             {
-                using (visitor.Lock()) PropertyContainer.Accept(visitor, ref wrapper);
+                using (visitor.Lock())
+                    PropertyContainer.Accept(visitor, ref wrapper);
             }
             catch (Exception e)
             {
@@ -508,11 +509,12 @@ namespace Unity.Serialization.Json
             
             result = CreateResult(events);
             
-            if (null == parameters.State && null != serializedReferences) serializedReferences.Clear();
+            if (null == parameters.State && null != serializedReferences)
+                serializedReferences.Clear();
             
             return result.DidSucceed();
         }
-        
+
         /// <summary>
         /// Deserializes from the specified SerializedValueView in to an existing instance of <typeparamref name="T"/>.
         /// </summary>

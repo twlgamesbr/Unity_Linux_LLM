@@ -228,7 +228,8 @@ namespace UnityEditor.Rendering
         void FilterEditorsBySearch()
         {
             m_CurrentSearchFilteredEditors.Clear();
-            if (string.IsNullOrEmpty(m_SearchString)) return;
+            if (string.IsNullOrEmpty(m_SearchString))
+                return;
 
             foreach (var editor in m_Editors)
             {
@@ -328,7 +329,8 @@ namespace UnityEditor.Rendering
                     using (var check = new EditorGUI.ChangeCheckScope())
                     {
                         m_SearchString = m_SearchField.OnGUI(searchRect, m_SearchString);
-                        if (check.changed) FilterEditorsBySearch();
+                        if (check.changed)
+                            FilterEditorsBySearch();
                     }
                     GUILayout.Space(2);
 

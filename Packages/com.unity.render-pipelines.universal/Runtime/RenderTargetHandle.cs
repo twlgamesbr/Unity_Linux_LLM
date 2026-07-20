@@ -124,7 +124,8 @@ namespace UnityEngine.Rendering.Universal
         /// <inheritdoc/>
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(null, obj))
+                return false;
             return obj is RenderTargetHandle && Equals((RenderTargetHandle)obj);
         }
 

@@ -44,8 +44,10 @@ namespace UnityEngine.Rendering.Universal
 
                 // `-a.z` and `a.z` is `dot(a, {0, 0, -1}).z` and `dot(a, {0, 0, 1}).z` optimized
                 // `cosAngleA` is multiplied by `coneHeight` to avoid normalizing `a`, which we know has length `coneHeight`
-                if (-a.z < coneHeight * cosAngleA) minMax.x = math.min(originVS.z, endPointVS.z - e * coneRadius);
-                if (a.z < coneHeight * cosAngleA) minMax.y = math.max(originVS.z, endPointVS.z + e * coneRadius);
+                if (-a.z < coneHeight * cosAngleA)
+                    minMax.x = math.min(originVS.z, endPointVS.z - e * coneRadius);
+                if (a.z < coneHeight * cosAngleA)
+                    minMax.y = math.max(originVS.z, endPointVS.z + e * coneRadius);
             }
             else if (light.lightType != LightType.Point)
             {

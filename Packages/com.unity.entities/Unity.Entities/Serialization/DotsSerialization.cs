@@ -1299,7 +1299,8 @@ namespace Unity.Entities.Serialization
 
                 // The previous page might be as filled as...empty, but so be it, this code path is not supposed to happen must and we absolutely need to maintain a Global Offset
                 Pages.Add(new PageInfo(buffer, size));
-            } else {
+            } else
+            {
                 // Reserve to current page, if possible
                 var page = &Pages.Ptr[Pages.Length - 1];
 

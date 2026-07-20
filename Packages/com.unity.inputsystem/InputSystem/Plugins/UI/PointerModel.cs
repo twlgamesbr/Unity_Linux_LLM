@@ -145,9 +145,12 @@ namespace UnityEngine.InputSystem.UI
 
             changedThisFrame = false;
 
-            leftButton = default; leftButton.OnEndFrame();
-            rightButton = default; rightButton.OnEndFrame();
-            middleButton = default; middleButton.OnEndFrame();
+            leftButton = default;
+            leftButton.OnEndFrame();
+            rightButton = default;
+            rightButton.OnEndFrame();
+            middleButton = default;
+            middleButton.OnEndFrame();
 
             m_ScreenPosition = default;
             m_ScrollDelta = default;

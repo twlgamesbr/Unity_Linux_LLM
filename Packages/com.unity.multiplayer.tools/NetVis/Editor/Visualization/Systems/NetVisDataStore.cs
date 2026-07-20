@@ -68,7 +68,8 @@ namespace Unity.Multiplayer.Tools.NetVis.Editor.Visualization
             UpdateNoDataState();
 
             // We do not want to lose the data if we switch back and forth between the modes when paused.
-            if (EditorApplication.isPaused && m_BandwidthSmoothingCache != null) return;
+            if (EditorApplication.isPaused && m_BandwidthSmoothingCache != null)
+                return;
 
             UpdateBandwidthBackend();
             m_BandwidthSmoothingCache?.OnConfigurationChanged(configuration.Settings.Bandwidth);

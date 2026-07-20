@@ -122,7 +122,8 @@ namespace Unity.Entities
                 var indexInBlock = index % k_EntitiesInBlock;
 
                 var block = (DataBlock*)m_DataBlocks[blockIndex];
-                if (block == null) return Entity.Null;
+                if (block == null)
+                    return Entity.Null;
 
                 var version = block->versions[indexInBlock];
                 return ((uint)version & 1) == 0 ? Entity.Null : new Entity { Index = index, Version = version };
@@ -134,9 +135,11 @@ namespace Unity.Entities
                 var indexInBlock = entity.Index % k_EntitiesInBlock;
 
                 var block = (DataBlock*)m_DataBlocks[blockIndex];
-                if (block == null) return false;
+                if (block == null)
+                    return false;
 
-                if (((uint)entity.Version & 1) == 0 || block->versions[indexInBlock] != entity.Version) return false;
+                if (((uint)entity.Version & 1) == 0 || block->versions[indexInBlock] != entity.Version)
+                    return false;
                 return true;
             }
 
@@ -173,12 +176,14 @@ namespace Unity.Entities
                 var indexInBlock = entity.Index % k_EntitiesInBlock;
 
                 var block = (DataBlock*)m_DataBlocks[blockIndex];
-                if (block == null) return EntityInChunk.Null;
+                if (block == null)
+                    return EntityInChunk.Null;
 
                 var bitfield = block->allocated[indexInBlock / 64];
                 var mask = 1UL << (indexInBlock % 64);
 
-                if ((bitfield & mask) == 0) return EntityInChunk.Null;
+                if ((bitfield & mask) == 0)
+                    return EntityInChunk.Null;
 
                 return ((EntityInChunk*)block->entityInChunk)[indexInBlock];
             }
@@ -450,12 +455,14 @@ namespace Unity.Entities
                 var indexInBlock = index % k_EntitiesInBlock;
 
                 var block = (DataBlock*)m_DataBlocks[blockIndex];
-                if (block == null) return default;
+                if (block == null)
+                    return default;
 
                 var bitfield = block->allocated[indexInBlock / 64];
                 var mask = 1UL << (indexInBlock % 64);
 
-                if ((bitfield & mask) == 0) return default;
+                if ((bitfield & mask) == 0)
+                    return default;
 
                 var nameIndex = block->nameByEntityIndex[indexInBlock];
                 return new EntityName { Index = nameIndex };

@@ -236,7 +236,12 @@ namespace Unity.Physics
                 }
             }
 
-            private static void Swap<T>(ref T a, ref T b) where T : struct { T t = a; a = b; b = t; }
+            private static void Swap<T>(ref T a, ref T b) where T : struct
+            {
+                T t = a;
+                a = b;
+                b = t;
+            }
 
             void Segregate(int axis, float pivot, Range range, int minItems, ref Range lRange, ref Range rRange)
             {
@@ -264,7 +269,8 @@ namespace Unity.Physics
                         rDomain.Include((*(end--)).xyz);
                     }
 
-                    if (start >= end) goto FINISHED;
+                    if (start >= end)
+                        goto FINISHED;
 
                     lDomain.Include((*end).xyz);
                     rDomain.Include((*start).xyz);

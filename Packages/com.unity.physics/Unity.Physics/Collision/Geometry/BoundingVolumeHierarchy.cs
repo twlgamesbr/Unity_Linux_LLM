@@ -274,8 +274,10 @@ namespace Unity.Physics
             /// <returns></returns>
             public bool IsChildValid(int index)
             {
-                if (IsLeaf && Data[index] == -1) return false;
-                if (!IsLeaf && Data[index] == 0) return false;
+                if (IsLeaf && Data[index] == -1)
+                    return false;
+                if (!IsLeaf && Data[index] == 0)
+                    return false;
                 return true;
             }
 

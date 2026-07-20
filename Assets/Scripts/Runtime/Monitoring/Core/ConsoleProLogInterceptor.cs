@@ -39,7 +39,8 @@ namespace NPCSystem.Monitoring
         /// </summary>
         public static void Initialize()
         {
-            if (_hooked) return;
+            if (_hooked)
+                return;
             _hooked = true;
             Application.logMessageReceivedThreaded += OnLogMessage;
         }
@@ -49,14 +50,16 @@ namespace NPCSystem.Monitoring
         /// </summary>
         public static void Shutdown()
         {
-            if (!_hooked) return;
+            if (!_hooked)
+                return;
             _hooked = false;
             Application.logMessageReceivedThreaded -= OnLogMessage;
         }
 
         static void OnLogMessage(string logString, string stackTrace, LogType type)
         {
-            if (string.IsNullOrEmpty(logString)) return;
+            if (string.IsNullOrEmpty(logString))
+                return;
 
             // Only intercept NPC-prefixed / known system logs
             if (!ShouldIntercept(logString))

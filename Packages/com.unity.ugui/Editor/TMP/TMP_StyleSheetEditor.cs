@@ -68,7 +68,8 @@ namespace TMPro.EditorUtilities
                 int size = openingDefinitionProperty.stringValue.Length;
 
                 // Adjust array size to match new string length.
-                if (openingDefinitionArray.arraySize != size) openingDefinitionArray.arraySize = size;
+                if (openingDefinitionArray.arraySize != size)
+                    openingDefinitionArray.arraySize = size;
 
                 for (int i = 0; i < size; i++)
                 {
@@ -91,7 +92,8 @@ namespace TMPro.EditorUtilities
                 int size = closingDefinitionProperty.stringValue.Length;
 
                 // Adjust array size to match new string length.
-                if (closingDefinitionArray.arraySize != size) closingDefinitionArray.arraySize = size;
+                if (closingDefinitionArray.arraySize != size)
+                    closingDefinitionArray.arraySize = size;
 
                 for (int i = 0; i < size; i++)
                 {
@@ -99,7 +101,6 @@ namespace TMPro.EditorUtilities
                     element.intValue = closingDefinitionProperty.stringValue[i];
                 }
             }
-
         }
     }
 
@@ -185,7 +186,10 @@ namespace TMPro.EditorUtilities
 
             // Move Style up.
             bool guiEnabled = GUI.enabled;
-            if (m_SelectedElement == -1 || m_SelectedElement == 0) { GUI.enabled = false; }
+            if (m_SelectedElement == -1 || m_SelectedElement == 0)
+            {
+                GUI.enabled = false;
+            }
             if (GUI.Button(rect, "Up"))
             {
                 SwapStyleElements(m_SelectedElement, m_SelectedElement - 1);
@@ -194,7 +198,10 @@ namespace TMPro.EditorUtilities
 
             // Move Style down.
             rect.x += rect.width;
-            if (m_SelectedElement == elementCount - 1) { GUI.enabled = false; }
+            if (m_SelectedElement == elementCount - 1)
+            {
+                GUI.enabled = false;
+            }
             if (GUI.Button(rect, "Down"))
             {
                 SwapStyleElements(m_SelectedElement, m_SelectedElement + 1);
@@ -222,7 +229,8 @@ namespace TMPro.EditorUtilities
 
             // Delete style
             rect.x += rect.width;
-            if (m_SelectedElement == -1 || m_SelectedElement >= elementCount) GUI.enabled = false;
+            if (m_SelectedElement == -1 || m_SelectedElement >= elementCount)
+                GUI.enabled = false;
             if (GUI.Button(rect, "-"))
             {
                 int index = m_SelectedElement == -1 ? 0 : m_SelectedElement;
@@ -236,7 +244,8 @@ namespace TMPro.EditorUtilities
             }
 
             // Return if we can't display any items.
-            if (itemsPerPage == 0) return;
+            if (itemsPerPage == 0)
+                return;
 
             // DISPLAY PAGE CONTROLS
             int shiftMultiplier = currentEvent.shift ? 10 : 1; // Page + Shift goes 10 page forward
@@ -245,8 +254,10 @@ namespace TMPro.EditorUtilities
             pagePos.width = totalWidth * 0.35f;
 
             // Previous Page
-            if (m_Page > 0) GUI.enabled = true;
-            else GUI.enabled = false;
+            if (m_Page > 0)
+                GUI.enabled = true;
+            else
+                GUI.enabled = false;
 
             if (GUI.Button(pagePos, "Previous"))
                 m_Page -= 1 * shiftMultiplier;
@@ -261,8 +272,10 @@ namespace TMPro.EditorUtilities
             // Next Page
             pagePos.x += pagePos.width;
             pagePos.width = totalWidth * 0.35f;
-            if (itemsPerPage * (m_Page + 1) < elementCount) GUI.enabled = true;
-            else GUI.enabled = false;
+            if (itemsPerPage * (m_Page + 1) < elementCount)
+                GUI.enabled = true;
+            else
+                GUI.enabled = false;
 
             if (GUI.Button(pagePos, "Next"))
                 m_Page += 1 * shiftMultiplier;
@@ -286,7 +299,6 @@ namespace TMPro.EditorUtilities
             GUI.enabled = true;
             if (currentEvent.type == EventType.MouseDown && currentEvent.button == 0)
                 m_SelectedElement = -1;
-
         }
 
 

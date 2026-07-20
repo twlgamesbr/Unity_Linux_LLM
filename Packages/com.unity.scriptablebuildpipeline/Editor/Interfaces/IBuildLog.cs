@@ -179,9 +179,12 @@ namespace UnityEditor.Build.Pipeline.Interfaces
 #if UNITY_2020_2_OR_NEWER || ENABLE_DETAILED_PROFILE_CAPTURING
         internal static DeferredEventType ConvertToDeferredType(ProfileEventType type)
         {
-            if (type == ProfileEventType.Begin) return DeferredEventType.Begin;
-            if (type == ProfileEventType.End) return DeferredEventType.End;
-            if (type == ProfileEventType.Info) return DeferredEventType.Info;
+            if (type == ProfileEventType.Begin)
+                return DeferredEventType.Begin;
+            if (type == ProfileEventType.End)
+                return DeferredEventType.End;
+            if (type == ProfileEventType.Info)
+                return DeferredEventType.Info;
             throw new Exception("Unknown type");
         }
 

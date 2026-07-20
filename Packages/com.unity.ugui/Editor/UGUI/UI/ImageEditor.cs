@@ -297,10 +297,12 @@ namespace UnityEditor.UI
         public override void OnPreviewGUI(Rect rect, GUIStyle background)
         {
             Image image = target as Image;
-            if (image == null) return;
+            if (image == null)
+                return;
 
             Sprite sf = image.sprite;
-            if (sf == null) return;
+            if (sf == null)
+                return;
 
             SpriteDrawUtility.DrawSprite(sf, rect, image.canvasRenderer.GetColor());
         }

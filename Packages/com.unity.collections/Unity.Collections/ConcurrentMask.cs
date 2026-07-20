@@ -27,9 +27,13 @@ namespace Unity.Collections
         public int Length { get { return 1024;} set {} }
         public ref long ElementAt(int index)
         {
-            unsafe { fixed(Long512* p = &f0) {
-                return ref UnsafeUtility.AsRef<long>((long*)p + index);
-            } }
+            unsafe
+            {
+                fixed (Long512* p = &f0)
+                {
+                    return ref UnsafeUtility.AsRef<long>((long*)p + index);
+            }
+            }
         }
     }
 

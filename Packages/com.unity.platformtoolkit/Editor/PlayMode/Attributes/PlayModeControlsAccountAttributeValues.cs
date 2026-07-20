@@ -102,7 +102,8 @@ namespace Unity.PlatformToolkit.PlayMode
         private void RemoveAttributeValue(PlayModeControlsAttributeDefinition attributeDefinition)
         {
             var attributeValue = m_AttributeValues.FirstOrDefault(av => av.AttributeDefinition.Guid == attributeDefinition.Guid);
-            if (attributeValue == null) return;
+            if (attributeValue == null)
+                return;
             m_AttributeValues.Remove(attributeValue);
             m_Persistor?.PersistWrites();
         }

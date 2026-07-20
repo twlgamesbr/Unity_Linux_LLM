@@ -55,8 +55,14 @@ namespace UnityEngine.Rendering.Universal
 
             if (index < lights.Length)
             {
-                if (isOrthographic) { TileLightOrthographic(index); }
-                else { TileLight(index); }
+                if (isOrthographic)
+                {
+                    TileLightOrthographic(index);
+                }
+                else
+                {
+                    TileLight(index);
+                }
             }
             else
             {
@@ -75,7 +81,8 @@ namespace UnityEngine.Rendering.Universal
             var lightToWorld = (float4x4)light.localToWorldMatrix;
             var lightPositionVS = math.mul(worldToViews[m_ViewIndex], math.float4(lightToWorld.c3.xyz, 1)).xyz;
             lightPositionVS.z *= -1;
-            if (lightPositionVS.z >= near) ExpandY(lightPositionVS);
+            if (lightPositionVS.z >= near)
+                ExpandY(lightPositionVS);
             var lightDirectionVS = math.normalize(math.mul(worldToViews[m_ViewIndex], math.float4(lightToWorld.c2.xyz, 0)).xyz);
             lightDirectionVS.z *= -1;
 
@@ -108,15 +115,19 @@ namespace UnityEngine.Rendering.Universal
             GetSphereHorizon(lightPositionVS.yz, range, near, sphereClipRadius, out var sphereBoundYZ0, out var sphereBoundYZ1);
             var sphereBoundY0 = math.float3(lightPositionVS.x, sphereBoundYZ0);
             var sphereBoundY1 = math.float3(lightPositionVS.x, sphereBoundYZ1);
-            if (SpherePointIsValid(sphereBoundY0)) ExpandY(sphereBoundY0);
-            if (SpherePointIsValid(sphereBoundY1)) ExpandY(sphereBoundY1);
+            if (SpherePointIsValid(sphereBoundY0))
+                ExpandY(sphereBoundY0);
+            if (SpherePointIsValid(sphereBoundY1))
+                ExpandY(sphereBoundY1);
 
             // Project light sphere onto XZ plane, find the horizon points, and re-construct view space position of found points.
             GetSphereHorizon(lightPositionVS.xz, range, near, sphereClipRadius, out var sphereBoundXZ0, out var sphereBoundXZ1);
             var sphereBoundX0 = math.float3(sphereBoundXZ0.x, lightPositionVS.y, sphereBoundXZ0.y);
             var sphereBoundX1 = math.float3(sphereBoundXZ1.x, lightPositionVS.y, sphereBoundXZ1.y);
-            if (SpherePointIsValid(sphereBoundX0)) ExpandY(sphereBoundX0);
-            if (SpherePointIsValid(sphereBoundX1)) ExpandY(sphereBoundX1);
+            if (SpherePointIsValid(sphereBoundX0))
+                ExpandY(sphereBoundX0);
+            if (SpherePointIsValid(sphereBoundX1))
+                ExpandY(sphereBoundX1);
 
             if (light.lightType == LightType.Spot)
             {
@@ -137,8 +148,10 @@ namespace UnityEngine.Rendering.Universal
                 GetProjectedCircleHorizon(baseCenter.yz, baseRadius, baseUY.yz, baseVY.yz, out var baseY1UV, out var baseY2UV);
                 var baseY1 = baseCenter + baseY1UV.x * baseUY + baseY1UV.y * baseVY;
                 var baseY2 = baseCenter + baseY2UV.x * baseUY + baseY2UV.y * baseVY;
-                if (baseY1.z >= near) ExpandY(baseY1);
-                if (baseY2.z >= near) ExpandY(baseY2);
+                if (baseY1.z >= near)
+                    ExpandY(baseY1);
+                if (baseY2.z >= near)
+                    ExpandY(baseY2);
 
                 // Project cone base into the XZ plane, find the horizon points, and re-construct view space position of found points.
                 // See comment for YZ plane for details.
@@ -147,8 +160,10 @@ namespace UnityEngine.Rendering.Universal
                 GetProjectedCircleHorizon(baseCenter.xz, baseRadius, baseUX.xz, baseVX.xz, out var baseX1UV, out var baseX2UV);
                 var baseX1 = baseCenter + baseX1UV.x * baseUX + baseX1UV.y * baseVX;
                 var baseX2 = baseCenter + baseX2UV.x * baseUX + baseX2UV.y * baseVX;
-                if (baseX1.z >= near) ExpandY(baseX1);
-                if (baseX2.z >= near) ExpandY(baseX2);
+                if (baseX1.z >= near)
+                    ExpandY(baseX1);
+                if (baseX2.z >= near)
+                    ExpandY(baseX2);
 
                 // Handle base circle clipping by intersecting it with the near-plane if needed.
                 if (GetCircleClipPoints(baseCenter, lightDirectionVS, baseRadius, near, out var baseClip0, out var baseClip1))
@@ -180,15 +195,19 @@ namespace UnityEngine.Rendering.Universal
                     var thetaY = FindNearConicTangentTheta(lightPositionVS.yz, lightDirectionVS.yz, r, coneU.yz, coneV.yz);
                     var p0Y = EvaluateNearConic(near, lightPositionVS, lightDirectionVS, r, coneU, coneV, thetaY.x);
                     var p1Y = EvaluateNearConic(near, lightPositionVS, lightDirectionVS, r, coneU, coneV, thetaY.y);
-                    if (ConicPointIsValid(p0Y)) ExpandY(p0Y);
-                    if (ConicPointIsValid(p1Y)) ExpandY(p1Y);
+                    if (ConicPointIsValid(p0Y))
+                        ExpandY(p0Y);
+                    if (ConicPointIsValid(p1Y))
+                        ExpandY(p1Y);
 
                     // Find the X bounds of the near-plane cone intersection, i.e. where x' = 0
                     var thetaX = FindNearConicTangentTheta(lightPositionVS.xz, lightDirectionVS.xz, r, coneU.xz, coneV.xz);
                     var p0X = EvaluateNearConic(near, lightPositionVS, lightDirectionVS, r, coneU, coneV, thetaX.x);
                     var p1X = EvaluateNearConic(near, lightPositionVS, lightDirectionVS, r, coneU, coneV, thetaX.y);
-                    if (ConicPointIsValid(p0X)) ExpandY(p0X);
-                    if (ConicPointIsValid(p1X)) ExpandY(p1X);
+                    if (ConicPointIsValid(p0X))
+                        ExpandY(p0X);
+                    if (ConicPointIsValid(p1X))
+                        ExpandY(p1X);
                 }
 
                 // Calculate the lines making up the sides of the cone as seen from the camera. `l1` and `l2` form lines
@@ -199,13 +218,15 @@ namespace UnityEngine.Rendering.Universal
                     var planeNormal = math.float3(0, 1, viewPlaneBottoms[m_ViewIndex]);
                     var l1t = math.dot(-lightPositionVS, planeNormal) / math.dot(l1, planeNormal);
                     var l1x = lightPositionVS + l1 * l1t;
-                    if (l1t >= 0 && l1t <= 1 && l1x.z >= near) ExpandY(l1x);
+                    if (l1t >= 0 && l1t <= 1 && l1x.z >= near)
+                        ExpandY(l1x);
                 }
                 {
                     var planeNormal = math.float3(0, 1, viewPlaneTops[m_ViewIndex]);
                     var l1t = math.dot(-lightPositionVS, planeNormal) / math.dot(l1, planeNormal);
                     var l1x = lightPositionVS + l1 * l1t;
-                    if (l1t >= 0 && l1t <= 1 && l1x.z >= near) ExpandY(l1x);
+                    if (l1t >= 0 && l1t <= 1 && l1x.z >= near)
+                        ExpandY(l1x);
                 }
 
                 m_TileYRange.Clamp(0, (short)(tileCount.y - 1));
@@ -223,16 +244,20 @@ namespace UnityEngine.Rendering.Universal
                     // Intersect lines with y-plane and clip if needed.
                     var l1t = math.dot(-lightPositionVS, planeNormal) / math.dot(l1, planeNormal);
                     var l1x = lightPositionVS + l1 * l1t;
-                    if (l1t >= 0 && l1t <= 1 && l1x.z >= near) planeRange.Expand((short)math.clamp(ViewToTileSpace(l1x).x, 0, tileCount.x - 1));
+                    if (l1t >= 0 && l1t <= 1 && l1x.z >= near)
+                        planeRange.Expand((short)math.clamp(ViewToTileSpace(l1x).x, 0, tileCount.x - 1));
 
                     var l2t = math.dot(-lightPositionVS, planeNormal) / math.dot(l2, planeNormal);
                     var l2x = lightPositionVS + l2 * l2t;
-                    if (l2t >= 0 && l2t <= 1 && l2x.z >= near) planeRange.Expand((short)math.clamp(ViewToTileSpace(l2x).x, 0, tileCount.x - 1));
+                    if (l2t >= 0 && l2t <= 1 && l2x.z >= near)
+                        planeRange.Expand((short)math.clamp(ViewToTileSpace(l2x).x, 0, tileCount.x - 1));
 
                     if (IntersectCircleYPlane(planeY, baseCenter, lightDirectionVS, baseUY, baseVY, baseRadius, out var circleTile0, out var circleTile1))
                     {
-                        if (circleTile0.z >= near) planeRange.Expand((short)math.clamp(ViewToTileSpace(circleTile0).x, 0, tileCount.x - 1));
-                        if (circleTile1.z >= near) planeRange.Expand((short)math.clamp(ViewToTileSpace(circleTile1).x, 0, tileCount.x - 1));
+                        if (circleTile0.z >= near)
+                            planeRange.Expand((short)math.clamp(ViewToTileSpace(circleTile0).x, 0, tileCount.x - 1));
+                        if (circleTile1.z >= near)
+                            planeRange.Expand((short)math.clamp(ViewToTileSpace(circleTile1).x, 0, tileCount.x - 1));
                     }
 
                     if (coneIsClipping)
@@ -242,8 +267,10 @@ namespace UnityEngine.Rendering.Universal
                         var theta = FindNearConicYTheta(near, lightPositionVS, lightDirectionVS, r, coneU, coneV, y);
                         var p0 = math.float3(EvaluateNearConic(near, lightPositionVS, lightDirectionVS, r, coneU, coneV, theta.x).x, y, near);
                         var p1 = math.float3(EvaluateNearConic(near, lightPositionVS, lightDirectionVS, r, coneU, coneV, theta.y).x, y, near);
-                        if (ConicPointIsValid(p0)) planeRange.Expand((short)math.clamp(ViewToTileSpace(p0).x, 0, tileCount.x - 1));
-                        if (ConicPointIsValid(p1)) planeRange.Expand((short)math.clamp(ViewToTileSpace(p1).x, 0, tileCount.x - 1));
+                        if (ConicPointIsValid(p0))
+                            planeRange.Expand((short)math.clamp(ViewToTileSpace(p0).x, 0, tileCount.x - 1));
+                        if (ConicPointIsValid(p1))
+                            planeRange.Expand((short)math.clamp(ViewToTileSpace(p1).x, 0, tileCount.x - 1));
                     }
 
                     // Write to tile ranges above and below the plane. Note that at `m_Offset` we store Y-range.
@@ -262,8 +289,10 @@ namespace UnityEngine.Rendering.Universal
 
                 var planeY = math.lerp(viewPlaneBottoms[m_ViewIndex], viewPlaneTops[m_ViewIndex], planeIndex * tileScaleInv.y);
                 GetSphereYPlaneHorizon(lightPositionVS, range, near, sphereClipRadius, planeY, out var sphereTile0, out var sphereTile1);
-                if (SpherePointIsValid(sphereTile0)) planeRange.Expand((short)math.clamp(ViewToTileSpace(sphereTile0).x, 0, tileCount.x - 1));
-                if (SpherePointIsValid(sphereTile1)) planeRange.Expand((short)math.clamp(ViewToTileSpace(sphereTile1).x, 0, tileCount.x - 1));
+                if (SpherePointIsValid(sphereTile0))
+                    planeRange.Expand((short)math.clamp(ViewToTileSpace(sphereTile0).x, 0, tileCount.x - 1));
+                if (SpherePointIsValid(sphereTile1))
+                    planeRange.Expand((short)math.clamp(ViewToTileSpace(sphereTile1).x, 0, tileCount.x - 1));
 
                 var tileIndex = m_Offset + 1 + planeIndex;
                 tileRanges[tileIndex] = InclusiveRange.Merge(tileRanges[tileIndex], planeRange);
@@ -301,10 +330,14 @@ namespace UnityEngine.Rendering.Universal
             var sphereBoundX0 = lightPosVS - math.float3(range, 0, 0);
             var sphereBoundX1 = lightPosVS + math.float3(range, 0, 0);
 
-            if (SpherePointIsValid(sphereBoundY0)) ExpandOrthographic(sphereBoundY0);
-            if (SpherePointIsValid(sphereBoundY1)) ExpandOrthographic(sphereBoundY1);
-            if (SpherePointIsValid(sphereBoundX0)) ExpandOrthographic(sphereBoundX0);
-            if (SpherePointIsValid(sphereBoundX1)) ExpandOrthographic(sphereBoundX1);
+            if (SpherePointIsValid(sphereBoundY0))
+                ExpandOrthographic(sphereBoundY0);
+            if (SpherePointIsValid(sphereBoundY1))
+                ExpandOrthographic(sphereBoundY1);
+            if (SpherePointIsValid(sphereBoundX0))
+                ExpandOrthographic(sphereBoundX0);
+            if (SpherePointIsValid(sphereBoundX1))
+                ExpandOrthographic(sphereBoundX1);
 
             var circleCenter = lightPosVS + lightDirVS * coneHeight;
             var circleRadius = math.sqrt(rangeSq - coneHeightSq);
@@ -356,8 +389,14 @@ namespace UnityEngine.Rendering.Universal
                 var sphereX = math.sqrt(rangeSq - square(planeY - lightPosVS.y));
                 var sphereX0 = math.float3(lightPosVS.x - sphereX, planeY, lightPosVS.z);
                 var sphereX1 = math.float3(lightPosVS.x + sphereX, planeY, lightPosVS.z);
-                if (SpherePointIsValid(sphereX0)) { ExpandRangeOrthographic(ref planeRange, sphereX0.x); }
-                if (SpherePointIsValid(sphereX1)) { ExpandRangeOrthographic(ref planeRange, sphereX1.x); }
+                if (SpherePointIsValid(sphereX0))
+                {
+                    ExpandRangeOrthographic(ref planeRange, sphereX0.x);
+                }
+                if (SpherePointIsValid(sphereX1))
+                {
+                    ExpandRangeOrthographic(ref planeRange, sphereX1.x);
+                }
 
                 if (light.lightType == LightType.Spot)
                 {
@@ -378,8 +417,14 @@ namespace UnityEngine.Rendering.Universal
                     var deltaY = planeY - lightPosVS.y;
                     var coneT0 = deltaY * coneDir0YInv;
                     var coneT1 = deltaY * coneDir1YInv;
-                    if (coneT0 >= 0 && coneT0 <= 1) { ExpandRangeOrthographic(ref planeRange, lightPosVS.x + coneT0 * coneDir0X); }
-                    if (coneT1 >= 0 && coneT1 <= 1) { ExpandRangeOrthographic(ref planeRange, lightPosVS.x + coneT1 * coneDir1X); }
+                    if (coneT0 >= 0 && coneT0 <= 1)
+                    {
+                        ExpandRangeOrthographic(ref planeRange, lightPosVS.x + coneT0 * coneDir0X);
+                    }
+                    if (coneT1 >= 0 && coneT1 <= 1)
+                    {
+                        ExpandRangeOrthographic(ref planeRange, lightPosVS.x + coneT1 * coneDir1X);
+                    }
                 }
 
                 var tileIndex = m_Offset + 1 + planeIndex;
@@ -450,7 +495,8 @@ namespace UnityEngine.Rendering.Universal
                     var clippedPoint = isOrthographic ? point.xy : point.xy/point.z;
                     var clippedIndex = clippedPointsCount++;
                     clippedPoints[clippedIndex] = clippedPoint;
-                    if (clippedPoint.x < clippedPoints[leftmostIndex].x) leftmostIndex = clippedIndex;
+                    if (clippedPoint.x < clippedPoints[leftmostIndex].x)
+                        leftmostIndex = clippedIndex;
                 }
             }
 
@@ -464,7 +510,8 @@ namespace UnityEngine.Rendering.Universal
                 {
                     var p1 = points[indices[j+1]];
                     // The entire line is in front of the near plane.
-                    if (p0.z < near && p1.z < near) continue;
+                    if (p0.z < near && p1.z < near)
+                        continue;
                     // Check whether the line needs clipping.
                     if (p0.z < near || p1.z < near)
                     {
@@ -473,7 +520,8 @@ namespace UnityEngine.Rendering.Universal
                         var clippedPoint = isOrthographic ? p.xy : p.xy/p.z;
                         var clippedIndex = clippedPointsCount++;
                         clippedPoints[clippedIndex] = clippedPoint;
-                        if (clippedPoint.x < clippedPoints[leftmostIndex].x) leftmostIndex = clippedIndex;
+                        if (clippedPoint.x < clippedPoints[leftmostIndex].x)
+                            leftmostIndex = clippedIndex;
                     }
                 }
             }
@@ -530,7 +578,8 @@ namespace UnityEngine.Rendering.Universal
 
                         // planeY = hp0 + t * (hp1 - hp0) => planeY - hp0 = t * (hp1 - hp0) => (planeY - hp0) / (hp1 - hp0) = t
                         var t = (planeY - hp0.y) / (hp1.y - hp0.y);
-                        if (t < 0 || t > 1) continue;
+                        if (t < 0 || t > 1)
+                            continue;
                         var x = math.lerp(hp0.x, hp1.x, t);
 
                         var p = math.float3(x, planeY, 1);
@@ -643,15 +692,27 @@ namespace UnityEngine.Rendering.Universal
             var c0 = c + math.float2(-direction.y, direction.x) * h;
             if (square(d) >= square(radius) && c0.y >= near)
             {
-                if (c0.x > p0.x) { p0 = c0; }
-                if (c0.x < p1.x) { p1 = c0; }
+                if (c0.x > p0.x)
+                {
+                    p0 = c0;
+                }
+                if (c0.x < p1.x)
+                {
+                    p1 = c0;
+                }
             }
 
             var c1 = c + math.float2(direction.y, -direction.x) * h;
             if (square(d) >= square(radius) && c1.y >= near)
             {
-                if (c1.x > p0.x) { p0 = c1; }
-                if (c1.x < p1.x) { p1 = c1; }
+                if (c1.x > p0.x)
+                {
+                    p0 = c1;
+                }
+                if (c1.x < p1.x)
+                {
+                    p1 = c1;
+                }
             }
         }
 
@@ -734,10 +795,12 @@ namespace UnityEngine.Rendering.Universal
 
                 // Transform horizon points to view space and use if not clipped.
                 var leftCandidate = leftOnPlane.x * planeU + leftOnPlane.y * planeV;
-                if (leftCandidate.z >= near) left = leftCandidate;
+                if (leftCandidate.z >= near)
+                    left = leftCandidate;
 
                 var rightCandidate = rightOnPlane.x * planeU + rightOnPlane.y * planeV;
-                if (rightCandidate.z >= near) right = rightCandidate;
+                if (rightCandidate.z >= near)
+                    right = rightCandidate;
             }
         }
 
@@ -885,7 +948,8 @@ namespace UnityEngine.Rendering.Universal
             var lineCenter = lineNormal * distToLine;
 
             // Avoid negative square roots, as this means we've hit one of the cases that we do not care about.
-            if (distToLine > circleRadius) return false;
+            if (distToLine > circleRadius)
+                return false;
 
             // What's left now is to intersect the line with the circle. We can do so with Pythagoras. Our triangle
             // is made up of `lineCenter`, the circle center and one of the intersection points.
@@ -917,7 +981,8 @@ namespace UnityEngine.Rendering.Universal
             var d = -math.dot(vertex, axis);
             // If d is zero, this leads to a numerical instability in the code later on. This is why we make the value
             // an epsilon if it is zero.
-            if (d == 0f) d = 1e-6f;
+            if (d == 0f)
+                d = 1e-6f;
             var sign = d < 0 ? -1f : 1f;
             // sign *= vertex.z < 0 ? -1f : 1f;
             // `origin` is the center of the circular slice we're about to calculate at distance `d` from the `vertex`.

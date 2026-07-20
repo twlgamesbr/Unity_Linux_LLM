@@ -175,7 +175,8 @@ namespace UnityEditor.Rendering
                 {
                     return $"Invalid lamp count value: {iesDataToken}";
                 }
-                if (lampCount < 1) lampCount = 1;
+                if (lampCount < 1)
+                    lampCount = 1;
 
                 if (!iesDataTokenEnumerator.MoveNext())
                 {
@@ -201,7 +202,8 @@ namespace UnityEditor.Rendering
                 {
                     return $"Invalid candela multiplier value: {iesDataToken}";
                 }
-                if (candelaMultiplier < 0f) candelaMultiplier = 0f;
+                if (candelaMultiplier < 0f)
+                    candelaMultiplier = 0f;
 
                 if (!iesDataTokenEnumerator.MoveNext())
                 {
@@ -283,7 +285,8 @@ namespace UnityEditor.Rendering
                 {
                     return $"Invalid ballast factor value: {iesDataToken}";
                 }
-                if (ballastFactor < 0f) ballastFactor = 0f;
+                if (ballastFactor < 0f)
+                    ballastFactor = 0f;
 
                 // Skip future use.
                 if (!iesDataTokenEnumerator.MoveNext())

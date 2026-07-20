@@ -166,7 +166,9 @@ namespace Unity.Collections
                     if (dst[i + j] != bytes[j])
                         goto end_of_loop;
                 return i;
-                end_of_loop : {}
+                end_of_loop :
+                {
+                }
             }
             return -1;
         }
@@ -194,7 +196,9 @@ namespace Unity.Collections
                     if (dst[i + j] != bytes[j])
                         goto end_of_loop;
                 return i;
-                end_of_loop : {}
+                end_of_loop :
+                {
+                }
             }
             return -1;
         }
@@ -297,7 +301,9 @@ namespace Unity.Collections
                     if (dst[i + j] != bytes[j])
                         goto end_of_loop;
                 return i;
-                end_of_loop : {}
+                end_of_loop :
+                {
+                }
             }
             return -1;
         }
@@ -326,7 +332,9 @@ namespace Unity.Collections
                     if (dst[i + j] != bytes[j])
                         goto end_of_loop;
                 return i;
-                end_of_loop : {}
+                end_of_loop :
+                {
+                }
             }
             return -1;
         }

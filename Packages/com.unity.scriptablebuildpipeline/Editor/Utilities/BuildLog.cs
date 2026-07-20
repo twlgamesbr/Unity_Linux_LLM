@@ -32,8 +32,20 @@ namespace UnityEditor.Build.Pipeline.Utilities
 
             public string Name { get; set; }
             public LogLevel Level { get; set; }
-            public List<LogStep> Children { get { if (m_Children == null) m_Children = new List<LogStep>(); return m_Children; } }
-            public List<LogEntry> Entries { get { if (m_Entries == null) m_Entries = new List<LogEntry>(); return m_Entries; } }
+            public List<LogStep> Children { get
+                {
+                    if (m_Children == null)
+                        m_Children = new List<LogStep>();
+                    return m_Children;
+                }
+            }
+            public List<LogEntry> Entries { get
+                {
+                    if (m_Entries == null)
+                        m_Entries = new List<LogEntry>();
+                    return m_Entries;
+                }
+            }
             public double DurationMS { get; private set; }
             public int ThreadId { get; set; }
             public double StartTime { get; set; }

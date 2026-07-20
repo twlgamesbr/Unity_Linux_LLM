@@ -811,8 +811,10 @@ namespace Unity.Entities
                 {
                     enableableTypesInAny.Sort();
                     int lastUniqueIndex = 0;
-                    for (int i = 1; i < enableableTypesInAny.Length; ++i) {
-                        if (enableableTypesInAny[i] != enableableTypesInAny[lastUniqueIndex]) {
+                    for (int i = 1; i < enableableTypesInAny.Length; ++i)
+                    {
+                        if (enableableTypesInAny[i] != enableableTypesInAny[lastUniqueIndex])
+                        {
                             enableableTypesInAny[++lastUniqueIndex] = enableableTypesInAny[i];
                         }
                     }

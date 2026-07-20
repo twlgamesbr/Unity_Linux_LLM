@@ -83,8 +83,10 @@ namespace Unity.Entities.Editor
 
         public void Register(ISearchBackend backend)
         {
-            if (null != Handler) backend.AddSearchOperatorHandler(Operator, Handler);
-            if (null != HandlerWithStringComparison) backend.AddSearchOperatorHandler(Operator, HandlerWithStringComparison);
+            if (null != Handler)
+                backend.AddSearchOperatorHandler(Operator, Handler);
+            if (null != HandlerWithStringComparison)
+                backend.AddSearchOperatorHandler(Operator, HandlerWithStringComparison);
         }
     }
 

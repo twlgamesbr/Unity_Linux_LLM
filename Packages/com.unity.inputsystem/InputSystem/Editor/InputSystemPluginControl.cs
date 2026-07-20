@@ -48,7 +48,8 @@ namespace UnityEngine.InputSystem.Editor
             BuildTarget target = EditorUserBuildSettings.activeBuildTarget;
             foreach (var platform in s_supportedBuildTargets)
             {
-                if (platform == target) return false;
+                if (platform == target)
+                    return false;
             }
             return true;
         }

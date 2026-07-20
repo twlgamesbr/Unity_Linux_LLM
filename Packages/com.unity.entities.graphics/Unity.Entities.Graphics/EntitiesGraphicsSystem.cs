@@ -384,7 +384,8 @@ namespace Unity.Rendering
         /// </summary>
         protected override void OnDestroy()
         {
-            if (!EntitiesGraphicsSystem.EntitiesGraphicsEnabled) return;
+            if (!EntitiesGraphicsSystem.EntitiesGraphicsEnabled)
+                return;
 
             var brgRenderArrays = m_BRGRenderMeshArrays.GetValueArray(Allocator.Temp);
             for (int i = 0; i < brgRenderArrays.Length; ++i)
@@ -1292,7 +1293,8 @@ namespace Unity.Rendering
         /// </summary>
         protected override void OnDestroy()
         {
-            if (!EntitiesGraphicsEnabled) return;
+            if (!EntitiesGraphicsEnabled)
+                return;
             CompleteJobs(true);
             Dispose();
         }
@@ -1427,7 +1429,8 @@ namespace Unity.Rendering
             int currentCapacity = m_BatchInfos.Length;
             int neededCapacity = BatchIndexRange;
 
-            if (currentCapacity >= neededCapacity) return;
+            if (currentCapacity >= neededCapacity)
+                return;
 
             Assert.IsTrue(kMaxBatchGrowFactor >= 1f,
                 "Grow factor should always be greater or equal to 1");
@@ -2640,8 +2643,10 @@ namespace Unity.Rendering
 
             byte flags = 0;
 
-            if (hasLodData) flags |= EntitiesGraphicsChunkCullingData.kFlagHasLodData;
-            if (hasPerInstanceCulling) flags |= EntitiesGraphicsChunkCullingData.kFlagInstanceCulling;
+            if (hasLodData)
+                flags |= EntitiesGraphicsChunkCullingData.kFlagHasLodData;
+            if (hasPerInstanceCulling)
+                flags |= EntitiesGraphicsChunkCullingData.kFlagInstanceCulling;
 
             return flags;
         }

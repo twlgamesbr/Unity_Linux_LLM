@@ -436,14 +436,16 @@ namespace UnityEngine.Rendering
                     //The current command buffer only includes very simple single generic functions. We just hard code these but in the future we might need reflection on the generic arguments if needed.
                     // We strip the last two chars at the name is normally something like MyClass`1 for generics.
                     var types = t.GenericTypeArguments;
-                    if (types.Length > 1) throw new NotImplementedException("Implement generic handling for more than 1 argument");
+                    if (types.Length > 1)
+                        throw new NotImplementedException("Implement generic handling for more than 1 argument");
                     return t.Name.Substring(0, t.Name.Length - 2) + "<T>";
                 }
                 // This is a defined generic like List<int>
                 else if (t.IsConstructedGenericType)
                 {
                     var types = t.GenericTypeArguments;
-                    if (types.Length > 1) throw new NotImplementedException("Implement generic handling for more than 1 argument");
+                    if (types.Length > 1)
+                        throw new NotImplementedException("Implement generic handling for more than 1 argument");
                     return t.Name.Substring(0, t.Name.Length - 2) + "<" + CSharpFlavour(types[0]) + ">";
                 }
                 else

@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c782dd27fb2e6298bafae1bb560ccba3, type: 3}
+  m_Name: SettingsGuardConfig
+  m_EditorClassIdentifier: NPCSystem.Editor::NPCSystem.Editor.Tools.SettingsGuardConfig
+  requiredApiCompatibilityLevel: 6
+  platformOverrides:
+  - platformName: WebGL
+    requiredLevel: 6
+  - platformName: Standalone
+    requiredLevel: 6
+  - platformName: Server
+    requiredLevel: 6
+  requiredEditorAssembliesLevel: 3
+  scriptingDefines:
+  - platformName: WebGL
+    defines: SENTIS_ANALYTICS_ENABLED
+  requiredScenes: []
+  verifyBuildProfileSettings: 1
+  autoFixOnVerify: 0

@@ -375,7 +375,8 @@ namespace Unity.Collections.LowLevel.Unsafe
                 if (CollectionHelper.IsAligned((ulong)addr, UnsafeUtility.AlignOf<T>()))
                     UnsafeUtility.CopyPtrToStructure<T>(addr, out value);
                 else
-                    fixed (void* pValue = &value) UnsafeUtility.MemCpy(pValue, addr, structSize);
+                    fixed (void* pValue = &value)
+                        UnsafeUtility.MemCpy(pValue, addr, structSize);
 
                 Offset += structSize;
             }

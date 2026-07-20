@@ -617,7 +617,8 @@ namespace Unity.Entities
                 {
                     var objArr = systemType.GetCustomAttributes(attributeType, true);
 
-                    if (objArr.Length == 0) continue;
+                    if (objArr.Length == 0)
+                        continue;
 
                     if (attrKind == SystemAttributeKind.CreateAfter)
                     {
@@ -683,8 +684,10 @@ namespace Unity.Entities
 
                             int flags = 0;
 
-                            if (myattr.OrderFirst) flags |= SystemAttribute.kOrderFirstFlag;
-                            if (myattr.OrderLast) flags |= SystemAttribute.kOrderLastFlag;
+                            if (myattr.OrderFirst)
+                                flags |= SystemAttribute.kOrderFirstFlag;
+                            if (myattr.OrderLast)
+                                flags |= SystemAttribute.kOrderLastFlag;
 
                             var typeIndex = GetSystemTypeIndexNoThrow(myattr.GroupType);
                             var isGroup = typeIndex != -1 && typeIndex.IsGroup;
@@ -1191,7 +1194,8 @@ namespace Unity.Entities
                 var systemCount = SharedSystemCount.Ref.Data;
 
                 var numAttributes = info.SystemAttributeCount;
-                var ret = new NativeList<SystemAttribute>(numAttributes, allocator);;
+                var ret = new NativeList<SystemAttribute>(numAttributes, allocator);
+                ;
 
                 for (int i = startingIndex; i < startingIndex + numAttributes; i++)
                 {

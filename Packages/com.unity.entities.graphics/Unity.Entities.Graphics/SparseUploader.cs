@@ -440,7 +440,8 @@ namespace Unity.Rendering
         public void PruneFreeBuffers(int maxMemoryToRetainInBytes)
         {
             int memoryToFree = TotalBufferSize - maxMemoryToRetainInBytes;
-            if (memoryToFree <= 0) return;
+            if (memoryToFree <= 0)
+                return;
 
             while (memoryToFree > 0 && m_FreeBufferIds.Count > 0)
             {

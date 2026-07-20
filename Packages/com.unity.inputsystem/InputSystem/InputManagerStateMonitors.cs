@@ -14,7 +14,8 @@ namespace UnityEngine.InputSystem
         ////TODO: support combining monitors for bitfields
         public void AddStateChangeMonitor(InputControl control, IInputStateChangeMonitor monitor, long monitorIndex, uint groupIndex)
         {
-            if (m_DevicesCount <= 0) return;
+            if (m_DevicesCount <= 0)
+                return;
 
             var device = control.device;
             var deviceIndex = device.m_DeviceIndex;

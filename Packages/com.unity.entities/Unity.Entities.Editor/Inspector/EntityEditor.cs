@@ -133,7 +133,8 @@ namespace Unity.Entities.Editor
 
         void IBinding.PreUpdate()
         {
-            if (m_InspectorContext.TargetExists()) return;
+            if (m_InspectorContext.TargetExists())
+                return;
             m_Root.Clear();
         }
 

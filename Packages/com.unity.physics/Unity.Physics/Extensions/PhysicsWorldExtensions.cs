@@ -15,9 +15,13 @@ namespace Unity.Physics.Extensions
         public static CollisionFilter GetCollisionFilter(this in PhysicsWorld world, int rigidBodyIndex)
         {
             CollisionFilter filter = CollisionFilter.Default;
-            if (!(0 <= rigidBodyIndex && rigidBodyIndex < world.NumBodies)) return filter;
+            if (!(0 <= rigidBodyIndex && rigidBodyIndex < world.NumBodies))
+                return filter;
 
-            unsafe { filter = world.Bodies[rigidBodyIndex].Collider.Value.GetCollisionFilter(); }
+            unsafe
+            {
+                filter = world.Bodies[rigidBodyIndex].Collider.Value.GetCollisionFilter();
+            }
 
             return filter;
         }
@@ -30,7 +34,8 @@ namespace Unity.Physics.Extensions
         /// <returns>   The mass. </returns>
         public static float GetMass(this in PhysicsWorld world, int rigidBodyIndex)
         {
-            if (!(0 <= rigidBodyIndex && rigidBodyIndex < world.NumDynamicBodies)) return 0;
+            if (!(0 <= rigidBodyIndex && rigidBodyIndex < world.NumDynamicBodies))
+                return 0;
 
             MotionVelocity mv = world.MotionVelocities[rigidBodyIndex];
 
@@ -50,7 +55,8 @@ namespace Unity.Physics.Extensions
         /// <returns>   The effective mass. </returns>
         public static float GetEffectiveMass(this in PhysicsWorld world, int rigidBodyIndex, float3 impulse, float3 point)
         {
-            if (!(0 <= rigidBodyIndex && rigidBodyIndex < world.NumDynamicBodies)) return 0;
+            if (!(0 <= rigidBodyIndex && rigidBodyIndex < world.NumDynamicBodies))
+                return 0;
 
             MotionVelocity mv = world.MotionVelocities[rigidBodyIndex];
 
@@ -84,7 +90,8 @@ namespace Unity.Physics.Extensions
         /// <returns>   The center of mass. </returns>
         public static float3 GetCenterOfMass(this in PhysicsWorld world, int rigidBodyIndex)
         {
-            if (!(0 <= rigidBodyIndex && rigidBodyIndex < world.NumDynamicBodies)) return float3.zero;
+            if (!(0 <= rigidBodyIndex && rigidBodyIndex < world.NumDynamicBodies))
+                return float3.zero;
 
             return world.MotionDatas[rigidBodyIndex].WorldFromMotion.pos;
         }
@@ -97,7 +104,8 @@ namespace Unity.Physics.Extensions
         /// <returns>   The position. </returns>
         public static float3 GetPosition(this in PhysicsWorld world, int rigidBodyIndex)
         {
-            if (!(0 <= rigidBodyIndex && rigidBodyIndex < world.NumDynamicBodies)) return float3.zero;
+            if (!(0 <= rigidBodyIndex && rigidBodyIndex < world.NumDynamicBodies))
+                return float3.zero;
 
             // Motion to body transform
             MotionData md = world.MotionDatas[rigidBodyIndex];
@@ -114,7 +122,8 @@ namespace Unity.Physics.Extensions
         /// <returns>   The rotation. </returns>
         public static quaternion GetRotation(this in PhysicsWorld world, int rigidBodyIndex)
         {
-            if (!(0 <= rigidBodyIndex && rigidBodyIndex < world.NumDynamicBodies)) return quaternion.identity;
+            if (!(0 <= rigidBodyIndex && rigidBodyIndex < world.NumDynamicBodies))
+                return quaternion.identity;
 
             // Motion to body transform
             MotionData md = world.MotionDatas[rigidBodyIndex];
@@ -131,7 +140,8 @@ namespace Unity.Physics.Extensions
         /// <returns>   The linear velocity. </returns>
         public static float3 GetLinearVelocity(this in PhysicsWorld world, int rigidBodyIndex)
         {
-            if (!(0 <= rigidBodyIndex && rigidBodyIndex < world.NumDynamicBodies)) return float3.zero;
+            if (!(0 <= rigidBodyIndex && rigidBodyIndex < world.NumDynamicBodies))
+                return float3.zero;
 
             return world.MotionVelocities[rigidBodyIndex].LinearVelocity;
         }
@@ -143,7 +153,8 @@ namespace Unity.Physics.Extensions
         /// <param name="linearVelocity">   The linear velocity. </param>
         public static void SetLinearVelocity(this PhysicsWorld world, int rigidBodyIndex, float3 linearVelocity)
         {
-            if (!(0 <= rigidBodyIndex && rigidBodyIndex < world.NumDynamicBodies)) return;
+            if (!(0 <= rigidBodyIndex && rigidBodyIndex < world.NumDynamicBodies))
+                return;
 
             Unity.Collections.NativeArray<MotionVelocity> motionVelocities = world.MotionVelocities;
             MotionVelocity mv = motionVelocities[rigidBodyIndex];
@@ -160,7 +171,8 @@ namespace Unity.Physics.Extensions
         /// <returns>   The linear velocity. </returns>
         public static float3 GetLinearVelocity(this in PhysicsWorld world, int rigidBodyIndex, float3 point)
         {
-            if (!(0 <= rigidBodyIndex && rigidBodyIndex < world.NumDynamicBodies)) return float3.zero;
+            if (!(0 <= rigidBodyIndex && rigidBodyIndex < world.NumDynamicBodies))
+                return float3.zero;
 
             MotionVelocity mv = world.MotionVelocities[rigidBodyIndex];
             MotionData md = world.MotionDatas[rigidBodyIndex];
@@ -193,7 +205,8 @@ namespace Unity.Physics.Extensions
         /// <returns>   The angular velocity. </returns>
         public static float3 GetAngularVelocity(this in PhysicsWorld world, int rigidBodyIndex)
         {
-            if (!(0 <= rigidBodyIndex && rigidBodyIndex < world.NumDynamicBodies)) return float3.zero;
+            if (!(0 <= rigidBodyIndex && rigidBodyIndex < world.NumDynamicBodies))
+                return float3.zero;
 
             MotionVelocity mv = world.MotionVelocities[rigidBodyIndex];
             MotionData md = world.MotionDatas[rigidBodyIndex];
@@ -208,7 +221,8 @@ namespace Unity.Physics.Extensions
         /// <param name="angularVelocity">  The angular velocity. </param>
         public static void SetAngularVelocity(this PhysicsWorld world, int rigidBodyIndex, float3 angularVelocity)
         {
-            if (!(0 <= rigidBodyIndex && rigidBodyIndex < world.NumDynamicBodies)) return;
+            if (!(0 <= rigidBodyIndex && rigidBodyIndex < world.NumDynamicBodies))
+                return;
 
             MotionData md = world.MotionDatas[rigidBodyIndex];
             float3 angularVelocityMotionSpace = math.rotate(math.inverse(md.WorldFromMotion.rot), angularVelocity);
@@ -227,7 +241,8 @@ namespace Unity.Physics.Extensions
         /// <param name="point">            The point. </param>
         public static void ApplyImpulse(this PhysicsWorld world, int rigidBodyIndex, float3 linearImpulse, float3 point)
         {
-            if (!(0 <= rigidBodyIndex && rigidBodyIndex < world.NumDynamicBodies)) return;
+            if (!(0 <= rigidBodyIndex && rigidBodyIndex < world.NumDynamicBodies))
+                return;
 
             MotionData md = world.MotionDatas[rigidBodyIndex];
             float3 angularImpulseWorldSpace = math.cross(point - md.WorldFromMotion.pos, linearImpulse);
@@ -247,7 +262,8 @@ namespace Unity.Physics.Extensions
         /// <param name="linearImpulse">    The linear impulse. </param>
         public static void ApplyLinearImpulse(this PhysicsWorld world, int rigidBodyIndex, float3 linearImpulse)
         {
-            if (!(0 <= rigidBodyIndex && rigidBodyIndex < world.NumDynamicBodies)) return;
+            if (!(0 <= rigidBodyIndex && rigidBodyIndex < world.NumDynamicBodies))
+                return;
 
             Unity.Collections.NativeArray<MotionVelocity> motionVelocities = world.MotionVelocities;
             MotionVelocity mv = motionVelocities[rigidBodyIndex];
@@ -262,7 +278,8 @@ namespace Unity.Physics.Extensions
         /// <param name="angularImpulse">   The angular impulse. </param>
         public static void ApplyAngularImpulse(this PhysicsWorld world, int rigidBodyIndex, float3 angularImpulse)
         {
-            if (!(0 <= rigidBodyIndex && rigidBodyIndex < world.NumDynamicBodies)) return;
+            if (!(0 <= rigidBodyIndex && rigidBodyIndex < world.NumDynamicBodies))
+                return;
 
             MotionData md = world.MotionDatas[rigidBodyIndex];
             float3 angularImpulseInertiaSpace = math.rotate(math.inverse(md.WorldFromMotion.rot), angularImpulse);

@@ -256,7 +256,8 @@ namespace UnityEngine.InputSystem.Editor
             for (var i = 0; i < actions.arraySize; i++)
             {
                 if (actions.GetArrayElementAtIndex(i)
-                    .FindPropertyRelative(nameof(InputAction.m_Name)).stringValue != actionName) continue;
+                    .FindPropertyRelative(nameof(InputAction.m_Name)).stringValue != actionName)
+                    continue;
 
                 return With(selectedActionIndex: i, selectionType: SelectionType.Action);
             }

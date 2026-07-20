@@ -144,7 +144,9 @@ namespace UnityEditor.Rendering
                 case 1: m_SerializedPropertyPerTargets[targetIndex].FindPropertyRelative("data2").boxedValue = value; break;
                 case 2: m_SerializedPropertyPerTargets[targetIndex].FindPropertyRelative("data3").boxedValue = value; break;
                 case 3: m_SerializedPropertyPerTargets[targetIndex].FindPropertyRelative("data4").boxedValue = value; break;
-            };
+            }
+
+            ;
         }
 
         //we cannot directly cast from boxed value to the ulong we want in C#, We first need to unbox in the true type

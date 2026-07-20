@@ -25,13 +25,23 @@ namespace TMPro
         /// The name identifying this style. ex. <style="name">.
         /// </summary>
         public string name
-        { get { return m_Name; } set { if (value != m_Name) m_Name = value; } }
+        { get { return m_Name; } set
+            {
+                if (value != m_Name)
+                    m_Name = value;
+            }
+        }
 
         /// <summary>
         /// The hash code corresponding to the name of this style.
         /// </summary>
         public int hashCode
-        { get { return m_HashCode; } set { if (value != m_HashCode) m_HashCode = value; } }
+        { get { return m_HashCode; } set
+            {
+                if (value != m_HashCode)
+                    m_HashCode = value;
+            }
+        }
 
         /// <summary>
         /// The initial definition of the style. ex. <b> <u>.

@@ -85,7 +85,8 @@ namespace UnityEngine.Rendering.RenderGraphModule
         public void UnRegisterDebug(string name)
         {
             //DebugManager.instance.RemovePanel(name.Length == 0 ? "Render Graph" : name);
-            if ( m_DebugPanel != null ) m_DebugPanel.children.Remove(m_DebugItems);
+            if ( m_DebugPanel != null )
+                m_DebugPanel.children.Remove(m_DebugItems);
             m_DebugPanel = null;
             m_DebugItems = null;
         }

@@ -97,7 +97,8 @@ namespace TMPro
             get { return m_fallbackMaterial; }
             set
             {
-                if (m_fallbackMaterial == value) return;
+                if (m_fallbackMaterial == value)
+                    return;
 
                 if (m_fallbackMaterial != null && m_fallbackMaterial != value)
                     TMP_MaterialManager.ReleaseFallbackMaterial(m_fallbackMaterial);
@@ -303,7 +304,8 @@ namespace TMPro
             //Debug.Log("*** OnDestroy() ***");
 
             // Destroy Mesh
-            if (m_mesh != null) DestroyImmediate(m_mesh);
+            if (m_mesh != null)
+                DestroyImmediate(m_mesh);
 
             if (m_MaskMaterial != null)
                 TMP_MaterialManager.ReleaseStencilMaterial(m_MaskMaterial);
@@ -338,7 +340,7 @@ namespace TMPro
         }
 
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         // Event received when custom material editor properties are changed.
         void ON_MATERIAL_PROPERTY_CHANGED(bool isChanged, Material mat)
         {
@@ -428,7 +430,8 @@ namespace TMPro
             // Check if event applies to this current object
             if (obj == gameObject || UnityEditor.PrefabUtility.GetCorrespondingObjectFromSource(gameObject) == obj)
             {
-                if (!m_isDefaultMaterial) return;
+                if (!m_isDefaultMaterial)
+                    return;
 
                 // Make sure we have a valid reference to the renderer.
                 //if (m_canvasRenderer == null) m_canvasRenderer = GetComponent<CanvasRenderer>();
@@ -652,7 +655,8 @@ namespace TMPro
         {
             if (update == CanvasUpdate.PreRender)
             {
-                if (!m_materialDirty) return;
+                if (!m_materialDirty)
+                    return;
 
                 UpdateMaterial();
                 m_materialDirty = false;

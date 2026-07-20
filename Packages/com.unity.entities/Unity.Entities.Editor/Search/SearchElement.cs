@@ -467,12 +467,14 @@ namespace Unity.Entities.Editor
 
             m_SearchStringTextField.RegisterCallback<KeyUpEvent, SearchElement>((evt, element) =>
             {
-                if (evt.keyCode == KeyCode.Escape) element.Search();
+                if (evt.keyCode == KeyCode.Escape)
+                    element.Search();
             }, this);
 
             m_AddFilterButton.clickable.clicked += () =>
             {
-                if (m_FilterPopupElementItems.Count == 0) return;
+                if (m_FilterPopupElementItems.Count == 0)
+                    return;
 
                 var filterDropdown = new FilterPopupElement(this, FilterPopupWidth);
 

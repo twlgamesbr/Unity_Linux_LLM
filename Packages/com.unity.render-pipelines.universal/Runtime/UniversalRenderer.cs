@@ -124,7 +124,12 @@ namespace UnityEngine.Rendering.Universal
         internal bool accurateGbufferNormals => m_DeferredLights != null ? m_DeferredLights.AccurateGbufferNormals : false;
 
 #if ENABLE_ADAPTIVE_PERFORMANCE
-        internal bool needTransparencyPass { get { return (UniversalRenderPipeline.asset?.useAdaptivePerformance == false) || !AdaptivePerformance.AdaptivePerformanceRenderSettings.SkipTransparentObjects;; } }
+        internal bool needTransparencyPass { get
+            {
+                return (UniversalRenderPipeline.asset?.useAdaptivePerformance == false) || !AdaptivePerformance.AdaptivePerformanceRenderSettings.SkipTransparentObjects;
+                ;
+            }
+        }
 #endif
         /// <summary>Property to control the depth priming behavior of the forward rendering path.</summary>
         public DepthPrimingMode depthPrimingMode { get { return m_DepthPrimingMode; } set { m_DepthPrimingMode = value; } }

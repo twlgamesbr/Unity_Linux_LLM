@@ -889,7 +889,8 @@ namespace UnityEngine.Rendering
             #if UNITY_EDITOR
             foreach (var touchup in Selection.GetFiltered<ProbeAdjustmentVolume>(SelectionMode.Unfiltered))
             {
-                if (!touchup.isActiveAndEnabled) continue;
+                if (!touchup.isActiveAndEnabled)
+                    continue;
 
                 Volume volume = new Volume(Matrix4x4.TRS(touchup.transform.position, touchup.transform.rotation, touchup.GetExtents()), 0, 0);
                 volume.CalculateCenterAndSize(out Vector3 center, out var _);
@@ -913,7 +914,7 @@ namespace UnityEngine.Rendering
                 if (++_AdjustmentVolumeCount == 16)
                     break;
             }
-            #endif
+#endif
         }
 
         Bounds GetCellBounds(Vector3 cellPosition)

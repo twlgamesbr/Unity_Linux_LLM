@@ -94,7 +94,8 @@ namespace UnityEngine.Rendering
             for (int index = bitIndexTrue.Count() - 1; index >= 0; --index)
             {
                 uint bitIndex = bitIndexTrue.ElementAt(index);
-                if (bitIndex >= capacity) continue;
+                if (bitIndex >= capacity)
+                    continue;
                 data |= (byte)(1u << (int)bitIndex);
             }
         }
@@ -213,7 +214,8 @@ namespace UnityEngine.Rendering
             for (int index = bitIndexTrue.Count() - 1; index >= 0; --index)
             {
                 uint bitIndex = bitIndexTrue.ElementAt(index);
-                if (bitIndex >= capacity) continue;
+                if (bitIndex >= capacity)
+                    continue;
                 data |= (ushort)(1u << (int)bitIndex);
             }
         }
@@ -333,7 +335,8 @@ namespace UnityEngine.Rendering
             for (int index = bitIndexTrue.Count() - 1; index >= 0; --index)
             {
                 uint bitIndex = bitIndexTrue.ElementAt(index);
-                if (bitIndex >= capacity) continue;
+                if (bitIndex >= capacity)
+                    continue;
                 data |= 1u << (int)bitIndex;
             }
         }
@@ -452,7 +455,8 @@ namespace UnityEngine.Rendering
             for (int index = bitIndexTrue.Count() - 1; index >= 0; --index)
             {
                 uint bitIndex = bitIndexTrue.ElementAt(index);
-                if (bitIndex >= capacity) continue;
+                if (bitIndex >= capacity)
+                    continue;
                 data |= 1uL << (int)bitIndex;
             }
         }

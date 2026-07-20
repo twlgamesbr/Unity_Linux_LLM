@@ -432,7 +432,8 @@ namespace UnityEditor.Rendering
                         var s = HardSegment(prevKey, key);
                         Handles.DrawAAPolyLine(state.width, s[0], s[1], s[2]);
                     }
-                    else Handles.DrawBezier(pts[0], pts[3], pts[1], pts[2], color, null, state.width);
+                    else
+                        Handles.DrawBezier(pts[0], pts[3], pts[1], pts[2], color, null, state.width);
 
                     prevKey = key;
                 }
@@ -452,7 +453,8 @@ namespace UnityEditor.Rendering
                             var s = HardSegment(p1, p2);
                             Handles.DrawAAPolyLine(state.width, s[0], s[1], s[2]);
                         }
-                        else Handles.DrawBezier(pts[0], pts[3], pts[1], pts[2], color, null, state.width);
+                        else
+                            Handles.DrawBezier(pts[0], pts[3], pts[1], pts[2], color, null, state.width);
                     }
                     else
                     {
@@ -476,7 +478,8 @@ namespace UnityEditor.Rendering
                             var s = HardSegment(p1, p2);
                             Handles.DrawAAPolyLine(state.width, s[0], s[1], s[2]);
                         }
-                        else Handles.DrawBezier(pts[0], pts[3], pts[1], pts[2], color, null, state.width);
+                        else
+                            Handles.DrawBezier(pts[0], pts[3], pts[1], pts[2], color, null, state.width);
                     }
                     else
                     {
@@ -954,7 +957,8 @@ namespace UnityEditor.Rendering
                     prev = i;
                     next = i + 1;
                 }
-                else break;
+                else
+                    break;
             }
 
             if (next == 0)

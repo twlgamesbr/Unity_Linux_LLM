@@ -115,7 +115,15 @@ namespace UnityEditor.Rendering
             // HDRP only
             if (renderPipelineAssetType != null && renderPipelineAssetType.Name == "HDRenderPipelineAsset")
             {
-                static int IndexOf(string[] names, string name) { for (int i = 0; i < names.Length; i++) { if (name == names[i]) return i; } return -1; }
+                static int IndexOf(string[] names, string name)
+                {
+                    for (int i = 0; i < names.Length; i++)
+                    {
+                        if (name == names[i])
+                            return i; }
+
+                    return -1;
+                }
 
                 var k_FrameSettingsField = Type.GetType("UnityEngine.Rendering.HighDefinition.FrameSettingsField,Unity.RenderPipelines.HighDefinition.Runtime");
                 var k_APVFrameSetting = k_FrameSettingsField.GetEnumValues().GetValue(IndexOf(k_FrameSettingsField.GetEnumNames(), "AdaptiveProbeVolume"));
@@ -203,7 +211,8 @@ namespace UnityEditor.Rendering
 
                     probeVolume.size = s_ShapeBox.size;
                     Vector3 delta = probeVolume.transform.rotation * s_ShapeBox.center - probeVolume.transform.position;
-                    probeVolume.transform.position += delta; ;
+                    probeVolume.transform.position += delta;
+                    ;
                 }
             }
         }

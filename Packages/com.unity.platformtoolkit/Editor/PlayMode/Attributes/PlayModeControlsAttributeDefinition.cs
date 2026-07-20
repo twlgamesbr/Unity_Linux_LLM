@@ -23,7 +23,8 @@ namespace Unity.PlatformToolkit.PlayMode
             get => m_Guid;
             set
             {
-                if (m_Guid != null) return;
+                if (m_Guid != null)
+                    return;
                 m_Guid = value;
             }
         }
@@ -37,7 +38,8 @@ namespace Unity.PlatformToolkit.PlayMode
             get => m_Name;
             set
             {
-                if (m_Name == value) return;
+                if (m_Name == value)
+                    return;
                 m_Name = value;
                 Persistor?.PersistWrites();
             }
@@ -60,7 +62,8 @@ namespace Unity.PlatformToolkit.PlayMode
 
             set
             {
-                if (m_ValueType == value) return;
+                if (m_ValueType == value)
+                    return;
                 if (!k_SupportedValueTypes.Contains(value))
                     throw new InvalidOperationException($"{value} is not a valid type for {nameof(PlayModeControlsAttributeDefinition)}");
                 m_ValueType = value;
@@ -73,7 +76,8 @@ namespace Unity.PlatformToolkit.PlayMode
         private Type GetTypeFromFullName(string fullName)
         {
             var type = Type.GetType(fullName);
-            if (type != null) return type;
+            if (type != null)
+                return type;
 
             #if UNITY_6000_4_OR_NEWER
                 var assemblies = UnityEngine.Assemblies.CurrentAssemblies.GetLoadedAssemblies();

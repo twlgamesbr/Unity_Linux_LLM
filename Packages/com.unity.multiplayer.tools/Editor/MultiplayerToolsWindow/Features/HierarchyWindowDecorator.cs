@@ -63,7 +63,8 @@ namespace Unity.Multiplayer.Tools.Editor.MultiplayerToolsWindow
 #if UNITY_6000_4_OR_NEWER
         static void EntityDecoratorHandler(EntityId entityId, Rect rect)
         {
-            if (!s_Enabled) return;
+            if (!s_Enabled)
+                return;
             s_TextStyle ??= new GUIStyle(EditorStyles.label) {padding = new RectOffset(0, 0, 0, 0)};
 
             var gameObject = EditorUtility.EntityIdToObject(entityId) as GameObject;
@@ -87,7 +88,8 @@ namespace Unity.Multiplayer.Tools.Editor.MultiplayerToolsWindow
 #endif
         static void RenderNetworkObjectIcon(Rect rect, GameObject go)
         {
-            if (!go.TryGetComponent<NetworkObject>(out var no)) return;
+            if (!go.TryGetComponent<NetworkObject>(out var no))
+                return;
 
             var iconRect = rect;
             iconRect.x += rect.width - 20;

@@ -111,7 +111,8 @@ namespace Unity.Jobs.CodeGen
                 }
             }
 
-            if (!referencesCollections) return false;
+            if (!referencesCollections)
+                return false;
 
             return true;
         }

@@ -345,9 +345,18 @@ namespace Unity.Physics
                         bool4 valid = dots != float4.zero;
                         distances = math.select(Constants.Min4F, distances, valid);
 
-                        float3 n0 = new float3(); n0[i] = 0.0f; n0[j] = nj[0]; n0[k] = nk[0];
-                        float3 n1 = new float3(); n1[i] = 0.0f; n1[j] = nj[1]; n1[k] = nk[1];
-                        float3 n2 = new float3(); n2[i] = 0.0f; n2[j] = nj[2]; n2[k] = nk[2];
+                        float3 n0 = new float3();
+                        n0[i] = 0.0f;
+                        n0[j] = nj[0];
+                        n0[k] = nk[0];
+                        float3 n1 = new float3();
+                        n1[i] = 0.0f;
+                        n1[j] = nj[1];
+                        n1[k] = nk[1];
+                        float3 n2 = new float3();
+                        n2[i] = 0.0f;
+                        n2[j] = nj[2];
+                        n2[k] = nk[2];
                         float4 temp = SelectMaxW(SelectMaxW(new float4(n0, distances.x), new float4(n1, distances.y)), new float4(n2, distances.z));
                         planeEdgeEdge = SelectMaxW(planeEdgeEdge, temp);
                     }

@@ -405,7 +405,8 @@ namespace Unity.Entities
                 typeHandle.m_LookupCache.Update(archetype, typeHandle.m_TypeIndex);
             }
             var typeIndexInArchetype = typeHandle.m_LookupCache.IndexInArchetype;
-            if (Hint.Unlikely(typeIndexInArchetype == -1)) return 0;
+            if (Hint.Unlikely(typeIndexInArchetype == -1))
+                return 0;
 
             return Archetype.Archetype->Chunks.GetChangeVersion(typeIndexInArchetype, m_Chunk.ListIndex);
         }
@@ -455,7 +456,8 @@ namespace Unity.Entities
         {
             ChunkDataUtility.GetIndexInTypeArray(m_EntityComponentStore->GetArchetype(m_Chunk), typeHandle.m_TypeIndex, ref typeHandle.m_TypeLookupCache);
             int typeIndexInArchetype = typeHandle.m_TypeLookupCache;
-            if (Hint.Unlikely(typeIndexInArchetype == -1)) return 0;
+            if (Hint.Unlikely(typeIndexInArchetype == -1))
+                return 0;
 
             return Archetype.Archetype->Chunks.GetChangeVersion(typeIndexInArchetype, m_Chunk.ListIndex);
         }
@@ -509,7 +511,8 @@ namespace Unity.Entities
                 bufferTypeHandle.m_LookupCache.Update(archetype, bufferTypeHandle.m_TypeIndex);
             }
             var typeIndexInArchetype = bufferTypeHandle.m_LookupCache.IndexInArchetype;
-            if (Hint.Unlikely(typeIndexInArchetype == -1)) return 0;
+            if (Hint.Unlikely(typeIndexInArchetype == -1))
+                return 0;
 
             return Archetype.Archetype->Chunks.GetChangeVersion(typeIndexInArchetype, m_Chunk.ListIndex);
         }
@@ -552,7 +555,8 @@ namespace Unity.Entities
             where T : struct, ISharedComponentData
         {
             var typeIndexInArchetype = ChunkDataUtility.GetIndexInTypeArray(m_EntityComponentStore->GetArchetype(m_Chunk), chunkSharedComponentData.m_TypeIndex);
-            if (Hint.Unlikely(typeIndexInArchetype == -1)) return 0;
+            if (Hint.Unlikely(typeIndexInArchetype == -1))
+                return 0;
 
             return Archetype.Archetype->Chunks.GetChangeVersion(typeIndexInArchetype, m_Chunk.ListIndex);
         }
@@ -578,7 +582,8 @@ namespace Unity.Entities
             ChunkDataUtility.GetIndexInTypeArray(m_EntityComponentStore->GetArchetype(m_Chunk), typeHandle.m_TypeIndex,
                 ref typeHandle.m_cachedTypeIndexinArchetype);
             int typeIndexInArchetype = typeHandle.m_cachedTypeIndexinArchetype;
-            if (Hint.Unlikely(typeIndexInArchetype == -1)) return 0;
+            if (Hint.Unlikely(typeIndexInArchetype == -1))
+                return 0;
 
             return Archetype.Archetype->Chunks.GetChangeVersion(typeIndexInArchetype, m_Chunk.ListIndex);
         }
@@ -1290,7 +1295,8 @@ namespace Unity.Entities
         {
             var archetype = m_EntityComponentStore->GetArchetype(m_Chunk);
             var typeIndexInArchetype = ChunkDataUtility.GetIndexInTypeArray(archetype, chunkSharedComponentData.m_TypeIndex);
-            if (Hint.Unlikely(typeIndexInArchetype == -1)) return -1;
+            if (Hint.Unlikely(typeIndexInArchetype == -1))
+                return -1;
 
             var chunkSharedComponentIndex = typeIndexInArchetype - archetype->FirstSharedComponent;
             var sharedComponentIndex = archetype->Chunks.GetSharedComponentValue(chunkSharedComponentIndex, m_Chunk.ListIndex);
@@ -1320,7 +1326,8 @@ namespace Unity.Entities
             ChunkDataUtility.GetIndexInTypeArray(archetype, typeHandle.m_TypeIndex,
                 ref typeHandle.m_cachedTypeIndexinArchetype);
             var typeIndexInArchetype = typeHandle.m_cachedTypeIndexinArchetype;
-            if (Hint.Unlikely(typeIndexInArchetype == -1)) return -1;
+            if (Hint.Unlikely(typeIndexInArchetype == -1))
+                return -1;
 
             var chunkSharedComponentIndex = typeIndexInArchetype - archetype->FirstSharedComponent;
             var sharedComponentIndex = archetype->Chunks.GetSharedComponentValue(chunkSharedComponentIndex, m_Chunk.ListIndex);

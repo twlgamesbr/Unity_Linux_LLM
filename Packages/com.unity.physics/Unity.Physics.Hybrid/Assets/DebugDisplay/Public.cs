@@ -262,64 +262,103 @@ namespace Unity.DebugDisplay
             {
                 case 0:
                 {
-                    s[0] = 0; s[1] = 1; s[2] = 2; s[3] = 4; s[4] = 5; s[5] = 6;
+                    s[0] = 0;
+                        s[1] = 1;
+                        s[2] = 2;
+                        s[3] = 4;
+                        s[4] = 5;
+                        s[5] = 6;
                     segmentCount = 6;
                     break;
-                }
+                    }
                 case 1:
                 {
-                    s[0] = 2; s[1] = 5;
+                    s[0] = 2;
+                        s[1] = 5;
                     segmentCount = 2;
                     break;
-                }
+                    }
                 case 2:
                 {
-                    s[0] = 0; s[1] = 2; s[2] = 3; s[3] = 4; s[4] = 6;
+                    s[0] = 0;
+                        s[1] = 2;
+                        s[2] = 3;
+                        s[3] = 4;
+                        s[4] = 6;
                     segmentCount = 5;
                     break;
-                }
+                    }
                 case 3:
                 {
-                    s[0] = 0; s[1] = 2; s[2] = 3; s[3] = 5; s[4] = 6;
+                    s[0] = 0;
+                        s[1] = 2;
+                        s[2] = 3;
+                        s[3] = 5;
+                        s[4] = 6;
                     segmentCount = 5;
                     break;
-                }
+                    }
                 case 4:
                 {
-                    s[0] = 1; s[1] = 2; s[2] = 3; s[3] = 5;
+                    s[0] = 1;
+                        s[1] = 2;
+                        s[2] = 3;
+                        s[3] = 5;
                     segmentCount = 4;
                     break;
-                }
+                    }
                 case 5:
                 {
-                    s[0] = 0; s[1] = 1; s[2] = 3; s[3] = 5; s[4] = 6;
+                    s[0] = 0;
+                        s[1] = 1;
+                        s[2] = 3;
+                        s[3] = 5;
+                        s[4] = 6;
                     segmentCount = 5;
                     break;
-                }
+                    }
                 case 6:
                 {
-                    s[0] = 0; s[1] = 1; s[2] = 3; s[3] = 4; s[4] = 5; s[5] = 6;
+                    s[0] = 0;
+                        s[1] = 1;
+                        s[2] = 3;
+                        s[3] = 4;
+                        s[4] = 5;
+                        s[5] = 6;
                     segmentCount = 6;
                     break;
-                }
+                    }
                 case 7:
                 {
-                    s[0] = 0; s[1] = 2; s[2] = 5;
+                    s[0] = 0;
+                        s[1] = 2;
+                        s[2] = 5;
                     segmentCount = 3;
                     break;
-                }
+                    }
                 case 8:
                 {
-                    s[0] = 0; s[1] = 1; s[2] = 2; s[3] = 3; s[4] = 4; s[5] = 5; s[6] = 6;
+                    s[0] = 0;
+                        s[1] = 1;
+                        s[2] = 2;
+                        s[3] = 3;
+                        s[4] = 4;
+                        s[5] = 5;
+                        s[6] = 6;
                     segmentCount = 7;
                     break;
-                }
+                    }
                 case 9:
                 {
-                    s[0] = 0; s[1] = 1; s[2] = 2; s[3] = 3; s[4] = 5; s[5] = 6;
+                    s[0] = 0;
+                        s[1] = 1;
+                        s[2] = 2;
+                        s[3] = 3;
+                        s[4] = 5;
+                        s[5] = 6;
                     segmentCount = 6;
                     break;
-                }
+                    }
                 default:
                 {
                     segmentCount = 0;
@@ -458,166 +497,264 @@ namespace Unity.DebugDisplay
             {
                 case 0: // A
                 {
-                    s[0] = 0; s[1] = 1; s[2] = 2; s[3] = 3; s[4] = 4; s[5] = 5;
+                    s[0] = 0;
+                        s[1] = 1;
+                        s[2] = 2;
+                        s[3] = 3;
+                        s[4] = 4;
+                        s[5] = 5;
                     segmentCount = 6;
                     break;
-                }
+                    }
                 case 1: // B
                 {
-                    s[0] = 0; s[1] = 1; s[2] = 3; s[3] = 4; s[4] = 5; s[5] = 6;
+                    s[0] = 0;
+                        s[1] = 1;
+                        s[2] = 3;
+                        s[3] = 4;
+                        s[4] = 5;
+                        s[5] = 6;
                     segmentCount = 6;
                     break;
-                }
+                    }
                 case 2: // C
                 {
-                    s[0] = 0; s[1] = 1; s[2] = 4; s[3] = 6;
+                    s[0] = 0;
+                        s[1] = 1;
+                        s[2] = 4;
+                        s[3] = 6;
                     segmentCount = 4;
                     break;
-                }
+                    }
                 case 3: // D
                 {
-                    s[0] = 0; s[1] = 1; s[2] = 2; s[3] = 4; s[4] = 5; s[5] = 6;
+                    s[0] = 0;
+                        s[1] = 1;
+                        s[2] = 2;
+                        s[3] = 4;
+                        s[4] = 5;
+                        s[5] = 6;
                     segmentCount = 6;
                     break;
-                }
+                    }
                 case 4: // E
                 {
-                    s[0] = 0; s[1] = 1; s[2] = 3; s[3] = 4; s[4] = 6;
+                    s[0] = 0;
+                        s[1] = 1;
+                        s[2] = 3;
+                        s[3] = 4;
+                        s[4] = 6;
                     segmentCount = 5;
                     break;
-                }
+                    }
                 case 5: // F
                 {
-                    s[0] = 0; s[1] = 1; s[2] = 3; s[3] = 4;
+                    s[0] = 0;
+                        s[1] = 1;
+                        s[2] = 3;
+                        s[3] = 4;
                     segmentCount = 4;
                     break;
-                }
+                    }
                 case 6: // G
                 {
-                    s[0] = 0; s[1] = 1; s[2] = 2; s[3] = 4; s[4] = 5; s[5] = 6;
+                    s[0] = 0;
+                        s[1] = 1;
+                        s[2] = 2;
+                        s[3] = 4;
+                        s[4] = 5;
+                        s[5] = 6;
                     segmentCount = 6;
                     break;
-                }
+                    }
                 case 7: // H
                 {
-                    s[0] = 1; s[1] = 2; s[2] = 3; s[3] = 4; s[4] = 5;
+                    s[0] = 1;
+                        s[1] = 2;
+                        s[2] = 3;
+                        s[3] = 4;
+                        s[4] = 5;
                     segmentCount = 5;
                     break;
-                }
+                    }
                 case 8: // I
                 {
-                    s[0] = 2; s[1] = 5;
+                    s[0] = 2;
+                        s[1] = 5;
                     segmentCount = 2;
                     break;
-                }
+                    }
                 case 9: // J
                 {
-                    s[0] = 2; s[1] = 4; s[2] = 5; s[3] = 6;
+                    s[0] = 2;
+                        s[1] = 4;
+                        s[2] = 5;
+                        s[3] = 6;
                     segmentCount = 4;
                     break;
-                }
+                    }
                 case 10: // K (kind of approximate)
                 {
-                    s[0] = 1; s[1] = 3; s[2] = 4; s[3] = 5;
+                    s[0] = 1;
+                        s[1] = 3;
+                        s[2] = 4;
+                        s[3] = 5;
                     segmentCount = 4;
                     break;
-                }
+                    }
                 case 11: // L
                 {
-                    s[0] = 1; s[1] = 4; s[2] = 6;
+                    s[0] = 1;
+                        s[1] = 4;
+                        s[2] = 6;
                     segmentCount = 3;
                     break;
-                }
+                    }
                 case 12: // M (kind of approximate)
                 {
-                    s[0] = 0; s[1] = 2; s[2] = 4; s[3] = 5;
+                    s[0] = 0;
+                        s[1] = 2;
+                        s[2] = 4;
+                        s[3] = 5;
                     segmentCount = 4;
                     break;
-                }
+                    }
                 case 13: // N
                 {
-                    s[0] = 0; s[1] = 2; s[2] = 3; s[3] = 4; s[4] = 5;
+                    s[0] = 0;
+                        s[1] = 2;
+                        s[2] = 3;
+                        s[3] = 4;
+                        s[4] = 5;
                     segmentCount = 5;
                     break;
-                }
+                    }
                 case 14: // O
                 {
-                    s[0] = 0; s[1] = 1; s[2] = 2; s[3] = 4; s[4] = 5; s[5] = 6;
+                    s[0] = 0;
+                        s[1] = 1;
+                        s[2] = 2;
+                        s[3] = 4;
+                        s[4] = 5;
+                        s[5] = 6;
                     segmentCount = 6;
                     break;
-                }
+                    }
                 case 15: // P
                 {
-                    s[0] = 0; s[1] = 1; s[2] = 2; s[3] = 3; s[4] = 4;
+                    s[0] = 0;
+                        s[1] = 1;
+                        s[2] = 2;
+                        s[3] = 3;
+                        s[4] = 4;
                     segmentCount = 5;
                     break;
-                }
+                    }
                 case 16: // Q
                 {
-                    s[0] = 0; s[1] = 1; s[2] = 2; s[3] = 3; s[4] = 5; s[5] = 6;
+                    s[0] = 0;
+                        s[1] = 1;
+                        s[2] = 2;
+                        s[3] = 3;
+                        s[4] = 5;
+                        s[5] = 6;
                     segmentCount = 6;
                     break;
-                }
+                    }
                 case 17: // R
                 {
-                    s[0] = 0; s[1] = 1; s[2] = 2; s[3] = 3; s[4] = 4; s[5] = 5;
+                    s[0] = 0;
+                        s[1] = 1;
+                        s[2] = 2;
+                        s[3] = 3;
+                        s[4] = 4;
+                        s[5] = 5;
                     segmentCount = 6;
                     break;
-                }
+                    }
                 case 18: // S
                 {
-                    s[0] = 0; s[1] = 1; s[2] = 3; s[3] = 5; s[4] = 6;
+                    s[0] = 0;
+                        s[1] = 1;
+                        s[2] = 3;
+                        s[3] = 5;
+                        s[4] = 6;
                     segmentCount = 5;
                     break;
-                }
+                    }
                 case 19: // T
                 {
-                    s[0] = 1; s[1] = 3; s[2] = 6;
+                    s[0] = 1;
+                        s[1] = 3;
+                        s[2] = 6;
                     segmentCount = 3;
                     break;
-                }
+                    }
                 case 20: // U
                 {
-                    s[0] = 1; s[1] = 2; s[2] = 4; s[3] = 5; s[4] = 6;
+                    s[0] = 1;
+                        s[1] = 2;
+                        s[2] = 4;
+                        s[3] = 5;
+                        s[4] = 6;
                     segmentCount = 5;
                     break;
-                }
+                    }
                 case 21: // V (kind of approximate)
                 {
-                    s[0] = 1; s[1] = 4; s[2] = 6;
+                    s[0] = 1;
+                        s[1] = 4;
+                        s[2] = 6;
                     segmentCount = 3;
                     break;
-                }
+                    }
                 case 22: // W (kind of approximate)
                 {
-                    s[0] = 1; s[1] = 2; s[2] = 4; s[3] = 5; s[4] = 6;
+                    s[0] = 1;
+                        s[1] = 2;
+                        s[2] = 4;
+                        s[3] = 5;
+                        s[4] = 6;
                     segmentCount = 5;
                     break;
-                }
+                    }
                 case 23: // X
                 {
-                    s[0] = 1; s[1] = 2; s[2] = 3; s[3] = 4; s[4] = 5;
+                    s[0] = 1;
+                        s[1] = 2;
+                        s[2] = 3;
+                        s[3] = 4;
+                        s[4] = 5;
                     segmentCount = 5;
                     break;
-                }
+                    }
                 case 24: // Y
                 {
-                    s[0] = 1; s[1] = 2; s[2] = 3; s[3] = 5; s[4] = 6;
+                    s[0] = 1;
+                        s[1] = 2;
+                        s[2] = 3;
+                        s[3] = 5;
+                        s[4] = 6;
                     segmentCount = 5;
                     break;
-                }
+                    }
                 case 25: // Z
                 {
-                    s[0] = 0; s[1] = 2; s[2] = 3; s[3] = 4; s[4] = 6;
+                    s[0] = 0;
+                        s[1] = 2;
+                        s[2] = 3;
+                        s[3] = 4;
+                        s[4] = 6;
                     segmentCount = 5;
                     break;
-                }
+                    }
                 case 26: // ':' -> 2 short center dots
                 {
-                    s[0] = 7; s[1] = 8;
+                    s[0] = 7;
+                        s[1] = 8;
                     segmentCount = 2;
                     break;
-                }
+                    }
                 case 27: // ' ' -> no segments
                 default:
                 {

@@ -256,7 +256,8 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
             for (var ci = 0; ci < inputPass.colorBufferMaxIndex + 1; ++ci)
             {
                 // Skip unused color slots
-                if (!inputPass.colorBufferAccess[ci].textureHandle.handle.IsValid()) continue;
+                if (!inputPass.colorBufferAccess[ci].textureHandle.handle.IsValid())
+                    continue;
 
                 if (ctx.TryAddToFragmentList(inputPass.colorBufferAccess[ci], ctxPass.firstFragment, ctxPass.numFragments, out errorMessage))
                 {
@@ -293,7 +294,8 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
             for (var ci = 0; ci < inputPass.fragmentInputMaxIndex + 1; ++ci)
             {
                 // Skip unused fragment input slots
-                if (!inputPass.fragmentInputAccess[ci].textureHandle.IsValid()) continue;
+                if (!inputPass.fragmentInputAccess[ci].textureHandle.IsValid())
+                    continue;
 
                 if (ctx.TryAddToFragmentList(inputPass.fragmentInputAccess[ci], ctxPass.firstFragmentInput, ctxPass.numFragmentInputs, out errorMessage))
                 {
@@ -316,7 +318,8 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
                 ref var uav = ref inputPass.randomAccessResource[ci];
 
                 // Skip unused random write slots
-                if (!uav.h.IsValid()) continue;
+                if (!uav.h.IsValid())
+                    continue;
 
                 if (ctx.TryAddToRandomAccessResourceList(uav.h, ci, uav.preserveCounterValue, ctxPass.firstRandomAccessResource, ctxPass.numRandomAccessResources, out errorMessage))
                 {
@@ -498,7 +501,8 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
                 ref var passData = ref ctx.passData.ElementAt(passId);
 
                 // We already found this node through another dependency chain
-                if (!passData.culled) continue;
+                if (!passData.culled)
+                    continue;
 
                 // Flow upstream from this node
                 foreach (ref readonly var input in passData.Inputs(ctx))
@@ -564,11 +568,13 @@ namespace UnityEngine.Rendering.RenderGraphModule.NativeRenderPassCompiler
                     var unusedResource = unusedVersionedResourceIdCullingStack.Pop();
 
                     ref var unusedUnversionedDataRes = ref ctx.resources.unversionedData[type].ElementAt(unusedResource.index);
-                    if (unusedUnversionedDataRes.isImported) continue; // Not always unused as someone can read it outside the graph
+                    if (unusedUnversionedDataRes.isImported)
+                        continue; // Not always unused as someone can read it outside the graph
 
                     ref var unusedVersionedDataRes = ref ctx.resources[unusedResource];
                     ref var producerData = ref ctx.passData.ElementAt(unusedVersionedDataRes.writePassId);
-                    if (producerData.culled) continue; // Producer has been culled already
+                    if (producerData.culled)
+                        continue; // Producer has been culled already
 
                     // Decrement the number of written resources that are used for this pass
                     producerData.tag--;

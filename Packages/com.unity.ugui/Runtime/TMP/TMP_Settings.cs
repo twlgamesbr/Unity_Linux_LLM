@@ -515,7 +515,8 @@ namespace TMPro
         /// <returns></returns>
         public static TMP_Settings GetSettings()
         {
-            if (TMP_Settings.instance == null) return null;
+            if (TMP_Settings.instance == null)
+                return null;
 
             return TMP_Settings.instance;
         }
@@ -527,7 +528,8 @@ namespace TMPro
         /// <returns></returns>
         public static TMP_FontAsset GetFontAsset()
         {
-            if (TMP_Settings.instance == null) return null;
+            if (TMP_Settings.instance == null)
+                return null;
 
             return TMP_Settings.instance.m_defaultFontAsset;
         }
@@ -539,7 +541,8 @@ namespace TMPro
         /// <returns></returns>
         public static TMP_SpriteAsset GetSpriteAsset()
         {
-            if (TMP_Settings.instance == null) return null;
+            if (TMP_Settings.instance == null)
+                return null;
 
             return TMP_Settings.instance.m_defaultSpriteAsset;
         }
@@ -551,7 +554,8 @@ namespace TMPro
         /// <returns></returns>
         public static TMP_StyleSheet GetStyleSheet()
         {
-            if (TMP_Settings.instance == null) return null;
+            if (TMP_Settings.instance == null)
+                return null;
 
             return TMP_Settings.instance.m_defaultStyleSheet;
         }
@@ -561,7 +565,8 @@ namespace TMPro
         {
             //Debug.Log("Loading Line Breaking Rules for Asian Languages.");
 
-            if (instance == null) return;
+            if (instance == null)
+                return;
 
             if (s_Instance.m_linebreakingRules == null)
                 s_Instance.m_linebreakingRules = new LineBreakingTable();

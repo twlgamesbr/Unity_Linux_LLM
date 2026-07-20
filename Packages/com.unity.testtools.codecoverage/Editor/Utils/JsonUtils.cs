@@ -52,7 +52,8 @@ namespace UnityEditor.TestTools.CodeCoverage
                             .Select(keyGroup => keyGroup.Key)
                             .ToArray();
 
-            if (duplicateKeys.Length > 0) return false;
+            if (duplicateKeys.Length > 0)
+                return false;
             return true;
         }
 
@@ -62,7 +63,8 @@ namespace UnityEditor.TestTools.CodeCoverage
                                 .Distinct()
                                 .ToArray();
 
-            if (invalidKeys.Length > 0) return false;
+            if (invalidKeys.Length > 0)
+                return false;
             return true;
         }
     }

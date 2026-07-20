@@ -114,7 +114,8 @@ namespace UnityEditor.UI
         PropertyField PrepareField(VisualElement parent, string propertyPath, bool hideable = true, string label = null)
         {
             var field = new PropertyField(null, label) { bindingPath = propertyPath };
-            if (hideable) field.AddToClassList(kHiddenClass);
+            if (hideable)
+                field.AddToClassList(kHiddenClass);
             parent.Add(field);
             return field;
         }

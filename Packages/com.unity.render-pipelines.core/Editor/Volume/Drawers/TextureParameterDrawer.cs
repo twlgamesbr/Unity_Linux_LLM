@@ -127,15 +127,19 @@ namespace UnityEditor.Rendering
 
         static Delegate validator = TextureParameterHelper.CastValidator((Object[] references, Type objType, SerializedProperty property, int options) =>
         {
-            if (HasGenuineNullSelection(references)) return null;
+            if (HasGenuineNullSelection(references))
+                return null;
 
             // Accept RenderTextures of correct dimensions
             Texture validated = (RenderTexture)TextureParameterHelper.ValidateObjectFieldAssignment(references, typeof(RenderTexture), property, options);
             if (validated != null)
             {
-                if (objType == typeof(Texture2D) && validated.dimension != TextureDimension.Tex2D) validated = null;
-                if (objType == typeof(Texture3D) && validated.dimension != TextureDimension.Tex3D) validated = null;
-                if (objType == typeof(Cubemap)   && validated.dimension != TextureDimension.Cube)  validated = null;
+                if (objType == typeof(Texture2D) && validated.dimension != TextureDimension.Tex2D)
+                    validated = null;
+                if (objType == typeof(Texture3D) && validated.dimension != TextureDimension.Tex3D)
+                    validated = null;
+                if (objType == typeof(Cubemap)   && validated.dimension != TextureDimension.Cube)
+                    validated = null;
             }
             // Accept textures of correct type
             if (validated == null)

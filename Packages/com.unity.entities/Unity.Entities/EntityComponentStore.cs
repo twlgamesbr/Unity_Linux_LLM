@@ -1914,7 +1914,8 @@ namespace Unity.Entities
         internal void AddSharedComponentReference_Unmanaged(int sharedComponentIndex, int numRefs = 1)
         {
             var elementIndex = GetElementIndexFromSharedComponentIndex(sharedComponentIndex);
-            if (elementIndex == 0) return;
+            if (elementIndex == 0)
+                return;
 
             var componentTypeIndex = GetComponentTypeFromSharedComponentIndex(sharedComponentIndex);
             var infos = CheckGetSharedComponentInfo(componentTypeIndex);
@@ -2396,7 +2397,10 @@ namespace Unity.Entities
             public int Length { get { return 256; } set {} }
             public ref long ElementAt(int index)
             {
-                fixed(Ulong16* p = &p00) { return ref UnsafeUtility.AsRef<long>((long*)p + index); }
+                fixed(Ulong16* p = &p00)
+                {
+                    return ref UnsafeUtility.AsRef<long>((long*)p + index);
+                }
             }
         }
 
@@ -2429,7 +2433,10 @@ namespace Unity.Entities
             public int Length { get { return 16384; } set {} }
             public ref long ElementAt(int index)
             {
-                fixed(Ulong4096* p = &p00) { return ref UnsafeUtility.AsRef<long>((long*)p + index); }
+                fixed(Ulong4096* p = &p00)
+                {
+                    return ref UnsafeUtility.AsRef<long>((long*)p + index);
+                }
             }
         }
 #pragma warning restore 169
@@ -2496,7 +2503,8 @@ namespace Unity.Entities
                         int megachunkIndex = (firstMegachunk + offset) & (megachunksInUniverse-1); // index of current megachunk
                         long maskAfterAllocation, oldMask, newMask, readMask = m_chunkInUse.ElementAt(megachunkIndex); // read the mask of which chunks are allocated
                         int chunkInMegachunk; // index of first chunk allocated in current megachunk
-                        do {
+                        do
+                        {
                             oldMask = readMask;
                             if(oldMask == ~0L)
                                 goto NEXT_MEGACHUNK; // can't find any bits, try the next megachunk
@@ -2506,7 +2514,7 @@ namespace Unity.Entities
                             if(oldMask == 0L) // if we're the first to allocate from this megachunk,
                                 newMask = ~0L; // mark the whole megachunk as full (busy) until we're done allocating memory
                             readMask = Interlocked.CompareExchange(ref m_chunkInUse.ElementAt(megachunkIndex), newMask, oldMask);
-                        } while(readMask != oldMask);
+                        } while (readMask != oldMask);
                         int firstChunkIndex = (megachunkIndex << log2ChunksPerMegachunk) + chunkInMegachunk;
                         if(oldMask == 0L) // if we are the first allocation in this chunk...
                         {
@@ -2520,7 +2528,8 @@ namespace Unity.Entities
                             ConcurrentMask.AtomicOr(ref m_megachunkIsFull.ElementAt(megachunkIndex>>6), 1L << (megachunkIndex & 63));
                         value = new ChunkIndex(firstChunkIndex);
                         return kErrorNone;
-                        NEXT_MEGACHUNK:;
+                        NEXT_MEGACHUNK:
+                        ;
                     }
                     actualCount >>= 1;
                 }
@@ -2729,19 +2738,24 @@ namespace Unity.Entities
 
             {
                 short i = (short)count;
-                do dstArchetype->FirstChunkComponent = i;
+                do
+                    dstArchetype->FirstChunkComponent = i;
                 while (types[--i].IsChunkComponent);
                 i++;
-                do dstArchetype->FirstSharedComponent = i;
+                do
+                    dstArchetype->FirstSharedComponent = i;
                 while (types[--i].IsSharedComponent);
                 i++;
-                do dstArchetype->FirstTagComponent = i;
+                do
+                    dstArchetype->FirstTagComponent = i;
                 while (types[--i].IsZeroSized);
                 i++;
-                do dstArchetype->FirstManagedComponent = i;
+                do
+                    dstArchetype->FirstManagedComponent = i;
                 while (types[--i].IsManagedComponent);
                 i++;
-                do dstArchetype->FirstBufferComponent = i;
+                do
+                    dstArchetype->FirstBufferComponent = i;
                 while (types[--i].IsBuffer);
             }
 

@@ -99,12 +99,14 @@ namespace UnityEngine.Rendering.Universal
             var maskCounts = freeMaskCounts;
             while (level >= 0)
             {
-                if (maskCounts[level] > 0) break;
+                if (maskCounts[level] > 0)
+                    break;
                 level--;
             }
 
             // No blocks available.
-            if (level < 0) return false;
+            if (level < 0)
+                return false;
 
             // Split a block at the level we found.
             int dataIndex;
@@ -117,7 +119,8 @@ namespace UnityEngine.Rendering.Universal
                 var bitIndex = math.tzcnt(freeMask);
                 freeMask ^= 1ul << bitIndex;
                 freeMasks[maskIndex] = freeMask;
-                if (freeMask != 0) freeMaskIndices[maskCounts[level]++] = maskIndex;
+                if (freeMask != 0)
+                    freeMaskIndices[maskCounts[level]++] = maskIndex;
                 dataIndex = maskIndex * 64 + bitIndex;
             }
 
@@ -240,7 +243,8 @@ namespace UnityEngine.Rendering.Universal
         static int AlignForward(int offset, int alignment)
         {
             var modulo = offset % alignment;
-            if (modulo != 0) offset += (alignment - modulo);
+            if (modulo != 0)
+                offset += (alignment - modulo);
             return offset;
         }
 

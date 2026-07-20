@@ -47,7 +47,8 @@ namespace TMPro
         /// <param name="fontAsset"></param>
         private void AddFontAssetInternal(TMP_FontAsset fontAsset)
         {
-            if (m_FontAssetReferenceLookup.ContainsKey(fontAsset.hashCode)) return;
+            if (m_FontAssetReferenceLookup.ContainsKey(fontAsset.hashCode))
+                return;
 
             // Add reference to the font asset.
             m_FontAssetReferenceLookup.Add(fontAsset.hashCode, fontAsset);
@@ -75,7 +76,8 @@ namespace TMPro
         /// <param name="spriteAsset"></param>
         private void AddSpriteAssetInternal(TMP_SpriteAsset spriteAsset)
         {
-            if (m_SpriteAssetReferenceLookup.ContainsKey(spriteAsset.hashCode)) return;
+            if (m_SpriteAssetReferenceLookup.ContainsKey(spriteAsset.hashCode))
+                return;
 
             // Add reference to sprite asset.
             m_SpriteAssetReferenceLookup.Add(spriteAsset.hashCode, spriteAsset);
@@ -101,7 +103,8 @@ namespace TMPro
         /// <param name="spriteAsset"></param>
         private void AddSpriteAssetInternal(int hashCode, TMP_SpriteAsset spriteAsset)
         {
-            if (m_SpriteAssetReferenceLookup.ContainsKey(hashCode)) return;
+            if (m_SpriteAssetReferenceLookup.ContainsKey(hashCode))
+                return;
 
             // Add reference to Sprite Asset.
             m_SpriteAssetReferenceLookup.Add(hashCode, spriteAsset);
@@ -155,7 +158,8 @@ namespace TMPro
         /// <param name="spriteAsset"></param>
         private void AddColorGradientPreset_Internal(int hashCode, TMP_ColorGradient spriteAsset)
         {
-            if (m_ColorGradientReferenceLookup.ContainsKey(hashCode)) return;
+            if (m_ColorGradientReferenceLookup.ContainsKey(hashCode))
+                return;
 
             // Add reference to Color Gradient Preset Asset.
             m_ColorGradientReferenceLookup.Add(hashCode, spriteAsset);

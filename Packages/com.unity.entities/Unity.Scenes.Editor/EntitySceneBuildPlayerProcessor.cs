@@ -165,11 +165,13 @@ namespace Unity.Scenes.Editor
             if (buildPlayerContext.BuildPlayerOptions.target == BuildTarget.WebGL)
             {
                 m_IsWebGLBuild = true;
-                if (File.Exists(k_WebGLStreamingAssetFilesManifest)) File.Delete(k_WebGLStreamingAssetFilesManifest); // We'll build the list by appending items one at a time, so clear any old list.
-                else Directory.CreateDirectory(new FileInfo(k_WebGLStreamingAssetFilesManifest).Directory.FullName);
+                if (File.Exists(k_WebGLStreamingAssetFilesManifest))
+                    File.Delete(k_WebGLStreamingAssetFilesManifest); // We'll build the list by appending items one at a time, so clear any old list.
+                else
+                    Directory.CreateDirectory(new FileInfo(k_WebGLStreamingAssetFilesManifest).Directory.FullName);
             }
 
-            if(Directory.Exists(m_BuildWorkingDir))
+            if (Directory.Exists(m_BuildWorkingDir))
                 Directory.Delete(m_BuildWorkingDir, true);
 
             m_BuildPlayerContext = buildPlayerContext;

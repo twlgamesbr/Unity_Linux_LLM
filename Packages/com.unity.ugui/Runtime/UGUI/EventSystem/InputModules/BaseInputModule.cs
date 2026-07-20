@@ -262,13 +262,15 @@ namespace UnityEngine.EventSystems
                     ExecuteEvents.Execute(t.gameObject, currentPointerData, ExecuteEvents.pointerExitHandler);
                     currentPointerData.hovered.Remove(t.gameObject);
 
-                    if (m_SendPointerHoverToParent) t = t.parent;
+                    if (m_SendPointerHoverToParent)
+                        t = t.parent;
 
                     // if we reach the common root break out!
                     if (commonRoot != null && commonRoot.transform == t)
                         break;
 
-                    if (!m_SendPointerHoverToParent) t = t.parent;
+                    if (!m_SendPointerHoverToParent)
+                        t = t.parent;
                 }
             }
 
@@ -294,13 +296,15 @@ namespace UnityEngine.EventSystems
                     if (!m_SendPointerHoverToParent && t.gameObject.GetComponent<IPointerEnterHandler>() != null)
                         break;
 
-                    if (m_SendPointerHoverToParent) t = t.parent;
+                    if (m_SendPointerHoverToParent)
+                        t = t.parent;
 
                     // if we reach the common root break out!
                     if (commonRoot != null && commonRoot.transform == t)
                         break;
 
-                    if (!m_SendPointerHoverToParent) t = t.parent;
+                    if (!m_SendPointerHoverToParent)
+                        t = t.parent;
                 }
             }
         }

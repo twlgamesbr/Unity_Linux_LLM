@@ -361,7 +361,8 @@ namespace Unity.Serialization.Json
                 if (FillBuffers())
                 {
                     // Remap the parent if the internal buffers have shifted.
-                    if (parent >= 0) parent = m_JsonTokenStream.Discard[parent];
+                    if (parent >= 0)
+                        parent = m_JsonTokenStream.Discard[parent];
                 }
 
                 var parserStart = m_NodeParser.TokenNextIndex - 1;
@@ -378,7 +379,7 @@ namespace Unity.Serialization.Json
                 return node == -1 ? default : m_PackedBinaryStream.GetView(GetViewIndex(node, parserStart, writerStart));
             }
         }
-        
+
         int ReadInternalBatch(SerializedValueView* views, int count, NodeType type, int parent)
         {
             var index = 0;
@@ -389,7 +390,8 @@ namespace Unity.Serialization.Json
                 if (FillBuffers())
                 {
                     // Remap the parent if the internal buffers have shifted.
-                    if (parent >= 0) parent = m_JsonTokenStream.Discard[parent];
+                    if (parent >= 0)
+                        parent = m_JsonTokenStream.Discard[parent];
                 }
 
                 var parserStart = m_NodeParser.TokenNextIndex - 1;
@@ -410,7 +412,7 @@ namespace Unity.Serialization.Json
                 return index;
             }
         }
-        
+
         static bool IsEmpty(UnsafeBuffer<char> buffer)
         {
             return buffer.Buffer == null || buffer.Length == 0;

@@ -53,14 +53,22 @@ namespace UnityEngine.Rendering
         /// <param name="clearDepth">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.ClearRenderTarget.html)</param>
         /// <param name="clearColor">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.ClearRenderTarget.html)</param>
         /// <param name="backgroundColor">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.ClearRenderTarget.html)</param>
-        public void ClearRenderTarget(bool clearDepth, bool clearColor, Color backgroundColor)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.ClearRenderTarget(clearDepth, clearColor, backgroundColor); }
+        public void ClearRenderTarget(bool clearDepth, bool clearColor, Color backgroundColor)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.ClearRenderTarget(clearDepth, clearColor, backgroundColor);
+        }
 
         /// <summary>Wraps [ClearRenderTarget](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.ClearRenderTarget.html) on a CommandBuffer.</summary>
         /// <param name="clearDepth">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.ClearRenderTarget.html)</param>
         /// <param name="clearColor">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.ClearRenderTarget.html)</param>
         /// <param name="backgroundColor">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.ClearRenderTarget.html)</param>
         /// <param name="depth">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.ClearRenderTarget.html)</param>
-        public void ClearRenderTarget(bool clearDepth, bool clearColor, Color backgroundColor, float depth)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.ClearRenderTarget(clearDepth, clearColor, backgroundColor, depth); }
+        public void ClearRenderTarget(bool clearDepth, bool clearColor, Color backgroundColor, float depth)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.ClearRenderTarget(clearDepth, clearColor, backgroundColor, depth);
+        }
 
         /// <summary>Wraps [ClearRenderTarget](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.ClearRenderTarget.html) on a CommandBuffer.</summary>
         /// <param name="clearDepth">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.ClearRenderTarget.html)</param>
@@ -68,104 +76,184 @@ namespace UnityEngine.Rendering
         /// <param name="backgroundColor">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.ClearRenderTarget.html)</param>
         /// <param name="depth">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.ClearRenderTarget.html)</param>
         /// <param name="stencil">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.ClearRenderTarget.html)</param>
-        public void ClearRenderTarget(bool clearDepth, bool clearColor, Color backgroundColor, float depth, uint stencil)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.ClearRenderTarget(clearDepth, clearColor, backgroundColor, depth, stencil); }
+        public void ClearRenderTarget(bool clearDepth, bool clearColor, Color backgroundColor, float depth, uint stencil)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.ClearRenderTarget(clearDepth, clearColor, backgroundColor, depth, stencil);
+        }
 
         /// <summary>Wraps [ClearRenderTarget](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.ClearRenderTarget.html) on a CommandBuffer.</summary>
         /// <param name="clearFlags">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.ClearRenderTarget.html)</param>
         /// <param name="backgroundColor">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.ClearRenderTarget.html)</param>
         /// <param name="depth">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.ClearRenderTarget.html)</param>
         /// <param name="stencil">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.ClearRenderTarget.html)</param>
-        public void ClearRenderTarget(RTClearFlags clearFlags, Color backgroundColor, float depth, uint stencil)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.ClearRenderTarget(clearFlags, backgroundColor, depth, stencil); }
+        public void ClearRenderTarget(RTClearFlags clearFlags, Color backgroundColor, float depth, uint stencil)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.ClearRenderTarget(clearFlags, backgroundColor, depth, stencil);
+        }
 
         /// <summary>Wraps [ClearRenderTarget](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.ClearRenderTarget.html) on a CommandBuffer.</summary>
         /// <param name="clearFlags">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.ClearRenderTarget.html)</param>
         /// <param name="backgroundColors">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.ClearRenderTarget.html)</param>
         /// <param name="depth">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.ClearRenderTarget.html)</param>
         /// <param name="stencil">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.ClearRenderTarget.html)</param>
-        public void ClearRenderTarget(RTClearFlags clearFlags, Color[] backgroundColors, float depth, uint stencil)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.ClearRenderTarget(clearFlags, backgroundColors, depth, stencil); }
+        public void ClearRenderTarget(RTClearFlags clearFlags, Color[] backgroundColors, float depth, uint stencil)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.ClearRenderTarget(clearFlags, backgroundColors, depth, stencil);
+        }
 
         /// <summary>Wraps [SetGlobalFloat](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloat.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloat.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloat.html)</param>
-        public void SetGlobalFloat(int nameID, float value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalFloat(nameID, value); }
+        public void SetGlobalFloat(int nameID, float value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalFloat(nameID, value);
+        }
 
         /// <summary>Wraps [SetGlobalInt](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalInt.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalInt.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalInt.html)</param>
-        public void SetGlobalInt(int nameID, int value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalInt(nameID, value); }
+        public void SetGlobalInt(int nameID, int value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalInt(nameID, value);
+        }
 
         /// <summary>Wraps [SetGlobalInteger](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalInteger.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalInteger.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalInteger.html)</param>
-        public void SetGlobalInteger(int nameID, int value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalInteger(nameID, value); }
+        public void SetGlobalInteger(int nameID, int value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalInteger(nameID, value);
+        }
 
         /// <summary>Wraps [SetGlobalVector](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVector.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVector.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVector.html)</param>
-        public void SetGlobalVector(int nameID, Vector4 value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalVector(nameID, value); }
+        public void SetGlobalVector(int nameID, Vector4 value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalVector(nameID, value);
+        }
 
         /// <summary>Wraps [SetGlobalColor](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalColor.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalColor.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalColor.html)</param>
-        public void SetGlobalColor(int nameID, Color value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalColor(nameID, value); }
+        public void SetGlobalColor(int nameID, Color value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalColor(nameID, value);
+        }
 
         /// <summary>Wraps [SetGlobalMatrix](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrix.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrix.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrix.html)</param>
-        public void SetGlobalMatrix(int nameID, Matrix4x4 value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalMatrix(nameID, value); }
+        public void SetGlobalMatrix(int nameID, Matrix4x4 value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalMatrix(nameID, value);
+        }
 
         /// <summary>Wraps [EnableShaderKeyword](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.EnableShaderKeyword.html) on a CommandBuffer.</summary>
         /// <param name="keyword">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.EnableShaderKeyword.html)</param>
-        public void EnableShaderKeyword(string keyword)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.EnableShaderKeyword(keyword); }
+        public void EnableShaderKeyword(string keyword)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.EnableShaderKeyword(keyword);
+        }
 
         /// <summary>Wraps [EnableKeyword](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.EnableKeyword.html) on a CommandBuffer.</summary>
         /// <param name="keyword">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.EnableKeyword.html)</param>
-        public void EnableKeyword(in GlobalKeyword keyword)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.EnableKeyword(keyword); }
+        public void EnableKeyword(in GlobalKeyword keyword)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.EnableKeyword(keyword);
+        }
 
         /// <summary>Wraps [EnableKeyword](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.EnableKeyword.html) on a CommandBuffer.</summary>
         /// <param name="material">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.EnableKeyword.html)</param>
         /// <param name="keyword">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.EnableKeyword.html)</param>
-        public void EnableKeyword(Material material, in LocalKeyword keyword)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.EnableKeyword(material, keyword); }
+        public void EnableKeyword(Material material, in LocalKeyword keyword)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.EnableKeyword(material, keyword);
+        }
 
         /// <summary>Wraps [EnableKeyword](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.EnableKeyword.html) on a CommandBuffer.</summary>
         /// <param name="computeShader">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.EnableKeyword.html)</param>
         /// <param name="keyword">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.EnableKeyword.html)</param>
-        public void EnableKeyword(ComputeShader computeShader, in LocalKeyword keyword)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.EnableKeyword(computeShader, keyword); }
+        public void EnableKeyword(ComputeShader computeShader, in LocalKeyword keyword)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.EnableKeyword(computeShader, keyword);
+        }
 
         /// <summary>Wraps [DisableShaderKeyword](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DisableShaderKeyword.html) on a CommandBuffer.</summary>
         /// <param name="keyword">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DisableShaderKeyword.html)</param>
-        public void DisableShaderKeyword(string keyword)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.DisableShaderKeyword(keyword); }
+        public void DisableShaderKeyword(string keyword)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.DisableShaderKeyword(keyword);
+        }
 
         /// <summary>Wraps [DisableKeyword](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DisableKeyword.html) on a CommandBuffer.</summary>
         /// <param name="keyword">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DisableKeyword.html)</param>
-        public void DisableKeyword(in GlobalKeyword keyword)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.DisableKeyword(keyword); }
+        public void DisableKeyword(in GlobalKeyword keyword)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.DisableKeyword(keyword);
+        }
 
         /// <summary>Wraps [DisableKeyword](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DisableKeyword.html) on a CommandBuffer.</summary>
         /// <param name="material">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DisableKeyword.html)</param>
         /// <param name="keyword">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DisableKeyword.html)</param>
-        public void DisableKeyword(Material material, in LocalKeyword keyword)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.DisableKeyword(material, keyword); }
+        public void DisableKeyword(Material material, in LocalKeyword keyword)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.DisableKeyword(material, keyword);
+        }
 
         /// <summary>Wraps [DisableKeyword](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DisableKeyword.html) on a CommandBuffer.</summary>
         /// <param name="computeShader">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DisableKeyword.html)</param>
         /// <param name="keyword">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DisableKeyword.html)</param>
-        public void DisableKeyword(ComputeShader computeShader, in LocalKeyword keyword)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.DisableKeyword(computeShader, keyword); }
+        public void DisableKeyword(ComputeShader computeShader, in LocalKeyword keyword)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.DisableKeyword(computeShader, keyword);
+        }
 
         /// <summary>Wraps [SetKeyword](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetKeyword.html) on a CommandBuffer.</summary>
         /// <param name="keyword">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetKeyword.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetKeyword.html)</param>
-        public void SetKeyword(in GlobalKeyword keyword, bool value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetKeyword(keyword, value); }
+        public void SetKeyword(in GlobalKeyword keyword, bool value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetKeyword(keyword, value);
+        }
 
         /// <summary>Wraps [SetKeyword](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetKeyword.html) on a CommandBuffer.</summary>
         /// <param name="material">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetKeyword.html)</param>
         /// <param name="keyword">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetKeyword.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetKeyword.html)</param>
-        public void SetKeyword(Material material, in LocalKeyword keyword, bool value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetKeyword(material, keyword, value); }
+        public void SetKeyword(Material material, in LocalKeyword keyword, bool value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetKeyword(material, keyword, value);
+        }
 
         /// <summary>Wraps [SetKeyword](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetKeyword.html) on a CommandBuffer.</summary>
         /// <param name="computeShader">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetKeyword.html)</param>
         /// <param name="keyword">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetKeyword.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetKeyword.html)</param>
-        public void SetKeyword(ComputeShader computeShader, in LocalKeyword keyword, bool value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetKeyword(computeShader, keyword, value); }
+        public void SetKeyword(ComputeShader computeShader, in LocalKeyword keyword, bool value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetKeyword(computeShader, keyword, value);
+        }
 
         /// <summary>Wraps [SetViewProjectionMatrices](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetViewProjectionMatrices.html) on a CommandBuffer.</summary>
         /// <param name="view">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetViewProjectionMatrices.html)</param>
@@ -180,17 +268,29 @@ namespace UnityEngine.Rendering
         /// <summary>Wraps [SetGlobalFloatArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloatArray.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloatArray.html)</param>
         /// <param name="values">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloatArray.html)</param>
-        public void SetGlobalFloatArray(int nameID, float[] values)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalFloatArray(nameID, values); }
+        public void SetGlobalFloatArray(int nameID, float[] values)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalFloatArray(nameID, values);
+        }
 
         /// <summary>Wraps [SetGlobalVectorArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVectorArray.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVectorArray.html)</param>
         /// <param name="values">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVectorArray.html)</param>
-        public void SetGlobalVectorArray(int nameID, Vector4[] values)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalVectorArray(nameID, values); }
+        public void SetGlobalVectorArray(int nameID, Vector4[] values)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalVectorArray(nameID, values);
+        }
 
         /// <summary>Wraps [SetGlobalMatrixArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrixArray.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrixArray.html)</param>
         /// <param name="values">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrixArray.html)</param>
-        public void SetGlobalMatrixArray(int nameID, Matrix4x4[] values)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalMatrixArray(nameID, values); }
+        public void SetGlobalMatrixArray(int nameID, Matrix4x4[] values)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalMatrixArray(nameID, values);
+        }
 
         /// <summary>Wraps [SetLateLatchProjectionMatrices](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetLateLatchProjectionMatrices.html) on a CommandBuffer.</summary>
         /// <param name="projectionMat">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetLateLatchProjectionMatrices.html)</param>
@@ -235,19 +335,35 @@ namespace UnityEngine.Rendering
 
         /// <summary>Wraps [SetInstanceMultiplier](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetInstanceMultiplier.html) on a CommandBuffer.</summary>
         /// <param name="multiplier">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetInstanceMultiplier.html)</param>
-        public void SetInstanceMultiplier(uint multiplier)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetInstanceMultiplier(multiplier); }
+        public void SetInstanceMultiplier(uint multiplier)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetInstanceMultiplier(multiplier);
+        }
 
         /// <summary>Wraps [SetFoveatedRenderingMode](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetFoveatedRenderingMode.html) on a CommandBuffer.</summary>
         /// <param name="foveatedRenderingMode">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetFoveatedRenderingMode.html)</param>
-        public void SetFoveatedRenderingMode(FoveatedRenderingMode foveatedRenderingMode)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetFoveatedRenderingMode(foveatedRenderingMode); }
+        public void SetFoveatedRenderingMode(FoveatedRenderingMode foveatedRenderingMode)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetFoveatedRenderingMode(foveatedRenderingMode);
+        }
 
         /// <summary>Wraps [SetWireframe](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetWireframe.html) on a CommandBuffer.</summary>
         /// <param name="enable">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetWireframe.html)</param>
-        public void SetWireframe(bool enable)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetWireframe(enable); }
+        public void SetWireframe(bool enable)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetWireframe(enable);
+        }
 
         /// <summary>Wraps [ConfigureFoveatedRendering](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.ConfigureFoveatedRendering.html) on a CommandBuffer.</summary>
         /// <param name="platformData">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.ConfigureFoveatedRendering.html)</param>
-        public void ConfigureFoveatedRendering(IntPtr platformData)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.ConfigureFoveatedRendering(platformData); }
+        public void ConfigureFoveatedRendering(IntPtr platformData)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.ConfigureFoveatedRendering(platformData);
+        }
 
         /// <summary>Wraps [SetupCameraProperties](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetupCameraProperties.html) on a CommandBuffer.</summary>
         /// <param name="camera">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetupCameraProperties.html)</param>
@@ -273,7 +389,11 @@ namespace UnityEngine.Rendering
         /// <param name="submeshIndex">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMesh.html)</param>
         /// <param name="shaderPass">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMesh.html)</param>
         /// <param name="properties">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMesh.html)</param>
-        public void DrawMesh(Mesh mesh, Matrix4x4 matrix, Material material, int submeshIndex, int shaderPass, MaterialPropertyBlock properties)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawMesh(mesh, matrix, material, submeshIndex, shaderPass, properties); }
+        public void DrawMesh(Mesh mesh, Matrix4x4 matrix, Material material, int submeshIndex, int shaderPass, MaterialPropertyBlock properties)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawMesh(mesh, matrix, material, submeshIndex, shaderPass, properties);
+        }
 
         /// <summary>Wraps [DrawMesh](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMesh.html) on a CommandBuffer.</summary>
         /// <param name="mesh">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMesh.html)</param>
@@ -281,20 +401,32 @@ namespace UnityEngine.Rendering
         /// <param name="material">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMesh.html)</param>
         /// <param name="submeshIndex">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMesh.html)</param>
         /// <param name="shaderPass">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMesh.html)</param>
-        public void DrawMesh(Mesh mesh, Matrix4x4 matrix, Material material, int submeshIndex, int shaderPass)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawMesh(mesh, matrix, material, submeshIndex, shaderPass); }
+        public void DrawMesh(Mesh mesh, Matrix4x4 matrix, Material material, int submeshIndex, int shaderPass)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawMesh(mesh, matrix, material, submeshIndex, shaderPass);
+        }
 
         /// <summary>Wraps [DrawMesh](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMesh.html) on a CommandBuffer.</summary>
         /// <param name="mesh">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMesh.html)</param>
         /// <param name="matrix">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMesh.html)</param>
         /// <param name="material">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMesh.html)</param>
         /// <param name="submeshIndex">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMesh.html)</param>
-        public void DrawMesh(Mesh mesh, Matrix4x4 matrix, Material material, int submeshIndex)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawMesh(mesh, matrix, material, submeshIndex); }
+        public void DrawMesh(Mesh mesh, Matrix4x4 matrix, Material material, int submeshIndex)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawMesh(mesh, matrix, material, submeshIndex);
+        }
 
         /// <summary>Wraps [DrawMesh](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMesh.html) on a CommandBuffer.</summary>
         /// <param name="mesh">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMesh.html)</param>
         /// <param name="matrix">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMesh.html)</param>
         /// <param name="material">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMesh.html)</param>
-        public void DrawMesh(Mesh mesh, Matrix4x4 matrix, Material material)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawMesh(mesh, matrix, material); }
+        public void DrawMesh(Mesh mesh, Matrix4x4 matrix, Material material)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawMesh(mesh, matrix, material);
+        }
 
         /// <summary>Wraps [DrawMultipleMeshes](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMultipleMeshes.html) on a CommandBuffer.</summary>
         /// <param name="matrices">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMultipleMeshes.html)</param>
@@ -304,29 +436,49 @@ namespace UnityEngine.Rendering
         /// <param name="material">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMultipleMeshes.html)</param>
         /// <param name="shaderPass">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMultipleMeshes.html)</param>
         /// <param name="properties">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMultipleMeshes.html)</param>
-        public void DrawMultipleMeshes(Matrix4x4[] matrices, Mesh[] meshes, int[] subsetIndices, int count, Material material, int shaderPass, MaterialPropertyBlock properties)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawMultipleMeshes(matrices, meshes, subsetIndices, count, material, shaderPass, properties); }
+        public void DrawMultipleMeshes(Matrix4x4[] matrices, Mesh[] meshes, int[] subsetIndices, int count, Material material, int shaderPass, MaterialPropertyBlock properties)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawMultipleMeshes(matrices, meshes, subsetIndices, count, material, shaderPass, properties);
+        }
 
         /// <summary>Wraps [DrawRenderer](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawRenderer.html) on a CommandBuffer.</summary>
         /// <param name="renderer">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawRenderer.html)</param>
         /// <param name="material">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawRenderer.html)</param>
         /// <param name="submeshIndex">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawRenderer.html)</param>
         /// <param name="shaderPass">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawRenderer.html)</param>
-        public void DrawRenderer(Renderer renderer, Material material, int submeshIndex, int shaderPass)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawRenderer(renderer, material, submeshIndex, shaderPass); }
+        public void DrawRenderer(Renderer renderer, Material material, int submeshIndex, int shaderPass)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawRenderer(renderer, material, submeshIndex, shaderPass);
+        }
 
         /// <summary>Wraps [DrawRenderer](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawRenderer.html) on a CommandBuffer.</summary>
         /// <param name="renderer">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawRenderer.html)</param>
         /// <param name="material">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawRenderer.html)</param>
         /// <param name="submeshIndex">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawRenderer.html)</param>
-        public void DrawRenderer(Renderer renderer, Material material, int submeshIndex)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawRenderer(renderer, material, submeshIndex); }
+        public void DrawRenderer(Renderer renderer, Material material, int submeshIndex)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawRenderer(renderer, material, submeshIndex);
+        }
 
         /// <summary>Wraps [DrawRenderer](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawRenderer.html) on a CommandBuffer.</summary>
         /// <param name="renderer">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawRenderer.html)</param>
         /// <param name="material">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawRenderer.html)</param>
-        public void DrawRenderer(Renderer renderer, Material material)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawRenderer(renderer, material); }
+        public void DrawRenderer(Renderer renderer, Material material)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawRenderer(renderer, material);
+        }
 
         /// <summary>Wraps [DrawRendererList](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawRendererList.html) on a CommandBuffer.</summary>
         /// <param name="rendererList">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawRendererList.html)</param>
-        public void DrawRendererList(RendererList rendererList)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawRendererList(rendererList); }
+        public void DrawRendererList(RendererList rendererList)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawRendererList(rendererList);
+        }
 
         /// <summary>Wraps [DrawProcedural](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html) on a CommandBuffer.</summary>
         /// <param name="matrix">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html)</param>
@@ -336,7 +488,11 @@ namespace UnityEngine.Rendering
         /// <param name="vertexCount">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html)</param>
         /// <param name="instanceCount">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html)</param>
         /// <param name="properties">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html)</param>
-        public void DrawProcedural(Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, int vertexCount, int instanceCount, MaterialPropertyBlock properties)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawProcedural(matrix, material, shaderPass, topology, vertexCount, instanceCount, properties); }
+        public void DrawProcedural(Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, int vertexCount, int instanceCount, MaterialPropertyBlock properties)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawProcedural(matrix, material, shaderPass, topology, vertexCount, instanceCount, properties);
+        }
 
         /// <summary>Wraps [DrawProcedural](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html) on a CommandBuffer.</summary>
         /// <param name="matrix">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html)</param>
@@ -345,7 +501,11 @@ namespace UnityEngine.Rendering
         /// <param name="topology">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html)</param>
         /// <param name="vertexCount">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html)</param>
         /// <param name="instanceCount">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html)</param>
-        public void DrawProcedural(Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, int vertexCount, int instanceCount)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawProcedural(matrix, material, shaderPass, topology, vertexCount, instanceCount); }
+        public void DrawProcedural(Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, int vertexCount, int instanceCount)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawProcedural(matrix, material, shaderPass, topology, vertexCount, instanceCount);
+        }
 
         /// <summary>Wraps [DrawProcedural](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html) on a CommandBuffer.</summary>
         /// <param name="matrix">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html)</param>
@@ -353,7 +513,11 @@ namespace UnityEngine.Rendering
         /// <param name="shaderPass">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html)</param>
         /// <param name="topology">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html)</param>
         /// <param name="vertexCount">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html)</param>
-        public void DrawProcedural(Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, int vertexCount)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawProcedural(matrix, material, shaderPass, topology, vertexCount); }
+        public void DrawProcedural(Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, int vertexCount)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawProcedural(matrix, material, shaderPass, topology, vertexCount);
+        }
 
         /// <summary>Wraps [DrawProcedural](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html) on a CommandBuffer.</summary>
         /// <param name="indexBuffer">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html)</param>
@@ -364,7 +528,11 @@ namespace UnityEngine.Rendering
         /// <param name="indexCount">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html)</param>
         /// <param name="instanceCount">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html)</param>
         /// <param name="properties">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html)</param>
-        public void DrawProcedural(GraphicsBuffer indexBuffer, Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, int indexCount, int instanceCount, MaterialPropertyBlock properties)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawProcedural(indexBuffer, matrix, material, shaderPass, topology, indexCount, instanceCount, properties); }
+        public void DrawProcedural(GraphicsBuffer indexBuffer, Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, int indexCount, int instanceCount, MaterialPropertyBlock properties)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawProcedural(indexBuffer, matrix, material, shaderPass, topology, indexCount, instanceCount, properties);
+        }
 
         /// <summary>Wraps [DrawProcedural](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html) on a CommandBuffer.</summary>
         /// <param name="indexBuffer">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html)</param>
@@ -374,7 +542,11 @@ namespace UnityEngine.Rendering
         /// <param name="topology">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html)</param>
         /// <param name="indexCount">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html)</param>
         /// <param name="instanceCount">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html)</param>
-        public void DrawProcedural(GraphicsBuffer indexBuffer, Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, int indexCount, int instanceCount)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawProcedural(indexBuffer, matrix, material, shaderPass, topology, indexCount, instanceCount); }
+        public void DrawProcedural(GraphicsBuffer indexBuffer, Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, int indexCount, int instanceCount)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawProcedural(indexBuffer, matrix, material, shaderPass, topology, indexCount, instanceCount);
+        }
 
         /// <summary>Wraps [DrawProcedural](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html) on a CommandBuffer.</summary>
         /// <param name="indexBuffer">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html)</param>
@@ -383,7 +555,11 @@ namespace UnityEngine.Rendering
         /// <param name="shaderPass">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html)</param>
         /// <param name="topology">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html)</param>
         /// <param name="indexCount">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProcedural.html)</param>
-        public void DrawProcedural(GraphicsBuffer indexBuffer, Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, int indexCount)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawProcedural(indexBuffer, matrix, material, shaderPass, topology, indexCount); }
+        public void DrawProcedural(GraphicsBuffer indexBuffer, Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, int indexCount)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawProcedural(indexBuffer, matrix, material, shaderPass, topology, indexCount);
+        }
 
         /// <summary>Wraps [DrawProceduralIndirect](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html) on a CommandBuffer.</summary>
         /// <param name="matrix">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
@@ -393,7 +569,11 @@ namespace UnityEngine.Rendering
         /// <param name="bufferWithArgs">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
         /// <param name="argsOffset">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
         /// <param name="properties">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        public void DrawProceduralIndirect(Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, ComputeBuffer bufferWithArgs, int argsOffset, MaterialPropertyBlock properties)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawProceduralIndirect(matrix, material, shaderPass, topology, bufferWithArgs, argsOffset, properties); }
+        public void DrawProceduralIndirect(Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, ComputeBuffer bufferWithArgs, int argsOffset, MaterialPropertyBlock properties)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawProceduralIndirect(matrix, material, shaderPass, topology, bufferWithArgs, argsOffset, properties);
+        }
 
         /// <summary>Wraps [DrawProceduralIndirect](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html) on a CommandBuffer.</summary>
         /// <param name="matrix">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
@@ -402,7 +582,11 @@ namespace UnityEngine.Rendering
         /// <param name="topology">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
         /// <param name="bufferWithArgs">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
         /// <param name="argsOffset">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        public void DrawProceduralIndirect(Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, ComputeBuffer bufferWithArgs, int argsOffset)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawProceduralIndirect(matrix, material, shaderPass, topology, bufferWithArgs, argsOffset); }
+        public void DrawProceduralIndirect(Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, ComputeBuffer bufferWithArgs, int argsOffset)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawProceduralIndirect(matrix, material, shaderPass, topology, bufferWithArgs, argsOffset);
+        }
 
         /// <summary>Wraps [DrawProceduralIndirect](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html) on a CommandBuffer.</summary>
         /// <param name="matrix">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
@@ -410,64 +594,11 @@ namespace UnityEngine.Rendering
         /// <param name="shaderPass">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
         /// <param name="topology">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
         /// <param name="bufferWithArgs">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        public void DrawProceduralIndirect(Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, ComputeBuffer bufferWithArgs)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawProceduralIndirect(matrix, material, shaderPass, topology, bufferWithArgs); }
-
-        /// <summary>Wraps [DrawProceduralIndirect](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html) on a CommandBuffer.</summary>
-        /// <param name="indexBuffer">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="matrix">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="material">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="shaderPass">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="topology">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="bufferWithArgs">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="argsOffset">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="properties">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        public void DrawProceduralIndirect(GraphicsBuffer indexBuffer, Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, ComputeBuffer bufferWithArgs, int argsOffset, MaterialPropertyBlock properties)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawProceduralIndirect(indexBuffer, matrix, material, shaderPass, topology, bufferWithArgs, argsOffset, properties); }
-
-        /// <summary>Wraps [DrawProceduralIndirect](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html) on a CommandBuffer.</summary>
-        /// <param name="indexBuffer">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="matrix">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="material">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="shaderPass">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="topology">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="bufferWithArgs">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="argsOffset">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        public void DrawProceduralIndirect(GraphicsBuffer indexBuffer, Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, ComputeBuffer bufferWithArgs, int argsOffset)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawProceduralIndirect(indexBuffer, matrix, material, shaderPass, topology, bufferWithArgs, argsOffset); }
-
-        /// <summary>Wraps [DrawProceduralIndirect](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html) on a CommandBuffer.</summary>
-        /// <param name="indexBuffer">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="matrix">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="material">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="shaderPass">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="topology">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="bufferWithArgs">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        public void DrawProceduralIndirect(GraphicsBuffer indexBuffer, Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, ComputeBuffer bufferWithArgs)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawProceduralIndirect(indexBuffer, matrix, material, shaderPass, topology, bufferWithArgs); }
-
-        /// <summary>Wraps [DrawProceduralIndirect](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html) on a CommandBuffer.</summary>
-        /// <param name="matrix">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="material">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="shaderPass">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="topology">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="bufferWithArgs">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="argsOffset">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="properties">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        public void DrawProceduralIndirect(Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, GraphicsBuffer bufferWithArgs, int argsOffset, MaterialPropertyBlock properties)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawProceduralIndirect(matrix, material, shaderPass, topology, bufferWithArgs, argsOffset, properties); }
-
-        /// <summary>Wraps [DrawProceduralIndirect](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html) on a CommandBuffer.</summary>
-        /// <param name="matrix">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="material">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="shaderPass">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="topology">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="bufferWithArgs">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="argsOffset">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        public void DrawProceduralIndirect(Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, GraphicsBuffer bufferWithArgs, int argsOffset)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawProceduralIndirect(matrix, material, shaderPass, topology, bufferWithArgs, argsOffset); }
-
-        /// <summary>Wraps [DrawProceduralIndirect](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html) on a CommandBuffer.</summary>
-        /// <param name="matrix">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="material">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="shaderPass">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="topology">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        /// <param name="bufferWithArgs">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        public void DrawProceduralIndirect(Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, GraphicsBuffer bufferWithArgs)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawProceduralIndirect(matrix, material, shaderPass, topology, bufferWithArgs); }
+        public void DrawProceduralIndirect(Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, ComputeBuffer bufferWithArgs)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawProceduralIndirect(matrix, material, shaderPass, topology, bufferWithArgs);
+        }
 
         /// <summary>Wraps [DrawProceduralIndirect](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html) on a CommandBuffer.</summary>
         /// <param name="indexBuffer">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
@@ -478,7 +609,11 @@ namespace UnityEngine.Rendering
         /// <param name="bufferWithArgs">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
         /// <param name="argsOffset">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
         /// <param name="properties">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        public void DrawProceduralIndirect(GraphicsBuffer indexBuffer, Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, GraphicsBuffer bufferWithArgs, int argsOffset, MaterialPropertyBlock properties)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawProceduralIndirect(indexBuffer, matrix, material, shaderPass, topology, bufferWithArgs, argsOffset, properties); }
+        public void DrawProceduralIndirect(GraphicsBuffer indexBuffer, Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, ComputeBuffer bufferWithArgs, int argsOffset, MaterialPropertyBlock properties)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawProceduralIndirect(indexBuffer, matrix, material, shaderPass, topology, bufferWithArgs, argsOffset, properties);
+        }
 
         /// <summary>Wraps [DrawProceduralIndirect](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html) on a CommandBuffer.</summary>
         /// <param name="indexBuffer">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
@@ -488,7 +623,11 @@ namespace UnityEngine.Rendering
         /// <param name="topology">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
         /// <param name="bufferWithArgs">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
         /// <param name="argsOffset">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        public void DrawProceduralIndirect(GraphicsBuffer indexBuffer, Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, GraphicsBuffer bufferWithArgs, int argsOffset)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawProceduralIndirect(indexBuffer, matrix, material, shaderPass, topology, bufferWithArgs, argsOffset); }
+        public void DrawProceduralIndirect(GraphicsBuffer indexBuffer, Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, ComputeBuffer bufferWithArgs, int argsOffset)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawProceduralIndirect(indexBuffer, matrix, material, shaderPass, topology, bufferWithArgs, argsOffset);
+        }
 
         /// <summary>Wraps [DrawProceduralIndirect](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html) on a CommandBuffer.</summary>
         /// <param name="indexBuffer">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
@@ -497,7 +636,92 @@ namespace UnityEngine.Rendering
         /// <param name="shaderPass">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
         /// <param name="topology">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
         /// <param name="bufferWithArgs">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
-        public void DrawProceduralIndirect(GraphicsBuffer indexBuffer, Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, GraphicsBuffer bufferWithArgs)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawProceduralIndirect(indexBuffer, matrix, material, shaderPass, topology, bufferWithArgs); }
+        public void DrawProceduralIndirect(GraphicsBuffer indexBuffer, Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, ComputeBuffer bufferWithArgs)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawProceduralIndirect(indexBuffer, matrix, material, shaderPass, topology, bufferWithArgs);
+        }
+
+        /// <summary>Wraps [DrawProceduralIndirect](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html) on a CommandBuffer.</summary>
+        /// <param name="matrix">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="material">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="shaderPass">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="topology">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="bufferWithArgs">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="argsOffset">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="properties">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        public void DrawProceduralIndirect(Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, GraphicsBuffer bufferWithArgs, int argsOffset, MaterialPropertyBlock properties)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawProceduralIndirect(matrix, material, shaderPass, topology, bufferWithArgs, argsOffset, properties);
+        }
+
+        /// <summary>Wraps [DrawProceduralIndirect](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html) on a CommandBuffer.</summary>
+        /// <param name="matrix">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="material">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="shaderPass">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="topology">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="bufferWithArgs">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="argsOffset">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        public void DrawProceduralIndirect(Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, GraphicsBuffer bufferWithArgs, int argsOffset)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawProceduralIndirect(matrix, material, shaderPass, topology, bufferWithArgs, argsOffset);
+        }
+
+        /// <summary>Wraps [DrawProceduralIndirect](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html) on a CommandBuffer.</summary>
+        /// <param name="matrix">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="material">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="shaderPass">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="topology">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="bufferWithArgs">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        public void DrawProceduralIndirect(Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, GraphicsBuffer bufferWithArgs)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawProceduralIndirect(matrix, material, shaderPass, topology, bufferWithArgs);
+        }
+
+        /// <summary>Wraps [DrawProceduralIndirect](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html) on a CommandBuffer.</summary>
+        /// <param name="indexBuffer">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="matrix">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="material">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="shaderPass">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="topology">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="bufferWithArgs">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="argsOffset">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="properties">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        public void DrawProceduralIndirect(GraphicsBuffer indexBuffer, Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, GraphicsBuffer bufferWithArgs, int argsOffset, MaterialPropertyBlock properties)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawProceduralIndirect(indexBuffer, matrix, material, shaderPass, topology, bufferWithArgs, argsOffset, properties);
+        }
+
+        /// <summary>Wraps [DrawProceduralIndirect](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html) on a CommandBuffer.</summary>
+        /// <param name="indexBuffer">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="matrix">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="material">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="shaderPass">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="topology">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="bufferWithArgs">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="argsOffset">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        public void DrawProceduralIndirect(GraphicsBuffer indexBuffer, Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, GraphicsBuffer bufferWithArgs, int argsOffset)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawProceduralIndirect(indexBuffer, matrix, material, shaderPass, topology, bufferWithArgs, argsOffset);
+        }
+
+        /// <summary>Wraps [DrawProceduralIndirect](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html) on a CommandBuffer.</summary>
+        /// <param name="indexBuffer">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="matrix">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="material">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="shaderPass">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="topology">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        /// <param name="bufferWithArgs">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawProceduralIndirect.html)</param>
+        public void DrawProceduralIndirect(GraphicsBuffer indexBuffer, Matrix4x4 matrix, Material material, int shaderPass, MeshTopology topology, GraphicsBuffer bufferWithArgs)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawProceduralIndirect(indexBuffer, matrix, material, shaderPass, topology, bufferWithArgs);
+        }
 
         /// <summary>Wraps [DrawMeshInstanced](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstanced.html) on a CommandBuffer.</summary>
         /// <param name="mesh">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstanced.html)</param>
@@ -507,7 +731,11 @@ namespace UnityEngine.Rendering
         /// <param name="matrices">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstanced.html)</param>
         /// <param name="count">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstanced.html)</param>
         /// <param name="properties">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstanced.html)</param>
-        public void DrawMeshInstanced(Mesh mesh, int submeshIndex, Material material, int shaderPass, Matrix4x4[] matrices, int count, MaterialPropertyBlock properties)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawMeshInstanced(mesh, submeshIndex, material, shaderPass, matrices, count, properties); }
+        public void DrawMeshInstanced(Mesh mesh, int submeshIndex, Material material, int shaderPass, Matrix4x4[] matrices, int count, MaterialPropertyBlock properties)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawMeshInstanced(mesh, submeshIndex, material, shaderPass, matrices, count, properties);
+        }
 
         /// <summary>Wraps [DrawMeshInstanced](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstanced.html) on a CommandBuffer.</summary>
         /// <param name="mesh">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstanced.html)</param>
@@ -516,7 +744,11 @@ namespace UnityEngine.Rendering
         /// <param name="shaderPass">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstanced.html)</param>
         /// <param name="matrices">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstanced.html)</param>
         /// <param name="count">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstanced.html)</param>
-        public void DrawMeshInstanced(Mesh mesh, int submeshIndex, Material material, int shaderPass, Matrix4x4[] matrices, int count)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawMeshInstanced(mesh, submeshIndex, material, shaderPass, matrices, count); }
+        public void DrawMeshInstanced(Mesh mesh, int submeshIndex, Material material, int shaderPass, Matrix4x4[] matrices, int count)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawMeshInstanced(mesh, submeshIndex, material, shaderPass, matrices, count);
+        }
 
         /// <summary>Wraps [DrawMeshInstanced](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstanced.html) on a CommandBuffer.</summary>
         /// <param name="mesh">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstanced.html)</param>
@@ -524,7 +756,11 @@ namespace UnityEngine.Rendering
         /// <param name="material">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstanced.html)</param>
         /// <param name="shaderPass">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstanced.html)</param>
         /// <param name="matrices">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstanced.html)</param>
-        public void DrawMeshInstanced(Mesh mesh, int submeshIndex, Material material, int shaderPass, Matrix4x4[] matrices)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawMeshInstanced(mesh, submeshIndex, material, shaderPass, matrices); }
+        public void DrawMeshInstanced(Mesh mesh, int submeshIndex, Material material, int shaderPass, Matrix4x4[] matrices)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawMeshInstanced(mesh, submeshIndex, material, shaderPass, matrices);
+        }
 
         /// <summary>Wraps [DrawMeshInstancedProcedural](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedProcedural.html) on a CommandBuffer.</summary>
         /// <param name="mesh">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedProcedural.html)</param>
@@ -533,7 +769,11 @@ namespace UnityEngine.Rendering
         /// <param name="shaderPass">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedProcedural.html)</param>
         /// <param name="count">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedProcedural.html)</param>
         /// <param name="properties">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedProcedural.html)</param>
-        public void DrawMeshInstancedProcedural(Mesh mesh, int submeshIndex, Material material, int shaderPass, int count, MaterialPropertyBlock properties)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawMeshInstancedProcedural(mesh, submeshIndex, material, shaderPass, count, properties); }
+        public void DrawMeshInstancedProcedural(Mesh mesh, int submeshIndex, Material material, int shaderPass, int count, MaterialPropertyBlock properties)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawMeshInstancedProcedural(mesh, submeshIndex, material, shaderPass, count, properties);
+        }
 
         /// <summary>Wraps [DrawMeshInstancedIndirect](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedIndirect.html) on a CommandBuffer.</summary>
         /// <param name="mesh">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedIndirect.html)</param>
@@ -543,7 +783,11 @@ namespace UnityEngine.Rendering
         /// <param name="bufferWithArgs">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedIndirect.html)</param>
         /// <param name="argsOffset">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedIndirect.html)</param>
         /// <param name="properties">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedIndirect.html)</param>
-        public void DrawMeshInstancedIndirect(Mesh mesh, int submeshIndex, Material material, int shaderPass, ComputeBuffer bufferWithArgs, int argsOffset, MaterialPropertyBlock properties)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawMeshInstancedIndirect(mesh, submeshIndex, material, shaderPass, bufferWithArgs, argsOffset, properties); }
+        public void DrawMeshInstancedIndirect(Mesh mesh, int submeshIndex, Material material, int shaderPass, ComputeBuffer bufferWithArgs, int argsOffset, MaterialPropertyBlock properties)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawMeshInstancedIndirect(mesh, submeshIndex, material, shaderPass, bufferWithArgs, argsOffset, properties);
+        }
 
         /// <summary>Wraps [DrawMeshInstancedIndirect](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedIndirect.html) on a CommandBuffer.</summary>
         /// <param name="mesh">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedIndirect.html)</param>
@@ -552,7 +796,11 @@ namespace UnityEngine.Rendering
         /// <param name="shaderPass">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedIndirect.html)</param>
         /// <param name="bufferWithArgs">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedIndirect.html)</param>
         /// <param name="argsOffset">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedIndirect.html)</param>
-        public void DrawMeshInstancedIndirect(Mesh mesh, int submeshIndex, Material material, int shaderPass, ComputeBuffer bufferWithArgs, int argsOffset)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawMeshInstancedIndirect(mesh, submeshIndex, material, shaderPass, bufferWithArgs, argsOffset); }
+        public void DrawMeshInstancedIndirect(Mesh mesh, int submeshIndex, Material material, int shaderPass, ComputeBuffer bufferWithArgs, int argsOffset)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawMeshInstancedIndirect(mesh, submeshIndex, material, shaderPass, bufferWithArgs, argsOffset);
+        }
 
         /// <summary>Wraps [DrawMeshInstancedIndirect](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedIndirect.html) on a CommandBuffer.</summary>
         /// <param name="mesh">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedIndirect.html)</param>
@@ -560,7 +808,11 @@ namespace UnityEngine.Rendering
         /// <param name="material">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedIndirect.html)</param>
         /// <param name="shaderPass">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedIndirect.html)</param>
         /// <param name="bufferWithArgs">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedIndirect.html)</param>
-        public void DrawMeshInstancedIndirect(Mesh mesh, int submeshIndex, Material material, int shaderPass, ComputeBuffer bufferWithArgs)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawMeshInstancedIndirect(mesh, submeshIndex, material, shaderPass, bufferWithArgs); }
+        public void DrawMeshInstancedIndirect(Mesh mesh, int submeshIndex, Material material, int shaderPass, ComputeBuffer bufferWithArgs)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawMeshInstancedIndirect(mesh, submeshIndex, material, shaderPass, bufferWithArgs);
+        }
 
         /// <summary>Wraps [DrawMeshInstancedIndirect](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedIndirect.html) on a CommandBuffer.</summary>
         /// <param name="mesh">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedIndirect.html)</param>
@@ -570,7 +822,11 @@ namespace UnityEngine.Rendering
         /// <param name="bufferWithArgs">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedIndirect.html)</param>
         /// <param name="argsOffset">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedIndirect.html)</param>
         /// <param name="properties">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedIndirect.html)</param>
-        public void DrawMeshInstancedIndirect(Mesh mesh, int submeshIndex, Material material, int shaderPass, GraphicsBuffer bufferWithArgs, int argsOffset, MaterialPropertyBlock properties)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawMeshInstancedIndirect(mesh, submeshIndex, material, shaderPass, bufferWithArgs, argsOffset, properties); }
+        public void DrawMeshInstancedIndirect(Mesh mesh, int submeshIndex, Material material, int shaderPass, GraphicsBuffer bufferWithArgs, int argsOffset, MaterialPropertyBlock properties)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawMeshInstancedIndirect(mesh, submeshIndex, material, shaderPass, bufferWithArgs, argsOffset, properties);
+        }
 
         /// <summary>Wraps [DrawMeshInstancedIndirect](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedIndirect.html) on a CommandBuffer.</summary>
         /// <param name="mesh">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedIndirect.html)</param>
@@ -579,7 +835,11 @@ namespace UnityEngine.Rendering
         /// <param name="shaderPass">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedIndirect.html)</param>
         /// <param name="bufferWithArgs">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedIndirect.html)</param>
         /// <param name="argsOffset">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedIndirect.html)</param>
-        public void DrawMeshInstancedIndirect(Mesh mesh, int submeshIndex, Material material, int shaderPass, GraphicsBuffer bufferWithArgs, int argsOffset)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawMeshInstancedIndirect(mesh, submeshIndex, material, shaderPass, bufferWithArgs, argsOffset); }
+        public void DrawMeshInstancedIndirect(Mesh mesh, int submeshIndex, Material material, int shaderPass, GraphicsBuffer bufferWithArgs, int argsOffset)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawMeshInstancedIndirect(mesh, submeshIndex, material, shaderPass, bufferWithArgs, argsOffset);
+        }
 
         /// <summary>Wraps [DrawMeshInstancedIndirect](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedIndirect.html) on a CommandBuffer.</summary>
         /// <param name="mesh">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedIndirect.html)</param>
@@ -587,156 +847,276 @@ namespace UnityEngine.Rendering
         /// <param name="material">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedIndirect.html)</param>
         /// <param name="shaderPass">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedIndirect.html)</param>
         /// <param name="bufferWithArgs">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawMeshInstancedIndirect.html)</param>
-        public void DrawMeshInstancedIndirect(Mesh mesh, int submeshIndex, Material material, int shaderPass, GraphicsBuffer bufferWithArgs)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawMeshInstancedIndirect(mesh, submeshIndex, material, shaderPass, bufferWithArgs); }
+        public void DrawMeshInstancedIndirect(Mesh mesh, int submeshIndex, Material material, int shaderPass, GraphicsBuffer bufferWithArgs)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawMeshInstancedIndirect(mesh, submeshIndex, material, shaderPass, bufferWithArgs);
+        }
 
         /// <summary>Wraps [DrawOcclusionMesh](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawOcclusionMesh.html) on a CommandBuffer.</summary>
         /// <param name="normalizedCamViewport">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.DrawOcclusionMesh.html)</param>
-        public void DrawOcclusionMesh(RectInt normalizedCamViewport)  { ThrowIfRasterNotAllowed();  m_WrappedCommandBuffer.DrawOcclusionMesh(normalizedCamViewport); }
+        public void DrawOcclusionMesh(RectInt normalizedCamViewport)
+        {
+            ThrowIfRasterNotAllowed();
+            m_WrappedCommandBuffer.DrawOcclusionMesh(normalizedCamViewport);
+        }
 
         /// <summary>Wraps [SetGlobalFloat](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloat.html) on a CommandBuffer.</summary>
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloat.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloat.html)</param>
-        public void SetGlobalFloat(string name, float value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalFloat(name, value); }
+        public void SetGlobalFloat(string name, float value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalFloat(name, value);
+        }
 
         /// <summary>Wraps [SetGlobalInt](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalInt.html) on a CommandBuffer.</summary>
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalInt.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalInt.html)</param>
-        public void SetGlobalInt(string name, int value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalInt(name, value); }
+        public void SetGlobalInt(string name, int value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalInt(name, value);
+        }
 
         /// <summary>Wraps [SetGlobalInteger](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalInteger.html) on a CommandBuffer.</summary>
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalInteger.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalInteger.html)</param>
-        public void SetGlobalInteger(string name, int value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalInteger(name, value); }
+        public void SetGlobalInteger(string name, int value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalInteger(name, value);
+        }
 
         /// <summary>Wraps [SetGlobalVector](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVector.html) on a CommandBuffer.</summary>
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVector.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVector.html)</param>
-        public void SetGlobalVector(string name, Vector4 value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalVector(name, value); }
+        public void SetGlobalVector(string name, Vector4 value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalVector(name, value);
+        }
 
         /// <summary>Wraps [SetGlobalColor](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalColor.html) on a CommandBuffer.</summary>
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalColor.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalColor.html)</param>
-        public void SetGlobalColor(string name, Color value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalColor(name, value); }
+        public void SetGlobalColor(string name, Color value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalColor(name, value);
+        }
 
         /// <summary>Wraps [SetGlobalMatrix](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrix.html) on a CommandBuffer.</summary>
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrix.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrix.html)</param>
-        public void SetGlobalMatrix(string name, Matrix4x4 value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalMatrix(name, value); }
+        public void SetGlobalMatrix(string name, Matrix4x4 value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalMatrix(name, value);
+        }
 
         /// <summary>Wraps [SetGlobalFloatArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloatArray.html) on a CommandBuffer.</summary>
         /// <param name="propertyName">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloatArray.html)</param>
         /// <param name="values">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloatArray.html)</param>
-        public void SetGlobalFloatArray(string propertyName, List<float> values)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalFloatArray(propertyName, values); }
+        public void SetGlobalFloatArray(string propertyName, List<float> values)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalFloatArray(propertyName, values);
+        }
 
         /// <summary>Wraps [SetGlobalFloatArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloatArray.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloatArray.html)</param>
         /// <param name="values">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloatArray.html)</param>
-        public void SetGlobalFloatArray(int nameID, List<float> values)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalFloatArray(nameID, values); }
+        public void SetGlobalFloatArray(int nameID, List<float> values)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalFloatArray(nameID, values);
+        }
 
         /// <summary>Wraps [SetGlobalFloatArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloatArray.html) on a CommandBuffer.</summary>
         /// <param name="propertyName">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloatArray.html)</param>
         /// <param name="values">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalFloatArray.html)</param>
-        public void SetGlobalFloatArray(string propertyName, float[] values)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalFloatArray(propertyName, values); }
+        public void SetGlobalFloatArray(string propertyName, float[] values)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalFloatArray(propertyName, values);
+        }
 
         /// <summary>Wraps [SetGlobalVectorArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVectorArray.html) on a CommandBuffer.</summary>
         /// <param name="propertyName">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVectorArray.html)</param>
         /// <param name="values">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVectorArray.html)</param>
-        public void SetGlobalVectorArray(string propertyName, List<Vector4> values)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalVectorArray(propertyName, values); }
+        public void SetGlobalVectorArray(string propertyName, List<Vector4> values)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalVectorArray(propertyName, values);
+        }
 
         /// <summary>Wraps [SetGlobalVectorArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVectorArray.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVectorArray.html)</param>
         /// <param name="values">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVectorArray.html)</param>
-        public void SetGlobalVectorArray(int nameID, List<Vector4> values)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalVectorArray(nameID, values); }
+        public void SetGlobalVectorArray(int nameID, List<Vector4> values)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalVectorArray(nameID, values);
+        }
 
         /// <summary>Wraps [SetGlobalVectorArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVectorArray.html) on a CommandBuffer.</summary>
         /// <param name="propertyName">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVectorArray.html)</param>
         /// <param name="values">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalVectorArray.html)</param>
-        public void SetGlobalVectorArray(string propertyName, Vector4[] values)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalVectorArray(propertyName, values); }
+        public void SetGlobalVectorArray(string propertyName, Vector4[] values)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalVectorArray(propertyName, values);
+        }
 
         /// <summary>Wraps [SetGlobalMatrixArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrixArray.html) on a CommandBuffer.</summary>
         /// <param name="propertyName">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrixArray.html)</param>
         /// <param name="values">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrixArray.html)</param>
-        public void SetGlobalMatrixArray(string propertyName, List<Matrix4x4> values)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalMatrixArray(propertyName, values); }
+        public void SetGlobalMatrixArray(string propertyName, List<Matrix4x4> values)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalMatrixArray(propertyName, values);
+        }
 
         /// <summary>Wraps [SetGlobalMatrixArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrixArray.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrixArray.html)</param>
         /// <param name="values">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrixArray.html)</param>
-        public void SetGlobalMatrixArray(int nameID, List<Matrix4x4> values)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalMatrixArray(nameID, values); }
+        public void SetGlobalMatrixArray(int nameID, List<Matrix4x4> values)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalMatrixArray(nameID, values);
+        }
 
         /// <summary>Wraps [SetGlobalMatrixArray](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrixArray.html) on a CommandBuffer.</summary>
         /// <param name="propertyName">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrixArray.html)</param>
         /// <param name="values">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalMatrixArray.html)</param>
-        public void SetGlobalMatrixArray(string propertyName, Matrix4x4[] values)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalMatrixArray(propertyName, values); }
+        public void SetGlobalMatrixArray(string propertyName, Matrix4x4[] values)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalMatrixArray(propertyName, values);
+        }
 
         /// <summary>Wraps [SetGlobalTexture](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html) on a CommandBuffer.</summary>
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html)</param>
-        public void SetGlobalTexture(string name, TextureHandle value)  { ThrowIfGlobalStateNotAllowed(); ValidateTextureHandle(value);  m_WrappedCommandBuffer.SetGlobalTexture(name, value); }
+        public void SetGlobalTexture(string name, TextureHandle value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            ValidateTextureHandle(value);
+            m_WrappedCommandBuffer.SetGlobalTexture(name, value);
+        }
 
         /// <summary>Wraps [SetGlobalTexture](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html)</param>
-        public void SetGlobalTexture(int nameID, TextureHandle value)  { ThrowIfGlobalStateNotAllowed(); ValidateTextureHandle(value);  m_WrappedCommandBuffer.SetGlobalTexture(nameID, value); }
+        public void SetGlobalTexture(int nameID, TextureHandle value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            ValidateTextureHandle(value);
+            m_WrappedCommandBuffer.SetGlobalTexture(nameID, value);
+        }
 
         /// <summary>Wraps [SetGlobalTexture](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html) on a CommandBuffer.</summary>
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html)</param>
         /// <param name="element">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html)</param>
-        public void SetGlobalTexture(string name, TextureHandle value, RenderTextureSubElement element)  { ThrowIfGlobalStateNotAllowed(); ValidateTextureHandle(value);  m_WrappedCommandBuffer.SetGlobalTexture(name, value, element); }
+        public void SetGlobalTexture(string name, TextureHandle value, RenderTextureSubElement element)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            ValidateTextureHandle(value);
+            m_WrappedCommandBuffer.SetGlobalTexture(name, value, element);
+        }
 
         /// <summary>Wraps [SetGlobalTexture](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html)</param>
         /// <param name="element">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalTexture.html)</param>
-        public void SetGlobalTexture(int nameID, TextureHandle value, RenderTextureSubElement element)  { ThrowIfGlobalStateNotAllowed(); ValidateTextureHandle(value);  m_WrappedCommandBuffer.SetGlobalTexture(nameID, value, element); }
+        public void SetGlobalTexture(int nameID, TextureHandle value, RenderTextureSubElement element)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            ValidateTextureHandle(value);
+            m_WrappedCommandBuffer.SetGlobalTexture(nameID, value, element);
+        }
 
         /// <summary>Wraps [SetGlobalBuffer](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalBuffer.html) on a CommandBuffer.</summary>
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalBuffer.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalBuffer.html)</param>
-        public void SetGlobalBuffer(string name, ComputeBuffer value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalBuffer(name, value); }
+        public void SetGlobalBuffer(string name, ComputeBuffer value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalBuffer(name, value);
+        }
 
         /// <summary>Wraps [SetGlobalBuffer](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalBuffer.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalBuffer.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalBuffer.html)</param>
-        public void SetGlobalBuffer(int nameID, ComputeBuffer value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalBuffer(nameID, value); }
+        public void SetGlobalBuffer(int nameID, ComputeBuffer value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalBuffer(nameID, value);
+        }
 
         /// <summary>Wraps [SetGlobalBuffer](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalBuffer.html) on a CommandBuffer.</summary>
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalBuffer.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalBuffer.html)</param>
-        public void SetGlobalBuffer(string name, GraphicsBuffer value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalBuffer(name, value); }
+        public void SetGlobalBuffer(string name, GraphicsBuffer value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalBuffer(name, value);
+        }
 
         /// <summary>Wraps [SetGlobalBuffer](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalBuffer.html) on a CommandBuffer.</summary>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalBuffer.html)</param>
         /// <param name="value">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalBuffer.html)</param>
-        public void SetGlobalBuffer(int nameID, GraphicsBuffer value)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalBuffer(nameID, value); }
+        public void SetGlobalBuffer(int nameID, GraphicsBuffer value)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalBuffer(nameID, value);
+        }
 
         /// <summary>Wraps [SetGlobalConstantBuffer](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html) on a CommandBuffer.</summary>
         /// <param name="buffer">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
         /// <param name="offset">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
         /// <param name="size">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
-        public void SetGlobalConstantBuffer(ComputeBuffer buffer, int nameID, int offset, int size)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalConstantBuffer(buffer, nameID, offset, size); }
+        public void SetGlobalConstantBuffer(ComputeBuffer buffer, int nameID, int offset, int size)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalConstantBuffer(buffer, nameID, offset, size);
+        }
 
         /// <summary>Wraps [SetGlobalConstantBuffer](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html) on a CommandBuffer.</summary>
         /// <param name="buffer">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
         /// <param name="offset">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
         /// <param name="size">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
-        public void SetGlobalConstantBuffer(ComputeBuffer buffer, string name, int offset, int size)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalConstantBuffer(buffer, name, offset, size); }
+        public void SetGlobalConstantBuffer(ComputeBuffer buffer, string name, int offset, int size)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalConstantBuffer(buffer, name, offset, size);
+        }
 
         /// <summary>Wraps [SetGlobalConstantBuffer](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html) on a CommandBuffer.</summary>
         /// <param name="buffer">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
         /// <param name="nameID">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
         /// <param name="offset">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
         /// <param name="size">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
-        public void SetGlobalConstantBuffer(GraphicsBuffer buffer, int nameID, int offset, int size)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalConstantBuffer(buffer, nameID, offset, size); }
+        public void SetGlobalConstantBuffer(GraphicsBuffer buffer, int nameID, int offset, int size)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalConstantBuffer(buffer, nameID, offset, size);
+        }
 
         /// <summary>Wraps [SetGlobalConstantBuffer](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html) on a CommandBuffer.</summary>
         /// <param name="buffer">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
         /// <param name="name">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
         /// <param name="offset">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
         /// <param name="size">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetGlobalConstantBuffer.html)</param>
-        public void SetGlobalConstantBuffer(GraphicsBuffer buffer, string name, int offset, int size)  { ThrowIfGlobalStateNotAllowed();  m_WrappedCommandBuffer.SetGlobalConstantBuffer(buffer, name, offset, size); }
+        public void SetGlobalConstantBuffer(GraphicsBuffer buffer, string name, int offset, int size)
+        {
+            ThrowIfGlobalStateNotAllowed();
+            m_WrappedCommandBuffer.SetGlobalConstantBuffer(buffer, name, offset, size);
+        }
 
         /// <summary>Wraps [SetShadowSamplingMode](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetShadowSamplingMode.html) on a CommandBuffer.</summary>
         /// <param name="shadowmap">[See CommandBuffer documentation](https://docs.unity3d.com/ScriptReference/Rendering.CommandBuffer.SetShadowSamplingMode.html)</param>

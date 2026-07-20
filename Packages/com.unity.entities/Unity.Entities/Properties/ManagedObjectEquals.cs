@@ -53,8 +53,10 @@ namespace Unity.Entities
         /// <returns><see langword="true"/> if the objects are considered equal; otherwise, <see langword="false"/>.</returns>
         public bool CompareEqual(object lhs, object rhs)
         {
-            if (lhs == null) return rhs == null;
-            if (rhs == null) return false;
+            if (lhs == null)
+                return rhs == null;
+            if (rhs == null)
+                return false;
 
             var type = lhs.GetType();
 
@@ -86,7 +88,8 @@ namespace Unity.Entities
         {
             foreach (var property in properties.GetProperties(ref srcContainer))
             {
-                if (!m_Equals) return;
+                if (!m_Equals)
+                    return;
                 ((IPropertyAccept<TContainer>)property).Accept(this, ref srcContainer);
             }
         }
@@ -113,7 +116,8 @@ namespace Unity.Entities
 
             for (var i = 0; i < srcContainer.Count; i++)
             {
-                if (CompareEquality(srcContainer[i], dstContainer[i])) continue;
+                if (CompareEquality(srcContainer[i], dstContainer[i]))
+                    continue;
                 m_Equals = false;
                 return;
             }
@@ -150,9 +154,11 @@ namespace Unity.Entities
                         return;
                     }
 
-                    if (!srcNext) break;
+                    if (!srcNext)
+                        break;
 
-                    if (CompareEquality(srcContainerEnumerator.Current, dstContainerEnumerator.Current)) continue;
+                    if (CompareEquality(srcContainerEnumerator.Current, dstContainerEnumerator.Current))
+                        continue;
                     m_Equals = false;
                     return;
                 }
@@ -191,12 +197,14 @@ namespace Unity.Entities
                         return;
                     }
 
-                    if (!srcNext) break;
+                    if (!srcNext)
+                        break;
 
                     var keysAreEqual = CompareEquality(srcContainerEnumerator.Current.Key, dstContainerEnumerator.Current.Key);
                     var valuesAreEqual = CompareEquality(srcContainerEnumerator.Current.Key, dstContainerEnumerator.Current.Key);
 
-                    if (keysAreEqual && valuesAreEqual) continue;
+                    if (keysAreEqual && valuesAreEqual)
+                        continue;
                     m_Equals = false;
                     return;
                 }
@@ -220,7 +228,8 @@ namespace Unity.Entities
             var dstValue = property.GetValue(ref dstContainer);
 
             // Copy the srcValue --> dstValue.
-            if (!CompareEquality(dstValue, srcValue)) m_Equals = false;
+            if (!CompareEquality(dstValue, srcValue))
+                m_Equals = false;
         }
 
         /// <summary>
@@ -240,8 +249,10 @@ namespace Unity.Entities
 
             if (TypeTraits<TValue>.CanBeNull)
             {
-                if (null == lhs) return null == rhs;
-                if (null == rhs) return false;
+                if (null == lhs)
+                    return null == rhs;
+                if (null == rhs)
+                    return false;
             }
 
             if (!TypeTraits<TValue>.IsValueType)
@@ -278,7 +289,8 @@ namespace Unity.Entities
                         return existingReference.Equals(rhs);
 
                     // Retain a mapping of references within this object. This is needed to support things like circular references.
-                    if (null == m_References) m_References = new Dictionary<object, object>();
+                    if (null == m_References)
+                        m_References = new Dictionary<object, object>();
                     m_References.Add(lhs, rhs);
                 }
             }

@@ -471,7 +471,8 @@ namespace TMPro
         /// <param name="targetMaterial"></param>
         public static void AddFallbackMaterialReference(Material targetMaterial)
         {
-            if (targetMaterial == null) return;
+            if (targetMaterial == null)
+                return;
 
             var sourceID = targetMaterial.GetEntityId();
 
@@ -494,7 +495,8 @@ namespace TMPro
         /// <param name="targetMaterial"></param>
         public static void RemoveFallbackMaterialReference(Material targetMaterial)
         {
-            if (targetMaterial == null) return;
+            if (targetMaterial == null)
+                return;
 
             var sourceID = targetMaterial.GetEntityId();
 
@@ -519,7 +521,8 @@ namespace TMPro
         public static void CleanupFallbackMaterials()
         {
             // Return if the list is empty.
-            if (m_fallbackCleanupList.Count == 0) return;
+            if (m_fallbackCleanupList.Count == 0)
+                return;
 
             for (int i = 0; i < m_fallbackCleanupList.Count; i++)
             {
@@ -546,7 +549,8 @@ namespace TMPro
         /// <param name="fallbackMaterial">Material to be released.</param>
         public static void ReleaseFallbackMaterial(Material fallbackMaterial)
         {
-            if (fallbackMaterial == null) return;
+            if (fallbackMaterial == null)
+                return;
 
             var materialID = fallbackMaterial.GetEntityId();
             if (m_fallbackMaterialLookup.TryGetValue(materialID, out var key))
@@ -565,9 +569,9 @@ namespace TMPro
 
             isFallbackListDirty = true;
 
-            #if TMP_DEBUG_MODE
+#if TMP_DEBUG_MODE
             ListFallbackMaterials();
-            #endif
+#endif
         }
 
 

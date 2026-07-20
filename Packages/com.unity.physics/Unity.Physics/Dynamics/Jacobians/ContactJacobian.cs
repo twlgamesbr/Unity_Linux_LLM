@@ -370,7 +370,8 @@ namespace Unity.Physics
                 }
                 else
                 {
-                    if (newDistanceToCp > 0.0f) jacAngular.ApplyImpulse = false;
+                    if (newDistanceToCp > 0.0f)
+                        jacAngular.ApplyImpulse = false;
                 }
             }
 
@@ -454,7 +455,8 @@ namespace Unity.Physics
                 // Required check for substepping because having a contact is not guaranteed. Need to check if the
                 // contact point has been reached this step (when ContactDistance<=0), otherwise, need to ensure that
                 // no impulse will be applied
-                if (!jacAngular.ApplyImpulse) dv = 0.0f;
+                if (!jacAngular.ApplyImpulse)
+                    dv = 0.0f;
 
                 float impulse = dv * jacAngular.Jac.EffectiveMass;
 

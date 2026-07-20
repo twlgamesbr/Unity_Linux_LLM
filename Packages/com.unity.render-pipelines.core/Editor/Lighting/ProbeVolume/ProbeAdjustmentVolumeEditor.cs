@@ -463,7 +463,8 @@ namespace UnityEditor.Rendering
 
                         adjustmentVolume.size = s_ShapeBox.size;
                         Vector3 delta = adjustmentVolume.transform.rotation * s_ShapeBox.center - adjustmentVolume.transform.position;
-                        adjustmentVolume.transform.position += delta; ;
+                        adjustmentVolume.transform.position += delta;
+                        ;
                     }
                 }
                 else if (adjustmentVolume.shape == ProbeAdjustmentVolume.Shape.Sphere)

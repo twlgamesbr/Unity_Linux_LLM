@@ -44,7 +44,8 @@ namespace UnityEditor.Rendering
 
         public static void DrawCameraSceneViewOverlay(Object target, SceneView sceneView, GetPreviewCamera previewCameraGetter)
         {
-            if (target == null) return;
+            if (target == null)
+                return;
 
             // cache some deep values
             var c = (Camera)target;

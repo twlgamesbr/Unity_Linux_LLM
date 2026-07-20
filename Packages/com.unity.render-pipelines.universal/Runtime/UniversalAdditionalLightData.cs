@@ -179,7 +179,8 @@ namespace UnityEngine.Rendering.Universal
             get => m_RenderingLayersMask;
             set
             {
-                if (m_RenderingLayersMask == value) return;
+                if (m_RenderingLayersMask == value)
+                    return;
                 m_RenderingLayersMask = value;
                 SyncLightAndShadowLayers();
             }
@@ -195,7 +196,8 @@ namespace UnityEngine.Rendering.Universal
             get => m_ShadowRenderingLayersMask;
             set
             {
-                if (value == m_ShadowRenderingLayersMask) return;
+                if (value == m_ShadowRenderingLayersMask)
+                    return;
                 m_ShadowRenderingLayersMask = value;
                 SyncLightAndShadowLayers();
             }

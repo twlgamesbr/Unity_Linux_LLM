@@ -110,7 +110,8 @@ namespace Unity.PlatformToolkit.PlayMode
 
         private void ValidateAttributeDefinitions(PlayModeStateChange playModeStateChange)
         {
-            if (playModeStateChange != PlayModeStateChange.EnteredPlayMode) return;
+            if (playModeStateChange != PlayModeStateChange.EnteredPlayMode)
+                return;
             if (AttributeDefinitions.Definitions.Any(a => string.IsNullOrEmpty(a.Name)))
                 Debug.LogWarning("One or more attribute definitions are missing a name.");
         }

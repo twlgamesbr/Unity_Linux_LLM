@@ -96,7 +96,8 @@ namespace Unity.Entities.Editor
 
             static NativeArray<T> SubArray<T>(NativeList<T> list, Range range) where T : unmanaged
             {
-                if (range.Count == 0) return default;
+                if (range.Count == 0)
+                    return default;
                 return list.AsArray().GetSubArray(range.Start, range.Count);
             }
         }
@@ -192,7 +193,9 @@ namespace Unity.Entities.Editor
         public void IntegrateEntityChanges(World world, HierarchyEntityChanges changes, NativeParallelHashMap<SceneTag, HierarchyNodeHandle> sceneTagToSubSceneNodeHandle)
         {
             var enumerator = CreateIntegrateEntityChangesEnumerator(world, changes, changes.GetChangeCount(), sceneTagToSubSceneNodeHandle);
-            while (enumerator.MoveNext()) { }
+            while (enumerator.MoveNext())
+            {
+            }
         }
 
         /// <summary>

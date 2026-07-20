@@ -327,7 +327,8 @@ namespace Unity.Entities
         void CheckExists()
         {
 #if ENABLE_UNITY_COLLECTIONS_CHECKS || UNITY_DOTS_DEBUG
-            if (m_StatePtr != null && World != null && World.IsCreated) return;
+            if (m_StatePtr != null && World != null && World.IsCreated)
+                return;
 
             throw new InvalidOperationException(
                 $"System {GetType()} is invalid. This usually means it was not created with World.GetOrCreateSystem<{GetType()}>() or has already been destroyed.");

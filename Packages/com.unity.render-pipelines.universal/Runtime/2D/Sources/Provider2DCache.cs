@@ -39,16 +39,28 @@ namespace UnityEngine.Rendering.Universal
 
         internal static bool AreProviderCachesEqual(Provider2DCache<T> a, Provider2DCache<T> b, Action<string> onNotEqual)
         {
-            if(a.m_Cache.Count != b.m_Cache.Count)     { onNotEqual("Cache sizes are Different Sizes"); return false; }
+            if(a.m_Cache.Count != b.m_Cache.Count)
+            {
+                onNotEqual("Cache sizes are Different Sizes");
+                return false;
+            }
 
-            for(int i = 0; i < a.m_Cache.Count; i++)
+            for (int i = 0; i < a.m_Cache.Count; i++)
             { 
-                if(!IsProviderInfoEqual(a.m_Cache[i].m_Key, b.m_Cache[i].m_Key)) { onNotEqual("Key info is different"); return false; }
+                if(!IsProviderInfoEqual(a.m_Cache[i].m_Key, b.m_Cache[i].m_Key))
+                {
+                    onNotEqual("Key info is different");
+                    return false;
+                }
 
                 Provider2D aT = a.m_Cache[i].m_Value.m_Provider;
                 Provider2D bT = b.m_Cache[i].m_Value.m_Provider;
 
-                if (aT == null || bT == null) { onNotEqual("Value info is null"); return false; }
+                if (aT == null || bT == null)
+                {
+                    onNotEqual("Value info is null");
+                    return false;
+                }
             }
 
             return true;

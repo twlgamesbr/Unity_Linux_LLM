@@ -66,7 +66,8 @@ namespace UnityEngine.Rendering
 
             Collider[] colliders = Physics.OverlapBox(brickCenter, halfExtents);
 
-            if (colliders.Length > 0) return false;
+            if (colliders.Length > 0)
+                return false;
 
             // TO_VERIFY: Shall we do this check?
             //foreach (var collider in colliders)

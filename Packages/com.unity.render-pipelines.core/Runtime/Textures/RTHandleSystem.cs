@@ -846,7 +846,8 @@ namespace UnityEngine.Rendering
                 //This is the same "magic" behavior like setting the desc.colorFormat = RenderTextureFormat.Shadowmap
                 //We elevate the magic to here to only use the explict properties (graphicsFormat, depthStencilFormat, ShadowSamplingMode) from now.
                 int depthBits = GraphicsFormatUtility.GetDepthBits(format);
-                if (depthBits < 16) depthBits = 16;
+                if (depthBits < 16)
+                    depthBits = 16;
 
                 depthStencilFormat = GraphicsFormatUtility.GetDepthStencilFormat(depthBits, 0);
                 colorFormat = GraphicsFormat.None;

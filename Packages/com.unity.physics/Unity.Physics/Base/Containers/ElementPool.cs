@@ -120,7 +120,8 @@ namespace Unity.Collections
                 T element = ((T*)m_Elements)[i];
                 if (element.IsAllocated)
                 {
-                    if (remap != null) remap[i] = numElements;
+                    if (remap != null)
+                        remap[i] = numElements;
                     ((T*)m_Elements)[numElements++] = element;
                 }
             }

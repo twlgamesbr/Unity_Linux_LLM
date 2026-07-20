@@ -166,7 +166,8 @@ namespace UnityEngine.Rendering.Universal
             // Collect valid, compiled sub-assets
             foreach (var asset in subassets)
             {
-                if (asset == null || !asset.GetType().IsSubclassOf(typeof(ScriptableRendererFeature))) continue;
+                if (asset == null || !asset.GetType().IsSubclassOf(typeof(ScriptableRendererFeature)))
+                    continue;
                 AssetDatabase.TryGetGUIDAndLocalFileIdentifier(asset, out var guid, out long localId);
                 loadedAssets.Add(localId, asset);
                 debugOutput += $"-{asset.name}\n--localId={localId}\n";
@@ -175,7 +176,8 @@ namespace UnityEngine.Rendering.Universal
             // Collect assets that are connected to the list
             for (var i = 0; i < m_RendererFeatures?.Count; i++)
             {
-                if (!m_RendererFeatures[i]) continue;
+                if (!m_RendererFeatures[i])
+                    continue;
                 if (AssetDatabase.TryGetGUIDAndLocalFileIdentifier(m_RendererFeatures[i], out var guid, out long localId))
                 {
                     linkedIds.Add(localId);
@@ -281,8 +283,10 @@ namespace UnityEngine.Rendering.Universal
 
             for (int i = 0; i < rendererFeatures.Count; i++)
             {
-                if (m_RendererFeatures[i] == null) continue;
-                if (!AssetDatabase.TryGetGUIDAndLocalFileIdentifier(m_RendererFeatures[i], out var guid, out long localId)) continue;
+                if (m_RendererFeatures[i] == null)
+                    continue;
+                if (!AssetDatabase.TryGetGUIDAndLocalFileIdentifier(m_RendererFeatures[i], out var guid, out long localId))
+                    continue;
 
                 m_RendererFeatureMap[i] = localId;
             }

@@ -14,7 +14,8 @@ namespace NPCSystem.Editor
         [InitializeOnLoadMethod]
         static void AutoCreate()
         {
-            if (_hasRun) return;
+            if (_hasRun)
+                return;
             _hasRun = true;
             Create();
         }

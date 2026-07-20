@@ -209,7 +209,12 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public Navigation        navigation        { get { return m_Navigation; } set { if (SetPropertyUtility.SetStruct(ref m_Navigation, value))        OnSetProperty(); } }
+        public Navigation        navigation        { get { return m_Navigation; } set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_Navigation, value))
+                    OnSetProperty();
+            }
+        }
 
         /// <summary>
         /// The type of transition that will be applied to the targetGraphic when the state changes.
@@ -234,7 +239,12 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public Transition        transition        { get { return m_Transition; } set { if (SetPropertyUtility.SetStruct(ref m_Transition, value))        OnSetProperty(); } }
+        public Transition        transition        { get { return m_Transition; } set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_Transition, value))
+                    OnSetProperty();
+            }
+        }
 
         /// <summary>
         /// The ColorBlock for this selectable object.
@@ -262,7 +272,12 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public ColorBlock        colors            { get { return m_Colors; } set { if (SetPropertyUtility.SetStruct(ref m_Colors, value))            OnSetProperty(); } }
+        public ColorBlock        colors            { get { return m_Colors; } set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_Colors, value))
+                    OnSetProperty();
+            }
+        }
 
         /// <summary>
         /// The SpriteState for this selectable object.
@@ -293,7 +308,12 @@ namespace UnityEngine.UI
         /// ]]>
         /// </code>
         /// </example>
-        public SpriteState       spriteState       { get { return m_SpriteState; } set { if (SetPropertyUtility.SetStruct(ref m_SpriteState, value))       OnSetProperty(); } }
+        public SpriteState       spriteState       { get { return m_SpriteState; } set
+            {
+                if (SetPropertyUtility.SetStruct(ref m_SpriteState, value))
+                    OnSetProperty();
+            }
+        }
 
         /// <summary>
         /// The AnimationTriggers for this selectable object.
@@ -301,7 +321,12 @@ namespace UnityEngine.UI
         /// <remarks>
         /// Modifications will not be visible if transition is not Animation.
         /// </remarks>
-        public AnimationTriggers animationTriggers { get { return m_AnimationTriggers; } set { if (SetPropertyUtility.SetClass(ref m_AnimationTriggers, value)) OnSetProperty(); } }
+        public AnimationTriggers animationTriggers { get { return m_AnimationTriggers; } set
+            {
+                if (SetPropertyUtility.SetClass(ref m_AnimationTriggers, value))
+                    OnSetProperty();
+            }
+        }
 
         /// <summary>
         /// Graphic that will be transitioned upon.
@@ -327,7 +352,12 @@ namespace UnityEngine.UI
         /// ]]>
         ///</code>
         /// </example>
-        public Graphic           targetGraphic     { get { return m_TargetGraphic; } set { if (SetPropertyUtility.SetClass(ref m_TargetGraphic, value))     OnSetProperty(); } }
+        public Graphic           targetGraphic     { get { return m_TargetGraphic; } set
+            {
+                if (SetPropertyUtility.SetClass(ref m_TargetGraphic, value))
+                    OnSetProperty();
+            }
+        }
 
         /// <summary>
         /// Is this object interactable.
@@ -856,7 +886,8 @@ namespace UnityEngine.UI
                 }
             }
 
-            if (wantsWrapAround && null == bestPick) return bestFurthestPick;
+            if (wantsWrapAround && null == bestPick)
+                return bestFurthestPick;
 
             return bestPick;
         }

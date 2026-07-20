@@ -65,7 +65,8 @@ namespace Unity.Networking.Transport.TLS
         /// <remarks>Only reliable if the structure itself is already fixed in memory.</remarks>
         internal byte* GetUnsafePtr()
         {
-            fixed(byte* bufferPtr = m_Buffer) return bufferPtr;
+            fixed(byte* bufferPtr = m_Buffer)
+                return bufferPtr;
         }
     }
 }

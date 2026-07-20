@@ -28,7 +28,10 @@ namespace UnityEditor.UI.Analytics
         public void OnProcessScene(Scene scene, BuildReport report)
         {
             //Not currently used in AssetBundle builds
-            if (buildEvent == null) { return;  }
+            if (buildEvent == null)
+            {
+                return;
+            }
             var gameObjects = scene.GetRootGameObjects();
             foreach (var gameObject in gameObjects)
             {

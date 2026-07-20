@@ -300,7 +300,10 @@ namespace TMPro.EditorUtilities
 
                             // Move sprite up.
                             bool guiEnabled = GUI.enabled;
-                            if (i == 0) { GUI.enabled = false; }
+                            if (i == 0)
+                            {
+                                GUI.enabled = false;
+                            }
                             if (GUI.Button(controlRect, "Up"))
                             {
                                 SwapCharacterElements(i, i - 1);
@@ -309,7 +312,10 @@ namespace TMPro.EditorUtilities
 
                             // Move sprite down.
                             controlRect.x += controlRect.width;
-                            if (i == arraySize - 1) { GUI.enabled = false; }
+                            if (i == arraySize - 1)
+                            {
+                                GUI.enabled = false;
+                            }
                             if (GUI.Button(controlRect, "Down"))
                             {
                                 SwapCharacterElements(i, i + 1);
@@ -349,7 +355,8 @@ namespace TMPro.EditorUtilities
 
                             // Delete selected Sprite
                             controlRect.x += controlRect.width;
-                            if (m_selectedElement == -1) GUI.enabled = false;
+                            if (m_selectedElement == -1)
+                                GUI.enabled = false;
                             if (GUI.Button(controlRect, "-"))
                             {
                                 m_SpriteCharacterTableProperty.DeleteArrayElementAtIndex(elementIndex);
@@ -361,8 +368,6 @@ namespace TMPro.EditorUtilities
 
                                 return;
                             }
-
-
                         }
                     }
                 }
@@ -528,7 +533,10 @@ namespace TMPro.EditorUtilities
 
                             // Move sprite up.
                             bool guiEnabled = GUI.enabled;
-                            if (i == 0) { GUI.enabled = false; }
+                            if (i == 0)
+                            {
+                                GUI.enabled = false;
+                            }
                             if (GUI.Button(controlRect, "Up"))
                             {
                                 SwapGlyphElements(i, i - 1);
@@ -537,7 +545,10 @@ namespace TMPro.EditorUtilities
 
                             // Move sprite down.
                             controlRect.x += controlRect.width;
-                            if (i == arraySize - 1) { GUI.enabled = false; }
+                            if (i == arraySize - 1)
+                            {
+                                GUI.enabled = false;
+                            }
                             if (GUI.Button(controlRect, "Down"))
                             {
                                 SwapGlyphElements(i, i + 1);
@@ -580,7 +591,8 @@ namespace TMPro.EditorUtilities
 
                             // Delete selected Sprite
                             controlRect.x += controlRect.width;
-                            if (m_selectedElement == -1) GUI.enabled = false;
+                            if (m_selectedElement == -1)
+                                GUI.enabled = false;
                             if (GUI.Button(controlRect, "-"))
                             {
                                 SerializedProperty selectedSpriteGlyphProperty = m_SpriteGlyphTableProperty.GetArrayElementAtIndex(elementIndex);
@@ -610,8 +622,6 @@ namespace TMPro.EditorUtilities
 
                                 return;
                             }
-
-
                         }
                     }
                 }
@@ -635,23 +645,26 @@ namespace TMPro.EditorUtilities
                 GUILayout.Space(25f);
 
                 m_xOffset = EditorGUILayout.FloatField(new GUIContent("OX:"), m_xOffset);
-                if (GUI.changed) UpdateGlobalProperty("m_HorizontalBearingX", m_xOffset);
+                if (GUI.changed)
+                    UpdateGlobalProperty("m_HorizontalBearingX", m_xOffset);
 
                 m_yOffset = EditorGUILayout.FloatField(new GUIContent("OY:"), m_yOffset);
-                if (GUI.changed) UpdateGlobalProperty("m_HorizontalBearingY", m_yOffset);
+                if (GUI.changed)
+                    UpdateGlobalProperty("m_HorizontalBearingY", m_yOffset);
 
                 m_xAdvance = EditorGUILayout.FloatField(new GUIContent("ADV."), m_xAdvance);
-                if (GUI.changed) UpdateGlobalProperty("m_HorizontalAdvance", m_xAdvance);
+                if (GUI.changed)
+                    UpdateGlobalProperty("m_HorizontalAdvance", m_xAdvance);
 
                 m_scale = EditorGUILayout.FloatField(new GUIContent("SF."), m_scale);
-                if (GUI.changed) UpdateGlobalProperty("m_Scale", m_scale);
+                if (GUI.changed)
+                    UpdateGlobalProperty("m_Scale", m_scale);
 
                 EditorGUILayout.EndHorizontal();
                 EditorGUILayout.EndVertical();
                 #endregion
 
                 GUI.changed = old_ChangedState;
-
             }
             #endregion
 
@@ -674,7 +687,6 @@ namespace TMPro.EditorUtilities
             GUI.enabled = true;
             if (currentEvent.type == EventType.MouseDown && currentEvent.button == 0)
                 m_selectedElement = -1;
-
         }
 
         private void ResetSelectionNextFrame()
@@ -903,7 +915,8 @@ namespace TMPro.EditorUtilities
         /// <returns></returns>
         void SearchCharacterTable(string searchPattern, ref List<int> searchResults)
         {
-            if (searchResults == null) searchResults = new List<int>();
+            if (searchResults == null)
+                searchResults = new List<int>();
             searchResults.Clear();
 
             int arraySize = m_SpriteCharacterTableProperty.arraySize;
@@ -939,7 +952,8 @@ namespace TMPro.EditorUtilities
 
         void SearchGlyphTable(string searchPattern, ref List<int> searchResults)
         {
-            if (searchResults == null) searchResults = new List<int>();
+            if (searchResults == null)
+                searchResults = new List<int>();
             searchResults.Clear();
 
             int arraySize = m_SpriteGlyphTableProperty.arraySize;

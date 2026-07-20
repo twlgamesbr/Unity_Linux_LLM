@@ -28,8 +28,10 @@ namespace TMPro.EditorUtilities
             EditorGUI.indentLevel = 0;
 
             // NORMAL TYPEFACE
-            if (label.text[0] == '4') GUI.enabled = false;
-            position.x += position.width; position.width = (width - position.width) / 2;
+            if (label.text[0] == '4')
+                GUI.enabled = false;
+            position.x += position.width;
+            position.width = (width - position.width) / 2;
             EditorGUI.PropertyField(position, prop_regular, GUIContent.none);
 
             // ITALIC TYPEFACE
@@ -1330,7 +1332,10 @@ namespace TMPro.EditorUtilities
 
                             // Move record up
                             bool guiEnabled = GUI.enabled;
-                            if (m_SelectedLigatureRecord == 0) { GUI.enabled = false; }
+                            if (m_SelectedLigatureRecord == 0)
+                            {
+                                GUI.enabled = false;
+                            }
                             if (GUI.Button(new Rect(controlRect.x, controlRect.y, btnWidth, controlRect.height), "Up"))
                             {
                                 SwapCharacterElements(m_LigatureSubstitutionRecords_prop, m_SelectedLigatureRecord, m_SelectedLigatureRecord - 1);
@@ -1343,7 +1348,10 @@ namespace TMPro.EditorUtilities
                             GUI.enabled = guiEnabled;
 
                             // Move record down
-                            if (m_SelectedLigatureRecord == arraySize - 1) { GUI.enabled = false; }
+                            if (m_SelectedLigatureRecord == arraySize - 1)
+                            {
+                                GUI.enabled = false;
+                            }
                             if (GUI.Button(new Rect(controlRect.x + btnWidth, controlRect.y, btnWidth, controlRect.height), "Down"))
                             {
                                 SwapCharacterElements(m_LigatureSubstitutionRecords_prop, m_SelectedLigatureRecord, m_SelectedLigatureRecord + 1);
@@ -2171,7 +2179,8 @@ namespace TMPro.EditorUtilities
 
             // Delete style
             rect.x += rect.width;
-            if (selectedRecord == -1 || selectedRecord >= recordCount) GUI.enabled = false;
+            if (selectedRecord == -1 || selectedRecord >= recordCount)
+                GUI.enabled = false;
             if (GUI.Button(rect, "-"))
             {
                 int index = selectedRecord == -1 ? 0 : selectedRecord;
@@ -2601,7 +2610,8 @@ namespace TMPro.EditorUtilities
         static List<uint> ParseGlyphIndexList(string pattern)
         {
             var list = new List<uint>();
-            if (string.IsNullOrWhiteSpace(pattern)) return list;
+            if (string.IsNullOrWhiteSpace(pattern))
+                return list;
 
             var separators = new[] { ',', ';', '|', ' ', '\t' };
             var parts = pattern.Split(separators, StringSplitOptions.RemoveEmptyEntries);
@@ -2621,7 +2631,8 @@ namespace TMPro.EditorUtilities
         /// <returns></returns>
         void SearchGlyphTable(string searchPattern, ref List<int> searchResults)
         {
-            if (searchResults == null) searchResults = new List<int>();
+            if (searchResults == null)
+                searchResults = new List<int>();
 
             searchResults.Clear();
 
@@ -2652,7 +2663,8 @@ namespace TMPro.EditorUtilities
 
         void SearchCharacterTable(string searchPattern, ref List<int> searchResults)
         {
-            if (searchResults == null) searchResults = new List<int>();
+            if (searchResults == null)
+                searchResults = new List<int>();
 
             searchResults.Clear();
 
@@ -2680,7 +2692,8 @@ namespace TMPro.EditorUtilities
 
         void SearchLigatureTable(string searchPattern, ref List<int> searchResults)
         {
-            if (searchResults == null) searchResults = new List<int>();
+            if (searchResults == null)
+                searchResults = new List<int>();
             searchResults.Clear();
 
             var requestedGlyphIndexes = ParseGlyphIndexList(searchPattern);
@@ -2725,7 +2738,8 @@ namespace TMPro.EditorUtilities
 
         void SearchKerningTable(string searchPattern, ref List<int> searchResults)
         {
-            if (searchResults == null) searchResults = new List<int>();
+            if (searchResults == null)
+                searchResults = new List<int>();
 
             searchResults.Clear();
 
@@ -2767,7 +2781,8 @@ namespace TMPro.EditorUtilities
 
         void SearchMarkToBaseTable(string searchPattern, ref List<int> searchResults)
         {
-            if (searchResults == null) searchResults = new List<int>();
+            if (searchResults == null)
+                searchResults = new List<int>();
 
             searchResults.Clear();
 
@@ -2806,7 +2821,8 @@ namespace TMPro.EditorUtilities
 
         void SearchMarkToMarkTable(string searchPattern, ref List<int> searchResults)
         {
-            if (searchResults == null) searchResults = new List<int>();
+            if (searchResults == null)
+                searchResults = new List<int>();
 
             searchResults.Clear();
 
