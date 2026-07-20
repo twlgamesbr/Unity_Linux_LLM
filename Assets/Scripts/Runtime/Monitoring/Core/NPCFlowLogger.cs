@@ -229,7 +229,7 @@ namespace NPCSystem.Monitoring
             // On non-WebGL platforms this is a safe no-op.
             DatadogConsent.Grant();
 
-            NPCSystem.TelemetryBootstrapper.Initialize(
+            TelemetryBootstrapper.Initialize(
                 sessionId: SystemInfo.deviceUniqueIdentifier,
                 metricPrefix: "npc",
                 enableFileSink: true,
