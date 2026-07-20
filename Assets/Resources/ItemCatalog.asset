@@ -12,4 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 853832d205d90492cb522c37228413ff, type: 3}
   m_Name: ItemCatalog
   m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.Items.ItemCatalog
-  _definitions: []
+  _definitions:
+  - {fileID: 11400000, guid: 044e1447ea393b5faacd728cec4ff369, type: 2}
+  - {fileID: 11400000, guid: eaabd5e3ebaab7df18d9f230b06deab2, type: 2}
+  - {fileID: 11400000, guid: 6cd078e7fc4b811f08e6648f6736ca2e, type: 2}
+  - {fileID: 11400000, guid: 37f9f82f629c0c45ba88b939d0c70a9e, type: 2}
+  - {fileID: 11400000, guid: 71a345b6aa5c35a348fc3c826a62e071, type: 2}

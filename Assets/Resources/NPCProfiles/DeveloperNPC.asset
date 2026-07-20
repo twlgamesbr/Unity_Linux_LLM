@@ -54,7 +54,10 @@ MonoBehaviour:
   _ragCategory: unity_linux_llm_codebase_v2
   _ragResults: 5
   _knowledgeSourcePath: 
-  _inventoryItems: []
+  _inventoryItems:
+  - {fileID: 11400000, guid: 044e1447ea393b5faacd728cec4ff369, type: 2}
+  - {fileID: 11400000, guid: eaabd5e3ebaab7df18d9f230b06deab2, type: 2}
+  - {fileID: 11400000, guid: 71a345b6aa5c35a348fc3c826a62e071, type: 2}
   _loraAdapterPath: 
   _loraWeight: 0.8
   _historySaveFile: 

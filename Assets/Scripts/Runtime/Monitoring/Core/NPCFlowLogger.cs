@@ -564,16 +564,33 @@ namespace NPCSystem.Monitoring
         void WriteUnityConsole(NPCFlowEvent flowEvent)
         {
             string line = FormatConsoleLine(flowEvent);
+
+            // Derive category from the flow event's stage
+            string category = flowEvent.Stage switch
+            {
+                NPCFlowStage.LLMChat or NPCFlowStage.LLMStream or NPCFlowStage.BackendRequest or NPCFlowStage.DialogueGeneration => "llm",
+                NPCFlowStage.QdrantEmbedding or NPCFlowStage.QdrantSearch or NPCFlowStage.LocalRagReady or NPCFlowStage.LocalRagSearch or NPCFlowStage.ContextRetrieval or NPCFlowStage.RagDimensionCheck => "rag",
+                NPCFlowStage.AuthRequest or NPCFlowStage.AuthSession => "auth",
+                NPCFlowStage.DialogueRouting or NPCFlowStage.ResponseComplete or NPCFlowStage.ActionSelection or NPCFlowStage.ActionExecution or NPCFlowStage.GrammarOverride or NPCFlowStage.GrammarRestore or NPCFlowStage.PromptBuild => "dialog",
+                NPCFlowStage.OwnershipAuthority or NPCFlowStage.NpcSpawn or NPCFlowStage.RpcTraffic or NPCFlowStage.NetworkHost or NPCFlowStage.PlayerSpawn or NPCFlowStage.PlayerNameRegistration or NPCFlowStage.AnimationSync or NPCFlowStage.AnimationFallback => "network",
+                NPCFlowStage.SceneBootstrap or NPCFlowStage.ReferenceResolution or NPCFlowStage.ConfigurationValidation or NPCFlowStage.ProfileIndexBuild or NPCFlowStage.HistoryLoad or NPCFlowStage.HistoryRestore or NPCFlowStage.NPCSwitch or NPCFlowStage.UIInput or NPCFlowStage.RequestStart or NPCFlowStage.ClientSession or NPCFlowStage.SmokeValidation or NPCFlowStage.WebGLGameplayLoad or NPCFlowStage.EditorWorkflow or NPCFlowStage.InputModeSwitch or NPCFlowStage.HistoryPersist => "system",
+                _ => "system"
+            };
+
+            string tagged = $"#NPC# #{category}# {line}";
+
+            // Use CPAPI protocol directly — no Console Pro assembly ref needed.
+            // Console Pro reads these magic strings from any Debug.Log output.
             switch (flowEvent.Level)
             {
                 case NPCFlowLogLevel.Error:
-                    UnityEngine.Debug.LogError(line);
+                    UnityEngine.Debug.LogError($"{tagged}\nCPAPI:{{\"cmd\":\"LogType\",\"name\":\"Error\"}}");
                     break;
                 case NPCFlowLogLevel.Warning:
-                    UnityEngine.Debug.LogWarning(line);
+                    UnityEngine.Debug.LogWarning($"{tagged}\nCPAPI:{{\"cmd\":\"LogType\",\"name\":\"Warning\"}}");
                     break;
                 default:
-                    UnityEngine.Debug.Log(line);
+                    UnityEngine.Debug.Log($"{tagged}\nCPAPI:{{\"cmd\":\"Filter\",\"name\":\"npc/{category}\"}}");
                     break;
             }
         }

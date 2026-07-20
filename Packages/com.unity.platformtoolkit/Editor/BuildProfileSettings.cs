@@ -10,7 +10,9 @@ namespace Unity.PlatformToolkit.Editor
 {
     internal class BuildProfileSettings : ScriptableObject
     {
-        internal const string k_PlatformImplementationKeyProperty = nameof(m_PlatformImplementationKey);
+        internal const string k_PlatformImplementationKeyProperty = nameof(
+            m_PlatformImplementationKey
+        );
 
         [SerializeField]
         private string m_PlatformImplementationKey;
@@ -27,7 +29,9 @@ namespace Unity.PlatformToolkit.Editor
                 return m_PlatformImplementationKey;
             }
 
-            var match = choices.Find(x => x.Key.Equals(m_PlatformImplementationKey, StringComparison.OrdinalIgnoreCase));
+            var match = choices.Find(x =>
+                x.Key.Equals(m_PlatformImplementationKey, StringComparison.OrdinalIgnoreCase)
+            );
 
             isKeyValidChoice = match != null;
             return m_PlatformImplementationKey;
@@ -40,7 +44,7 @@ namespace Unity.PlatformToolkit.Editor
         public void AssignKeyIfEmpty(BuildProfile buildProfile)
         {
             string key = GetImplementationKey(buildProfile, out bool isKeyValidChoice);
-            if (!isKeyValidChoice &&string.IsNullOrEmpty(key))
+            if (!isKeyValidChoice && string.IsNullOrEmpty(key))
             {
                 var choices = GatherValidImplementations(buildProfile);
                 m_PlatformImplementationKey = choices.Count > 0 ? choices[0].Key : null;
@@ -63,15 +67,18 @@ namespace Unity.PlatformToolkit.Editor
                 return;
 
             var type = AssetDatabase.GetMainAssetTypeAtPath(path);
-            var buildProfile = type == typeof(BuildProfile)
-                ? AssetDatabase.LoadAssetAtPath<BuildProfile>(path)
-                : null;
+            var buildProfile =
+                type == typeof(BuildProfile)
+                    ? AssetDatabase.LoadAssetAtPath<BuildProfile>(path)
+                    : null;
 
             if (buildProfile != null)
                 AssignKeyIfEmpty(buildProfile);
         }
 
-        public static List<IPlatformToolkitSupportDeclaration> GatherValidImplementations(BuildProfile buildProfile)
+        public static List<IPlatformToolkitSupportDeclaration> GatherValidImplementations(
+            BuildProfile buildProfile
+        )
         {
             var choices = new List<IPlatformToolkitSupportDeclaration>();
             var implementations = SupportDeclarationManager.SupportDeclarations;
@@ -93,7 +100,10 @@ namespace Unity.PlatformToolkit.Editor
             return choices;
         }
 
-        private static bool IsImplementationSupported(IPlatformToolkitSupportDeclaration implInfo, GUID profilePlatformGuid)
+        private static bool IsImplementationSupported(
+            IPlatformToolkitSupportDeclaration implInfo,
+            GUID profilePlatformGuid
+        )
         {
             if (implInfo.SupportedBuildProfileGuids == null)
                 return false;
@@ -111,19 +121,20 @@ namespace Unity.PlatformToolkit.Editor
 
 #if UNITY_6000_4_OR_NEWER
         [BuildProfileSettingsProvider(typeof(BuildProfileSettings))]
-        static BuildProfileSettingsProvider createProvider() => new BuildProfileSettingsProvider("Platform Toolkit Settings")
-        {
-            canAddSetting = static (BuildProfile profile) =>
+        static BuildProfileSettingsProvider createProvider() =>
+            new BuildProfileSettingsProvider("Platform Toolkit Settings")
             {
-                var valid = GatherValidImplementations(profile);
-                return valid != null && valid.Count > 0;
-            },
-            hasCustomEditor = true,
-            tooltip = "Provide Platform Toolkit with settings for which implementation to use with this profile."
-        };
+                canAddSetting = static (BuildProfile profile) =>
+                {
+                    var valid = GatherValidImplementations(profile);
+                    return valid != null && valid.Count > 0;
+                },
+                hasCustomEditor = true,
+                tooltip =
+                    "Provide Platform Toolkit with settings for which implementation to use with this profile.",
+            };
 #endif
     }
-
 
 #if UNITY_6000_4_OR_NEWER
     /// <summary>
@@ -141,7 +152,10 @@ namespace Unity.PlatformToolkit.Editor
             {
                 var path = AssetDatabase.GetAssetPath(targetAsset);
                 var type = AssetDatabase.GetMainAssetTypeAtPath(path);
-                buildProfile = type == typeof(BuildProfile) ? AssetDatabase.LoadAssetAtPath<BuildProfile>(path) : null;
+                buildProfile =
+                    type == typeof(BuildProfile)
+                        ? AssetDatabase.LoadAssetAtPath<BuildProfile>(path)
+                        : null;
             }
 
             if (buildProfile == null)
@@ -154,11 +168,17 @@ namespace Unity.PlatformToolkit.Editor
 
     internal static class BuildProfileInspectorGUI
     {
-        public static VisualElement CreateInspectorGUI(BuildProfile profile, SerializedObject serializedObject)
+        public static VisualElement CreateInspectorGUI(
+            BuildProfile profile,
+            SerializedObject serializedObject
+        )
         {
-            BuildProfileSettings targetAsset = serializedObject.targetObject as BuildProfileSettings;
+            BuildProfileSettings targetAsset =
+                serializedObject.targetObject as BuildProfileSettings;
 
-            var keyProperty = serializedObject.FindProperty(BuildProfileSettings.k_PlatformImplementationKeyProperty);
+            var keyProperty = serializedObject.FindProperty(
+                BuildProfileSettings.k_PlatformImplementationKeyProperty
+            );
             Debug.Assert(keyProperty != null);
 
             var choices = BuildProfileSettings.GatherValidImplementations(profile);
@@ -168,7 +188,10 @@ namespace Unity.PlatformToolkit.Editor
             return customInspector;
         }
 
-        private static VisualElement CreateImpElement(List<IPlatformToolkitSupportDeclaration> choices, SerializedProperty keyProperty)
+        private static VisualElement CreateImpElement(
+            List<IPlatformToolkitSupportDeclaration> choices,
+            SerializedProperty keyProperty
+        )
         {
             const string typeHeader = "Platform implementation";
 
@@ -179,20 +202,27 @@ namespace Unity.PlatformToolkit.Editor
             dropdown.labelElement.style.minWidth = 150;
 
             string missingKey = null;
-            Func<IPlatformToolkitSupportDeclaration, string> formatCallback = (IPlatformToolkitSupportDeclaration info) =>
-                {
-                    if (info == null)
-                        return missingKey != null ? $"{missingKey} (Missing)" : "None";
+            Func<IPlatformToolkitSupportDeclaration, string> formatCallback = (
+                IPlatformToolkitSupportDeclaration info
+            ) =>
+            {
+                if (info == null)
+                    return missingKey != null ? $"{missingKey} (Missing)" : "None";
 
-                    return info.DisplayName;
-                };
+                return info.DisplayName;
+            };
 
             int selectedIndex = -1;
             foreach (var choice in choices)
             {
                 dropdown.choices.Add(choice);
 
-                if (choice.Key.Equals(keyProperty.stringValue, System.StringComparison.OrdinalIgnoreCase))
+                if (
+                    choice.Key.Equals(
+                        keyProperty.stringValue,
+                        System.StringComparison.OrdinalIgnoreCase
+                    )
+                )
                 {
                     selectedIndex = dropdown.choices.Count - 1;
                 }
@@ -220,13 +250,14 @@ namespace Unity.PlatformToolkit.Editor
             dropdown.formatListItemCallback = formatCallback;
             dropdown.formatSelectedValueCallback = formatCallback;
 
-            dropdown.RegisterValueChangedCallback((ChangeEvent<IPlatformToolkitSupportDeclaration> evt) =>
-            {
-                keyProperty.stringValue = evt.newValue?.Key;
-                keyProperty.serializedObject.ApplyModifiedProperties();
-            });
+            dropdown.RegisterValueChangedCallback(
+                (ChangeEvent<IPlatformToolkitSupportDeclaration> evt) =>
+                {
+                    keyProperty.stringValue = evt.newValue?.Key;
+                    keyProperty.serializedObject.ApplyModifiedProperties();
+                }
+            );
             return dropdown;
         }
     }
 }
-

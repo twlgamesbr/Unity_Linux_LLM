@@ -52,6 +52,10 @@ namespace NPCSystem.Monitoring
             {
                 TelemetryRouter router = TelemetryRouter.Instance;
 
+                // Install global log interceptor to catch stray Debug.Log calls
+                // and route them through Console Pro API automatically.
+                ConsoleProLogInterceptor.Initialize();
+
                 // Register file sink (always — JSONL is lightweight and works everywhere)
                 if (enableFileSink)
                 {
@@ -60,6 +64,15 @@ namespace NPCSystem.Monitoring
                     );
                     router.Register(fileSink);
                     Debug.Log($"[TelemetryBootstrapper] FileTelemetrySink registered → {Application.persistentDataPath}/Telemetry/");
+                }
+
+                // Register ConsolePro sink (Editor-only — enhanced filtering via Console Pro)
+                // Uses the FLYINGWORM_CONSOLE_3 define for conditional compilation.
+                // The sink degrades gracefully to prefixed Debug.Log when Console Pro is absent.
+                {
+                    var consoleSink = new ConsoleProTelemetrySink(filterPrefix: metricPrefix);
+                    router.Register(consoleSink);
+                    Debug.Log("[TelemetryBootstrapper] ConsoleProTelemetrySink registered.");
                 }
 
                 // Register Datadog sink

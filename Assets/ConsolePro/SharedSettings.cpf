@@ -1,0 +1,980 @@
+{
+    "sharedSettingsFormatVersion": 1,
+    "standardFilters": [
+        {
+            "filterName": "",
+            "mainColor": {
+                "r": 1.0,
+                "g": 1.0,
+                "b": 1.0,
+                "a": 1.0
+            },
+            "isStandardFilter": true,
+            "isTempFilter": false,
+            "filterOnly": false,
+            "tintBackgroundWithAccentColor": true,
+            "useAdvancedColors": false,
+            "customTextColor": {
+                "r": 1.0,
+                "g": 1.0,
+                "b": 1.0,
+                "a": 1.0
+            },
+            "customBackgroundColor": {
+                "r": 1.0,
+                "g": 1.0,
+                "b": 1.0,
+                "a": 1.0
+            },
+            "swallowStandard": true,
+            "standardCanSwallow": false,
+            "overrideStandardColors": true,
+            "overrideStandardIcon": true,
+            "collapseIconBackground": false,
+            "collapseIconSymbol": false,
+            "collapseIconLetter": false,
+            "collapseIconTexture": false,
+            "useIconBackground": false,
+            "useIconSymbol": false,
+            "useIconLetter": false,
+            "useIconTexture": false,
+            "filterFormatVersion": 1,
+            "iconColorize": false,
+            "iconLayers": [
+                {
+                    "iconType": "ConsoleProIcon",
+                    "iconType2": "None",
+                    "iconText": "A",
+                    "useIconTextFirstLetter": true,
+                    "useIconLogColor": true,
+                    "iconColor": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    },
+                    "iconBuiltInID": "BACKGROUNDS_ECPLOGICON",
+                    "iconTextureGUID": "",
+                    "iconUnityCustomName": "",
+                    "iconFontPath": "",
+                    "useIconShadow": true,
+                    "iconShadowColor": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 1.0
+                    },
+                    "iconShadowOpacity": 1.0,
+                    "iconFilterMode": "Point",
+                    "iconOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "iconShadowOffset": {
+                        "x": 0.5,
+                        "y": 0.5
+                    },
+                    "iconSize": 13.0,
+                    "name": null,
+                    "isEnabled": true,
+                    "collapsed": false,
+                    "itemGUID": "ef036997-6291-484e-a13e-18a4fa6dd92a"
+                }
+            ],
+            "useAndOpForSearchList": false,
+            "searchList": [
+                {
+                    "searchString": "<Any>",
+                    "searchType": "Exact",
+                    "removeSearchStringFromLog": false,
+                    "logTypeList": [
+                        {
+                            "logType": "Log",
+                            "name": null,
+                            "isEnabled": true,
+                            "collapsed": false,
+                            "itemGUID": "a3413e39-696b-4d7f-b3bd-e2f1aaae1d3a"
+                        }
+                    ],
+                    "columnTypeList": [
+                        {
+                            "columnType": "Log",
+                            "name": null,
+                            "isEnabled": true,
+                            "collapsed": false,
+                            "itemGUID": "3e10ca4a-3014-4693-979b-bbaa2c77d2e3"
+                        }
+                    ],
+                    "sourceCodeList": [],
+                    "name": null,
+                    "isEnabled": true,
+                    "collapsed": false,
+                    "itemGUID": "36794bf0-f5bd-4ea8-8cd2-8ef12599846b"
+                }
+            ],
+            "iconLetter": null,
+            "iconSymbol": null,
+            "iconBackground": null,
+            "iconTexture": null,
+            "showInToolbar": true,
+            "hideLabelInToolbar": false,
+            "hideWhenNoMatches": false,
+            "leftSpacing": 0,
+            "rightSpacing": 0,
+            "middleSpacing": 0,
+            "name": "Log",
+            "isEnabled": true,
+            "collapsed": true,
+            "itemGUID": "e061a5a6-382e-49b4-ae86-77b37fecb299"
+        },
+        {
+            "filterName": "",
+            "mainColor": {
+                "r": 1.0,
+                "g": 0.839999973773956,
+                "b": 0.0199999995529652,
+                "a": 0.699999988079071
+            },
+            "isStandardFilter": true,
+            "isTempFilter": false,
+            "filterOnly": false,
+            "tintBackgroundWithAccentColor": true,
+            "useAdvancedColors": false,
+            "customTextColor": {
+                "r": 1.0,
+                "g": 1.0,
+                "b": 1.0,
+                "a": 1.0
+            },
+            "customBackgroundColor": {
+                "r": 1.0,
+                "g": 1.0,
+                "b": 1.0,
+                "a": 1.0
+            },
+            "swallowStandard": true,
+            "standardCanSwallow": false,
+            "overrideStandardColors": true,
+            "overrideStandardIcon": true,
+            "collapseIconBackground": false,
+            "collapseIconSymbol": false,
+            "collapseIconLetter": false,
+            "collapseIconTexture": false,
+            "useIconBackground": false,
+            "useIconSymbol": false,
+            "useIconLetter": false,
+            "useIconTexture": false,
+            "filterFormatVersion": 1,
+            "iconColorize": false,
+            "iconLayers": [
+                {
+                    "iconType": "ConsoleProIcon",
+                    "iconType2": "None",
+                    "iconText": "A",
+                    "useIconTextFirstLetter": true,
+                    "useIconLogColor": true,
+                    "iconColor": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    },
+                    "iconBuiltInID": "BACKGROUNDS_ECPBGTRIANGLE",
+                    "iconTextureGUID": "",
+                    "iconUnityCustomName": "",
+                    "iconFontPath": "",
+                    "useIconShadow": true,
+                    "iconShadowColor": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 1.0
+                    },
+                    "iconShadowOpacity": 1.0,
+                    "iconFilterMode": "Point",
+                    "iconOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "iconShadowOffset": {
+                        "x": 0.5,
+                        "y": 0.5
+                    },
+                    "iconSize": 13.0,
+                    "name": null,
+                    "isEnabled": true,
+                    "collapsed": false,
+                    "itemGUID": "a3899f2c-f53e-40d9-ba48-eed5ae7edc53"
+                },
+                {
+                    "iconType": "Text",
+                    "iconType2": "None",
+                    "iconText": "!",
+                    "useIconTextFirstLetter": false,
+                    "useIconLogColor": false,
+                    "iconColor": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    },
+                    "iconBuiltInID": "BACKGROUNDS_ECPBGROUNDEDSQUARE",
+                    "iconTextureGUID": "",
+                    "iconUnityCustomName": "",
+                    "iconFontPath": "",
+                    "useIconShadow": true,
+                    "iconShadowColor": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 1.0
+                    },
+                    "iconShadowOpacity": 1.0,
+                    "iconFilterMode": "Point",
+                    "iconOffset": {
+                        "x": 0.0,
+                        "y": 2.0
+                    },
+                    "iconShadowOffset": {
+                        "x": 0.5,
+                        "y": 0.5
+                    },
+                    "iconSize": 7.0,
+                    "name": null,
+                    "isEnabled": true,
+                    "collapsed": false,
+                    "itemGUID": "ddf3a049-5c5b-4976-ada4-cd411f4636d2"
+                }
+            ],
+            "useAndOpForSearchList": false,
+            "searchList": [
+                {
+                    "searchString": "<Any>",
+                    "searchType": "Exact",
+                    "removeSearchStringFromLog": false,
+                    "logTypeList": [
+                        {
+                            "logType": "Warning",
+                            "name": null,
+                            "isEnabled": true,
+                            "collapsed": false,
+                            "itemGUID": "92cbccf5-97b3-4a03-ac96-4efb1ce5a3b8"
+                        },
+                        {
+                            "logType": "CompilerWarning",
+                            "name": null,
+                            "isEnabled": true,
+                            "collapsed": false,
+                            "itemGUID": "f09ebbda-588c-46f7-b2ec-428c843be11f"
+                        }
+                    ],
+                    "columnTypeList": [
+                        {
+                            "columnType": "Log",
+                            "name": null,
+                            "isEnabled": true,
+                            "collapsed": false,
+                            "itemGUID": "c010aad8-3750-4a7e-acb5-d89915355786"
+                        }
+                    ],
+                    "sourceCodeList": [],
+                    "name": null,
+                    "isEnabled": true,
+                    "collapsed": false,
+                    "itemGUID": "b84d2613-8ad4-456a-8df8-9edeb70f782d"
+                }
+            ],
+            "iconLetter": null,
+            "iconSymbol": null,
+            "iconBackground": null,
+            "iconTexture": null,
+            "showInToolbar": true,
+            "hideLabelInToolbar": false,
+            "hideWhenNoMatches": false,
+            "leftSpacing": 0,
+            "rightSpacing": 0,
+            "middleSpacing": 0,
+            "name": "Warning",
+            "isEnabled": true,
+            "collapsed": true,
+            "itemGUID": "2bc1e578-73a9-4d5a-9873-032d79f76044"
+        },
+        {
+            "filterName": "",
+            "mainColor": {
+                "r": 1.0,
+                "g": 0.0,
+                "b": 0.0,
+                "a": 0.699999988079071
+            },
+            "isStandardFilter": true,
+            "isTempFilter": false,
+            "filterOnly": false,
+            "tintBackgroundWithAccentColor": true,
+            "useAdvancedColors": true,
+            "customTextColor": {
+                "r": 1.0,
+                "g": 1.0,
+                "b": 1.0,
+                "a": 1.0
+            },
+            "customBackgroundColor": {
+                "r": 1.0,
+                "g": 0.0,
+                "b": 0.0,
+                "a": 0.699999988079071
+            },
+            "swallowStandard": true,
+            "standardCanSwallow": false,
+            "overrideStandardColors": true,
+            "overrideStandardIcon": true,
+            "collapseIconBackground": false,
+            "collapseIconSymbol": false,
+            "collapseIconLetter": false,
+            "collapseIconTexture": false,
+            "useIconBackground": false,
+            "useIconSymbol": false,
+            "useIconLetter": false,
+            "useIconTexture": false,
+            "filterFormatVersion": 1,
+            "iconColorize": false,
+            "iconLayers": [
+                {
+                    "iconType": "ConsoleProIcon",
+                    "iconType2": "None",
+                    "iconText": "A",
+                    "useIconTextFirstLetter": true,
+                    "useIconLogColor": true,
+                    "iconColor": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    },
+                    "iconBuiltInID": "BACKGROUNDS_ECPBGROUNDEDSQUARE",
+                    "iconTextureGUID": "",
+                    "iconUnityCustomName": "",
+                    "iconFontPath": "",
+                    "useIconShadow": true,
+                    "iconShadowColor": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 1.0
+                    },
+                    "iconShadowOpacity": 1.0,
+                    "iconFilterMode": "Point",
+                    "iconOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "iconShadowOffset": {
+                        "x": 0.5,
+                        "y": 0.5
+                    },
+                    "iconSize": 13.0,
+                    "name": null,
+                    "isEnabled": true,
+                    "collapsed": false,
+                    "itemGUID": "9f68873b-f8c5-4b82-a3c9-df9e16ffa6ba"
+                },
+                {
+                    "iconType": "Text",
+                    "iconType2": "None",
+                    "iconText": "X",
+                    "useIconTextFirstLetter": false,
+                    "useIconLogColor": false,
+                    "iconColor": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    },
+                    "iconBuiltInID": "BACKGROUNDS_ECPBGROUNDEDSQUARE",
+                    "iconTextureGUID": "",
+                    "iconUnityCustomName": "",
+                    "iconFontPath": "",
+                    "useIconShadow": true,
+                    "iconShadowColor": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 1.0
+                    },
+                    "iconShadowOpacity": 1.0,
+                    "iconFilterMode": "Point",
+                    "iconOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "iconShadowOffset": {
+                        "x": 0.5,
+                        "y": 0.5
+                    },
+                    "iconSize": 7.0,
+                    "name": null,
+                    "isEnabled": true,
+                    "collapsed": false,
+                    "itemGUID": "0752dc5e-bdd1-4206-ba90-d9ecba5594f7"
+                }
+            ],
+            "useAndOpForSearchList": false,
+            "searchList": [
+                {
+                    "searchString": "<Any>",
+                    "searchType": "Exact",
+                    "removeSearchStringFromLog": false,
+                    "logTypeList": [
+                        {
+                            "logType": "Error",
+                            "name": null,
+                            "isEnabled": true,
+                            "collapsed": false,
+                            "itemGUID": "4f2df93c-491b-4c9c-8814-138e013e28ba"
+                        },
+                        {
+                            "logType": "CompilerError",
+                            "name": null,
+                            "isEnabled": true,
+                            "collapsed": false,
+                            "itemGUID": "fe47ea48-0f0c-4698-8f12-cff8c0fcee58"
+                        }
+                    ],
+                    "columnTypeList": [
+                        {
+                            "columnType": "Log",
+                            "name": null,
+                            "isEnabled": true,
+                            "collapsed": false,
+                            "itemGUID": "9e84d1d7-31b8-448f-b189-eb336bf3c10c"
+                        }
+                    ],
+                    "sourceCodeList": [],
+                    "name": null,
+                    "isEnabled": true,
+                    "collapsed": false,
+                    "itemGUID": "99872bd2-77f3-41bd-ba58-ee9d96e55d15"
+                }
+            ],
+            "iconLetter": null,
+            "iconSymbol": null,
+            "iconBackground": null,
+            "iconTexture": null,
+            "showInToolbar": true,
+            "hideLabelInToolbar": false,
+            "hideWhenNoMatches": false,
+            "leftSpacing": 0,
+            "rightSpacing": 0,
+            "middleSpacing": 0,
+            "name": "Error",
+            "isEnabled": true,
+            "collapsed": true,
+            "itemGUID": "79f718a9-dd6a-43b0-b9d4-c5d0526a998a"
+        },
+        {
+            "filterName": "",
+            "mainColor": {
+                "r": 0.61599999666214,
+                "g": 0.0,
+                "b": 1.0,
+                "a": 0.699999988079071
+            },
+            "isStandardFilter": true,
+            "isTempFilter": false,
+            "filterOnly": false,
+            "tintBackgroundWithAccentColor": true,
+            "useAdvancedColors": true,
+            "customTextColor": {
+                "r": 1.0,
+                "g": 1.0,
+                "b": 1.0,
+                "a": 1.0
+            },
+            "customBackgroundColor": {
+                "r": 0.61599999666214,
+                "g": 0.0,
+                "b": 1.0,
+                "a": 0.699999988079071
+            },
+            "swallowStandard": true,
+            "standardCanSwallow": false,
+            "overrideStandardColors": true,
+            "overrideStandardIcon": true,
+            "collapseIconBackground": false,
+            "collapseIconSymbol": false,
+            "collapseIconLetter": false,
+            "collapseIconTexture": false,
+            "useIconBackground": false,
+            "useIconSymbol": false,
+            "useIconLetter": false,
+            "useIconTexture": false,
+            "filterFormatVersion": 1,
+            "iconColorize": false,
+            "iconLayers": [
+                {
+                    "iconType": "ConsoleProIcon",
+                    "iconType2": "None",
+                    "iconText": "A",
+                    "useIconTextFirstLetter": true,
+                    "useIconLogColor": true,
+                    "iconColor": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    },
+                    "iconBuiltInID": "BACKGROUNDS_ECPBGROUNDEDSQUARE",
+                    "iconTextureGUID": "",
+                    "iconUnityCustomName": "",
+                    "iconFontPath": "",
+                    "useIconShadow": true,
+                    "iconShadowColor": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 1.0
+                    },
+                    "iconShadowOpacity": 1.0,
+                    "iconFilterMode": "Point",
+                    "iconOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "iconShadowOffset": {
+                        "x": 0.5,
+                        "y": 0.5
+                    },
+                    "iconSize": 13.0,
+                    "name": null,
+                    "isEnabled": true,
+                    "collapsed": false,
+                    "itemGUID": "8f6b2c04-3339-4656-a2f7-2e7a11494715"
+                },
+                {
+                    "iconType": "Text",
+                    "iconType2": "None",
+                    "iconText": "X",
+                    "useIconTextFirstLetter": false,
+                    "useIconLogColor": false,
+                    "iconColor": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    },
+                    "iconBuiltInID": "BACKGROUNDS_ECPBGROUNDEDSQUARE",
+                    "iconTextureGUID": "",
+                    "iconUnityCustomName": "",
+                    "iconFontPath": "",
+                    "useIconShadow": true,
+                    "iconShadowColor": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 1.0
+                    },
+                    "iconShadowOpacity": 1.0,
+                    "iconFilterMode": "Point",
+                    "iconOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "iconShadowOffset": {
+                        "x": 0.5,
+                        "y": 0.5
+                    },
+                    "iconSize": 7.0,
+                    "name": null,
+                    "isEnabled": true,
+                    "collapsed": false,
+                    "itemGUID": "6e10b499-9f6d-4ca4-8c87-e227d18e5f0a"
+                }
+            ],
+            "useAndOpForSearchList": false,
+            "searchList": [
+                {
+                    "searchString": "<Any>",
+                    "searchType": "Exact",
+                    "removeSearchStringFromLog": false,
+                    "logTypeList": [
+                        {
+                            "logType": "Exception",
+                            "name": null,
+                            "isEnabled": true,
+                            "collapsed": false,
+                            "itemGUID": "53d2806e-2cf2-4e5f-b363-f78ea6ba87af"
+                        },
+                        {
+                            "logType": "CompilerException",
+                            "name": null,
+                            "isEnabled": true,
+                            "collapsed": false,
+                            "itemGUID": "31bed2eb-1fe3-4ff8-9e15-aa6dd8bbb9a0"
+                        }
+                    ],
+                    "columnTypeList": [
+                        {
+                            "columnType": "Log",
+                            "name": null,
+                            "isEnabled": true,
+                            "collapsed": false,
+                            "itemGUID": "e3fddd42-fc99-461a-a912-c4cd26e158ae"
+                        }
+                    ],
+                    "sourceCodeList": [],
+                    "name": null,
+                    "isEnabled": true,
+                    "collapsed": false,
+                    "itemGUID": "9645a096-b547-4bd2-b8fd-72c2df1672a8"
+                }
+            ],
+            "iconLetter": null,
+            "iconSymbol": null,
+            "iconBackground": null,
+            "iconTexture": null,
+            "showInToolbar": true,
+            "hideLabelInToolbar": false,
+            "hideWhenNoMatches": true,
+            "leftSpacing": 0,
+            "rightSpacing": 0,
+            "middleSpacing": 0,
+            "name": "Exception",
+            "isEnabled": true,
+            "collapsed": true,
+            "itemGUID": "714a1f97-9af2-41e1-9f76-18f77759d427"
+        },
+        {
+            "filterName": "",
+            "mainColor": {
+                "r": 1.0,
+                "g": 0.5,
+                "b": 0.0,
+                "a": 0.699999988079071
+            },
+            "isStandardFilter": true,
+            "isTempFilter": false,
+            "filterOnly": false,
+            "tintBackgroundWithAccentColor": true,
+            "useAdvancedColors": true,
+            "customTextColor": {
+                "r": 1.0,
+                "g": 1.0,
+                "b": 1.0,
+                "a": 1.0
+            },
+            "customBackgroundColor": {
+                "r": 1.0,
+                "g": 0.5,
+                "b": 0.0,
+                "a": 0.699999988079071
+            },
+            "swallowStandard": true,
+            "standardCanSwallow": false,
+            "overrideStandardColors": true,
+            "overrideStandardIcon": true,
+            "collapseIconBackground": false,
+            "collapseIconSymbol": false,
+            "collapseIconLetter": false,
+            "collapseIconTexture": false,
+            "useIconBackground": false,
+            "useIconSymbol": false,
+            "useIconLetter": false,
+            "useIconTexture": false,
+            "filterFormatVersion": 1,
+            "iconColorize": false,
+            "iconLayers": [
+                {
+                    "iconType": "ConsoleProIcon",
+                    "iconType2": "None",
+                    "iconText": "A",
+                    "useIconTextFirstLetter": true,
+                    "useIconLogColor": true,
+                    "iconColor": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    },
+                    "iconBuiltInID": "BACKGROUNDS_ECPBGROUNDEDSQUARE",
+                    "iconTextureGUID": "",
+                    "iconUnityCustomName": "",
+                    "iconFontPath": "",
+                    "useIconShadow": true,
+                    "iconShadowColor": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 1.0
+                    },
+                    "iconShadowOpacity": 1.0,
+                    "iconFilterMode": "Point",
+                    "iconOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "iconShadowOffset": {
+                        "x": 0.5,
+                        "y": 0.5
+                    },
+                    "iconSize": 13.0,
+                    "name": null,
+                    "isEnabled": true,
+                    "collapsed": false,
+                    "itemGUID": "83d6ac70-c7fb-4d2c-a063-7968bcb6efc9"
+                },
+                {
+                    "iconType": "Text",
+                    "iconType2": "None",
+                    "iconText": "X",
+                    "useIconTextFirstLetter": false,
+                    "useIconLogColor": false,
+                    "iconColor": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    },
+                    "iconBuiltInID": "BACKGROUNDS_ECPBGROUNDEDSQUARE",
+                    "iconTextureGUID": "",
+                    "iconUnityCustomName": "",
+                    "iconFontPath": "",
+                    "useIconShadow": true,
+                    "iconShadowColor": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 1.0
+                    },
+                    "iconShadowOpacity": 1.0,
+                    "iconFilterMode": "Point",
+                    "iconOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "iconShadowOffset": {
+                        "x": 0.5,
+                        "y": 0.5
+                    },
+                    "iconSize": 7.0,
+                    "name": null,
+                    "isEnabled": true,
+                    "collapsed": false,
+                    "itemGUID": "c3e01246-ba22-4f41-b15e-b10694f7732a"
+                }
+            ],
+            "useAndOpForSearchList": false,
+            "searchList": [
+                {
+                    "searchString": "<Any>",
+                    "searchType": "Exact",
+                    "removeSearchStringFromLog": false,
+                    "logTypeList": [
+                        {
+                            "logType": "Assert",
+                            "name": null,
+                            "isEnabled": true,
+                            "collapsed": false,
+                            "itemGUID": "d4a87fa2-17fa-468f-9b72-6275be495314"
+                        }
+                    ],
+                    "columnTypeList": [
+                        {
+                            "columnType": "Log",
+                            "name": null,
+                            "isEnabled": true,
+                            "collapsed": false,
+                            "itemGUID": "9e7b5830-06ed-4a61-8b96-1133614b63ad"
+                        }
+                    ],
+                    "sourceCodeList": [],
+                    "name": null,
+                    "isEnabled": true,
+                    "collapsed": false,
+                    "itemGUID": "fbd3cb96-5ca1-4e4b-9598-e16a73c44db9"
+                }
+            ],
+            "iconLetter": null,
+            "iconSymbol": null,
+            "iconBackground": null,
+            "iconTexture": null,
+            "showInToolbar": true,
+            "hideLabelInToolbar": false,
+            "hideWhenNoMatches": true,
+            "leftSpacing": 0,
+            "rightSpacing": 0,
+            "middleSpacing": 0,
+            "name": "Assert",
+            "isEnabled": true,
+            "collapsed": true,
+            "itemGUID": "a964ccfd-df4d-46c3-a325-fc297fa6bb0e"
+        },
+        {
+            "filterName": "",
+            "mainColor": {
+                "r": 0.519999980926514,
+                "g": 0.829999983310699,
+                "b": 1.0,
+                "a": 0.699999988079071
+            },
+            "isStandardFilter": true,
+            "isTempFilter": false,
+            "filterOnly": false,
+            "tintBackgroundWithAccentColor": true,
+            "useAdvancedColors": false,
+            "customTextColor": {
+                "r": 1.0,
+                "g": 1.0,
+                "b": 1.0,
+                "a": 1.0
+            },
+            "customBackgroundColor": {
+                "r": 1.0,
+                "g": 1.0,
+                "b": 1.0,
+                "a": 1.0
+            },
+            "swallowStandard": true,
+            "standardCanSwallow": false,
+            "overrideStandardColors": true,
+            "overrideStandardIcon": true,
+            "collapseIconBackground": false,
+            "collapseIconSymbol": false,
+            "collapseIconLetter": false,
+            "collapseIconTexture": false,
+            "useIconBackground": false,
+            "useIconSymbol": false,
+            "useIconLetter": false,
+            "useIconTexture": false,
+            "filterFormatVersion": 1,
+            "iconColorize": false,
+            "iconLayers": [
+                {
+                    "iconType": "ConsoleProIcon",
+                    "iconType2": "None",
+                    "iconText": "A",
+                    "useIconTextFirstLetter": true,
+                    "useIconLogColor": true,
+                    "iconColor": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    },
+                    "iconBuiltInID": "BACKGROUNDS_ECPBGROUNDEDSQUARE",
+                    "iconTextureGUID": "",
+                    "iconUnityCustomName": "",
+                    "iconFontPath": "",
+                    "useIconShadow": true,
+                    "iconShadowColor": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 1.0
+                    },
+                    "iconShadowOpacity": 1.0,
+                    "iconFilterMode": "Point",
+                    "iconOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "iconShadowOffset": {
+                        "x": 0.5,
+                        "y": 0.5
+                    },
+                    "iconSize": 13.0,
+                    "name": null,
+                    "isEnabled": true,
+                    "collapsed": false,
+                    "itemGUID": "e44eff94-32f7-4071-84d9-6acff5062336"
+                },
+                {
+                    "iconType": "ConsoleProSymbol",
+                    "iconType2": "None",
+                    "iconText": "A",
+                    "useIconTextFirstLetter": true,
+                    "useIconLogColor": false,
+                    "iconColor": {
+                        "r": 1.0,
+                        "g": 1.0,
+                        "b": 1.0,
+                        "a": 1.0
+                    },
+                    "iconBuiltInID": "SYMBOLS_ALARMCLOCKMINI3X",
+                    "iconTextureGUID": "",
+                    "iconUnityCustomName": "",
+                    "iconFontPath": "",
+                    "useIconShadow": true,
+                    "iconShadowColor": {
+                        "r": 0.0,
+                        "g": 0.0,
+                        "b": 0.0,
+                        "a": 1.0
+                    },
+                    "iconShadowOpacity": 1.0,
+                    "iconFilterMode": "Point",
+                    "iconOffset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "iconShadowOffset": {
+                        "x": 0.5,
+                        "y": 0.5
+                    },
+                    "iconSize": 7.0,
+                    "name": null,
+                    "isEnabled": true,
+                    "collapsed": false,
+                    "itemGUID": "ce70f12c-68f6-4075-be7e-f27f926d5069"
+                }
+            ],
+            "useAndOpForSearchList": false,
+            "searchList": [
+                {
+                    "searchString": "<Any>",
+                    "searchType": "Exact",
+                    "removeSearchStringFromLog": false,
+                    "logTypeList": [
+                        {
+                            "logType": "Watch",
+                            "name": null,
+                            "isEnabled": true,
+                            "collapsed": false,
+                            "itemGUID": "84646ad2-02c6-4765-8383-c3fe91f43c1c"
+                        }
+                    ],
+                    "columnTypeList": [
+                        {
+                            "columnType": "Log",
+                            "name": null,
+                            "isEnabled": true,
+                            "collapsed": false,
+                            "itemGUID": "bdd93896-4e42-4510-a047-4224d73266f3"
+                        }
+                    ],
+                    "sourceCodeList": [],
+                    "name": null,
+                    "isEnabled": true,
+                    "collapsed": false,
+                    "itemGUID": "f1b7e89d-61f6-4a30-9ca1-f9bd8756d6e2"
+                }
+            ],
+            "iconLetter": null,
+            "iconSymbol": null,
+            "iconBackground": null,
+            "iconTexture": null,
+            "showInToolbar": true,
+            "hideLabelInToolbar": false,
+            "hideWhenNoMatches": true,
+            "leftSpacing": 0,
+            "rightSpacing": 0,
+            "middleSpacing": 0,
+            "name": "Watch",
+            "isEnabled": true,
+            "collapsed": true,
+            "itemGUID": "e3440abe-4cac-4e38-877e-24bb6d612742"
+        }
+    ],
+    "sharedIgnoredStackEntries": [],
+    "sharedIgnoredLogEntries": [],
+    "sharedFilters": []
+}

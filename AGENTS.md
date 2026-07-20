@@ -308,7 +308,124 @@ After cleaning MissingScripts, **re-add any valid components** that were lost an
 - `m_BuildAddressablesWithPlayerBuild` should be `0` for iteration builds. Rebuild Addressables manually when needed.
 - If SBP errors appear, clear `Library/com.unity.addressables/`, `Temp/com.unity.addressables/`, and stale `addressables_content_state.bin` files, then rebuild.
 
-## 15. Code quality workflow
+## 15. Holistic Unity Session Workflow (MANDATORY)
+
+Before ANY Unity analysis or editing session, follow this complete pipeline. Every step must be ticked before declaring work complete or "ready."
+
+### Phase A — Source-of-Truth Ingestion (start every session)
+1. **Load latest Project Auditor report** — read `Project_Auditor/*.projectauditor` (latest dated file). Extract ALL issues with severity Error / Critical / Major. These are the ground truth for the current state of the project.
+2. **Check last build logs** — read `Logs/Editor.log` tail (grep for "Build completed", "error CS", "Failed"). Identify any build failures and their root causes.
+3. **Check apiCompatibilityLevel** — confirm `ProjectSettings/ProjectSettings.asset` has `apiCompatibilityLevel: 2` (.NET Standard 2.1). Level 6 (.NET 8) WILL break Unity Transport, Serialization, and RP Core packages, causing build failures. If wrong, fix before any other work.
+
+### Phase B — Automated Settings Verification (SettingsGuard)
+4. **Run SettingsGuard** — in Unity Editor: `Tools > SettingsGuard > Verify`. Or from CLI:
+   ```
+   Unity -batchmode -quit -projectPath . -logFile Logs/settings-guard.log \
+       -executeMethod NPCSystem.Editor.Tools.SettingsGuard.Verify
+   ```
+   SettingsGuard checks: apiCompatibilityLevel (default + per-platform), editor assemblies level, scripting defines, build profile scenes, and more. Reports errors and warnings with exit code 0/1.
+5. **Fix and re-verify** if errors found — `Tools > SettingsGuard > Fix and Verify` or:
+   ```
+   Unity -batchmode -quit -projectPath . -logFile Logs/settings-guard.log \
+       -executeMethod NPCSystem.Editor.Tools.SettingsGuard.FixAndVerify
+   ```
+6. **Create default config** if first run — `Tools > SettingsGuard > Create Default Config`. Creates `Assets/Settings/SettingsGuardConfig.asset` with expected values for .NET Standard 2.1 across all platforms.
+
+### Phase C — Pre-Audit (before touching anything)
+7. **Load current AGENTS.md scene audit checklist** (§11) and categorical wiring table.
+8. **Remind** of known failure patterns: after cleaning MissingScripts, EVERY serialized field resets to default. Always re-verify.
+
+### Phase D — Scene Audit Execution (use GladeKit MCP)
+Run AGENTS.md §11 Steps 1-8 (full hierarchy → component audit → read scripts → trace missing → verify ALL fields → compile → categorical wiring → save).
+
+### Phase E — Post-Audit Verification
+9. **Compile** — 0 errors mandatory.
+10. **Run codebase-embedder check** — `uv run codebase-embedder check --root ../..`
+11. **Re-index if artifacts changed** — `uv run codebase-embedder index --root ../.. --clear`
+12. **Save everything** — scene, scripts, prefabs.
+
+### Known failure patterns (from Project Auditor + past mistakes)
+
+| # | Pattern | How to catch | Severity |
+|---|---|---|---|
+| 1 | `apiCompatibilityLevel` set to 6 instead of 2 | Run `SettingsGuard.Verify` or check `ProjectSettings.asset` lines 867, 950 | **Build failure** |
+| 2 | MissingScript on re-added component hides null serialized fields | Use `get_component_inspector_properties(onlyTopLevel=false)` on EVERY re-added component | **Runtime silent failure** |
+| 3 | `_profiles` arrays empty on managers | Read source script to know what arrays exist, then verify contents not just existence | **NPC won't talk** |
+| 4 | ScriptableObject assets (`ItemCatalog`, `NPCProfile`) missing | `check_asset_exists()` then `set_script_component_property()` | **NullRef at runtime** |
+| 5 | Service components missing from child GOs | Read source script of parent Manager to see what it expects via GetComponentInChildren | **Discoverability broken** |
+
+## 16. Editor Console Pro Integration
+
+Console Pro is installed at `Assets/ConsolePro/` with version-specific DLLs for Unity 6000.5+.
+
+### Features integrated into the NPC telemetry pipeline
+
+| Feature | File | What it does |
+|---|---|---|
+| `ConsoleProTelemetrySink` | `Monitoring/Core/ConsoleProTelemetrySink.cs` | Routes ALL telemetry events through Console Pro filters by category (dialog, rag, auth, network, items). Uses `LogToFilter()` and `LogAsType()` for structured, filterable logs. |
+| `ConsoleProWatcher` | `Monitoring/Core/ConsoleProWatcher.cs` | Real-time watch panel tracking LLM duration, Qdrant latency, FPS, memory, active sessions, messages sent. |
+| `ConsoleProBehaviour` | `Monitoring/Core/ConsoleProBehaviour.cs` | MonoBehaviour that drives the Watcher each frame. Attach to a persistent GO (e.g. NPCFlowLogger). |
+| `ConsoleProDebug.Watch` | Real-time Watch panel counters | `FPS`, `Memory`, `LLM Duration` |
+
+### Features (all active)
+
+| Layer | Mechanism | Effect |
+|---|---|---|
+| **Temp Filters** | `#NPC# #category#` tags in every log | Console Pro auto-creates colored filter buttons for `dialog`, `llm`, `rag`, `auth`, `network`, `items`, `system` — zero setup required |
+| **Log Interceptor** | `Application.logMessageReceivedThreaded` hook | Catches ALL stray `Debug.Log` from `[NPC...]`, `[Supabase...]`, `[Qdrant...]` prefixed calls and routes through Console Pro API |
+| **Watch Panel** | `ConsoleProDebug.Watch()` push every frame | Live counters: FPS, frame time, memory, GC alloc, LLM duration/tokens, RAG latency, active sessions, auth logins, network ping, items traded |
+| **Severity Mapping** | `LogAsType()` | Errors → red highlight, Warnings → yellow, Info → filtered by category |
+| **Shared Settings** | `.cep` file via Preferences > Shared Settings | Commit custom filters with colors/icons to version control for team consistency |
+| **Remote Server** | `ConsoleProRemoteServer` component | Receives logs from WebGL/mobile builds over LAN during development |
+
+### Setup
+
+1. Open Console Pro: **Window > Console Pro 3** (or _Cmd+\\_)
+2. Run **Tools > Console Pro > Apply Project Setup** — applies define, verifies DLLs
+3. Attach `ConsoleProBehaviour` to NPCFlowLogger for live Watch panel
+4. **[Optional]** Right-click Console Pro toolbar > **Preferences > Custom Filters** — add permanent filters matching the `#category#` tags
+5. **[Optional]** Preferences > **Shared Settings** — save to `Assets/settings.cep` for team sharing
+6. **[WebGL]** **Tools > Console Pro > Add Remote Server to Scene** — build with Development Build to receive remote logs
+
+### How it works
+
+- `TelemetryRouter.Point("req-1", "QdrantRAGService", "rag", "success", "Query OK")` → Console Pro shows it under filter `#NPC# #rag#`
+- `NPCFlowLogger.Log(...)` → `WriteUnityConsole()` uses Console Pro API with stage-derived category
+- `ConsoleProBehaviour` on NPCFlowLogger pushes live counters to Watch panel every 3 frames
+- `ConsoleProLogInterceptor` catches every un-routed `Debug.Log` from NPC system scripts
+
+### Structured logging conventions
+
+All telemetry should use the TelemetryRouter API, NOT raw `Debug.Log`:
+- ✅ `TelemetryRouter.Point(id, source, "dialogue", "success", message)`
+- ❌ `Debug.Log("Dialogue completed successfully")`
+
+Exception: one-shot initialization messages (Bootstrapper, startup config) and log-system failure fallbacks may still use `Debug.Log` — the interceptor catches them.
+
+### Quick reference (tags available as filters)
+
+| Tag | Category | Color (auto) |
+|---|---|---|
+| `#dialog#` | Dialogue system | Green |
+| `#llm#` | LocalAI LLM requests | Blue |
+| `#rag#` | Qdrant vector search | Purple |
+| `#auth#` | Supabase auth | Orange |
+| `#network#` | Netcode/transport | Cyan |
+| `#items#` | Trade/inventory | Yellow |
+| `#system#` | Bootstrap/setup | Gray |
+
+### Console Pro docs
+`Assets/ConsolePro/Editor Console Pro Documentation.pdf`
+
+## 17. Build & Deploy checklist (before any build attempt)
+
+1. **Run SettingsGuard** — `Tools > SettingsGuard > Fix and Verify` (or CLI equivalent)
+2. **Verify `apiCompatibilityLevel: 2`** in `ProjectSettings.asset` — both the default AND the per-platform override
+3. **Scene audit** (§11) — 0 missing scripts, 0 unassigned critical refs, 0 compile errors
+4. **If build fails with package-level CS errors** (CS0246, CS0103 on packages) — **always apiCompatibilityLevel first**, not package reinstall
+5. **Clear stale artifacts** if changing compatibility level: delete `Library/`, `Temp/com.unity.addressables/`, `Library/com.unity.addressables/`, `addressables_content_state.bin`
+
+## 18. Recurring code quality workflow
 
 Repeatable audit → fix → verify cycle using existing tools:
 
@@ -316,7 +433,7 @@ Repeatable audit → fix → verify cycle using existing tools:
 2. **Check** — `uv run codebase-embedder check --root ../.. --target <path> --output report.md` (runs `.codebaserules.yaml` rules)
 3. **Fix** — address violations in reported files (SER01 → private fields, NET01 → remove hard-coded localhost, BPR01 → split bool params, CMT01 → delete commented code)
 4. **Re-check** — run `check` again, confirm 0 violations
-5. **Scene audit** (when Unity Editor is open) — use GladeKit MCP: `get_scene_hierarchy` → `find_game_objects` → `get_component_inspector_properties` → verify field values match code expectations
+5. **Scene audit** (when Unity Editor is open) — run the full §15 holistic workflow
 6. **Re-index** — `uv run codebase-embedder index --root ../.. --clear` for a clean re-index when artifacts change significantly
 
 Key flags:
@@ -327,4 +444,4 @@ Key flags:
 
 ---
 
-*Generated from completed code-quality-improvement phases 1-9 (2026-07-09). Unified codebase workflow: roslyn_parser + codebase-embedder check replaces deprecated NPCDialogueCodeReview.*
+*Generated from completed code-quality-improvement phases 1-9 (2026-07-09) + Project Auditor integration (2026-07-19) + SettingsGuard + ConsolePro integration (2026-07-19).*

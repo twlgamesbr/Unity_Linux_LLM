@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ae69a150ff5b93fad8e72f08f26f81b1, type: 3}
+  m_Name: gold-coin
+  m_EditorClassIdentifier: NPCSystem.Runtime::NPCSystem.Items.NPCItemDefinition
+  _itemId: gold-coin
+  _displayName: Gold Coin
+  _description: A shiny gold coin. The universal currency of the realm.
+  _maxStackSize: 999
+  _category: 10
+  _tags:
+  - currency
+  - trade
+  _tradeValue: 0
+  _requiredItemIds: []
+  _codeSummary: 
+  _qdrantCollection: unity_linux_llm_codebase_v2
+  _qdrantPointId: 
