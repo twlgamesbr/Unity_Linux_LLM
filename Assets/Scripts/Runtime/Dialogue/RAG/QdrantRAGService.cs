@@ -72,6 +72,12 @@ namespace NPCSystem.Dialogue.RAG
         [ShowInInspector]
         string SearchEndpointPreview => BuildQueryEndpoint();
 
+        // ─── Runtime state ───
+        /// <summary>True if the last connectivity check passed. Graceful fallback for offline.</summary>
+        bool _isAvailable = true;
+        float _lastAvailabilityCheck;
+        const float AvailabilityCheckCooldownSec = 30f;
+
         // ─── Public accessors ───
         public string QdrantUrl
         {
@@ -88,6 +94,9 @@ namespace NPCSystem.Dialogue.RAG
             get => _embedder;
             set => _embedder = value;
         }
+
+        /// <summary>Whether Qdrant is believed reachable. Updated lazily.</summary>
+        public bool IsAvailable => _isAvailable;
 
         void Awake()
         {
@@ -274,6 +283,14 @@ namespace NPCSystem.Dialogue.RAG
             if (string.IsNullOrWhiteSpace(query))
                 return new List<string>();
 
+            // Graceful fallback: if Qdrant was unreachable recently, skip without error noise
+            if (!_isAvailable)
+            {
+                if (Time.time - _lastAvailabilityCheck < AvailabilityCheckCooldownSec)
+                    return new List<string>();
+                _lastAvailabilityCheck = Time.time;
+            }
+
             using var searchSpan = DatadogTracer.StartSpan(
                 "qdrant.search_hybrid",
                 service: "unity-dedicated-server",
@@ -331,7 +348,8 @@ namespace NPCSystem.Dialogue.RAG
             }
             catch (Exception ex)
             {
-                Debug.LogError($"[QdrantRAGService] Search failed: {ex.Message}");
+                _isAvailable = false;
+                Debug.LogWarning($"[QdrantRAGService] Search failed (will retry in {AvailabilityCheckCooldownSec}s): {ex.Message}");
                 return new List<string>();
             }
         }
@@ -371,7 +389,8 @@ namespace NPCSystem.Dialogue.RAG
 
             if (request.result != UnityWebRequest.Result.Success)
             {
-                Debug.LogError($"[QdrantRAGService] Query failed: {request.error}\n{request.downloadHandler.text}");
+                _isAvailable = false;
+                Debug.LogWarning($"[QdrantRAGService] Query failed (will retry in {AvailabilityCheckCooldownSec}s): {request.error}");
                 return null;
             }
 

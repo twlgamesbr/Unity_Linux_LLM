@@ -3,6 +3,8 @@
 // In WebGL builds, add ConsoleProRemoteServer to the scene via Tools > Console Pro > Add Remote Server.
 //#define USECONSOLEPROREMOTESERVERINEDITOR
 
+using UnityEngine;
+
 #if (!UNITY_EDITOR && DEBUG) || (UNITY_EDITOR && USECONSOLEPROREMOTESERVERINEDITOR)
 #if !UNSUPPORTEDCONSOLEPROREMOTESERVER
 #define USECONSOLEPROREMOTESERVER

@@ -487,7 +487,9 @@ namespace NPCSystem.Auth
                     data: new Dictionary<string, object> { ["username"] = username, ["rememberMe"] = rememberMe }
                 );
 
-            PlayerAuthSessionResponse session = await authService.LoginAsync(username, password, rememberMe);
+            PlayerAuthSessionResponse session = rememberMe
+                ? await authService.LoginAndPersistAsync(username, password)
+                : await authService.LoginAsync(username, password);
 
             NPCFlowLogger
                 .FindOrCreate()

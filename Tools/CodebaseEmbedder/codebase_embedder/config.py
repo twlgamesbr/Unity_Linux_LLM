@@ -7,6 +7,9 @@ from pathlib import Path
 DEFAULT_EXCLUDE_DIRS = {
     ".git", ".venv", "Library", "Temp", "Logs", "UserSettings", "obj", "bin",
     "Build", "Builds", ".codebase-index", "node_modules", "__pycache__",
+    # Exclude AI Agent memory, chat sessions, logs, and workspace snapshots
+    # to avoid contaminating the main codebase RAG collection with conversational histories.
+    ".agents", ".claude", ".gemini", ".gladekit", ".herdr", ".hermes", ".omo", ".opencode", ".vscode",
 }
 
 

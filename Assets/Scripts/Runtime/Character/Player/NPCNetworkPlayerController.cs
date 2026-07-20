@@ -32,6 +32,13 @@ namespace NPCSystem.Character.Player
         static readonly int SprintingHash = Animator.StringToHash("Sprinting");
         static readonly int JumpHash = Animator.StringToHash("Jump");
 
+        enum AnimatorState
+        {
+            Idle,
+            Walking,
+            Sprinting,
+        }
+
         public CharacterController characterController;
 
         public Animator animator;

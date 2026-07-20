@@ -387,7 +387,24 @@ namespace NPCSystem.Auth
             }
         }
 
-        public async Task<PlayerAuthSessionResponse> LoginAsync(string username, string password, bool rememberMe)
+        /// <summary>
+        /// Log in with username and password. Session is NOT persisted locally.
+        /// Use <see cref="LoginAndPersistAsync"/> if you want the session saved.
+        /// </summary>
+        public async Task<PlayerAuthSessionResponse> LoginAsync(string username, string password)
+        {
+            return await LoginInternalAsync(username, password, rememberMe: false);
+        }
+
+        /// <summary>
+        /// Log in with username and password, and persist the session locally.
+        /// </summary>
+        public async Task<PlayerAuthSessionResponse> LoginAndPersistAsync(string username, string password)
+        {
+            return await LoginInternalAsync(username, password, rememberMe: true);
+        }
+
+        async Task<PlayerAuthSessionResponse> LoginInternalAsync(string username, string password, bool rememberMe)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
             var session = await SupabaseAuthClient.LoginWebGLAsync(

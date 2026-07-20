@@ -36,6 +36,8 @@ namespace NPCSystem.Character.Animation
     [RequireComponent(typeof(NPCPlayerCharacterController))]
     public sealed class NPCNetworkAnimatorState : NetworkBehaviour
     {
+        static readonly string WebGl = "WebGL";
+
         // ── Network Variable ──
         /// <summary>
         /// The latest authoritative animation snapshot.
@@ -80,6 +82,12 @@ namespace NPCSystem.Character.Animation
             {
                 _lastPosition = transform.position;
             }
+
+            // WebGL: reduce animation sync rate and disable server fallback
+#if UNITY_WEBGL && !UNITY_EDITOR
+            _sendIntervalSec = 0.1f; // 10 Hz instead of 20 Hz
+            _enableServerFallback = false;
+#endif
         }
 
         public override void OnNetworkDespawn()

@@ -180,13 +180,6 @@ namespace NPCSystem.Character.Player
             if (!IsOwner || _motor == null)
                 return;
 
-            // Tab toggles between UI mode (cursor free, movement locked) and gameplay
-            if (Keyboard.current != null && Keyboard.current.tabKey.wasPressedThisFrame)
-            {
-                SetUIActive(!IsInUIMode);
-                return;
-            }
-
             _motor.MoveInput = _inputHandler != null ? _inputHandler.MoveInput : Vector2.zero;
             _motor.SprintInput = _inputHandler != null && _inputHandler.SprintHeld;
         }
@@ -203,6 +196,7 @@ namespace NPCSystem.Character.Player
             _inputHandler.OnPrevious += HandleGiveToPlayer;
             _inputHandler.OnNext += HandleGiveToNpc;
             _inputHandler.OnCrouch += HandleCrouch;
+            _inputHandler.OnToggleUI += HandleToggleUI;
 
             _eventsSubscribed = true;
         }
@@ -217,6 +211,7 @@ namespace NPCSystem.Character.Player
             _inputHandler.OnPrevious -= HandleGiveToPlayer;
             _inputHandler.OnNext -= HandleGiveToNpc;
             _inputHandler.OnCrouch -= HandleCrouch;
+            _inputHandler.OnToggleUI -= HandleToggleUI;
 
             _eventsSubscribed = false;
         }
@@ -255,7 +250,22 @@ namespace NPCSystem.Character.Player
             // Reserved for crouch toggle — extend when crouch mechanic is added
         }
 
+        void HandleToggleUI()
+        {
+            if (!IsOwner)
+                return;
+            SetUIActive(!IsInUIMode);
+        }
+
         // ─── Input Management ───
+
+        /// <summary>Public entry point for external systems to toggle UI mode.</summary>
+        public void ToggleUIMode()
+        {
+            if (!IsOwner)
+                return;
+            SetUIActive(!IsInUIMode);
+        }
 
         void EnableOwnerInput()
         {

@@ -5,9 +5,9 @@
         "NPCSystem.Runtime",
         "Unity.Settings.Editor",
         "UnityEditor.TestRunner",
-        "Unity.TestTools.CodeCoverage.Editor",
         "Unity.Performance.Profile-Analyzer.Editor",
-        "Unity.Physics.Editor.ProjectSettingsBridge"
+        "Unity.Physics.Editor.ProjectSettingsBridge",
+        "ConsolePro"
     ],
     "includePlatforms": [
         "Editor"

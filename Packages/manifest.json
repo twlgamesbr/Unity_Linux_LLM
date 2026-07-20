@@ -36,7 +36,6 @@
     "com.unity.toolchain.linux-x86_64-linux": "1.1.0",
     "com.unity.transport": "6.5.0",
     "com.unity.ugui": "2.5.0",
-    "com.unity.ui.test-framework": "6.5.0",
     "com.unity.visualscripting": "1.9.11",
     "com.unity.web.stripping-tool": "1.3.0",
     "com.v0lt.editor-attributes": "https://github.com/v0lt13/EditorAttributes.git",

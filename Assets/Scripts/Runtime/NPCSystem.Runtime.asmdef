@@ -9,7 +9,7 @@
         "Unity.TextMeshPro",
         "EditorAttributes",
         "NPCSystem.Monitoring",
-        "com.datadog.unity"
+        "ConsolePro"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -29,5 +29,9 @@
         "Microsoft.IdentityModel.Logging.dll",
         "Microsoft.IdentityModel.Tokens.dll",
         "System.IdentityModel.Tokens.Jwt.dll"
-    ]
+    ],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

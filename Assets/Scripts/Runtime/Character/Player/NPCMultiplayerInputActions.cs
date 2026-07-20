@@ -48,6 +48,7 @@ namespace NPCSystem.Character.Player
         InputAction _previousAction;
         InputAction _nextAction;
         InputAction _attackAction;
+        InputAction _toggleUIAction;
 
         InputActionMap _playerMap;
         InputActionMap _uiMap;
@@ -66,6 +67,7 @@ namespace NPCSystem.Character.Player
         public event Action OnPrevious;
         public event Action OnNext;
         public event Action OnAttack;
+        public event Action OnToggleUI;
 
         // ─── Public accessors for Inspector-assigned fields ───
         public InputActionAsset InputActions
@@ -116,6 +118,8 @@ namespace NPCSystem.Character.Player
                 OnNext?.Invoke();
             if (_attackAction != null && _attackAction.WasPressedThisFrame())
                 OnAttack?.Invoke();
+            if (_toggleUIAction != null && _toggleUIAction.WasPressedThisFrame())
+                OnToggleUI?.Invoke();
         }
 
         public void EnableActions()
@@ -193,6 +197,7 @@ namespace NPCSystem.Character.Player
             _previousAction = _playerMap.FindAction("Previous", false);
             _nextAction = _playerMap.FindAction("Next", false);
             _attackAction = _playerMap.FindAction("Attack", false);
+            _toggleUIAction = _playerMap.FindAction("ToggleUI", false);
 
             // Optional: log missing non-critical actions
             if (_moveAction == null)

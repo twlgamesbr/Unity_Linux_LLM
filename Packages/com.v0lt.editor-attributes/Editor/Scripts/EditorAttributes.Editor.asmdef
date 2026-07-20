@@ -2,8 +2,7 @@
     "name": "EditorAttributes.Editor",
     "rootNamespace": "EditorAttributes.Editor",
     "references": [
-        "EditorAttributes",
-        "Unity.Addressables.Editor"
+        "EditorAttributes"
     ],
     "includePlatforms": [
         "Editor"

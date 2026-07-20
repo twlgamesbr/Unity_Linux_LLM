@@ -1,27 +1,14 @@
-using NPCSystem.Auth;
-using NPCSystem.Character.NPC;
-using NPCSystem.Character.Player;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Dialogue.Persistence;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Session;
-using NPCSystem.Dialogue.UI;
-using NPCSystem.Initialization;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Monitoring;
-using NPCSystem.Network.Core;
 using UnityEngine;
 
 namespace NPCSystem.Character.Animation
 {
     /// <summary>
-    /// Drives animator parameters from an <see cref="AnimatorSnapshot"/> (network-authoritative)
-    /// or falls back to reading from <see cref="NPCCharacterMotor"/> directly.
+    /// Drives animator parameters from <see cref="AnimatorSnapshot"/> snapshots
+    /// received via <see cref="ApplySnapshot"/> from <see cref="NPCNetworkAnimatorState"/>.
     ///
-    /// When <see cref="NPCNetworkAnimatorState"/> is present on the same GameObject, the bridge
-    /// receives snapshots via <see cref="ApplySnapshot"/> and the motor is used only as a
-    /// second source for immediate local response (owner client).
+    /// No direct motor polling — all animation state comes through snapshots only.
+    /// The owner client captures state via NPCNetworkAnimatorState.CaptureFromMotor()
+    /// which feeds ApplySnapshot() in the same frame for immediate local response.
     ///
     /// No movement logic, no input logic — pure animation parameter application.
     /// </summary>
@@ -41,9 +28,6 @@ namespace NPCSystem.Character.Animation
         [SerializeField]
         Animator animator;
 
-        [SerializeField]
-        NPCCharacterMotor motor;
-
         [Header("Tuning")]
         [SerializeField]
         float moveXScale = 1f;
@@ -59,8 +43,6 @@ namespace NPCSystem.Character.Animation
         {
             if (animator == null)
                 animator = GetComponent<Animator>();
-            if (motor == null)
-                motor = GetComponent<NPCCharacterMotor>();
         }
 
         void Update()
@@ -68,25 +50,13 @@ namespace NPCSystem.Character.Animation
             if (animator == null)
                 return;
 
-            // If a network snapshot is available, apply it (authoritative path).
-            // Otherwise, fall back to reading local motor state (legacy/local-play path).
+            // Only apply snapshots from NPCNetworkAnimatorState — no direct motor polling.
+            // The owner client is handled via NPCNetworkAnimatorState.CaptureFromMotor()
+            // which feeds ApplySnapshot() in the same frame.
             if (_hasPendingSnapshot)
             {
                 ApplySnapshotToAnimator(_pendingSnapshot);
                 _hasPendingSnapshot = false;
-            }
-            else if (motor != null)
-            {
-                Vector2 moveInput = motor.MoveInput;
-                bool grounded = motor.Grounded;
-                bool sprinting = motor.IsSprinting;
-
-                animator.SetFloat(MoveXHash, moveInput.x * moveXScale);
-                animator.SetFloat(MoveYHash, moveInput.y * moveYScale);
-                animator.SetFloat(SpeedHash, motor.SpeedRatio);
-                animator.SetFloat(MotionSpeedHash, motor.SpeedRatio);
-                animator.SetBool(GroundedHash, grounded);
-                animator.SetBool(SprintingHash, sprinting);
             }
         }
 

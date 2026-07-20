@@ -26,5 +26,15 @@ namespace NPCSystem.Network.Core
         {
             return false;
         }
+
+        void Start()
+        {
+    #if UNITY_WEBGL && !UNITY_EDITOR
+            // Reduce network sync precision for WebGL bandwidth savings
+            PositionThreshold = 0.05f;  // default is typically 0.001
+            RotAngleThreshold = 1.0f;   // less frequent rotation sync
+            Interpolate = true;          // still smooth on client
+    #endif
+        }
     }
 }

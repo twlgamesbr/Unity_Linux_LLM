@@ -29,6 +29,15 @@ namespace NPCSystem.Auth
     public class UnitySessionStore : IGotrueSessionPersistence<Session>
     {
         const string RelativePath = "NPCDialogue/player-auth-session.json";
+        static readonly string PersistentDataPath;
+
+        static UnitySessionStore()
+        {
+            string path = "/home/athar/.var/app/com.unity.UnityHub/config/unity3d/TWLgames/Unity_Linux_LLM";
+            try { path = Application.persistentDataPath; }
+            catch { /* Fallback to default path */ }
+            PersistentDataPath = path;
+        }
 
         // ── IGotrueSessionPersistence<Session> ─────────────────────
 
@@ -80,6 +89,11 @@ namespace NPCSystem.Auth
                 DestroySession();
                 return null;
             }
+        }
+
+        static string GetFullPath()
+        {
+            return Path.Combine(PersistentDataPath, RelativePath).Replace('\\', '/');
         }
 
         // ── Backward-compat static helpers ────────────────────────
@@ -171,39 +185,6 @@ namespace NPCSystem.Auth
                     out DateTime expiresAt
                 )
                 && expiresAt <= DateTime.UtcNow;
-        }
-
-        private static string _cachedPersistentDataPath;
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        private static void InitializeOnMainThread()
-        {
-            try
-            {
-                _cachedPersistentDataPath = Application.persistentDataPath;
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"[UnitySessionStore] Failed to cache persistentDataPath on startup: {ex.Message}");
-            }
-        }
-
-        static string GetFullPath()
-        {
-            string basePath = _cachedPersistentDataPath;
-            if (string.IsNullOrEmpty(basePath))
-            {
-                try
-                {
-                    basePath = Application.persistentDataPath;
-                    _cachedPersistentDataPath = basePath;
-                }
-                catch
-                {
-                    basePath = Directory.GetCurrentDirectory();
-                }
-            }
-            return Path.Combine(basePath, RelativePath).Replace('\\', '/');
         }
     }
 }

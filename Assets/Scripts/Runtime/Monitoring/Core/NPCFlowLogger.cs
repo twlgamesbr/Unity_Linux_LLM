@@ -18,7 +18,7 @@ namespace NPCSystem.Monitoring
             MessageMode.Log,
             drawAbove: true
         )]
-        [FoldoutGroup("Console Output", true, nameof(LogToUnityConsole))]
+        [FoldoutGroup("Console Output", true, nameof(_logToUnityConsole))]
         [SerializeField]
         bool _logToUnityConsole = true;
         public bool LogToUnityConsole
@@ -35,7 +35,7 @@ namespace NPCSystem.Monitoring
             set => _logToStdout = value;
         }
 
-        [FoldoutGroup("File Output", true, nameof(LogToJsonlFile))]
+        [FoldoutGroup("File Output", true, nameof(_logToJsonlFile))]
         [SerializeField]
         bool _logToJsonlFile = true;
         public bool LogToJsonlFile
@@ -46,9 +46,9 @@ namespace NPCSystem.Monitoring
 
         [FoldoutGroup(
             "Text Sanitization",
-            nameof(IncludeTextSnippets),
-            nameof(IncludeRawTextPayloads),
-            nameof(MaxSnippetChars)
+            nameof(_includeTextSnippets),
+            nameof(_includeRawTextPayloads),
+            nameof(_maxSnippetChars)
         )]
         [SerializeField]
         bool _includeTextSnippets = false;
@@ -75,7 +75,7 @@ namespace NPCSystem.Monitoring
             set => _maxSnippetChars = value;
         }
 
-        [FoldoutGroup("Cache Settings", true, nameof(MaxInMemoryEvents))]
+        [FoldoutGroup("Cache Settings", true, nameof(_maxInMemoryEvents))]
         [SerializeField]
         private EditorAttributes.Void cacheSettingsGroup;
 
@@ -90,10 +90,10 @@ namespace NPCSystem.Monitoring
         [FoldoutGroup(
             "Log File Storage",
             true,
-            nameof(RelativeLogDirectory),
-            nameof(OverrideAbsoluteLogDirectory),
-            nameof(MaxLogDays),
-            nameof(MaxLogDirectorySizeMB)
+            nameof(_relativeLogDirectory),
+            nameof(_overrideAbsoluteLogDirectory),
+            nameof(_maxLogDays),
+            nameof(_maxLogDirectorySizeMB)
         )]
         [SerializeField]
         private EditorAttributes.Void logFileStorageGroup;
@@ -130,7 +130,7 @@ namespace NPCSystem.Monitoring
             set => _maxLogDirectorySizeMB = value;
         }
 
-        [FoldoutGroup("Retry Suppression", true, nameof(MaxDuplicateEventsPerMinute))]
+        [FoldoutGroup("Retry Suppression", true, nameof(_maxDuplicateEventsPerMinute))]
         [SerializeField]
         private EditorAttributes.Void suppressionGroup;
 

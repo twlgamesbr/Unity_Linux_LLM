@@ -14,9 +14,6 @@ using NPCSystem.Monitoring;
 using NPCSystem.Network.Core;
 using Unity.Netcode;
 using UnityEngine;
-#if !UNITY_SERVER
-using UnityEngine.InputSystem;
-#endif
 
 namespace NPCSystem.Items
 {
@@ -38,46 +35,14 @@ namespace NPCSystem.Items
         public float pickupRange = 3f;
         public float transferRange = 4f;
 
-#if !UNITY_SERVER
-        InputAction _interactAction;
-        InputAction _giveToPlayerAction;
-        InputAction _giveToNpcAction;
-        NPCNetworkPlayerController _playerController;
-#endif
-
         void Awake()
         {
             inventory = inventory != null ? inventory : GetComponent<NPCPlayerInventory>();
-#if !UNITY_SERVER
-            _playerController = GetComponent<NPCNetworkPlayerController>();
-#endif
         }
 
         void Update()
         {
-            if (!IsOwner)
-            {
-                return;
-            }
-
-#if !UNITY_SERVER
-            ResolveActions();
-
-            if (_interactAction != null && _interactAction.WasPressedThisFrame())
-            {
-                RequestPickupNearestItemServerRpc();
-            }
-
-            if (_giveToPlayerAction != null && _giveToPlayerAction.WasPressedThisFrame())
-            {
-                RequestGiveHeldItemToNearestPlayerServerRpc();
-            }
-
-            if (_giveToNpcAction != null && _giveToNpcAction.WasPressedThisFrame())
-            {
-                RequestGiveHeldItemToNearestNpcServerRpc();
-            }
-#endif
+            // Input is handled via NPCPlayerCharacterController events — no polling needed
         }
 
         [Rpc(SendTo.Server)]
@@ -306,21 +271,6 @@ namespace NPCSystem.Items
 
             return null;
         }
-
-#if !UNITY_SERVER
-        void ResolveActions()
-        {
-            if (_playerController == null || _playerController.inputActions == null)
-            {
-                return;
-            }
-
-            InputActionMap map = _playerController.inputActions.FindActionMap(_playerController.ActionMapName, false);
-            _interactAction ??= map?.FindAction(interactActionName, false);
-            _giveToPlayerAction ??= map?.FindAction(giveToPlayerActionName, false);
-            _giveToNpcAction ??= map?.FindAction(giveToNpcActionName, false);
-        }
-#endif
 
         void LogInteractorEvent(ulong clientId, NPCFlowStatus status, string message)
         {
