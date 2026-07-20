@@ -51,6 +51,12 @@ namespace NPCSystem.Dialogue.FunctionCalling
             StringComparer.OrdinalIgnoreCase
         );
 
+        // Built-in function definitions (trust, cooldown, max-calls metadata)
+        private readonly Dictionary<string, NPCFunctionDefinition> _functionDefinitions = new Dictionary<
+            string,
+            NPCFunctionDefinition
+        >(StringComparer.OrdinalIgnoreCase);
+
         // Cooldown tracking
         private readonly Dictionary<string, float> _functionCooldowns = new Dictionary<string, float>(
             StringComparer.OrdinalIgnoreCase
@@ -119,7 +125,7 @@ namespace NPCSystem.Dialogue.FunctionCalling
 
             _initialized = true;
             _logger?.Log(
-                NPCFlowStage.SystemInit,
+                NPCFlowStage.SceneBootstrap,
                 NPCFlowStatus.Success,
                 NPCFlowLogLevel.Debug,
                 "NPCFunctionExecutor initialized",
@@ -138,6 +144,31 @@ namespace NPCSystem.Dialogue.FunctionCalling
             RegisterFunction("update_trust", ExecuteUpdateTrustAsync);
             RegisterFunction("unlock_dialogue_topic", ExecuteUnlockDialogueTopicAsync);
             RegisterFunction("spawn_object", ExecuteSpawnObjectAsync);
+
+            // Register built-in function definitions (trust, cooldown, max-calls metadata)
+            RegisterDefinition(NPCFunctionDefinition.CreateGiveItemFunction());
+            RegisterDefinition(NPCFunctionDefinition.CreateChangeMoodFunction());
+            RegisterDefinition(NPCFunctionDefinition.CreateModifySceneObjectFunction());
+            RegisterDefinition(NPCFunctionDefinition.CreateUpdateTrustFunction());
+            RegisterDefinition(NPCFunctionDefinition.CreateUnlockTopicFunction());
+            RegisterDefinition(NPCFunctionDefinition.CreateSpawnObjectFunction());
+        }
+
+        /// <summary>
+        /// Register a function definition (metadata for trust, cooldown, max-calls).
+        /// </summary>
+        public void RegisterDefinition(NPCFunctionDefinition definition)
+        {
+            if (definition != null && !string.IsNullOrWhiteSpace(definition.functionName))
+                _functionDefinitions[definition.functionName] = definition;
+        }
+
+        /// <summary>
+        /// Look up a function definition by name.
+        /// </summary>
+        private NPCFunctionDefinition GetFunctionDefinition(string functionName)
+        {
+            return _functionDefinitions.TryGetValue(functionName, out var def) ? def : null;
         }
 
         /// <summary>
@@ -168,11 +199,14 @@ namespace NPCSystem.Dialogue.FunctionCalling
             }
 
             // Check trust requirement
-            var funcDef = profile?.GetFunctionDefinition(call.name);
-            if (funcDef != null)
+            var funcDef = GetFunctionDefinition(call.name);
+            if (funcDef != null && _contextService != null)
             {
-                var playerCtx = await _contextService?.GetOrLoadContextAsync(profile.GetNpcSlug());
-                if (playerCtx != null && playerCtx.TrustScore < funcDef.requiredTrustLevel)
+                var playerCtx = await _contextService.GetOrLoadContextAsync(profile.GetNpcSlug());
+                if (
+                    !playerCtx.Equals(default(PlayerDialogueContext))
+                    && playerCtx.TrustScore < funcDef.requiredTrustLevel
+                )
                 {
                     return NPCFunctionResult.Failure(
                         call.callId,
@@ -300,7 +334,7 @@ namespace NPCSystem.Dialogue.FunctionCalling
             if (_itemCatalog == null)
                 return NPCFunctionResult.Failure(call.callId, call.name, "ItemCatalog not available");
 
-            var itemDef = _itemCatalog.GetItem(args.itemId);
+            var itemDef = _itemCatalog.FindItem(args.itemId);
             if (itemDef == null)
                 return NPCFunctionResult.Failure(call.callId, call.name, $"Item not found: {args.itemId}");
 
@@ -485,7 +519,7 @@ namespace NPCSystem.Dialogue.FunctionCalling
             {
                 var npcSlug = profile.GetNpcSlug();
                 var ctx = await _contextService.GetOrLoadContextAsync(npcSlug);
-                ctx.TrustScore = Mathf.Clamp(ctx.TrustScore + args.change, 0, 100);
+                ctx = ctx.WithTrustScore(ctx.TrustScore + args.change);
                 _contextService.InvalidateContext(npcSlug);
 
                 // Persist to Supabase
@@ -689,19 +723,19 @@ namespace NPCSystem.Dialogue.FunctionCalling
     }
 
     [Serializable]
-    public struct Vector3Serializable
+    public class Vector3Serializable
     {
-        public float x,
-            y,
-            z;
+        public float x;
+        public float y;
+        public float z;
     }
 
     [Serializable]
-    public struct ColorSerializable
+    public class ColorSerializable
     {
-        public float r,
-            g,
-            b,
-            a = 1f;
+        public float r;
+        public float g;
+        public float b;
+        public float a = 1f;
     }
 }

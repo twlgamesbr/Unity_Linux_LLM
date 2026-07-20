@@ -1,19 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using NPCSystem.Auth;
-using NPCSystem.Character.NPC;
-using NPCSystem.Character.Player;
-using NPCSystem.Dialogue.Core;
-using NPCSystem.Dialogue.Persistence;
-using NPCSystem.Dialogue.RAG;
-using NPCSystem.Dialogue.Session;
-using NPCSystem.Dialogue.UI;
-using NPCSystem.Initialization;
-using NPCSystem.Items;
-using NPCSystem.LocalAI;
-using NPCSystem.Monitoring;
-using NPCSystem.Network.Core;
 using UnityEngine;
 
 namespace NPCSystem.Dialogue.Session
@@ -195,6 +182,26 @@ namespace NPCSystem.Dialogue.Session
             );
 
             return string.Join("\n", lines);
+        }
+
+        // ── Mutation helpers (immutable struct) ──────────────────
+
+        /// <summary>
+        /// Returns a new context with the trust score updated and clamped to [0, 100].
+        /// </summary>
+        public readonly PlayerDialogueContext WithTrustScore(int newTrustScore)
+        {
+            return new PlayerDialogueContext(
+                _playerName,
+                _playerId,
+                Mathf.Clamp(newTrustScore, 0, 100),
+                _currentMood,
+                _dialogueCount,
+                _knownClues,
+                _inventory,
+                _visitedLocations,
+                _loadedFromServer
+            );
         }
 
         // ── Empty / Default ──────────────────────────────────────

@@ -29,6 +29,7 @@ namespace NPCSystem.Auth
         public string email;
         public string username;
         public string createdAtUtc;
+        public string sessionToken;
     }
 
     /// <summary>

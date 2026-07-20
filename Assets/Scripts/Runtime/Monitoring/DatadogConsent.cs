@@ -2,6 +2,8 @@
 // Copyright (c) NPC System. All rights reserved.
 // </copyright>
 
+using System.Runtime.InteropServices;
+
 namespace NPCSystem.Monitoring
 {
     /// <summary>

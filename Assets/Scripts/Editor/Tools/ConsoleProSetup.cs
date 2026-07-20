@@ -170,7 +170,7 @@ namespace NPCSystem.Editor.Tools
             if (remoteType == null)
                 return;
 
-            var existing = UnityEngine.Object.FindObjectOfType(remoteType);
+            var existing = UnityEngine.Object.FindAnyObjectByType(remoteType);
             if (existing == null)
             {
                 Debug.Log(
